@@ -55,8 +55,6 @@
 | --- | --- | --- | --- | --- |
 | Paper | 0.52 | 6.89:1 | 8.27:1 | 6.54:1 |
 | Ink | 0.63 | 9.83:1 | 8.80:1 | 10.21:1 |
-| Sepia | 0.51 | 7.08:1 | 10.05:1 | 5.85:1 |
-| Rust | 0.63 | 9.98:1 | 8.80:1 | 8.36:1 |
 
 ΔE はおよそ 0.02 で見分けられる差です。褪せても、無効の灰とは明らかに別の色のままです。
 
@@ -70,7 +68,7 @@
 - **操作の輪郭は変えない**：secondary の輪郭（`border-strong`）は経年で色を変えません。primary の塗りは褪せても背景に対して 4.5:1 以上あるので、ボタンの形は 3:1 以上で見えます。
 - **保存の検査**：調整画面の保存は、`ageContrast`（文字 4.5:1、フォーカス 3:1）を割る値と、スライダーの範囲の外の値を受け付けません（[tune-server.mjs](../scripts/wear/tune-server.mjs) の `validate`）。
 
-標準の値・強の、褪色したあとの accent：Paper `#2424d8` → `#364a90`、Ink `#a9b1ff` → `#b4b5d5`、Sepia `#2e3199` → `#393f69`、Rust `#b2b5f2` → `#bab8cf`。
+標準の値・強の、褪色したあとの accent：Paper `#2424d8` → `#364a90`、Ink `#a9b1ff` → `#b4b5d5`。
 
 ## 設定
 
@@ -114,4 +112,3 @@
 | | |
 | --- | --- |
 | ![Paper](images/wear-age/paper.png) | ![Ink](images/wear-age/ink.png) |
-| ![Sepia](images/wear-age/sepia.png) | ![Rust](images/wear-age/rust.png) |

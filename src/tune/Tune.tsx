@@ -33,7 +33,7 @@ import { faceVars } from '../wear/textures.mjs';
 import { liveWearStyle } from '../wear/live';
 import { FontCheck } from './FontCheck';
 
-const themes: Theme[] = ['paper', 'ink', 'sepia', 'rust'];
+const themes: Theme[] = ['paper', 'ink'];
 const kindNames: Record<WearKind, string> = {
   small: '補足（12–13px）',
   text: '本文（14–16px）',
@@ -675,8 +675,6 @@ function Column({
 const themeNames: Record<Theme, string> = {
   paper: 'Paper',
   ink: 'Ink',
-  sepia: 'Sepia',
-  rust: 'Rust',
 };
 
 /** The selected theme's tones: what the sheet browns toward, how much, and what a scuff shows. */

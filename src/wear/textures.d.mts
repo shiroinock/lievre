@@ -1,7 +1,7 @@
 import type { WearConfig, WearKind } from './presets.mjs';
 type Tokens = unknown;
 export const LEVELS: number;
-export const THEMES: ('paper' | 'ink' | 'sepia' | 'rust')[];
+export const THEMES: ('paper' | 'ink')[];
 export function surfaceField(salt: string): Float32Array;
 export function kasureField(salt: string, kasure: WearConfig['kasure']): Float32Array;
 export function quantise(field: Float32Array, round?: (n: number) => number): Uint8Array;

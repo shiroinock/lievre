@@ -13,18 +13,6 @@
     --k-wear-sure: url('./sure-ink.png');
     --k-wear-rim: inset 0 0 48px 8px rgb(42 47 74 / 0.063);
   }
-  .kei[data-wear='baked'][data-theme='sepia'] {
-    --k-wear-surface: url('./surface-sepia.png');
-    --k-wear-yake: url('./yake-sepia.png');
-    --k-wear-sure: url('./sure-sepia.png');
-    --k-wear-rim: inset 0 0 48px 8px rgb(233 200 134 / 0.105);
-  }
-  .kei[data-wear='baked'][data-theme='rust'] {
-    --k-wear-surface: url('./surface-rust.png');
-    --k-wear-yake: url('./yake-rust.png');
-    --k-wear-sure: url('./sure-rust.png');
-    --k-wear-rim: inset 0 0 48px 8px rgb(62 47 40 / 0.063);
-  }
   .kei[data-wear='baked'] {
     --k-wear-kasure: url('./kasure.png');
     --k-wear-shift: 0.035em 0.022em;

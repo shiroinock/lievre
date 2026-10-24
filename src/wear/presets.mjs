@@ -46,15 +46,13 @@ export const TEXT_KINDS = {
  *      fill, before contrast stops it; rules (0–1) how broken 1px lines get; chips (0–1) how big
  *      a bite corners lose.
  * tones: per theme, the colour the sheet browns toward (yake), how much of strength it takes
- *        (amount), and the colour a scuff shows (sure). Paper and Sepia yellow toward a tone of
- *        nearly their own lightness, so the hue turns while text keeps its contrast; Ink and Rust
- *        only dull toward a warmer, greyer dark, at 0.6 of the strength.
+ *        (amount), and the colour a scuff shows (sure). Paper yellows toward a tone of nearly its
+ *        own lightness, so the hue turns while text keeps its contrast; Ink only dulls toward a
+ *        warmer, greyer dark, at 0.6 of the strength.
  */
 const TONES = {
   paper: { yake: '#f2dca6', amount: 1, sure: '#ffffff' },
   ink: { yake: '#2a2f4a', amount: 0.6, sure: '#262b5c' },
-  sepia: { yake: '#e9c886', amount: 1, sure: '#fbf7ec' },
-  rust: { yake: '#3e2f28', amount: 0.6, sure: '#382722' },
 };
 
 export const PRESETS = {

@@ -93,13 +93,13 @@ describe('Wear: seeded and reproducible', () => {
   });
 
   it('gives live the same textures and offsets as the baked build', () => {
-    const live = liveWearStyle('t', config, 'sepia') as Record<string, string>;
+    const live = liveWearStyle('t', config, 'paper') as Record<string, string>;
     const shared = wearVars(config, 'KASURE');
     for (const [name, value] of Object.entries(shared))
       if (name !== '--k-wear-kasure') expect(live[name]).toBe(value);
     for (const [name, value] of Object.entries(sheetVars(config))) expect(live[name]).toBe(value);
     expect(live['--k-wear-rim']).toBe(
-      sheetThemeVars(config, 'sepia', { yake: '', sure: '' }, tokens)['--k-wear-rim'],
+      sheetThemeVars(config, 'paper', { yake: '', sure: '' }, tokens)['--k-wear-rim'],
     );
     // The same pixels, stored rather than compressed.
     const stored = textures(config, tokens);
@@ -217,7 +217,7 @@ describe('Wear: provider', () => {
 
   it('writes seeded live filters and carries them into portals', async () => {
     const { container } = render(
-      <KeiProvider wear="live" wearSeed="ash" theme="sepia">
+      <KeiProvider wear="live" wearSeed="ash" theme="ink">
         <Dialog trigger={<Button>開く</Button>} title="表示設定" description="表示を調整">
           <Button>保存</Button>
         </Dialog>

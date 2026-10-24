@@ -10,7 +10,7 @@ import { heldOutline, resolve, themeTokens } from './contrast.mjs';
 import { OUTLINE_CAPS, SHEET, SHEET_SLICE, TEXT_KINDS, THIN, TILE, VARIANTS } from './presets.mjs';
 
 export const LEVELS = 16;
-export const THEMES = ['paper', 'ink', 'sepia', 'rust'];
+export const THEMES = ['paper', 'ink'];
 const smooth = (lo, hi, v) => Math.min(1, Math.max(0, (v - lo) / (hi - lo)));
 
 /** Grain and stains: opacity 0..1 of the text colour, scaled by stain.strength in the palette. */
