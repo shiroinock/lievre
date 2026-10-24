@@ -1,5 +1,9 @@
 // Each layout check must still catch the mistake it was written for, and pass the right way.
 import { describe, it, expect, afterEach } from 'vitest';
+import { createRoot } from 'react-dom/client';
+import { flushSync } from 'react-dom';
+import { KeiProvider, Sparkline } from '../../index';
+import '../../styles/kei.css';
 import { checkPart, undeclared } from './checks';
 import type { LayoutCheck } from './declare';
 
@@ -103,5 +107,55 @@ describe('配置の検査', () => {
     const parts = [{ name: '見本', selector: '.k-x', checks: ['fits' as const] }];
     expect(undeclared(parts, host)).toEqual(['button.k-new「追加」']);
     expect(undeclared([...parts, { ...parts[0], selector: '.k-new' }], host)).toEqual([]);
+  });
+});
+
+describe('配置の検査：中身の広がりと文字のベースライン', () => {
+  it('中身の広がり', () => {
+    const chart = (ratio: string) =>
+      `<svg class="k-x" viewBox="0 0 200 50" ${ratio} style="display: block; width: 296px; height: 40px">
+        <polyline points="0,40 100,10 200,30" fill="none" stroke="black" vector-effect="non-scaling-stroke" />
+      </svg>`;
+    expect(messages(chart(''), 'fills-x')[0]).toMatch(
+      /箱の幅 296px、左に 68px・右に 68px の空き.*preserveAspectRatio/,
+    );
+    expect(messages(chart('preserveAspectRatio="none"'), 'fills-x')).toEqual([]);
+  });
+
+  it('文字のベースライン', () => {
+    // A value set larger and with its own line height sits lower unless the row aligns baselines.
+    const row = (align: string) =>
+      `<div class="k-x" style="display: flex; justify-content: space-between; align-items: ${align}; font: 13px / 20px sans-serif">
+        <span>CPU</span>
+        <span style="font: 14.4px / 28px monospace">42%</span>
+      </div>`;
+    expect(messages(row('flex-start'), { baseline: ':scope > *' })[0]).toMatch(
+      /span「CPU」（13px）を基準に、span「42%」（14.4px）\+\d(\.\d)?px。基準：差が 0.5px 以内。flex なら align-items: baseline/,
+    );
+    expect(messages(row('baseline'), { baseline: ':scope > *' })).toEqual([]);
+  });
+});
+
+describe('実際の部品で検出する', () => {
+  it('Sparkline の折れ線が箱の中央に縮んでいるのを見つける', () => {
+    const root = createRoot(host);
+    flushSync(() =>
+      root.render(
+        <KeiProvider>
+          <div style={{ width: 296 }}>
+            <Sparkline values={[3, 7, 4, 8, 6, 12]} label="処理数の推移" />
+          </div>
+        </KeiProvider>,
+      ),
+    );
+    const { violations } = checkPart(
+      { name: '折れ線', selector: '.k-sparkline', checks: ['fills-x'] },
+      host,
+    );
+    root.unmount();
+    // Today's Sparkline keeps the viewBox's aspect ratio; baseline.ts lists it until it is fixed.
+    expect(violations.map((v) => v.message)).toEqual([
+      expect.stringMatching(/箱の幅 296px、左に \d+(\.\d)?px・右に \d+(\.\d)?px の空き/),
+    ]);
   });
 });

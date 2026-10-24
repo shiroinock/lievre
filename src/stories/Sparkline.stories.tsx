@@ -18,7 +18,7 @@ const meta = {
   component: Sparkline,
   parameters: {
     layoutGate: {
-      parts: [{ name: '折れ線', selector: '.k-sparkline', checks: ['grid-height'] }],
+      parts: [{ name: '折れ線', selector: '.k-sparkline', checks: ['grid-height', 'fills-x'] }],
     } satisfies LayoutGate,
     docs: {
       description: {

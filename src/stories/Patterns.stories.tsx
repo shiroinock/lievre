@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { LayoutGate } from '../test/layout/declare';
+import { SCREEN_PARTS } from '../test/layout/screen-parts';
 import { OperationsExample, SettingsExample, NewWorkDialog } from '../patterns/Operations';
 import { ToastProvider } from '../index';
 import { expect, fn, userEvent, within } from 'storybook/test';
@@ -8,7 +9,8 @@ const meta = {
   component: OperationsExample,
   parameters: {
     layoutGate: {
-      skip: '画面例。中の部品は、それぞれの部品の Story で測っている。',
+      screen: '部品を組み合わせた画面。操作の要素の網羅は、それぞれの部品の Story で見る。',
+      parts: SCREEN_PARTS,
     } satisfies LayoutGate,
     layout: 'padded',
     docs: {

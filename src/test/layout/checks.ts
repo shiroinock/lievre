@@ -34,6 +34,21 @@ export function firstLineCentre(text: Text) {
   return first ? (first.top + first.bottom) / 2 : null;
 }
 
+// The first line's baseline: a text fragment's box is its font's ascent + descent, so the
+// baseline sits one ascent below the top.
+const canvas = document.createElement('canvas').getContext('2d')!;
+export function baselineOf(text: Text) {
+  const range = document.createRange();
+  range.selectNodeContents(text);
+  const first = [...range.getClientRects()].find((r) => r.width > 0);
+  if (!first) return null;
+  const s = getComputedStyle(text.parentElement!);
+  canvas.font = `${s.fontWeight} ${s.fontSize} ${s.fontFamily}`;
+  return first.top + canvas.measureText(text.textContent!.trim() || 'x').fontBoundingBoxAscent;
+}
+
+const MARKS = 'path, polyline, polygon, line, rect, circle, ellipse, text';
+
 function checkOne(el: Element, check: LayoutCheck): string | null {
   const s = getComputedStyle(el);
   const box = el.getBoundingClientRect();
@@ -81,6 +96,23 @@ function checkOne(el: Element, check: LayoutCheck): string | null {
     return `中身がはみ出しています（${[over > 0 && `横に ${over}px`, down > 0 && `縦に ${down}px`].filter(Boolean).join('・')}）。基準：scrollWidth・scrollHeight が clientWidth・clientHeight を超えない。文字を折り返すか、幅を中身に合わせてください。`;
   }
 
+  if (check === 'fills-x') {
+    const marks = [...el.querySelectorAll(MARKS)]
+      .filter(visible)
+      .map((m) => m.getBoundingClientRect());
+    if (!marks.length) return null;
+    const left =
+      Math.min(...marks.map((m) => m.left)) -
+      (box.left + parseFloat(s.paddingLeft) + parseFloat(s.borderLeftWidth));
+    const right =
+      box.right -
+      parseFloat(s.paddingRight) -
+      parseFloat(s.borderRightWidth) -
+      Math.max(...marks.map((m) => m.right));
+    if (Math.max(left, right) <= CRITERIA.fill) return null;
+    return `描いた中身が箱の幅いっぱいに広がっていません（箱の幅 ${px(box.width)}、左に ${px(left)}・右に ${px(right)} の空き）。基準：左右の空きが ${CRITERIA.fill}px 以内。svg なら viewBox の縦横比に縛られていないか（preserveAspectRatio）を確かめてください。`;
+  }
+
   if ('padding' in check) {
     const ratio = CRITERIA.paddingRatio[check.padding];
     const want = Math.round((box.height * ratio) / CRITERIA.grid) * CRITERIA.grid;
@@ -88,6 +120,31 @@ function checkOne(el: Element, check: LayoutCheck): string | null {
     const r = parseFloat(s.paddingRight);
     if (Math.abs(l - want) <= CRITERIA.size && Math.abs(r - want) <= CRITERIA.size) return null;
     return `左右の padding が左 ${px(l)}・右 ${px(r)} です。基準：高さ ${px(box.height)} の${check.padding === 'button' ? 'ボタン' : '入力欄'}は ${want}px（高さ×${ratio} を ${CRITERIA.grid}px に丸めた値）。`;
+  }
+
+  if ('baseline' in check) {
+    const items = [...el.querySelectorAll(check.baseline)]
+      .filter(visible)
+      .map((item) => ({ item, text: firstText(item) }))
+      .filter((x): x is { item: Element; text: Text } => !!x.text);
+    // Only items that share a line with the first one are compared.
+    const top = items[0]?.item.getBoundingClientRect();
+    const row = items.filter(({ item }) => {
+      const r = item.getBoundingClientRect();
+      return top && r.top < top.bottom && r.bottom > top.top;
+    });
+    const lines = row.map(({ item, text }) => ({ item, text, base: baselineOf(text) ?? 0 }));
+    const bases = lines.map((l) => l.base);
+    if (lines.length < 2 || Math.max(...bases) - Math.min(...bases) <= CRITERIA.baseline)
+      return null;
+    const list = lines
+      .map(({ item, text, base }, n) => {
+        const size = getComputedStyle(text.parentElement!).fontSize;
+        const off = n === 0 ? 'を基準に' : `${base > bases[0] ? '+' : ''}${r1(base - bases[0])}px`;
+        return `${describe(item)}（${size}）${off}`;
+      })
+      .join('、');
+    return `同じ行の文字のベースラインがそろっていません：${list}。基準：差が ${CRITERIA.baseline}px 以内。flex なら align-items: baseline にしてください。`;
   }
 
   if ('icon' in check) {

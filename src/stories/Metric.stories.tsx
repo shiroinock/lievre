@@ -13,6 +13,8 @@ const meta = {
       parts: [
         { name: '指標', selector: '.k-metric', checks: ['padding-equal', 'fits'] },
         { name: '指標の変化', selector: '.k-metric-change', checks: [{ icon: 'svg' }] },
+        { name: '指標の見出し', selector: '.k-metric-top', checks: [{ baseline: ':scope > *' }] },
+        { name: '折れ線', selector: '.k-sparkline', checks: ['fills-x'] },
       ],
     } satisfies LayoutGate,
     docs: {

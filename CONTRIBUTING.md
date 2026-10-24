@@ -49,8 +49,10 @@ const meta = {
 | チェックボックス・ラジオ・スイッチ | 欄に `{ icon: '箱の selector', text: 'ラベルの selector' }`                    |
 | パネル（Card・Alert・Toast）       | `padding-equal`                                                                |
 | 並べて使う部品                     | 並べた Story を作り、親に `{ sameHeight: '…' }`                                |
+| 図（svg）                          | `fills-x`                                                                      |
+| ラベルと値の行                     | `{ baseline: ':scope > *' }`                                                   |
 
-部品を測らない Story ファイル（画面例など）は、`layoutGate: { skip: '理由' }` と書きます。
+部品を測らない Story ファイルは、`layoutGate: { skip: '理由' }` と書きます。部品を組み合わせた画面の Story は、`{ screen: '理由', parts: SCREEN_PARTS }` で、画面に出てくる部品をまとめて測ります。
 
 ## 3. テスト
 

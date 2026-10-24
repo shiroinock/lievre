@@ -110,7 +110,7 @@ for (const { file, module } of files) {
           for (const part of gate.parts) {
             const { found, violations } = checkPart(part, document.body);
             const key = `${meta.title} › ${part.name}`;
-            foundParts.set(key, (foundParts.get(key) ?? 0) + found);
+            if (!gate.screen) foundParts.set(key, (foundParts.get(key) ?? 0) + found);
             for (const v of violations) {
               const index = known(meta.title, v, combo);
               if (index >= 0) usedBaseline.add(index);
@@ -120,10 +120,11 @@ for (const { file, module } of files) {
                 );
             }
           }
-          for (const el of undeclared(gate.parts, document.body))
-            failures.push(
-              `${where} 操作の要素 ${el} が、どの部品の宣言にも入っていません。${file} の layoutGate.parts に、この要素を含む部品を足してください。`,
-            );
+          if (!gate.screen)
+            for (const el of undeclared(gate.parts, document.body))
+              failures.push(
+                `${where} 操作の要素 ${el} が、どの部品の宣言にも入っていません。${file} の layoutGate.parts に、この要素を含む部品を足してください。`,
+              );
         }
         measuredCombos.set(meta.title, (measuredCombos.get(meta.title) ?? 0) + 1);
         pass(failures);

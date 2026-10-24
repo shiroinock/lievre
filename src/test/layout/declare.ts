@@ -6,9 +6,14 @@ export type LayoutGate =
   | {
       /** 測る部品。selector は `.k-` で始め、Story の描画（ポータルを含む）から探す。 */
       parts: LayoutPart[];
+      /**
+       * 部品を組み合わせた画面（デモ・画面例）のとき、その理由。操作の要素がすべて宣言に
+       * 入っているか、宣言した部品がすべて描画されているかは見ない。
+       */
+      screen?: string;
     }
   | {
-      /** 部品を測らない理由。画面例など、部品をそれぞれの Story で測っているもの。 */
+      /** 部品を測らない理由。部品をそれぞれの Story で測っている見本など。 */
       skip: string;
     };
 
@@ -37,7 +42,11 @@ export type LayoutCheck =
   /** アイコン・箱の縦の中心が、隣の文字の1行目の行ボックスの中央にある。 */
   | { icon: string; text?: string }
   /** 部品の中で selector に当たる要素の高さが揃っている。 */
-  | { sameHeight: string };
+  | { sameHeight: string }
+  /** 描いた中身（svg の線や図形）が、箱の左右いっぱいに広がっている。 */
+  | 'fills-x'
+  /** 部品の中で selector に当たり、同じ行に並ぶ文字のベースラインがそろっている。 */
+  | { baseline: string };
 
 export const CRITERIA = {
   /** 中央揃えの部品の左右のずれ（左右の余白の差の半分）。 */
@@ -52,6 +61,10 @@ export const CRITERIA = {
   coarseControlHeight: 44,
   grid: 4,
   paddingRatio: { button: 0.4, input: 0.3 },
+  /** 描いた中身と箱の左右の空き。線の太さの分だけ許す。 */
+  fill: 2,
+  /** 同じ行の文字のベースラインの差。 */
+  baseline: 0.5,
 } as const;
 
 export const checkId = (check: LayoutCheck) =>
@@ -61,7 +74,9 @@ export const checkId = (check: LayoutCheck) =>
       ? 'padding'
       : 'icon' in check
         ? `icon ${check.icon}`
-        : 'same-height';
+        : 'baseline' in check
+          ? 'baseline'
+          : 'same-height';
 
 export const CHECK_LABEL: Record<string, string> = {
   'inset-x': '左右の中央',
@@ -73,4 +88,6 @@ export const CHECK_LABEL: Record<string, string> = {
   padding: '左右の内側の余白',
   icon: 'アイコンと文字の縦の中心',
   'same-height': '並んだ部品の高さ',
+  'fills-x': '中身の広がり',
+  baseline: '文字のベースライン',
 };

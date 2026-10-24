@@ -10,7 +10,14 @@ const meta = {
   component: Progress,
   parameters: {
     layoutGate: {
-      parts: [{ name: '進み具合', selector: '.k-progress-wrap', checks: ['fits'] }],
+      parts: [
+        { name: '進み具合', selector: '.k-progress-wrap', checks: ['fits'] },
+        {
+          name: '進み具合の見出し',
+          selector: '.k-progress-label',
+          checks: [{ baseline: ':scope > *' }],
+        },
+      ],
     } satisfies LayoutGate,
     docs: {
       description: {
