@@ -15,6 +15,7 @@ import {
   Badge,
   Meter,
   Progress,
+  Sparkline,
   type Column,
 } from '../index';
 import { OperationsExample, SettingsExample } from '../patterns/Operations';
@@ -153,6 +154,13 @@ describe('Tables and measures', () => {
     );
     expect(screen.getByRole('meter')).toHaveAttribute('aria-valuenow', '100');
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
+  });
+  it('stretches the sparkline to its box instead of letterboxing it', () => {
+    setup(<Sparkline label="推移" values={[1, 3, 2]} />);
+    expect(screen.getByRole('img', { name: '推移' })).toHaveAttribute(
+      'preserveAspectRatio',
+      'none',
+    );
   });
   it('renders an informative empty table instead of a blank panel', () => {
     setup(<DataTable rows={[]} columns={columns} getRowId={(r) => r.id} caption="測定値" />);

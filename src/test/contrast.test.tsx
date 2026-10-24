@@ -63,12 +63,29 @@ describe('Semantic color contrast and token synchronization', () => {
         expect(ratio(resolve(set, 'focus'), resolve(set, background))).toBeGreaterThanOrEqual(3);
       });
     }
-    it(`${theme}: selected row text reaches 4.5:1`, () => {
-      expect(ratio(resolve(set, 'text'), resolve(set, 'selected'))).toBeGreaterThanOrEqual(4.5);
-    });
+    // Selected rows also carry secondary lines and ghost buttons in muted text.
+    for (const foreground of ['text', 'muted']) {
+      it(`${theme}: selected row ${foreground} reaches 4.5:1`, () => {
+        expect(ratio(resolve(set, foreground), resolve(set, 'selected'))).toBeGreaterThanOrEqual(
+          4.5,
+        );
+      });
+    }
     it(`${theme}: selected menu text reaches 4.5:1`, () => {
       expect(ratio(resolve(set, 'accent'), resolve(set, 'selected'))).toBeGreaterThanOrEqual(4.5);
     });
+    // A selected row must stand apart from the surface it sits on and from the hover tint.
+    for (const [background, min] of [
+      ['surface', 1.3],
+      ['bg', 1.25],
+      ['surface-sunken', 1.15],
+    ] as const) {
+      it(`${theme}: selected / ${background} differs by ${min}:1`, () => {
+        expect(ratio(resolve(set, 'selected'), resolve(set, background))).toBeGreaterThanOrEqual(
+          min,
+        );
+      });
+    }
     it(`${theme}: OFF switch thumb reaches 3:1`, () => {
       expect(
         ratio(resolve(set, 'border-strong'), resolve(set, 'surface-sunken')),

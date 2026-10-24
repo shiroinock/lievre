@@ -32,10 +32,11 @@ import { cx, PortalSurface } from './system';
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
+  /** 処理中の表示。押せなくなり、aria-busy が付きます。 */
   loading?: boolean;
   icon?: ReactNode;
 };
-/** 1つの作業領域に主要操作は原則1つ。loading時は再実行を防ぎます。 */
+/** 1つの作業領域に主要操作は原則1つ。loading時は再実行を防ぎます。`type` の既定は 'button' なので、フォームの送信には `type="submit"` を付けます。画面の移動には ActionLink を使います。 */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
     variant = 'secondary',
@@ -66,14 +67,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 });
 
 export type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
-/** 色と文字を併用する状態ラベル。色だけでは状態を表しません。 */
+/** 色と文字を併用する状態ラベル。色だけでは状態を表さないため、children（「正常」などの文字）は必須です。 */
 export function Badge({
   tone = 'neutral',
   dot = false,
   children,
   className,
   ...props
-}: HTMLAttributes<HTMLSpanElement> & { tone?: Tone; dot?: boolean }) {
+}: HTMLAttributes<HTMLSpanElement> & {
+  /** 'neutral' | 'success' | 'warning' | 'danger' | 'info'。Toast の 'error' はここでは 'danger'。 */
+  tone?: Tone;
+  dot?: boolean;
+  children: ReactNode;
+}) {
   return (
     <span {...props} className={cx('k-badge', `k-tone-${tone}`, className)}>
       {dot && <span className="k-status-dot" aria-hidden />}
@@ -118,8 +124,11 @@ function FieldFrame({
   );
 }
 export type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
+  /** 見える名前。input と結びます。placeholder の代わりにはしません。 */
   label: string;
+  /** 補助文。aria-describedby で入力と結びます。 */
   hint?: string;
+  /** エラー文。渡すと hint の代わりに表示し、aria-invalid と aria-describedby を付けます。 */
   error?: string;
   controlSize?: 'md' | 'lg';
 };
@@ -144,6 +153,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     </FieldFrame>
   );
 });
+/** 複数行の入力。label・hint・error の扱いは TextField と同じです。 */
 export function Textarea({
   label,
   hint,
@@ -172,9 +182,11 @@ export function Textarea({
 export type CheckboxProps = {
   label: string;
   hint?: string;
+  /** エラー文。aria-invalid と aria-describedby を付けます。 */
   error?: string;
   checked?: boolean | 'indeterminate';
   defaultChecked?: boolean;
+  /** 'indeterminate' も来るため、boolean の state には `(c) => setX(c === true)` で渡します。 */
   onCheckedChange?: (checked: boolean | 'indeterminate') => void;
   disabled?: boolean;
   name?: string;
@@ -224,10 +236,12 @@ export type SwitchProps = {
   hint?: string;
   checked?: boolean;
   defaultChecked?: boolean;
+  /** onChange ではなくこちらを使います。 */
   onCheckedChange?: (checked: boolean) => void;
   disabled?: boolean;
   name?: string;
 };
+/** 即時に切り替わる設定。label は部品の中で Switch と結ぶため、id や外の label は使いません。 */
 export function Switch({ label, hint, ...props }: SwitchProps) {
   const id = useId();
   return (
@@ -256,15 +270,19 @@ export function Switch({ label, hint, ...props }: SwitchProps) {
 
 export type SelectProps = {
   label: string;
+  /** 選択肢。子要素（option）では渡しません。 */
   options: { value: string; label: string; disabled?: boolean }[];
   placeholder?: string;
+  /** 未選択は ''。 */
   value?: string;
   defaultValue?: string;
+  /** onChange ではなくこちらを使います。 */
   onValueChange?: (value: string) => void;
   disabled?: boolean;
   required?: boolean;
   name?: string;
   hint?: string;
+  /** エラー文。aria-invalid と aria-describedby を付けます。 */
   error?: string;
 };
 /** 矢印キー・文字検索・Escapeに対応した単一選択。 */
@@ -385,6 +403,7 @@ export function Tabs({
   onValueChange,
 }: {
   items: TabItem[];
+  /** タブの並びの名前。画面には出さず、読み上げに使います。 */
   label: string;
   defaultValue?: string;
   value?: string;
@@ -541,11 +560,13 @@ export function Breadcrumb({ items }: { items: { label: string; href?: string }[
   );
 }
 
+/** 前後のページ送り。DataTable と組み合わせるときは、全件を並べ替えてから区切った rows を渡します。 */
 export function Pagination({
   page,
   totalPages,
   onPageChange,
 }: {
+  /** 1 始まり。 */
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;

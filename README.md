@@ -2,6 +2,8 @@
 
 業務の画面を読みやすく組み立てるための、日本語向けの React コンポーネントと CSS トークンです。設計の考え方は [DESIGN.md](DESIGN.md) にまとめています。
 
+AI のコーディングエージェントで使うときは、まず [llms.txt](llms.txt) を読ませてください。使い方の約束と全部品の props を1つにまとめたもので、パッケージにも入っています（`node_modules/@kei-design/react/llms.txt`）。
+
 ## 起動
 
 Node.js 22.12 以降が必要です。
@@ -25,6 +27,8 @@ npm run dev         # 概要のデモ http://127.0.0.1:5173
 | `src/docs`           | 導入、設計原則、配色・文字・余白                               |
 | `src/patterns`       | 画面例：探す・読む・申し込む・管理する                         |
 | `references`         | 参考にした81件のピンと一覧ビューア                             |
+| `llms.txt`           | エージェント向けの使い方と全部品の API（型から生成）           |
+| `bench/agent`        | エージェント向けのベンチマーク                                 |
 
 ## 開発
 
@@ -34,6 +38,8 @@ npm run lint        # stylelint・ESLint の KEI 独自ルール（scripts/style
 npm test            # 部品・画面フロー・axe・コントラスト・トークン同期
 npm run test:layout # 配置の基準をブラウザで測る（docs/quality-gate.md、初回は npx playwright install chromium）
 npm run tokens      # kei.css を変更したら tokens.json を書き出す
+npm run llms        # 部品の props や説明を変えたら llms.txt を書き出す
+npm run bench:agent # エージェント向けのベンチマーク（docs/agent-benchmark.md）
 npm run format
 npm run build       # lib/・dist/・dist/storybook/
 ```

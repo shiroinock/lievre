@@ -4,6 +4,7 @@ import {
   useId,
   type AnchorHTMLAttributes,
   type HTMLAttributes,
+  type ReactElement,
   type ReactNode,
 } from 'react';
 import { cx } from './system';
@@ -20,7 +21,7 @@ export function Text({
   as?: 'p' | 'span' | 'div';
   size?: 'small' | 'body' | 'lead';
   tone?: 'default' | 'muted';
-}) {
+}): ReactElement {
   return createElement(as, {
     ...props,
     className: cx('k-text', `k-text--${size}`, tone === 'muted' && 'k-muted', className),
@@ -131,6 +132,7 @@ export function RadioGroup({
   error,
   required = false,
 }: {
+  /** まとまりの名前。fieldset の legend になります。 */
   label: string;
   options: RadioOption[];
   value?: string;
@@ -138,6 +140,7 @@ export function RadioGroup({
   onValueChange?: (value: string) => void;
   name?: string;
   disabled?: boolean;
+  /** エラー文。fieldset に aria-describedby で結びます。 */
   error?: string;
   required?: boolean;
 }) {

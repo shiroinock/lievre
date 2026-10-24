@@ -33,6 +33,8 @@ export function Sparkline({
     <svg
       className={cx('k-sparkline', `k-sparkline--${color}`)}
       viewBox="0 0 200 50"
+      // Stretch to the box: the stroke stays 2px (non-scaling), so only the data is scaled.
+      preserveAspectRatio="none"
       role="img"
       aria-labelledby={id}
     >
@@ -50,6 +52,7 @@ export function Sparkline({
     </svg>
   );
 }
+/** 計器の読み値。value は等幅、unit は本文の書体で並べます。 */
 export function Metric({
   label,
   value,
@@ -60,9 +63,13 @@ export function Metric({
   code,
 }: {
   label: string;
+  /** 数値だけ（"99.95"）。単位は unit に分けます。 */
   value: string;
+  /** "%"・"円" など。 */
   unit?: string;
+  /** 変化の文。矢印は読み上げないため、向きは言葉で書きます（"前週比 +0.02 ポイント上昇"）。 */
   change?: string;
+  /** 矢印と色だけを変えます。 */
   trend?: 'up' | 'down' | 'neutral';
   values?: number[];
   code?: string;
@@ -140,16 +147,20 @@ export function Meter({
 export type Column<T> = {
   key: string;
   header: string;
+  /** セルの中身。数値は `<span className="k-mono">` で包み、単位はその外に置きます。 */
   render: (row: T) => ReactNode;
+  /** 渡した列だけ並べ替えられます。 */
   sortValue?: (row: T) => string | number;
   align?: 'left' | 'right';
   width?: string;
 };
 export type TableSort = { key: string; direction: 'asc' | 'desc' } | null;
 export type DataTableProps<T> = {
+  /** 表示する行。並べ替えはここで渡した行の中だけで行うため、ページ送りでは全件を並べ替えてから区切った行を渡し、sorting / onSortingChange で状態を持ちます。 */
   rows: T[];
   columns: Column<T>[];
   getRowId: (row: T) => string;
+  /** 表の名前。画面には出さず、読み上げに使います。 */
   caption: string;
   selectable?: boolean;
   selectedIds?: string[];
@@ -158,6 +169,7 @@ export type DataTableProps<T> = {
   loading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
+  /** 渡すと並べ替えの状態を外で持ちます（ページ送りと組み合わせるとき）。見出しを押すたびに昇順と降順を切り替え、解除はしません。 */
   sorting?: TableSort;
   onSortingChange?: (sort: TableSort) => void;
 };
