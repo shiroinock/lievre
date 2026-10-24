@@ -1,0 +1,29 @@
+{
+  "method": "Computed foreground over composited solid ancestor backgrounds. Non-opaque elements, disabled controls, inputs, SVG, placeholders, pseudo-elements and background images excluded; semantic pair thresholds tested separately. Not a full WCAG conformance audit.",
+  "samples": [
+    {
+      "failures": [],
+      "minimum": 5.254,
+      "textSamples": 182,
+      "theme": "paper"
+    },
+    {
+      "failures": [],
+      "minimum": 6.054,
+      "textSamples": 182,
+      "theme": "ink"
+    },
+    {
+      "failures": [],
+      "minimum": 5.245,
+      "textSamples": 126,
+      "theme": "paper"
+    },
+    {
+      "failures": [],
+      "minimum": 6.054,
+      "textSamples": 126,
+      "theme": "ink"
+    }
+  ]
+}

@@ -1,0 +1,175 @@
+{
+  "mobile": [
+    {
+      "example": "library",
+      "theme": "paper",
+      "viewport": {
+        "height": 568,
+        "width": 320
+      },
+      "file": "phone-library-light.png"
+    },
+    {
+      "example": "library",
+      "theme": "ink",
+      "viewport": {
+        "height": 568,
+        "width": 320
+      },
+      "file": "phone-library-dark.png"
+    },
+    {
+      "example": "article",
+      "theme": "paper",
+      "viewport": {
+        "height": 568,
+        "width": 320
+      },
+      "file": "phone-article-light.png"
+    },
+    {
+      "example": "article",
+      "theme": "ink",
+      "viewport": {
+        "height": 568,
+        "width": 320
+      },
+      "file": "phone-article-dark.png"
+    },
+    {
+      "example": "registration",
+      "theme": "paper",
+      "viewport": {
+        "height": 568,
+        "width": 320
+      },
+      "file": "phone-registration-light.png"
+    },
+    {
+      "example": "registration",
+      "theme": "ink",
+      "viewport": {
+        "height": 568,
+        "width": 320
+      },
+      "file": "phone-registration-dark.png"
+    },
+    {
+      "example": "library",
+      "theme": "paper",
+      "viewport": {
+        "height": 842,
+        "width": 414
+      },
+      "file": "phone414-library-light.png"
+    },
+    {
+      "example": "library",
+      "theme": "ink",
+      "viewport": {
+        "height": 842,
+        "width": 414
+      },
+      "file": "phone414-library-dark.png"
+    },
+    {
+      "example": "article",
+      "theme": "paper",
+      "viewport": {
+        "height": 842,
+        "width": 414
+      },
+      "file": "phone414-article-light.png"
+    },
+    {
+      "example": "article",
+      "theme": "ink",
+      "viewport": {
+        "height": 842,
+        "width": 414
+      },
+      "file": "phone414-article-dark.png"
+    },
+    {
+      "example": "registration",
+      "theme": "paper",
+      "viewport": {
+        "height": 842,
+        "width": 414
+      },
+      "file": "phone414-registration-light.png"
+    },
+    {
+      "example": "registration",
+      "theme": "ink",
+      "viewport": {
+        "height": 842,
+        "width": 414
+      },
+      "file": "phone414-registration-dark.png"
+    }
+  ],
+  "solidText": [
+    {
+      "example": "library",
+      "body": "16px",
+      "failures": [],
+      "minimum": 6.204528960181886,
+      "pageOverflow": false,
+      "samples": 29,
+      "theme": "paper",
+      "viewport": 756
+    },
+    {
+      "example": "library",
+      "body": "16px",
+      "failures": [],
+      "minimum": 6.857448354340401,
+      "pageOverflow": false,
+      "samples": 29,
+      "theme": "ink",
+      "viewport": 756
+    },
+    {
+      "example": "article",
+      "body": "16px",
+      "failures": [],
+      "minimum": 6.204528960181886,
+      "pageOverflow": false,
+      "samples": 20,
+      "theme": "paper",
+      "viewport": 756
+    },
+    {
+      "example": "article",
+      "body": "16px",
+      "failures": [],
+      "minimum": 6.857448354340401,
+      "pageOverflow": false,
+      "samples": 20,
+      "theme": "ink",
+      "viewport": 756
+    },
+    {
+      "example": "registration",
+      "body": "16px",
+      "failures": [],
+      "minimum": 6.204528960181886,
+      "pageOverflow": false,
+      "samples": 16,
+      "theme": "paper",
+      "viewport": 771
+    },
+    {
+      "example": "registration",
+      "body": "16px",
+      "failures": [],
+      "minimum": 9.082684226868755,
+      "pageOverflow": false,
+      "samples": 16,
+      "theme": "ink",
+      "viewport": 771
+    }
+  ],
+  "limitations": "Solid computed foreground/background samples exclude input values, placeholders, SVG, non-opaque and decorative elements. Real viewport visual checks were performed in Storybook at 320px and 414px; physical phones, touch keyboard and 200% zoom not tested."
+}

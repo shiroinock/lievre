@@ -1,0 +1,76 @@
+{
+  "units": "CSS px at browser root font 16px; two-line sample rows",
+  "samples": [
+    {
+      "density": "comfortable",
+      "input": {
+        "font": "14px",
+        "height": 40
+      },
+      "overflow": false,
+      "smallestVisibleText": 12,
+      "table": {
+        "cellPadding": "12px 16px",
+        "font": "14px",
+        "row": 71.390625
+      },
+      "theme": "ink",
+      "width": 756
+    },
+    {
+      "density": "compact",
+      "input": {
+        "font": "14px",
+        "height": 32
+      },
+      "overflow": false,
+      "smallestVisibleText": 12,
+      "table": {
+        "cellPadding": "8px 12px",
+        "font": "14px",
+        "row": 63.390625
+      },
+      "theme": "ink",
+      "width": 756
+    },
+    {
+      "density": "comfortable",
+      "input": {
+        "font": "14px",
+        "height": 40
+      },
+      "overflow": false,
+      "smallestVisibleText": 12,
+      "table": {
+        "cellPadding": "12px 16px",
+        "font": "14px",
+        "row": 71.390625
+      },
+      "theme": "paper",
+      "width": 756
+    },
+    {
+      "density": "compact",
+      "input": {
+        "font": "14px",
+        "height": 32
+      },
+      "overflow": false,
+      "smallestVisibleText": 12,
+      "table": {
+        "cellPadding": "8px 12px",
+        "font": "14px",
+        "row": 63.390625
+      },
+      "theme": "paper",
+      "width": 756
+    }
+  ],
+  "stress": {
+    "pane": 320,
+    "table": 318,
+    "tableContent": 707,
+    "pageOverflow": false
+  },
+  "limitations": "Representative states and 320px pane with text-spacing override. Actual 200% browser/text zoom and all device/browser combinations not tested."
+}

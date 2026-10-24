@@ -1,0 +1,12 @@
+node_modules/
+dist/
+lib/
+*.log
+coverage/
+.DS_Store
+.openai/
+
+*.tgz
+.env
+.env.*
+!.env.example
