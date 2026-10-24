@@ -41,11 +41,12 @@
 
 | ルール                 | 基準                                                                                                            |
 | ---------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `kei/spacing-grid`     | 余白の px は 4px の倍数（0 と ±1px、`calc()`・`var()` は対象外）。                                              |
 | `kei/padding-symmetry` | `kei.components` / `kei.utilities` の部品で、左右の padding が違う値なら理由のコメントを必須にする。            |
 | `kei/height-grid`      | `height` / `min-height` / `max-height` の px は 4px の倍数。罫線と目印の 1px・2px、`calc()`・`var()` は対象外。 |
 | 説明のない無効化       | `stylelint-disable` には必ず `-- 理由` を書く（`reportDescriptionlessDisables`）。                              |
 
-余白（padding・margin・gap と、名前に padding・gap・space を含むカスタムプロパティ）を 4px の格子に乗せるルール `kei/spacing-grid` は、別の変更で入ります。
+余白（padding・margin・gap と、名前に padding・gap・space を含むカスタムプロパティ）は `kei/spacing-grid` で 4px の格子に乗せます（0 と ±1px は許可）。
 
 わざと基準を外すときは、その行の直前に理由を書きます。
 

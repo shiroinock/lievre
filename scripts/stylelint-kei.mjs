@@ -106,7 +106,26 @@ const forcedColorsState = rule('forced-colors-state', '', (root, fail) => {
   });
 });
 
-export default [utilitiesNoSize, monoUnicodeRange, monoWeights, forcedColorsState];
+// Spacing sits on the 4px grid. 0 and 1px (a border's width) pass; anything else needs a
+// stylelint-disable comment that says why. calc() and var() are left to their inputs.
+const SPACING =
+  /^(padding|margin)(-(top|right|bottom|left|block|inline)(-(start|end))?)?$|^(row-|column-)?gap$/;
+const spacingGrid = rule('spacing-grid', '', (root, fail) => {
+  root.walkDecls((decl) => {
+    const spacing = SPACING.test(decl.prop) || /^--[\w-]*(padding|gap|space)/.test(decl.prop);
+    if (!spacing || decl.value.includes('(')) return;
+    for (const [, n] of decl.value.matchAll(/(-?\d*\.?\d+)px\b/g)) {
+      const px = Math.abs(parseFloat(n));
+      if (px > 1 && px % 4)
+        fail(
+          decl,
+          `${decl.prop}: ${decl.value} の ${n}px は4pxの格子から外れています。4の倍数にするか、光学的な補正なら理由を書いて stylelint-disable-next-line kei/spacing-grid -- 理由 としてください。`,
+        );
+    }
+  });
+});
+
+export default [utilitiesNoSize, monoUnicodeRange, monoWeights, forcedColorsState, spacingGrid];
 
 // ------------------------------------------------------------- layout gate
 // Static half of the layout gate (docs/quality-gate.md); the browser half is src/test/layout.
