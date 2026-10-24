@@ -5,6 +5,7 @@ import { flushSync } from 'react-dom';
 import { KeiProvider, Sparkline } from '../../index';
 import '../../styles/fonts.css';
 import '../../styles/kei.css';
+import { inset } from '../../../scripts/measure-alignment.js';
 import { checkPart, undeclared } from './checks';
 import type { LayoutCheck } from './declare';
 
@@ -37,6 +38,17 @@ describe('配置の検査', () => {
     const [message] = messages(box('height: 40px; padding: 8px 0 0'), 'inset-y');
     expect(message).toMatch(/下に寄っています.*基準：上下の余白の差の半分が 0.1em（1.4px）以内/);
     expect(messages(box('height: 40px; padding: 0'), 'inset-y')).toEqual([]);
+  });
+
+  it('文字の輪郭は OS によらず同じに測る', async () => {
+    // Linux Chromium's measureText bounds bulge past the curves; macOS's do not. The ink is read
+    // from pixels instead, so the same label measures the same on CI and on a Mac.
+    await document.fonts.load('600 14px "IBM Plex Sans JP"', '3件を削除');
+    host.innerHTML = box("height: 40px; font: 600 14px / 20px 'IBM Plex Sans JP'", '3件を削除');
+    const { t, b } = inset(host.querySelector('.k-x')!)!;
+    // The outline's own extent, as macOS reports it; Linux's control boxes came out 0.2px taller.
+    expect(Math.abs(t - 11.05)).toBeLessThanOrEqual(0.1);
+    expect(Math.abs(b - 13.9)).toBeLessThanOrEqual(0.1);
   });
 
   it('操作の高さ', () => {

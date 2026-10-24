@@ -12,21 +12,58 @@ function fontOf(el) {
   return { css: `${s.fontWeight} ${s.fontSize} ${s.fontFamily}`, size: parseFloat(s.fontSize) };
 }
 
-// Some platforms (Linux Chromium) round glyph bounds to whole pixels, so the ink is measured
-// at 100px and scaled down. The font's ascent stays at the real size: layout uses that one.
-const SCALE_TO = 100;
+// Glyph bounds from measureText differ by platform: Linux Chromium returns each outline's
+// control box, which bulges past the curves by 0.1-0.2px at 14px (を, 削's tail), and rounds it
+// to whole pixels. So the ink is found by drawing each character large and reading the pixels
+// back. A character's rows depend only on the font, so they are cached; a string's height is
+// the union of its characters'. The font's ascent stays at the real size: layout uses that one.
+const INK_PX = 256;
+const ink = document.createElement('canvas');
+ink.width = INK_PX * 2;
+ink.height = INK_PX * 2;
+const inkCtx = ink.getContext('2d', { willReadFrequently: true });
+const glyphs = new Map();
+function glyphInk(weight, family, ch) {
+  const key = `${weight} ${family} ${ch}`;
+  if (!glyphs.has(key)) {
+    const baseline = INK_PX * 1.25;
+    inkCtx.clearRect(0, 0, ink.width, ink.height);
+    inkCtx.font = `${weight} ${INK_PX}px ${family}`;
+    inkCtx.textBaseline = 'alphabetic';
+    inkCtx.fillText(ch, INK_PX / 2, baseline);
+    const { data } = inkCtx.getImageData(0, 0, ink.width, ink.height);
+    let top = -1;
+    let bottom = -1;
+    for (let y = 0; y < ink.height; y++) {
+      for (let x = 3; x < ink.width * 4; x += 4) {
+        if (data[y * ink.width * 4 + x] < 128) continue;
+        if (top < 0) top = y;
+        bottom = y + 1;
+        break;
+      }
+    }
+    glyphs.set(key, top < 0 ? null : { ascent: baseline - top, descent: bottom - baseline });
+  }
+  return glyphs.get(key);
+}
+
 function measureText(el, text) {
   const s = getComputedStyle(el);
-  const size = parseFloat(s.fontSize);
+  const k = parseFloat(s.fontSize) / INK_PX;
   canvas.font = `${s.fontWeight} ${s.fontSize} ${s.fontFamily}`;
   const real = canvas.measureText(text);
-  canvas.font = `${s.fontWeight} ${SCALE_TO}px ${s.fontFamily}`;
-  const big = canvas.measureText(text);
-  const k = size / SCALE_TO;
+  let ascent = -Infinity;
+  let descent = -Infinity;
+  for (const ch of new Set(text)) {
+    const g = glyphInk(s.fontWeight, s.fontFamily, ch);
+    if (!g) continue;
+    ascent = Math.max(ascent, g.ascent);
+    descent = Math.max(descent, g.descent);
+  }
   return {
     width: real.width,
-    actualBoundingBoxAscent: big.actualBoundingBoxAscent * k,
-    actualBoundingBoxDescent: big.actualBoundingBoxDescent * k,
+    actualBoundingBoxAscent: ascent === -Infinity ? 0 : ascent * k,
+    actualBoundingBoxDescent: descent === -Infinity ? 0 : descent * k,
     fontBoundingBoxAscent: real.fontBoundingBoxAscent,
     fontBoundingBoxDescent: real.fontBoundingBoxDescent,
   };
