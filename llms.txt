@@ -26,6 +26,7 @@ import '@kei-design/react/styles.css';
 - 状態は色だけでなく文字でも伝えます。Badge には必ず文字を入れます。Metric の `trend` は矢印と色だけなので、向きは `change` に言葉で書きます（「前週比 +0.02 ポイント上昇」）。
 - 数値・時刻・ID・コードは `<span className="k-mono">`、文中の数値は `.k-tabular`。単位（%・円）は `.k-mono` の外に置きます：`<span><span className="k-mono">{n}</span>円</span>`。Metric は `value="99.95" unit="%"` と分けます。
 - Dialog には `title` と `description` が必須です。閉じるだけのボタンは `<DialogClose asChild><Button>キャンセル</Button></DialogClose>` で包みます。処理してから閉じるときは `open` / `onOpenChange` で開閉を持ちます。フォーカスの閉じ込めと復帰は部品が行います。
+- アイコンだけのボタンは `<IconButton label="行の操作" icon={<MoreHorizontal />} />`。`label` が読み上げの名前とツールチップの両方になるので、`aria-label` は書きません。`Button` に svg だけを入れません。
 - ラベルは日本語で書き、英大文字や記号で飾りません。
 
 ## 表の並べ替えとページ送り
@@ -211,6 +212,17 @@ const sorted = useMemo(() => {
 - `loading?: boolean` — 既定 false。処理中の表示。押せなくなり、aria-busy が付きます。
 - `icon?: ReactNode`
 - ほかに ButtonHTMLAttributes<HTMLButtonElement> の属性を受け取ります。
+
+### IconButton
+
+アイコンだけのボタン。label を読み上げとツールチップの両方に使うので、名前を付け忘れません。
+
+- `label: string` — 読み上げとツールチップに出す名前。何をするかを言葉で書きます（「閉じる」「行の操作」）。
+- `icon: ReactNode` — アイコン（lucide-react など）。大きさは size に合わせて部品が決め、aria-hidden も部品が付けます。
+- `variant?: 'danger' | 'primary' | 'secondary' | 'ghost'` — 既定 'ghost'。色は Button と同じです。既定は枠のない 'ghost'。
+- `size?: 'sm' | 'md' | 'lg'` — 既定 'md'。'md' は密度の操作の高さ（40 / 32px）、'sm' は 32px、'lg' は 48px の正方形。タッチの画面では 44px まで広げます。
+- `tooltip?: boolean` — 既定 true。false にするとツールチップを出しません。すぐ横に同じ言葉が書いてあるときだけ使います。
+- `loading?: boolean` — 既定 false。処理中の表示。押せなくなり、aria-busy が付きます。
 
 ### TextField
 

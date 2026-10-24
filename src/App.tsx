@@ -25,6 +25,7 @@ import {
   ToastProvider,
   type Theme,
   type Density,
+  IconButton,
 } from './index';
 import { ComponentGallery } from './docs/ComponentGallery';
 import { ColorFoundation, Foundations, ReferenceDirection, principles } from './docs/Foundations';
@@ -180,13 +181,14 @@ export default function App() {
               <strong>KEI</strong>
               <small>デザインシステム</small>
             </div>
-            <button
-              className="sidebar-close k-icon-button"
-              aria-label="メニューを閉じる"
+            <IconButton
+              className="sidebar-close"
+              size="sm"
+              label="メニューを閉じる"
+              icon={<X />}
+              tooltip={false}
               onClick={() => setNavOpen(false)}
-            >
-              <X size={18} />
-            </button>
+            />
           </div>
           <nav aria-label="メインナビゲーション" className="main-nav">
             {pages.map((p) => (
@@ -242,16 +244,17 @@ export default function App() {
         )}
         <div className="app-main">
           <header className="app-topbar">
-            <button
+            <IconButton
               ref={menuRef}
               aria-controls="app-navigation"
-              className="mobile-menu k-icon-button"
+              className="mobile-menu"
+              size="sm"
+              label="メニューを開く"
+              icon={<Menu />}
+              tooltip={false}
               onClick={() => setNavOpen(true)}
-              aria-label="メニューを開く"
               aria-expanded={navOpen}
-            >
-              <Menu size={18} />
-            </button>
+            />
             <span className="topbar-title">{active.label}</span>
           </header>
           <main id="main" className="app-content" tabIndex={-1}>

@@ -345,20 +345,86 @@
     color: var(--k-muted);
   }
 
+  /* A square: width = height = the control height of its size. The border is transparent
+     unless the variant draws one, so every variant has the same box. */
   .k-icon-button {
+    --icon-button-size: 32px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: 0;
+    flex-shrink: 0;
+    width: var(--icon-button-size);
+    height: var(--icon-button-size);
+    padding: 0;
+    border: 1px solid transparent;
     border-radius: var(--k-radius-md);
     background: transparent;
     color: var(--k-muted);
+    transition:
+      background-color var(--k-motion) var(--k-ease),
+      border-color var(--k-motion) var(--k-ease),
+      color var(--k-motion) var(--k-ease);
   }
-  .k-icon-button:hover {
+  .k-icon-button:hover:not(:disabled) {
     background: var(--k-surface-sunken);
     color: var(--k-text);
+  }
+  .k-icon-button--md {
+    --icon-button-size: var(--k-control-height);
+  }
+  .k-icon-button--lg {
+    --icon-button-size: 48px;
+  }
+  .k-icon-button-icon {
+    display: flex;
+  }
+  .k-icon-button-icon > svg {
+    width: 16px;
+    height: 16px;
+  }
+  .k-icon-button--lg .k-icon-button-icon > svg {
+    width: 20px;
+    height: 20px;
+  }
+  .k-icon-button--secondary {
+    background: var(--k-surface-raised);
+    border-color: var(--k-border-strong);
+    color: var(--k-text);
+  }
+  .k-icon-button--secondary:active:not(:disabled) {
+    background: var(--k-accent-soft);
+    border-color: var(--k-accent);
+  }
+  .k-icon-button--ghost:active:not(:disabled) {
+    background: var(--k-accent-soft);
+  }
+  .k-icon-button--primary {
+    background: var(--k-accent);
+    color: var(--k-on-accent);
+  }
+  .k-icon-button--primary:where(:hover, :active):not(:disabled) {
+    background: var(--k-accent-hover);
+    color: var(--k-on-accent);
+  }
+  .k-icon-button--danger {
+    background: var(--k-danger);
+    color: var(--k-on-danger);
+  }
+  .k-icon-button--danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--k-danger) 86%, var(--k-text));
+    color: var(--k-on-danger);
+  }
+  .k-icon-button:disabled {
+    color: var(--k-muted);
+    cursor: not-allowed;
+  }
+  .k-icon-button:where(
+      .k-icon-button--primary,
+      .k-icon-button--secondary,
+      .k-icon-button--danger
+    ):disabled {
+    background: var(--k-surface-sunken);
+    border-color: var(--k-border);
   }
 
   .k-spin {

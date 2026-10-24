@@ -16,6 +16,7 @@ import {
   Meter,
   Progress,
   Sparkline,
+  IconButton,
   type Column,
 } from '../index';
 import { OperationsExample, SettingsExample } from '../patterns/Operations';
@@ -84,6 +85,24 @@ describe('Input and focus contracts', () => {
     await userEvent.keyboard('{Escape}');
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
+  });
+  it('names an icon-only button by its label, shows the same words as a tooltip and keeps focus while loading', async () => {
+    const { rerender } = setup(<IconButton label="行の操作" icon={<svg data-testid="icon" />} />);
+    const button = screen.getByRole('button', { name: '行の操作' });
+    expect(button).toHaveAttribute('type', 'button');
+    expect(screen.getByTestId('icon').parentElement).toHaveAttribute('aria-hidden', 'true');
+    await userEvent.tab();
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('行の操作');
+    rerender(
+      <KeiProvider>
+        <ToastProvider>
+          <IconButton label="行の操作" icon={<svg />} loading />
+        </ToastProvider>
+      </KeiProvider>,
+    );
+    expect(screen.getByRole('button', { name: '行の操作' })).toBe(button);
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('aria-busy', 'true');
   });
   it('traps dialog focus and restores it to the trigger on Escape', async () => {
     setup(

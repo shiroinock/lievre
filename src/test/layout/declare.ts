@@ -33,6 +33,10 @@ export type LayoutCheck =
   | 'control-height'
   /** 高さが 4px の倍数。 */
   | 'grid-height'
+  /** 幅と高さが同じ（アイコンだけのボタン）。 */
+  | 'square'
+  /** フォーカスの輪郭（2px の線と 2px の隙間）が、はみ出しを切る親の内側に収まる。 */
+  | 'focus-room'
   /** padding と罫線を除いた行の箱の高さが 4px の倍数（書体や大きさの違う文字が混ざる行で崩れる）。 */
   | 'line-grid'
   /** padding が上下左右で同じ（パネル）。 */
@@ -69,6 +73,8 @@ export const CRITERIA = {
   line: 0.1,
   /** 同じ行の文字のベースラインの差。 */
   baseline: 0.5,
+  /** フォーカスの輪郭が要素の外に出る幅（outline 2px + outline-offset 2px）。 */
+  focusRing: 4,
 } as const;
 
 export const checkId = (check: LayoutCheck) =>
@@ -87,6 +93,8 @@ export const CHECK_LABEL: Record<string, string> = {
   'inset-y': '上下の中央',
   'control-height': '操作の高さ',
   'grid-height': '高さの格子',
+  square: '正方形',
+  'focus-room': 'フォーカスの輪郭の余地',
   'line-grid': '行の箱の格子',
   'padding-equal': 'パネルの内側の余白',
   fits: 'はみ出し',

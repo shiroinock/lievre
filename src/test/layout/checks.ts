@@ -80,6 +80,36 @@ function checkOne(el: Element, check: LayoutCheck): string | null {
     return `高さが ${px(box.height)} です。基準：${CRITERIA.grid}px の倍数（近いのは ${Math.floor(box.height / 4) * 4}px か ${Math.ceil(box.height / 4) * 4}px）。`;
   }
 
+  if (check === 'square') {
+    if (Math.abs(box.width - box.height) <= CRITERIA.size) return null;
+    return `幅 ${px(box.width)}・高さ ${px(box.height)} で、正方形になっていません。基準：幅と高さの差が ${CRITERIA.size}px 以内。padding ではなく width と height で大きさを決めてください。`;
+  }
+
+  if (check === 'focus-room') {
+    // The ring is drawn outside the box, so any ancestor that clips its overflow must leave room.
+    const ring = CRITERIA.focusRing;
+    for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+      const as = getComputedStyle(a);
+      if (as.overflowX === 'visible' && as.overflowY === 'visible') continue;
+      const r = a.getBoundingClientRect();
+      const inner = {
+        left: r.left + parseFloat(as.borderLeftWidth),
+        right: r.right - parseFloat(as.borderRightWidth),
+        top: r.top + parseFloat(as.borderTopWidth),
+        bottom: r.bottom - parseFloat(as.borderBottomWidth),
+      };
+      const cut = [
+        ['左', box.left - ring - inner.left],
+        ['右', inner.right - (box.right + ring)],
+        ['上', box.top - ring - inner.top],
+        ['下', inner.bottom - (box.bottom + ring)],
+      ].filter(([, room]) => (room as number) < -CRITERIA.size);
+      if (cut.length)
+        return `フォーカスの輪郭が、はみ出しを切る親 ${describe(a)} に${cut.map(([side, room]) => `${side}で ${px(-(room as number))}`).join('・')} 切られます。基準：要素の外に ${ring}px（輪郭 2px と隙間 2px）の余地がある。親の padding を空けるか、overflow を visible にしてください。`;
+    }
+    return null;
+  }
+
   if (check === 'line-grid') {
     const inner =
       box.height -

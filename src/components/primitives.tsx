@@ -66,6 +66,63 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   );
 });
 
+export type IconButtonProps = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'children' | 'aria-label'
+> & {
+  /** 読み上げとツールチップに出す名前。何をするかを言葉で書きます（「閉じる」「行の操作」）。 */
+  label: string;
+  /** アイコン（lucide-react など）。大きさは size に合わせて部品が決め、aria-hidden も部品が付けます。 */
+  icon: ReactNode;
+  /** 色は Button と同じです。既定は枠のない 'ghost'。 */
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  /** 'md' は密度の操作の高さ（40 / 32px）、'sm' は 32px、'lg' は 48px の正方形。タッチの画面では 44px まで広げます。 */
+  size?: 'sm' | 'md' | 'lg';
+  /** false にするとツールチップを出しません。すぐ横に同じ言葉が書いてあるときだけ使います。 */
+  tooltip?: boolean;
+  /** 処理中の表示。押せなくなり、aria-busy が付きます。 */
+  loading?: boolean;
+};
+/** アイコンだけのボタン。label を読み上げとツールチップの両方に使うので、名前を付け忘れません。 */
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
+  {
+    label,
+    icon,
+    variant = 'ghost',
+    size = 'md',
+    tooltip = true,
+    loading = false,
+    disabled,
+    className,
+    type = 'button',
+    ...props
+  },
+  ref,
+) {
+  const button = (
+    <button
+      {...props}
+      ref={ref}
+      type={type}
+      aria-label={label}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      className={cx(
+        'k-icon-button',
+        `k-icon-button--${variant}`,
+        `k-icon-button--${size}`,
+        className,
+      )}
+    >
+      <span className="k-icon-button-icon" aria-hidden>
+        {loading ? <Loader2 className="k-spin" /> : icon}
+      </span>
+    </button>
+  );
+  // The tree stays the same while loading, so the button keeps its focus.
+  return tooltip ? <Tooltip content={label}>{button}</Tooltip> : button;
+});
+
 export type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 /** 色と文字を併用する状態ラベル。色だけでは状態を表さないため、children（「正常」などの文字）は必須です。 */
 export function Badge({

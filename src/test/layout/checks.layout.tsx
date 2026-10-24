@@ -102,6 +102,29 @@ describe('配置の検査', () => {
     expect(messages(row(40), { sameHeight: '.k-a, .k-b' })).toEqual([]);
   });
 
+  it('正方形', () => {
+    expect(messages(box('width: 40px; height: 32px; padding: 0'), 'square')[0]).toMatch(
+      /幅 40px・高さ 32px で、正方形になっていません/,
+    );
+    expect(messages(box('width: 32px; height: 32px; padding: 0'), 'square')).toEqual([]);
+  });
+
+  it('フォーカスの輪郭の余地', () => {
+    // The ring reaches 4px outside the box; a clipping parent with less padding cuts it.
+    const inside = (pad: number) =>
+      `<div style="overflow: hidden; padding: ${pad}px"><button class="k-x" style="display: block; width: 32px; height: 32px">×</button></div>`;
+    expect(messages(inside(2), 'focus-room')[0]).toMatch(
+      /はみ出しを切る親 div「×」 に左で 2px・上で 2px・下で 2px 切られます/,
+    );
+    expect(messages(inside(4), 'focus-room')).toEqual([]);
+    expect(
+      messages(
+        `<div style="padding: 0"><button class="k-x" style="width: 32px; height: 32px">×</button></div>`,
+        'focus-room',
+      ),
+    ).toEqual([]);
+  });
+
   it('宣言のない操作の要素を見つける', () => {
     host.innerHTML =
       '<div class="k-x"><button>保存</button></div><button class="k-new">追加</button>';
