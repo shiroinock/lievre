@@ -30,6 +30,7 @@ npm run dev         # 概要のデモ http://127.0.0.1:5173
 
 ```sh
 npm run typecheck
+npm run lint        # stylelint・ESLint の KEI 独自ルール（scripts/stylelint-kei.mjs、eslint.config.mjs）
 npm test            # 部品・画面フロー・axe・コントラスト・トークン同期
 npm run tokens      # kei.css を変更したら tokens.json を書き出す
 npm run format
