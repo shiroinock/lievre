@@ -338,6 +338,8 @@ Field で今の TextField・Select・RadioGroup を作り直すのは、配置�
 
 `radix-ui` にない部品で、土台を1つ足す必要があります。候補は、コンボボックスと日付の両方を持ち、和暦（`@internationalized/date` の `JapaneseCalendar`）に対応する React Aria です。ただし、依存を増やす判断として、Ariakit や Downshift など範囲の狭い土台とも比べます。比べる点は、機能が足りるか、依存の大きさ、「依存を増やすときの約束」を満たせるかです。先に Combobox だけを試作して確かめてから決めます。全角・半角の正規化と IME の扱いは、ここで共通にします。
 
+試作の結果、Combobox の土台は Downshift（一覧の枠は Radix の Popover）、日付の計算は `@internationalized/date` にしました。理由と比べた結果は [Combobox と DatePicker の土台](combobox-foundation.md) にあります。
+
 1. 全角・半角の正規化（関数）と Format
 2. Combobox（単一）
 3. DatePicker（年月日の直接入力 → カレンダー → 期間 → 和暦の表示）
