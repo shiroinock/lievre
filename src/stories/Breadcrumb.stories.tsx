@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import {
   Breadcrumb,
   Button,
@@ -16,6 +17,15 @@ const meta = {
   title: 'Components/Navigation/Breadcrumb',
   component: Breadcrumb,
   parameters: {
+    layoutGate: {
+      parts: [
+        {
+          name: 'パンくず',
+          selector: '.k-breadcrumb',
+          checks: ['fits', { sameHeight: ':scope > li' }],
+        },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component: '現在地はaria-current=page。最後の項目をリンクにせず現在地を示します。',

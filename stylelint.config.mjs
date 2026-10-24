@@ -1,8 +1,9 @@
 // Only KEI's own guards: formatting is Prettier's job.
-import kei from './scripts/stylelint-kei.mjs';
+import kei, { layoutRules } from './scripts/stylelint-kei.mjs';
+import { heightGridKnown } from './scripts/stylelint-baseline.mjs';
 
 export default {
-  plugins: kei,
+  plugins: [...kei, ...layoutRules],
   // A rule may be switched off for one line, but only with a reason after `--`.
   reportDescriptionlessDisables: true,
   rules: {
@@ -20,5 +21,8 @@ export default {
           'font の一括指定には「/ 行の高さ」を書いてください（書かないと normal に戻ります）。',
       },
     ],
+    // Layout gate (docs/quality-gate.md).
+    'kei/padding-symmetry': true,
+    'kei/height-grid': [true, { known: heightGridKnown }],
   },
 };

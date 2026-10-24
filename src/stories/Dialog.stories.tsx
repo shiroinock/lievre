@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Dialog, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,38 @@ const meta = {
   title: 'Components/Overlays/Dialog',
   component: Dialog,
   parameters: {
+    layoutGate: {
+      parts: [
+        {
+          name: '開くボタン',
+          selector: '.k-button',
+          checks: [
+            'inset-x',
+            'inset-y',
+            'control-height',
+            { padding: 'button' },
+            'fits',
+            { icon: 'svg' },
+          ],
+        },
+        {
+          name: 'ダイアログの見出し',
+          selector: '.k-dialog-header',
+          checks: [{ icon: '.k-icon-button', text: '.k-dialog-title' }],
+        },
+        {
+          name: '閉じるボタン',
+          selector: '.k-icon-button',
+          checks: ['inset-x', 'inset-y', 'control-height'],
+        },
+        { name: 'ダイアログの本文', selector: '.k-dialog-body', checks: ['padding-equal'] },
+        {
+          name: 'ダイアログの操作',
+          selector: '.k-dialog-footer',
+          checks: ['padding-equal', { sameHeight: '.k-button' }],
+        },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:
@@ -59,3 +92,5 @@ export const OpenClose: Story = {
     await expect(trigger).toHaveFocus();
   },
 };
+/** 開いた状態。配置の検査は、この Story でダイアログの中を測ります。 */
+export const Open: Story = { args: { open: true } };

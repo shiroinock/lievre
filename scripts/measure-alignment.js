@@ -12,14 +12,33 @@ function fontOf(el) {
   return { css: `${s.fontWeight} ${s.fontSize} ${s.fontFamily}`, size: parseFloat(s.fontSize) };
 }
 
+// Some platforms (Linux Chromium) round glyph bounds to whole pixels, so the ink is measured
+// at 100px and scaled down. The font's ascent stays at the real size: layout uses that one.
+const SCALE_TO = 100;
+function measureText(el, text) {
+  const s = getComputedStyle(el);
+  const size = parseFloat(s.fontSize);
+  canvas.font = `${s.fontWeight} ${s.fontSize} ${s.fontFamily}`;
+  const real = canvas.measureText(text);
+  canvas.font = `${s.fontWeight} ${SCALE_TO}px ${s.fontFamily}`;
+  const big = canvas.measureText(text);
+  const k = size / SCALE_TO;
+  return {
+    width: real.width,
+    actualBoundingBoxAscent: big.actualBoundingBoxAscent * k,
+    actualBoundingBoxDescent: big.actualBoundingBoxDescent * k,
+    fontBoundingBoxAscent: real.fontBoundingBoxAscent,
+    fontBoundingBoxDescent: real.fontBoundingBoxDescent,
+  };
+}
+
 // The first line's baseline. A text range's box is the primary font's ascent + descent,
 // so the baseline sits one ascent below its top. (A probe element would become a flex item.)
 function baselineOf(textNode) {
   const range = document.createRange();
   range.selectNodeContents(textNode);
   const first = [...range.getClientRects()].find((r) => r.width > 0);
-  canvas.font = fontOf(textNode.parentElement).css;
-  const m = canvas.measureText(textNode.textContent.trim() || 'x');
+  const m = measureText(textNode.parentElement, textNode.textContent.trim() || 'x');
   return first.top + m.fontBoundingBoxAscent;
 }
 
@@ -30,9 +49,7 @@ function textInk(node) {
   range.selectNodeContents(node);
   const rects = [...range.getClientRects()].filter((r) => r.width > 0);
   if (!rects.length) return null;
-  const { css } = fontOf(node.parentElement);
-  canvas.font = css;
-  const m = canvas.measureText(text);
+  const m = measureText(node.parentElement, text);
   const base = baselineOf(node);
   const last = rects.at(-1);
   // Later lines share the first line's ink metrics, shifted by their own offset.
@@ -51,8 +68,7 @@ function inputInk(el) {
   if (!text) return null;
   const s = getComputedStyle(el);
   const r = el.getBoundingClientRect();
-  canvas.font = fontOf(el).css;
-  const m = canvas.measureText(text);
+  const m = measureText(el, text);
   const padT = parseFloat(s.paddingTop) + parseFloat(s.borderTopWidth);
   const padB = parseFloat(s.paddingBottom) + parseFloat(s.borderBottomWidth);
   const lineH = parseFloat(s.lineHeight) || parseFloat(s.fontSize) * 1.2;
@@ -162,10 +178,9 @@ export function iconOffset(icon, textEl) {
       .nextNode();
   if (!textNode) return null;
   const base = baselineOf(textNode);
-  const { css, size } = fontOf(textNode.parentElement);
-  canvas.font = css;
+  const { size } = fontOf(textNode.parentElement);
   const cjk = /[぀-ヿ一-鿿]/.test(textNode.textContent);
-  const m = canvas.measureText(cjk ? '国' : 'x');
+  const m = measureText(textNode.parentElement, cjk ? '国' : 'x');
   // Japanese: centre of the ideographic face; Latin: half the x-height.
   const centre = cjk
     ? base - (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2

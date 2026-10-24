@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Card, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,16 @@ const meta = {
   title: 'Components/Layout/Card',
   component: Card,
   parameters: {
+    layoutGate: {
+      parts: [
+        { name: 'カードの本文', selector: '.k-card-body', checks: ['padding-equal'] },
+        {
+          name: 'カードの見出し',
+          selector: '.k-card-header',
+          checks: [{ icon: ':scope > .k-button', text: ':scope > div' }],
+        },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

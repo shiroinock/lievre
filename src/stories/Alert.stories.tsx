@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Alert, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,15 @@ const meta = {
   title: 'Components/Feedback/Alert',
   component: Alert,
   parameters: {
+    layoutGate: {
+      parts: [
+        {
+          name: 'お知らせ',
+          selector: '.k-alert',
+          checks: ['padding-equal', { icon: ':scope > svg' }],
+        },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

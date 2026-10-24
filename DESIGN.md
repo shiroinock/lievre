@@ -77,6 +77,8 @@ console.table(M.measureIcons()); // アイコンと1行目の中央のずれ
 console.table(M.audit()); // 背景か線のある箱のうち、上下か左右が2px以上ずれているもの
 ```
 
+CI では、すべての Story をこの基準で測ります（`npm run test:layout`）。基準の値と、宣言・既知の例外の扱いは [docs/quality-gate.md](docs/quality-gate.md) にあります。
+
 ## 部品の構成
 
 1. **トークン**：配色・文字・余白・形・密度・動き。

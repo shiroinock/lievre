@@ -144,3 +144,82 @@ export default [
   spacingGrid,
   surfaceTokens,
 ];
+
+// ------------------------------------------------------------- layout gate
+// Static half of the layout gate (docs/quality-gate.md); the browser half is src/test/layout.
+
+const disableHint = (name) =>
+  `わざと外すときは、直前の行に /* stylelint-disable-next-line kei/${name} -- 理由 */ を書いてください。`;
+// Splits a value on top-level spaces, keeping calc(…) and var(…) whole.
+const words = (value) => value.match(/(?:[^\s(]+|\([^)]*\))+/g) ?? [];
+const inComponents = (decl) =>
+  inside(decl, (a) => a.name === 'layer' && /^kei\.(components|utilities)$/.test(a.params.trim()));
+
+// Parts are centred in their box, so the left and right padding must match unless a comment says why.
+const paddingSymmetry = rule('padding-symmetry', '', (root, fail) => {
+  root.walkRules((r) => {
+    if (!inComponents(r)) return;
+    const sides = {};
+    r.each((d) => {
+      if (d.type !== 'decl') return;
+      const v = words(d.value);
+      if (d.prop === 'padding') [sides.left, sides.right] = [v[3] ?? v[1] ?? v[0], v[1] ?? v[0]];
+      if (d.prop === 'padding-inline') [sides.left, sides.right] = [v[0], v[1] ?? v[0]];
+      if (d.prop === 'padding-left' || d.prop === 'padding-inline-start') sides.left = d.value;
+      if (d.prop === 'padding-right' || d.prop === 'padding-inline-end') sides.right = d.value;
+      if (/^padding/.test(d.prop)) sides.decl = d;
+    });
+    if (!sides.decl || sides.left === sides.right) return;
+    const [left, right] = [sides.left ?? 'なし', sides.right ?? 'なし'];
+    fail(
+      sides.decl,
+      `「${r.selector}」の padding は左右が違います（左 ${left}・右 ${right}）。部品の中身は左右の中央に置くので、左右を同じ値にしてください。${disableHint('padding-symmetry')}`,
+    );
+  });
+});
+
+// Heights sit on the 4px grid. 1px and 2px are rules and indicator lines, not boxes.
+// `known` lists today's misses in kei.css so they can be fixed one by one; an entry that no
+// longer happens is reported, so the list only shrinks.
+// (Written with createPlugin directly, because this rule takes options.)
+const heightGridCheck = (root, fail, options = {}) => {
+  const known = options.known ?? [];
+  const used = new Set();
+  root.walkDecls(/^(min-|max-)?height$/, (decl) => {
+    if (!inComponents(decl) || /\(/.test(decl.value)) return;
+    const n = decl.value.match(/^(-?[\d.]+)px$/)?.[1];
+    if (n === undefined || [0, 1, 2].includes(Number(n)) || Number(n) % 4 === 0) return;
+    const selector = decl.parent.selector;
+    const k = known.findIndex((e) => e.selector === selector && e.prop === decl.prop);
+    if (k >= 0) return used.add(k);
+    const lo = Math.floor(n / 4) * 4;
+    fail(
+      decl,
+      `「${selector}」の ${decl.prop}: ${decl.value} は 4px の倍数ではありません（近いのは ${lo}px か ${lo + 4}px）。高さは 4px の倍数か、操作の高さのトークン --k-control-height（40 / 32px）を使ってください。${disableHint('height-grid')}`,
+    );
+  });
+  if (!root.source?.input.file?.endsWith('src/styles/kei.css')) return;
+  known.forEach((e, k) => {
+    if (!used.has(k))
+      fail(
+        root.first ?? root,
+        `kei/height-grid の既知の例外「${e.selector} { ${e.prop} }」はもう起きていません。stylelint.config.mjs の一覧から消してください。`,
+      );
+  });
+};
+const heightGridRule = (primary, options) => (root, result) => {
+  if (!primary) return;
+  heightGridCheck(
+    root,
+    (node, message) => report({ ruleName: 'kei/height-grid', result, node, message }),
+    options,
+  );
+};
+heightGridRule.ruleName = 'kei/height-grid';
+heightGridRule.messages = ruleMessages('kei/height-grid', {});
+heightGridRule.meta = {
+  url: 'https://github.com/shiroinock/kei-design-system/blob/main/docs/quality-gate.md',
+};
+const heightGrid = createPlugin('kei/height-grid', heightGridRule);
+
+export const layoutRules = [paddingSymmetry, heightGrid];

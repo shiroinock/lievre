@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import {
   ActionLink,
   Button,
@@ -16,6 +17,9 @@ const meta = {
   title: 'Foundations/Universal components',
   component: Text,
   parameters: {
+    layoutGate: {
+      skip: '基礎の部品を組み合わせた見本。部品はそれぞれの Story で測っている。',
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,22 @@ const meta = {
   title: 'Components/Actions/Button',
   component: Button,
   parameters: {
+    layoutGate: {
+      parts: [
+        {
+          name: 'ボタン',
+          selector: '.k-button',
+          checks: [
+            'inset-x',
+            'inset-y',
+            'control-height',
+            { padding: 'button' },
+            'fits',
+            { icon: 'svg' },
+          ],
+        },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:
