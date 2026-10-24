@@ -2,15 +2,24 @@ import { createContext, useContext, useState, type HTMLAttributes, type ReactNod
 import { Toast as ToastPrimitive } from 'radix-ui';
 import { X, CheckCircle2, AlertCircle } from 'lucide-react';
 
-export type Theme = 'paper' | 'ink';
+/** sepia と rust は試作のテーマです。 */
+export type Theme = 'paper' | 'ink' | 'sepia' | 'rust';
+/** 試作：worn は紙の粒・刷りのずれ・擦れた罫線を加えます。 */
+export type Wear = 'clean' | 'worn';
 export type Density = 'comfortable' | 'compact';
 export type Typography = 'standard' | 'interface';
 export const cx = (...values: (string | false | undefined | null)[]) =>
   values.filter(Boolean).join(' ');
-const ThemeContext = createContext<{ theme: Theme; density: Density; typography: Typography }>({
+const ThemeContext = createContext<{
+  theme: Theme;
+  density: Density;
+  typography: Typography;
+  wear: Wear;
+}>({
   theme: 'paper',
   density: 'comfortable',
   typography: 'standard',
+  wear: 'clean',
 });
 export function useKeiTheme() {
   return useContext(ThemeContext);
@@ -20,22 +29,30 @@ export function KeiProvider({
   theme: givenTheme,
   density: givenDensity,
   typography: givenTypography,
+  wear: givenWear,
   className,
   children,
   ...props
-}: HTMLAttributes<HTMLDivElement> & { theme?: Theme; density?: Density; typography?: Typography }) {
+}: HTMLAttributes<HTMLDivElement> & {
+  theme?: Theme;
+  density?: Density;
+  typography?: Typography;
+  wear?: Wear;
+}) {
   const inherited = useKeiTheme();
   const theme = givenTheme ?? inherited.theme;
   const density = givenDensity ?? inherited.density;
   const typography = givenTypography ?? inherited.typography;
+  const wear = givenWear ?? inherited.wear;
   return (
-    <ThemeContext.Provider value={{ theme, density, typography }}>
+    <ThemeContext.Provider value={{ theme, density, typography, wear }}>
       <div
         {...props}
         className={cx('kei', className)}
         data-theme={theme}
         data-density={density}
         data-typography={typography}
+        data-wear={wear}
       >
         {children}
       </div>
@@ -43,13 +60,14 @@ export function KeiProvider({
   );
 }
 export function PortalSurface({ children }: { children: ReactNode }) {
-  const { theme, density, typography } = useKeiTheme();
+  const { theme, density, typography, wear } = useKeiTheme();
   return (
     <div
       className="kei kei-portal"
       data-theme={theme}
       data-density={density}
       data-typography={typography}
+      data-wear={wear}
     >
       {children}
     </div>

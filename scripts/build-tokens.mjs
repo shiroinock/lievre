@@ -6,6 +6,8 @@ import { pathToFileURL } from 'node:url';
 const scopes = {
   paper: /\.kei \{([^}]*)\}/,
   ink: /\.kei\[data-theme='ink'\] \{([^}]*)\}/,
+  sepia: /\.kei\[data-theme='sepia'\] \{([^}]*)\}/,
+  rust: /\.kei\[data-theme='rust'\] \{([^}]*)\}/,
   compact: /\.kei\[data-density='compact'\] \{([^}]*)\}/,
   interface: /\.kei\[data-typography='interface'\] \{([^}]*)\}/,
 };

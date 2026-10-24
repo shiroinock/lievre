@@ -10,6 +10,8 @@ import {
   Menu,
   Moon,
   Ruler,
+  Scroll,
+  Cog,
   Sun,
   X,
 } from 'lucide-react';
@@ -25,6 +27,7 @@ import {
   ToastProvider,
   type Theme,
   type Density,
+  type Wear,
 } from './index';
 import { ComponentGallery } from './docs/ComponentGallery';
 import { ColorFoundation, Foundations, ReferenceDirection, principles } from './docs/Foundations';
@@ -102,6 +105,7 @@ function InstrumentPanel() {
 export default function App() {
   const [theme, setTheme] = useState<Theme>('paper');
   const [density, setDensity] = useState<Density>('comfortable');
+  const [wear, setWear] = useState<Wear>('clean');
   const [page, setPage] = useState<Page>('overview');
   const [navOpen, setNavOpen] = useState(false);
   const active = pages.find((p) => p.id === page)!;
@@ -159,7 +163,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   return (
-    <KeiProvider theme={theme} density={density} className="kei-app">
+    <KeiProvider theme={theme} density={density} wear={wear} className="kei-app">
       <ToastProvider>
         <a href="#main" className="skip-link">
           本文へスキップ
@@ -218,6 +222,14 @@ export default function App() {
                 <Moon size={14} aria-hidden />
                 Ink
               </button>
+              <button aria-pressed={theme === 'sepia'} onClick={() => setTheme('sepia')}>
+                <Scroll size={14} aria-hidden />
+                Sepia
+              </button>
+              <button aria-pressed={theme === 'rust'} onClick={() => setTheme('rust')}>
+                <Cog size={14} aria-hidden />
+                Rust
+              </button>
             </div>
             <div className="density-control">
               <label htmlFor="density">表示密度</label>
@@ -228,6 +240,13 @@ export default function App() {
               >
                 <option value="comfortable">標準</option>
                 <option value="compact">高密度</option>
+              </select>
+            </div>
+            <div className="density-control">
+              <label htmlFor="wear">質感（試作）</label>
+              <select id="wear" value={wear} onChange={(e) => setWear(e.target.value as Wear)}>
+                <option value="clean">整った面</option>
+                <option value="worn">擦れ</option>
               </select>
             </div>
             <p className="sidebar-version">v{version}</p>

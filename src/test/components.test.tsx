@@ -84,6 +84,19 @@ describe('Input and focus contracts', () => {
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
   });
+  it('carries prototype theme and wear into portals', async () => {
+    render(
+      <KeiProvider theme="rust" wear="worn">
+        <Dialog trigger={<Button>開く</Button>} title="表示設定" description="表示を調整">
+          <Button>保存</Button>
+        </Dialog>
+      </KeiProvider>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: '開く' }));
+    const scope = screen.getByRole('dialog', { name: '表示設定' }).closest('.kei');
+    expect(scope).toHaveAttribute('data-theme', 'rust');
+    expect(scope).toHaveAttribute('data-wear', 'worn');
+  });
   it('traps dialog focus and restores it to the trigger on Escape', async () => {
     setup(
       <Dialog trigger={<Button>開く</Button>} title="表示設定" description="表示を調整">

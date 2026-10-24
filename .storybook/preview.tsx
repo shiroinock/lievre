@@ -2,6 +2,7 @@ import type { Preview } from '@storybook/react-vite';
 import { KeiProvider } from '../src/components/system';
 import '../src/styles/fonts.css';
 import '../src/styles/kei.css';
+import '../src/styles/kei-wear.css';
 import '../src/styles/demo.css';
 const preview: Preview = {
   tags: ['autodocs'],
@@ -14,6 +15,20 @@ const preview: Preview = {
         items: [
           { value: 'paper', title: 'Paper（明るい面）' },
           { value: 'ink', title: 'Ink（深い紺の面）' },
+          { value: 'sepia', title: 'Sepia（焼けた紙・試作）' },
+          { value: 'rust', title: 'Rust（錆びた筐体・試作）' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+    wear: {
+      description: '質感（試作）',
+      toolbar: {
+        title: '質感',
+        icon: 'contrast',
+        items: [
+          { value: 'clean', title: '整った面' },
+          { value: 'worn', title: '擦れ（試作）' },
         ],
         dynamicTitle: true,
       },
@@ -43,13 +58,19 @@ const preview: Preview = {
       },
     },
   },
-  initialGlobals: { theme: 'paper', density: 'comfortable', typography: 'standard' },
+  initialGlobals: {
+    theme: 'paper',
+    density: 'comfortable',
+    typography: 'standard',
+    wear: 'clean',
+  },
   decorators: [
     (Story, context) => (
       <KeiProvider
         theme={context.globals.theme}
         density={context.globals.density}
         typography={context.globals.typography}
+        wear={context.globals.wear}
         className={context.parameters.layout === 'fullscreen' ? 'kei-story-full' : 'kei-story'}
       >
         <Story />
