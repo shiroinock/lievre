@@ -33,6 +33,8 @@ export function Sparkline({
     <svg
       className={cx('k-sparkline', `k-sparkline--${color}`)}
       viewBox="0 0 200 50"
+      // Stretch to the box: the stroke stays 2px (non-scaling), so only the data is scaled.
+      preserveAspectRatio="none"
       role="img"
       aria-labelledby={id}
     >
