@@ -23,7 +23,8 @@
     --k-accent-hover: #1b1ba6;
     --k-accent-soft: #e7e8fd;
     --k-on-accent: #ffffff;
-    --k-selected: var(--k-accent-soft);
+    /* Distinct from hover (sunken) and the work surface, not just a tint of them. */
+    --k-selected: #d5d8fb;
     --k-success: #0b6b58;
     --k-success-soft: #ddf1eb;
     --k-warning: #7e5400;
@@ -103,6 +104,7 @@
     --k-accent: #a9b1ff;
     --k-accent-hover: #c9cdff;
     --k-accent-soft: #23286c;
+    --k-selected: #2e358c;
     --k-on-accent: #0f1148;
     --k-success: #7dd6bf;
     --k-success-soft: #11352e;
@@ -1279,6 +1281,12 @@
   .k-table tbody tr[data-selected],
   .k-table tbody tr[data-selected]:hover {
     background: var(--k-selected);
+  }
+  /* A selected row also carries the accent edge used by the active tab, so it never relies on the fill alone. */
+  .k-table tbody tr[data-selected] > :first-child {
+    background-image: linear-gradient(var(--k-accent), var(--k-accent));
+    background-repeat: no-repeat;
+    background-size: 4px 100%;
   }
   .k-table input[type='checkbox'] {
     width: 18px;
