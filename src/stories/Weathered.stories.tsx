@@ -24,7 +24,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '採用前の試作です。紙の粒・刷りのずれ・擦れた罫線を加える `wear="worn"` を、Paper / Ink で比べます。候補の一覧と根拠は references/weathered-candidates.md にあります（Sepia と Rust のテーマは採用しませんでした）。',
+          '採用前の試作です。紙の粒と擦れた罫線を加える `wear="worn"` を、Paper / Ink で比べます。候補の一覧と根拠は references/weathered-candidates.md にあります（Sepia と Rust のテーマは採用しませんでした）。',
       },
     },
   },
@@ -118,7 +118,7 @@ export const SideBySide: Story = {
           <KeiProvider key={theme + wear} theme={theme} wear={wear} style={{ padding: 24 }}>
             <Sample
               name={theme === 'paper' ? 'Paper' : 'Ink'}
-              note={wear === 'clean' ? '整った面' : '擦れ：粒・刷りのずれ・罫線の欠け'}
+              note={wear === 'clean' ? '整った面' : '擦れ：粒・罫線の欠け'}
             />
           </KeiProvider>
         )),

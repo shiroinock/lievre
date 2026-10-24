@@ -22,12 +22,6 @@
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.8 0 0 0 -.6'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* Misregistration: large numerals and display headings carry a second impression in the
-     accent, offset by a fraction of the stroke. Zero blur — it is a print offset, not a shadow. */
-  .kei[data-wear='worn'] :is(.k-heading--display, .k-metric-value, .k-meter-reading strong) {
-    text-shadow: 0.05em 0.035em 0 color-mix(in srgb, var(--k-accent) 38%, transparent);
-  }
-
   /* Worn rules: decorative dividers and chart grids break up at irregular intervals.
      Control outlines and table rules carry meaning, so they are left whole. */
   .kei[data-wear='worn'] .k-divider::before,
@@ -52,9 +46,6 @@
   @media (prefers-contrast: more), (forced-colors: active) {
     .kei[data-wear='worn']:not(.kei-portal)::before {
       display: none;
-    }
-    .kei[data-wear='worn'] :is(.k-heading--display, .k-metric-value, .k-meter-reading strong) {
-      text-shadow: none;
     }
     .kei[data-wear='worn'] .k-divider::before,
     .kei[data-wear='worn'] .k-divider::after {
