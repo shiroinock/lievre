@@ -49,8 +49,8 @@ export const palette: { group: string; swatches: Swatch[] }[] = [
       {
         token: '--k-selected',
         name: '選択の面',
-        paper: '#E7E8FD',
-        ink: '#23286C',
+        paper: '#D5D8FB',
+        ink: '#2E358C',
         use: '選択行・選択中の項目',
       },
     ],
@@ -117,9 +117,11 @@ export function TypeFoundation() {
       <div className="section-intro">
         <h2>文字</h2>
         <p>
-          本文は16px、行間1.75。操作画面では <code>typography="interface"</code>{' '}
-          で14pxにします。表示密度を変えても文字の大きさは変えません。書体は IBM Plex Sans JP と IBM
-          Plex Mono の2つです。
+          本文は16pxで行の高さ28px。操作画面では <code>typography="interface"</code>{' '}
+          で14px・24pxにします。行の高さは <code>--k-line-body</code>（約1.7倍）と{' '}
+          <code>--k-line-tight</code>
+          （約1.45倍）で、どの大きさでも4pxの倍数に丸めます。表示密度を変えても文字の大きさは変えません。書体は
+          IBM Plex Sans JP と IBM Plex Mono の2つです。
         </p>
       </div>
       <div className="type-scale">
@@ -167,7 +169,7 @@ export function SpaceFoundation() {
       <div className="section-intro">
         <h2>余白と形</h2>
         <p>
-          余白は4pxの倍数。部品の内側は8〜16px、まとまりの間は24〜32px。操作の高さは標準40px、高密度32pxです。
+          余白は4pxの倍数。部品の内側は8〜16px、まとまりの間は24〜32px。操作の高さは標準40px、高密度32pxで、左右の余白はボタンが高さの0.4倍、入力欄が0.3倍です。中身は上下左右の中央に置き、アイコンは隣の文字の1行目の中央に揃えます。
         </p>
       </div>
       <div className="spacing-scale">

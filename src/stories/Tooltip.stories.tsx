@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Tooltip, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,23 @@ const meta = {
   title: 'Components/Feedback/Tooltip',
   component: Tooltip,
   parameters: {
+    layoutGate: {
+      parts: [
+        {
+          name: 'ヒントを出すボタン',
+          selector: '.k-button',
+          checks: [
+            'inset-x',
+            'inset-y',
+            'control-height',
+            { padding: 'button' },
+            'fits',
+            { icon: 'svg' },
+          ],
+        },
+        { name: 'ツールチップ', selector: '.k-tooltip', checks: ['inset-y', 'fits'] },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:
@@ -30,4 +48,13 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 export const LongText: Story = {
   args: { content: '補助情報は短く。重要な説明や必須操作をTooltipの中だけに隠さないでください。' },
+};
+/** キーボードで表示した状態。配置の検査は、この Story でツールチップを測ります。 */
+export const Open: Story = {
+  play: async ({ canvasElement }) => {
+    await userEvent.tab();
+    await expect(
+      await within(canvasElement.ownerDocument.body).findByRole('tooltip'),
+    ).toBeInTheDocument();
+  },
 };

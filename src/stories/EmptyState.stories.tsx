@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import {
   EmptyState,
   Button,
@@ -16,6 +17,9 @@ const meta = {
   title: 'Components/Feedback/EmptyState',
   component: EmptyState,
   parameters: {
+    layoutGate: {
+      parts: [{ name: '空の状態', selector: '.k-empty', checks: ['inset-x'] }],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component: '空の理由と次の行動を明示します。検索結果ゼロと未作成を区別します。',

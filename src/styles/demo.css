@@ -22,7 +22,7 @@ body:has(.kei-app) {
   background: var(--demo-page-bg);
 }
 
-/* The sidebar and the instrument face are solid ultramarine; Ink calms them to a deep blue. */
+/* The sidebar is the app's frame, not content, so it alone is solid ultramarine; Ink calms it to a deep blue. */
 .kei-app {
   --demo-page-bg: #f3f4f8;
   --demo-blue: #2424d8;
@@ -137,7 +137,7 @@ body:has(.kei-app) {
 
 .main-nav {
   display: grid;
-  gap: 2px;
+  gap: 4px;
 }
 .main-nav button {
   display: flex;
@@ -178,7 +178,7 @@ body:has(.kei-app) {
 }
 .sidebar-link small {
   display: block;
-  margin-top: 2px;
+  margin-top: 4px;
   font-size: var(--k-text-xs);
   color: var(--demo-blue-muted);
 }
@@ -193,10 +193,11 @@ body:has(.kei-app) {
   padding: 24px 8px 0;
 }
 .theme-segment {
+  /* Four themes: two rows of two, on main's 4px spacing. */
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  padding: 2px;
+  gap: 4px;
+  padding: 4px;
   border-radius: var(--k-radius-md);
   background: var(--demo-blue-inset);
 }
@@ -205,7 +206,7 @@ body:has(.kei-app) {
   flex: 1;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
   min-height: 32px;
   border: 0;
   border-radius: var(--k-radius-sm);
@@ -267,7 +268,7 @@ body:has(.kei-app) {
 .inline-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-height: 32px;
   padding: 0;
   border: 0;
@@ -294,7 +295,7 @@ body:has(.kei-app) {
   margin: 0 0 20px;
   font-size: clamp(var(--k-text-2xl), 3.6vw, 2.75rem);
   font-weight: var(--k-weight-bold);
-  line-height: 1.35;
+  line-height: round(1.35em, 4px);
   letter-spacing: var(--k-tracking-heading);
   font-feature-settings: 'palt';
 }
@@ -302,7 +303,7 @@ body:has(.kei-app) {
   max-width: 34em;
   margin: 0 0 28px;
   font-size: var(--k-text-lg);
-  line-height: var(--k-leading-body);
+  line-height: var(--k-line-body);
   color: var(--k-muted);
 }
 .hero-facts {
@@ -323,30 +324,13 @@ body:has(.kei-app) {
   font-size: var(--k-text-md);
 }
 
-/* Real components on the instrument face: tokens are re-pointed, not restyled. */
+/* Content sits on the work surface like any card; ultramarine stays on what can be pressed or is selected. */
 .instrument-panel {
-  --k-bg: var(--demo-blue);
-  --k-surface: var(--demo-blue);
-  --k-surface-raised: var(--demo-blue);
-  --k-surface-sunken: var(--demo-blue-inset);
-  --k-text: #ffffff;
-  --k-muted: #d6d8ff;
-  --k-subtle: #d6d8ff;
-  --k-border: var(--demo-blue-line);
-  --k-border-strong: #b9bcff;
-  --k-accent: #ffffff;
-  --k-success: #8ee6cf;
-  --k-success-soft: var(--demo-blue-inset);
-  --k-skeleton: var(--demo-blue-inset);
   padding: 24px;
+  border: 1px solid var(--k-border);
   border-radius: var(--k-radius-lg);
-  background: var(--demo-blue);
+  background: var(--k-surface);
   color: var(--k-text);
-}
-.kei-app[data-theme='ink'] .instrument-panel {
-  --demo-blue: #1f1fa8;
-  --demo-blue-inset: #14147a;
-  --demo-blue-line: #4b4bc4;
 }
 .instrument-panel > header {
   display: flex;
@@ -368,8 +352,9 @@ body:has(.kei-app) {
   gap: 24px;
   padding: 24px 0;
 }
+/* As narrow as the 180px face, so the dial never spills past the meter's own box. */
 .instrument-panel-body .k-meter {
-  width: 168px;
+  width: 180px;
 }
 .instrument-panel .k-metric {
   padding: 0;
@@ -396,7 +381,7 @@ body:has(.kei-app) {
   margin: 0;
   font-size: var(--k-text-xl);
   font-weight: var(--k-weight-bold);
-  line-height: var(--k-leading-tight);
+  line-height: var(--k-line-tight);
   letter-spacing: var(--k-tracking-heading);
   font-feature-settings: 'palt';
 }
@@ -427,7 +412,7 @@ body:has(.kei-app) {
 .principle-row p {
   margin: 0;
   font-size: var(--k-text-md);
-  line-height: var(--k-leading-body);
+  line-height: var(--k-line-body);
   color: var(--k-muted);
 }
 .overview-stage {
@@ -454,9 +439,10 @@ body:has(.kei-app) {
   padding: 24px;
   overflow: auto;
   border-radius: var(--k-radius-lg);
-  background: var(--demo-blue);
-  color: var(--demo-blue-text);
-  font: var(--k-text-mono-min) / 1.7 var(--k-font-mono);
+  border: 1px solid var(--k-border);
+  background: var(--k-surface-sunken);
+  color: var(--k-text);
+  font: var(--k-text-mono-min) / var(--k-line-body) var(--k-font-mono);
 }
 
 .app-footer {
@@ -464,7 +450,7 @@ body:has(.kei-app) {
   flex-wrap: wrap;
   justify-content: space-between;
   gap: 8px 16px;
-  padding: 24px 0 32px;
+  padding: 24px 0;
   border-top: 1px solid var(--k-border);
   font-size: var(--k-text-xs);
   color: var(--k-muted);
@@ -481,7 +467,7 @@ body:has(.kei-app) {
   margin: 0 0 12px;
   font-size: var(--k-text-2xl);
   font-weight: var(--k-weight-bold);
-  line-height: var(--k-leading-tight);
+  line-height: var(--k-line-tight);
   letter-spacing: var(--k-tracking-heading);
   font-feature-settings: 'palt';
 }
@@ -511,7 +497,7 @@ body:has(.kei-app) {
 }
 .section-intro > p {
   margin: 12px 0 0;
-  line-height: var(--k-leading-body);
+  line-height: var(--k-line-body);
   color: var(--k-muted);
 }
 .section-intro code,
@@ -524,7 +510,7 @@ body:has(.kei-app) {
   max-width: 48em;
   margin: 32px 0 0;
   font-size: var(--k-text-md);
-  line-height: var(--k-leading-body);
+  line-height: var(--k-line-body);
   color: var(--k-muted);
 }
 .foundation-note .k-kbd {
@@ -538,7 +524,7 @@ body:has(.kei-app) {
 }
 .principle-description {
   margin: 0;
-  line-height: var(--k-leading-body);
+  line-height: var(--k-line-body);
   color: var(--k-muted);
 }
 
@@ -559,13 +545,13 @@ body:has(.kei-app) {
 .swatch {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   min-width: 0;
   font-size: var(--k-text-sm);
 }
 .swatch-chip {
   height: 72px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   border: 1px solid var(--k-border);
   border-radius: var(--k-radius-md);
 }
@@ -597,7 +583,7 @@ body:has(.kei-app) {
 .type-scale-sample {
   overflow: hidden;
   font-weight: var(--k-weight-bold);
-  line-height: var(--k-leading-tight);
+  line-height: var(--k-line-tight);
   font-feature-settings: 'palt';
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -637,18 +623,18 @@ body:has(.kei-app) {
 .type-pairs p {
   margin: 0;
   font-size: var(--k-text-md);
-  line-height: var(--k-leading-body);
+  line-height: var(--k-line-body);
   color: var(--k-muted);
 }
 .type-pairs .type-figure {
   margin: 12px 0;
   font-size: var(--k-text-3xl);
   font-weight: var(--k-weight-medium);
-  line-height: 1.2;
+  line-height: round(1.2em, 4px);
   color: var(--k-text);
 }
 .type-figure small {
-  margin-left: 2px;
+  margin-left: 4px;
   font-family: var(--k-font-sans);
   font-size: 0.5em;
   color: var(--k-muted);
@@ -709,7 +695,7 @@ body:has(.kei-app) {
   font-size: var(--k-text-mono-min);
 }
 .radius-grid p {
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   font-size: var(--k-text-sm);
   color: var(--k-muted);
 }
@@ -732,7 +718,7 @@ body:has(.kei-app) {
 }
 .reference-translation dd {
   margin: 4px 0 0;
-  line-height: var(--k-leading-body);
+  line-height: var(--k-line-body);
 }
 
 /* -------------------------------------------------------------- gallery */
@@ -798,6 +784,7 @@ body:has(.kei-app) {
   margin: 0 0 4px;
   font-size: var(--k-text-2xl);
   font-weight: var(--k-weight-bold);
+  line-height: var(--k-line-tight);
   letter-spacing: var(--k-tracking-heading);
   font-feature-settings: 'palt';
 }
@@ -857,7 +844,8 @@ body:has(.kei-app) {
   color: var(--k-muted);
 }
 .queue-search .k-input {
-  padding-left: 34px;
+  /* icon inset + icon + gap */
+  padding-left: calc(12px + 14px + 8px);
 }
 /* The fields keep their accessible names; the visible label is the icon and placeholder. */
 .queue-search > .k-field .k-label,
@@ -883,7 +871,7 @@ body:has(.kei-app) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 20px;
+  padding: 4px 20px;
   border-top: 1px solid var(--k-border);
   background: var(--k-selected);
   color: var(--k-accent);
@@ -902,7 +890,6 @@ body:has(.kei-app) {
 }
 .work-name {
   display: grid;
-  gap: 2px;
 }
 .work-name small {
   font-size: var(--k-text-xs);
@@ -917,8 +904,8 @@ body:has(.kei-app) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--k-accent-soft);
   color: var(--k-accent);
@@ -988,7 +975,7 @@ body:has(.kei-app) {
 }
 .capacity-content .k-meter {
   flex: none;
-  width: 168px;
+  width: 180px;
 }
 .capacity-bars {
   display: grid;
@@ -1026,7 +1013,6 @@ body:has(.kei-app) {
 }
 .activity-list small {
   display: block;
-  margin-top: 2px;
   font-size: var(--k-text-mono-min);
   color: var(--k-muted);
 }
@@ -1113,7 +1099,7 @@ body:has(.kei-app) {
 }
 .everyday-prose {
   font-size: var(--k-body);
-  line-height: 1.9;
+  line-height: round(1.9em, 4px);
 }
 .everyday-prose > * + * {
   margin-top: 24px;
@@ -1154,7 +1140,7 @@ body:has(.kei-app) {
 }
 .everyday-summary {
   display: grid;
-  gap: 12px;
+  gap: 4px;
   margin: 0;
 }
 .everyday-summary dt {

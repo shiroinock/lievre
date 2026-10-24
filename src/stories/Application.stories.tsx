@@ -1,9 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
+import { SCREEN_PARTS } from '../test/layout/screen-parts';
 import App from '../App';
 const meta = {
   title: 'Patterns/Application',
   component: App,
   parameters: {
+    layoutGate: {
+      screen: '部品を組み合わせた画面。操作の要素の網羅は、それぞれの部品の Story で見る。',
+      parts: SCREEN_PARTS,
+    } satisfies LayoutGate,
     layout: 'fullscreen',
     docs: {
       description: {

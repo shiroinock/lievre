@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-24T12:50:38.031Z",
+  "kei": {
+    "tasks": [
+      {
+        "task": "T1",
+        "types": 3135,
+        "typesAndDesign": 5322,
+        "llms": null
+      },
+      {
+        "task": "T2",
+        "types": 3237,
+        "typesAndDesign": 5424,
+        "llms": null
+      },
+      {
+        "task": "T3",
+        "types": 3333,
+        "typesAndDesign": 5520,
+        "llms": null
+      },
+      {
+        "task": "T4",
+        "types": 8603,
+        "typesAndDesign": 10790,
+        "llms": null
+      },
+      {
+        "task": "T5",
+        "types": 3237,
+        "typesAndDesign": 5424,
+        "llms": null
+      }
+    ],
+    "allTypes": 11428,
+    "source": 9331,
+    "implementation": 57576
+  }
+}
