@@ -24,7 +24,16 @@ const RANGES = {
   'kasure.threshold': [0.3, 0.95],
   'kasure.floor': [0.5, 1],
   'stain.strength': [0, 0.2],
+  'yake.strength': [0, 0.6],
+  'yake.reach': [40, 320],
+  'yake.mottle': [0, 1],
+  'yake.corner': [0, 1],
+  'yake.surfaces': [0, 1],
+  'sure.density': [0, 1],
+  'sure.strength': [0, 0.8],
+  'sure.fold': [0, 1],
 };
+const COLOUR = /^#[0-9a-f]{6}$/i;
 
 /** Returns the reasons a config cannot be saved; an empty list means it can. */
 export function validate(config, tokens) {
@@ -35,6 +44,14 @@ export function validate(config, tokens) {
     const value = path.split('.').reduce((o, k) => o[k], config);
     if (typeof value !== 'number' || !(value >= lo && value <= hi))
       problems.push(`${path} は ${lo}〜${hi} にしてください。`);
+  }
+  for (const [theme, tone] of Object.entries(config.tones)) {
+    if (
+      !COLOUR.test(tone.yake) ||
+      !COLOUR.test(tone.sure) ||
+      !(tone.amount >= 0 && tone.amount <= 1.5)
+    )
+      problems.push(`tones.${theme} の値が正しくありません（色は #rrggbb、amount は 0〜1.5）。`);
   }
   for (const kind of Object.keys(TEXT_KINDS)) {
     const { distort, kasure } = config.kinds[kind];

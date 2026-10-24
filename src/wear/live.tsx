@@ -3,7 +3,7 @@
 import type { CSSProperties } from 'react';
 import tokens from '../../tokens/tokens.json';
 import { seedFor } from './seed.mjs';
-import { liveEdge, textures, wearVars } from './textures.mjs';
+import { liveEdge, sheetThemeVars, sheetVars, textures, wearVars } from './textures.mjs';
 import { TEXT_KINDS, VARIANTS } from './params.mjs';
 import type { WearConfig, WearKind } from './presets.mjs';
 
@@ -20,24 +20,34 @@ function toUrl(bytes: Uint8Array) {
   return `data:image/png;base64,${btoa(binary)}`;
 }
 
-// Textures depend on the salt, the kasure and stain values and the theme's text colour; tuning
-// rebuilds them often, so keep the last few and release the rest.
-const cache = new Map<string, { surface: string; kasure: string }>();
+// Textures depend on the salt, the kasure, stain, yake and sure values and the theme's colours;
+// tuning rebuilds them often, so keep the last few and release the rest.
+type Urls = { surface: string; kasure: string; yake: string; sure: string };
+const cache = new Map<string, Urls>();
 function textureUrls(config: WearConfig, theme: string) {
-  const key = JSON.stringify([config.salt, config.kasure, config.stain, theme]);
+  const key = JSON.stringify([
+    config.salt,
+    config.kasure,
+    config.stain,
+    config.yake,
+    config.sure,
+    config.tones,
+    theme,
+  ]);
   let hit = cache.get(key);
   if (!hit) {
     const { files } = textures(config, tokens);
     hit = {
       surface: toUrl(files[`surface-${theme}.png`] ?? files['surface-paper.png']),
       kasure: toUrl(files['kasure.png']),
+      yake: toUrl(files[`yake-${theme}.png`] ?? files['yake-paper.png']),
+      sure: toUrl(files[`sure-${theme}.png`] ?? files['sure-paper.png']),
     };
     cache.set(key, hit);
     for (const [old, urls] of cache)
       if (cache.size > 8 && old !== key) {
         cache.delete(old);
-        if (urls.surface.startsWith('blob:'))
-          [urls.surface, urls.kasure].forEach(URL.revokeObjectURL);
+        if (urls.surface.startsWith('blob:')) Object.values(urls).forEach(URL.revokeObjectURL);
       }
   }
   return hit;
@@ -49,6 +59,8 @@ export function liveWearStyle(prefix: string, config: WearConfig, theme: string)
   const style: Record<string, string> = {
     ...wearVars(config, `url(${urls.kasure})`),
     '--k-wear-surface': `url(${urls.surface})`,
+    ...sheetVars(config),
+    ...sheetThemeVars(config, theme, { yake: `url(${urls.yake})`, sure: `url(${urls.sure})` }),
   };
   for (const kind of kinds)
     if (config.kinds[kind].distort)

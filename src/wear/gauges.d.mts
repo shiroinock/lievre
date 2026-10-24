@@ -22,7 +22,7 @@ export function kasureGauge(config: WearConfig, kind: WearKind, field?: Float32A
 export function contrastGauge(
   config: WearConfig,
   tokens: unknown,
-): Record<string, { min: number; level: GaugeLevel }>;
+): Record<string, { min: number; at: string; level: GaugeLevel }>;
 export function gauges(
   config: WearConfig,
   tokens: unknown,
@@ -35,6 +35,12 @@ export function gauges(
     outline: OutlineGauge;
     kasure: KasureGauge;
   }[];
-  contrast: Record<string, { min: number; level: GaugeLevel }>;
+  contrast: Record<string, { min: number; at: string; level: GaugeLevel }>;
   level: GaugeLevel;
 };
+export function wornBackgrounds(
+  config: WearConfig,
+  set: unknown,
+  theme: string,
+  background: string,
+): string[];

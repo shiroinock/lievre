@@ -16,6 +16,40 @@
   "stain": {
     "strength": 0.08
   },
+  "yake": {
+    "strength": 0.35,
+    "reach": 160,
+    "mottle": 0.5,
+    "corner": 0.4,
+    "surfaces": 0.3
+  },
+  "sure": {
+    "density": 0.5,
+    "strength": 0.35,
+    "fold": 0.6
+  },
+  "tones": {
+    "paper": {
+      "yake": "#f2dca6",
+      "amount": 1,
+      "sure": "#ffffff"
+    },
+    "ink": {
+      "yake": "#2a2f4a",
+      "amount": 0.6,
+      "sure": "#262b5c"
+    },
+    "sepia": {
+      "yake": "#e9c886",
+      "amount": 1,
+      "sure": "#fbf7ec"
+    },
+    "rust": {
+      "yake": "#3e2f28",
+      "amount": 0.6,
+      "sure": "#382722"
+    }
+  },
   "kinds": {
     "small": {
       "distort": false,

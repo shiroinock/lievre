@@ -5,8 +5,15 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { deflateSync } from 'node:zlib';
-import { normaliseConfig, TEXT_KINDS, TILE, VARIANTS } from '../src/wear/presets.mjs';
-import { faceVars, THEMES, textures, wearVars } from '../src/wear/textures.mjs';
+import { normaliseConfig, SHEET_SLICE, TEXT_KINDS, TILE, VARIANTS } from '../src/wear/presets.mjs';
+import {
+  faceVars,
+  sheetThemeVars,
+  sheetVars,
+  THEMES,
+  textures,
+  wearVars,
+} from '../src/wear/textures.mjs';
 
 const GUARD = ':not(:has(a, button, input, select, textarea, [tabindex]))';
 const block = (selector, declarations) =>
@@ -23,6 +30,9 @@ export function buildRules() {
   const worn = ".kei:is([data-wear='baked'], [data-wear='live'])";
   const rules = [
     block(`${worn}:not(.kei-portal)`, { 'background-position': 'var(--k-wear-root-pos)' }),
+    block(`${worn}:not(.kei-portal)::before`, {
+      'border-image': `var(--k-wear-yake) ${SHEET_SLICE} / var(--k-wear-yake-reach) stretch`,
+    }),
   ];
   for (let n = 0; n < VARIANTS; n++)
     rules.push(
@@ -81,11 +91,16 @@ export function buildWear(config, tokens) {
     css.push(
       block(`.kei[data-wear='baked'][data-theme='${theme}']`, {
         '--k-wear-surface': `url('./surface-${theme}.png')`,
+        ...sheetThemeVars(config, theme, {
+          yake: `url('./yake-${theme}.png')`,
+          sure: `url('./sure-${theme}.png')`,
+        }),
       }),
     );
   css.push(
     block(".kei[data-wear='baked']", {
       ...wearVars(config, "url('./kasure.png')"),
+      ...sheetVars(config),
       ...faceVars(config),
     }),
   );
@@ -95,7 +110,7 @@ export function buildWear(config, tokens) {
   const meta = {
     config,
     // Hashes of the pixels before compression, so the check does not depend on the zlib build.
-    pixels: { surface: digest(pixels.surface), kasure: digest(pixels.kasure) },
+    pixels: Object.fromEntries(Object.entries(pixels).map(([k, v]) => [k, digest(v)])),
     bytes: Object.fromEntries(Object.entries(files).map(([k, v]) => [k, v.length])),
   };
   return { files, css: css.join('\n') + '\n', rules: buildRules(), meta };

@@ -10,7 +10,10 @@ export function textures(
   config: WearConfig,
   tokens: Tokens,
   deflate?: (rows: Uint8Array) => Uint8Array,
-): { pixels: { surface: Uint8Array; kasure: Uint8Array }; files: Record<string, Uint8Array> };
+): {
+  pixels: { surface: Uint8Array; kasure: Uint8Array; yake: Uint8Array; sure: Uint8Array };
+  files: Record<string, Uint8Array>;
+};
 export function placements(salt: string): Record<string, [number, number][]>;
 export function wearVars(config: WearConfig, kasure: string): Record<string, string>;
 export function liveEdge(
@@ -18,3 +21,11 @@ export function liveEdge(
   kind: WearKind,
 ): { baseFrequency: number; scale: number };
 export function faceVars(config: WearConfig): Record<string, string>;
+export function yakeField(salt: string, yake: WearConfig['yake']): Float32Array;
+export function sureField(salt: string, sure: WearConfig['sure']): Float32Array;
+export function sheetVars(config: WearConfig): Record<string, string>;
+export function sheetThemeVars(
+  config: WearConfig,
+  theme: string,
+  urls: { yake: string; sure: string },
+): Record<string, string>;

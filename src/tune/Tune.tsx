@@ -61,10 +61,12 @@ type Slider = {
   max: number;
   step: number;
 };
-function outlineSlider(
+type Group = 'outline' | 'yake' | 'sure';
+function groupSlider<G extends Group>(
+  group: G,
   label: string,
   hint: string,
-  key: keyof WearConfig['outline'],
+  key: keyof WearConfig[G],
   min: number,
   max: number,
   step: number,
@@ -72,13 +74,16 @@ function outlineSlider(
   return {
     label,
     hint,
-    get: (c) => c.outline[key],
-    set: (c, v) => ({ ...c, outline: { ...c.outline, [key]: v } }),
+    get: (c) => c[group][key] as number,
+    set: (c, v) => ({ ...c, [group]: { ...c[group], [key]: v } }),
     min,
     max,
     step,
   };
 }
+const outlineSlider = (
+  ...args: [string, string, keyof WearConfig['outline'], number, number, number]
+) => groupSlider('outline', ...args);
 const sliders: Slider[] = [
   outlineSlider('縁の荒れの量', '1/1000 em。縁が線に垂直に動く量', 'rough', 0, 20, 0.5),
   outlineSlider('縁の荒れの細かさ', '1/1000 em。小さいほど細かく荒れる', 'roughScale', 8, 60, 1),
@@ -135,6 +140,46 @@ const sliders: Slider[] = [
     max: 0.2,
     step: 0.005,
   },
+  groupSlider(
+    'yake',
+    'ヤケの強さ',
+    '最も濃い角での、テーマの色味の不透明度',
+    'strength',
+    0,
+    0.6,
+    0.01,
+  ),
+  groupSlider('yake', 'ヤケの届く深さ', 'px。画面の端からどこまで色が付くか', 'reach', 40, 320, 10),
+  groupSlider(
+    'yake',
+    'ヤケのむら',
+    '届く深さと濃さが、場所によって変わる度合い',
+    'mottle',
+    0,
+    1,
+    0.05,
+  ),
+  groupSlider('yake', '角の強さ', '二方向の端が重なる角に、さらに足す濃さ', 'corner', 0, 1, 0.05),
+  groupSlider(
+    'yake',
+    'カードの縁のヤケ',
+    'カードと Metric の縁を、ヤケの強さに対してどれだけ焼くか（0 で焼かない）',
+    'surfaces',
+    0,
+    1,
+    0.05,
+  ),
+  groupSlider('sure', 'スレの密度', '擦れて色が抜けた筋と斑点の多さ', 'density', 0, 1, 0.05),
+  groupSlider('sure', 'スレの強さ', '最も擦れた点の、抜けた色の不透明度', 'strength', 0, 0.8, 0.01),
+  groupSlider(
+    'sure',
+    '折り目のスレ',
+    '中ほどの縦の折り目に出るスレの濃さ（端に対して）',
+    'fold',
+    0,
+    1,
+    0.05,
+  ),
 ];
 
 type Status = { state: string; log?: string; problems?: string[]; error?: string };
@@ -241,6 +286,13 @@ export function Tune() {
             <small>{s.hint}</small>
           </label>
         ))}
+        <ToneControls
+          theme={theme}
+          tone={config.tones[theme]}
+          onChange={(tone) =>
+            setConfig((c) => ({ ...c, preset: 'custom', tones: { ...c.tones, [theme]: tone } }))
+          }
+        />
         <table className="tune-kinds">
           <caption className="k-label">文字の種類ごと</caption>
           <thead>
@@ -321,6 +373,17 @@ export function Tune() {
             実行時の列は、縁の荒れを SVG
             のフィルタで近似します。画素を動かすので、フォントの太さのむらは表せず、ノイズの形もフォントとは違います。焼き込みと同じ見た目は「焼き込み（調整中の値）」の列で確かめてください。この列は、見本の文字だけを開発サーバーでその場で焼き込みます（2秒ほど）。
           </Text>
+        </section>
+        <section aria-labelledby="tune-sheet" className="tune-sheet-section">
+          <Heading level={2} size="section" id="tune-sheet">
+            広い面で見る
+          </Heading>
+          <Text size="small" tone="muted">
+            ヤケとスレは画面（ビューポート）の端から付きます。ここでは、この枠を1枚の紙として、調整中の値（実行時）で表示します。端の近くに、サイドバーの文字と表の端の列を置いています。
+          </Text>
+          <KeiProvider theme={theme} wear="live" wearConfig={shown} className="tune-sheet">
+            <WideSheet />
+          </KeiProvider>
         </section>
         <FontCheck reach={edgeReach(saved)} stamp={baked} />
       </main>
@@ -405,7 +468,8 @@ function Gauges({ g }: { g: ReturnType<typeof gauges> }) {
       <div className="k-table-wrap">
         <table className="k-table">
           <caption className="k-label">
-            最も濃い汚れの上で、全ての文字色と、最も薄いカスレの文字が 4.5:1 に届くか
+            汚れ・ヤケ・スレが最も濃い点の上で、全ての文字色と、最も薄いカスレの文字が 4.5:1
+            に届くか（いちばん低くなる層を添えます）
           </caption>
           <thead>
             <tr>
@@ -420,7 +484,8 @@ function Gauges({ g }: { g: ReturnType<typeof gauges> }) {
             <tr>
               {Object.entries(g.contrast).map(([t, c]) => (
                 <td key={t}>
-                  <span className="k-mono">{c.min.toFixed(2)}:1</span> <Level level={c.level} />
+                  <span className="k-mono">{c.min.toFixed(2)}:1</span>（{c.at}）{' '}
+                  <Level level={c.level} />
                 </td>
               ))}
             </tr>
@@ -547,6 +612,101 @@ function Column({
       <KeiProvider theme={theme} wear={wear} wearConfig={config} className="tune-specimen">
         <Specimen />
       </KeiProvider>
+    </div>
+  );
+}
+
+const themeNames: Record<Theme, string> = {
+  paper: 'Paper',
+  ink: 'Ink',
+  sepia: 'Sepia',
+  rust: 'Rust',
+};
+
+/** The selected theme's tones: what the sheet browns toward, how much, and what a scuff shows. */
+function ToneControls({
+  theme,
+  tone,
+  onChange,
+}: {
+  theme: Theme;
+  tone: WearConfig['tones'][Theme];
+  onChange: (tone: WearConfig['tones'][Theme]) => void;
+}) {
+  return (
+    <fieldset className="tune-tones">
+      <legend className="k-label">{themeNames[theme]} の色味（テーマは下で切り替え）</legend>
+      <label>
+        <input
+          type="color"
+          value={tone.yake}
+          onChange={(e) => onChange({ ...tone, yake: e.target.value })}
+        />
+        <span className="k-text--small">ヤケの色</span>
+      </label>
+      <label>
+        <input
+          type="color"
+          value={tone.sure}
+          onChange={(e) => onChange({ ...tone, sure: e.target.value })}
+        />
+        <span className="k-text--small">スレの色</span>
+      </label>
+      <label className="tune-slider">
+        <span className="k-text--small">
+          このテーマでの強さ <output>{tone.amount}</output>
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={1.5}
+          step={0.05}
+          value={tone.amount}
+          onChange={(e) => onChange({ ...tone, amount: Number(e.target.value) })}
+        />
+      </label>
+    </fieldset>
+  );
+}
+
+/** A wide sheet with text against its edges: a side column, and a table that runs to the right. */
+function WideSheet() {
+  return (
+    <div className="tune-sheet-layout">
+      <nav aria-label="見本のサイドバー" className="tune-sheet-side">
+        <Text size="small">はじめに</Text>
+        <Text size="small">デザインの基礎</Text>
+        <Text size="small">コンポーネント</Text>
+        <Text size="small">画面パターン</Text>
+        <Text size="small" tone="muted">
+          v0.2.0
+        </Text>
+      </nav>
+      <div className="tune-sheet-body">
+        <Heading level={3} size="title">
+          計測の記録
+        </Heading>
+        <Text>端の近くの文字も、ヤケとスレの上で読めるかを確かめます。</Text>
+        <DataTable
+          caption="端まで届く表"
+          rows={rows}
+          getRowId={(r) => r.id}
+          columns={[
+            { key: 'id', header: 'ID', render: (r) => <span className="k-mono">{r.id}</span> },
+            { key: 'at', header: '時刻', render: (r) => <span className="k-mono">{r.at}</span> },
+            {
+              key: 'count',
+              header: '件数',
+              align: 'right',
+              render: (r) => <span className="k-mono">{r.count}</span>,
+            },
+          ]}
+        />
+        <div className="tune-sheet-cards">
+          <Metric label="同期の成功率" value="98.4" unit="%" code="SYN-07" />
+          <Metric label="待ち件数" value="312" code="SYN-08" />
+        </div>
+      </div>
     </div>
   );
 }

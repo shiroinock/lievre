@@ -8,7 +8,15 @@ import { buildWear, readConfig } from '../../scripts/build-wear.mjs';
 import { seedFor, mulberry32, noise2 } from '../wear/seed.mjs';
 import { KASURE_FLOOR, SURFACE_MAX } from '../wear/params.mjs';
 import { normaliseConfig, PRESETS } from '../wear/presets.mjs';
-import { kasureField, textures, wearVars } from '../wear/textures.mjs';
+import {
+  kasureField,
+  sheetThemeVars,
+  sheetVars,
+  textures,
+  wearVars,
+  yakeField,
+} from '../wear/textures.mjs';
+import { SHEET, SHEET_SLICE } from '../wear/presets.mjs';
 import { contrastGauge, outlineGauge, gauges } from '../wear/gauges.mjs';
 import { liveWearStyle } from '../wear/live';
 import { KeiProvider, Dialog, Button } from '../index';
@@ -48,7 +56,8 @@ describe('Wear: seeded and reproducible', () => {
     expect(seedFor('kei', 'card', 2)).not.toBe(seedFor('kei', 'card', 3));
     const [a, b] = [mulberry32(7), mulberry32(7)];
     expect([a(), a(), a()]).toEqual([b(), b(), b()]);
-  });
+    // Four builds of every texture, the 512px yake frame among them.
+  }, 20000);
 
   it('tiles without a seam', () => {
     expect(noise2(5, 0, 0.3, 4)).toBeCloseTo(noise2(5, 4, 0.3, 4), 12);
@@ -62,11 +71,36 @@ describe('Wear: seeded and reproducible', () => {
       );
   });
 
+  it('browns the sheet from its edges and keeps the middle of the frame clear', () => {
+    for (const preset of Object.values(PRESETS)) {
+      const field = yakeField(preset.salt, preset.yake);
+      const at = (x: number, y: number) => field[y * SHEET + x];
+      // The middle slice is stretched across the screen: nothing in it, so no stripe appears.
+      for (let y = SHEET_SLICE; y < SHEET - SHEET_SLICE; y += 7)
+        for (let x = SHEET_SLICE; x < SHEET - SHEET_SLICE; x += 7) expect(at(x, y)).toBe(0);
+      // Deeper toward the edge, and deepest in the corners.
+      const mid = SHEET / 2;
+      expect(at(mid, 0)).toBeGreaterThan(at(mid, 40));
+      const corner = Math.max(
+        at(0, 0),
+        at(SHEET - 1, 0),
+        at(0, SHEET - 1),
+        at(SHEET - 1, SHEET - 1),
+      );
+      expect(corner).toBeGreaterThan(at(mid, 0));
+      expect(field.every((v) => v <= 1)).toBe(true);
+    }
+  });
+
   it('gives live the same textures and offsets as the baked build', () => {
     const live = liveWearStyle('t', config, 'sepia') as Record<string, string>;
     const shared = wearVars(config, 'KASURE');
     for (const [name, value] of Object.entries(shared))
       if (name !== '--k-wear-kasure') expect(live[name]).toBe(value);
+    for (const [name, value] of Object.entries(sheetVars(config))) expect(live[name]).toBe(value);
+    expect(live['--k-wear-rim']).toBe(
+      sheetThemeVars(config, 'sepia', { yake: '', sure: '' })['--k-wear-rim'],
+    );
     // The same pixels, stored rather than compressed.
     const stored = textures(config, tokens);
     expect(stored.pixels).toEqual(textures(config, tokens, (rows) => deflateSync(rows)).pixels);
@@ -134,8 +168,19 @@ describe('Wear: what it may touch', () => {
       // Worn faces keep every advance width (checked by npm run wear:font), so text does not move.
       'font-family',
       '--k-font-mono',
+      // The sheet: the root's ::before and ::after are fixed (or absolute) behind the content, and
+      // its own stacking context keeps them there. The border is 0 wide; only its image is drawn.
+      'isolation',
+      'z-index',
+      'pointer-events',
+      'border-style',
+      'border-width',
+      'border-image',
+      // Cards and metrics brown along their edges with an inset shadow, which takes no room.
+      'box-shadow',
     ]);
-    // position/inset only appear on the meter's ::before, which is absolutely placed inside it.
+    // position/inset appear on the meter's ::before, absolutely placed inside it, and on the
+    // root's sheet layers, which are fixed to the viewport.
     expect(
       declarations
         .map((d) => d.trim())

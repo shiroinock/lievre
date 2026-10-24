@@ -62,8 +62,22 @@ export function kasureGauge(config, kind, field = kasureField(config.salt, confi
 }
 
 /**
- * Contrast at the darkest point, per theme: every text colour on the most stained surface, and
- * text-coloured glyphs at the faintest point of the deepest dry brush on top of that stain.
+ * The most worn backgrounds of a surface in a theme: stained at the darkest speckle, then browned
+ * at the darkest corner of the yake, and that again with the most rubbed scuff on top. Text sits
+ * on all three somewhere near an edge, so each must hold.
+ */
+export function wornBackgrounds(config, set, theme, background) {
+  const tone = config.tones[theme];
+  const stained = mix(resolve(set, background), resolve(set, 'text'), config.stain.strength);
+  const browned = mix(stained, tone.yake, config.yake.strength * tone.amount);
+  const rubbed = mix(browned, tone.sure, config.sure.strength);
+  return [stained, browned, rubbed];
+}
+
+/**
+ * Contrast at the darkest point, per theme: every text colour on the most worn surface (stain,
+ * yake and scuffs at their strongest), and text-coloured glyphs at the faintest point of the
+ * deepest dry brush on top of that. at says which layer was the worst.
  */
 export function contrastGauge(config, tokens) {
   const depth = Math.max(...Object.values(config.kinds).map((k) => k.kasure));
@@ -72,13 +86,18 @@ export function contrastGauge(config, tokens) {
     THEMES.map((theme) => {
       const set = themeTokens(tokens, theme);
       let min = Infinity;
-      for (const background of ['bg', 'surface']) {
-        const stained = mix(resolve(set, background), resolve(set, 'text'), config.stain.strength);
-        for (const fg of ['text', 'muted', 'subtle', 'success', 'warning', 'danger', 'info'])
-          min = Math.min(min, ratio(resolve(set, fg), stained));
-        min = Math.min(min, ratio(mix(stained, resolve(set, 'text'), faintest), stained));
-      }
-      return [theme, { min, level: min >= GUIDES.contrast ? 'ok' : 'warn' }];
+      let at = '';
+      const layers = ['汚れ', 'ヤケ', 'スレ'];
+      for (const background of ['bg', 'surface'])
+        wornBackgrounds(config, set, theme, background).forEach((worn, i) => {
+          const check = (value) => {
+            if (value < min) [min, at] = [value, layers[i]];
+          };
+          for (const fg of ['text', 'muted', 'subtle', 'success', 'warning', 'danger', 'info'])
+            check(ratio(resolve(set, fg), worn));
+          check(ratio(mix(worn, resolve(set, 'text'), faintest), worn));
+        });
+      return [theme, { min, at, level: min >= GUIDES.contrast ? 'ok' : 'warn' }];
     }),
   );
 }

@@ -36,6 +36,46 @@
       background-size: 256px 256px;
     }
 
+    /* The sheet: yake browns the page in from the edges of the viewport, and sure rubs the colour
+       off in scuffs near the edges and along one fold. Both sit behind the content (z-index -1
+       in the root's own stacking context), so they age the paper and never the ink: text,
+       focus outlines, controls and status colours are drawn over them unchanged. Fixed to the
+       viewport, they are composited once and not repainted while the page scrolls. The frame
+       is cut into nine (border-image), so the corners keep their size on any screen; when the
+       screen is narrower than two reaches, the browser shrinks all four edges alike. */
+    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal) {
+      isolation: isolate;
+    }
+    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::before,
+    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::before {
+      border-style: solid;
+      border-width: 0;
+      /* border-image (the slice is SHEET_SLICE) comes from wear/rules.css. */
+    }
+    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::after {
+      background-image: var(--k-wear-sure);
+      background-size: 256px 256px;
+      mask: var(--k-wear-sure-mask);
+    }
+    /* A root inside another root (a specimen on the tuning page) is a sheet of its own box.
+       Position that root (relative) so the sheet stays inside it. */
+    .kei .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::before,
+    .kei .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::after {
+      position: absolute;
+    }
+    /* Cards and metrics are sheets laid on the page: they brown along their own edges, more
+       weakly (yake.surfaces). */
+    .kei:is([data-wear='baked'], [data-wear='live']) :is(.k-card, .k-metric) {
+      box-shadow: var(--k-wear-rim);
+    }
+
     /* Misregistration: large numerals and display headings carry a second impression in the
        accent. Zero blur — it is a print offset, not a shadow. */
     .kei:is([data-wear='baked'], [data-wear='live'])

@@ -4,6 +4,9 @@
     .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal) {
       background-position: var(--k-wear-root-pos);
     }
+    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::before {
+      border-image: var(--k-wear-yake) 160 / var(--k-wear-yake-reach) stretch;
+    }
     .kei:is([data-wear='baked'], [data-wear='live']) :is(.k-card, .k-metric) {
       background-position: var(--k-wear-card-pos-0);
     }

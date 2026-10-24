@@ -17,6 +17,40 @@
     "stain": {
       "strength": 0.08
     },
+    "yake": {
+      "strength": 0.35,
+      "reach": 160,
+      "mottle": 0.5,
+      "corner": 0.4,
+      "surfaces": 0.3
+    },
+    "sure": {
+      "density": 0.5,
+      "strength": 0.35,
+      "fold": 0.6
+    },
+    "tones": {
+      "paper": {
+        "yake": "#f2dca6",
+        "amount": 1,
+        "sure": "#ffffff"
+      },
+      "ink": {
+        "yake": "#2a2f4a",
+        "amount": 0.6,
+        "sure": "#262b5c"
+      },
+      "sepia": {
+        "yake": "#e9c886",
+        "amount": 1,
+        "sure": "#fbf7ec"
+      },
+      "rust": {
+        "yake": "#3e2f28",
+        "amount": 0.6,
+        "sure": "#382722"
+      }
+    },
     "kinds": {
       "small": {
         "distort": false,
@@ -42,12 +76,22 @@
   },
   "pixels": {
     "surface": "24cbd0f38917608c",
-    "kasure": "0331ecef9dbea1d8"
+    "kasure": "0331ecef9dbea1d8",
+    "yake": "252a1631b415dfdc",
+    "sure": "89342154ecf77cc3"
   },
   "bytes": {
+    "yake-paper.png": 6056,
+    "sure-paper.png": 3043,
     "surface-paper.png": 16771,
+    "yake-ink.png": 6056,
+    "sure-ink.png": 3043,
     "surface-ink.png": 16771,
+    "yake-sepia.png": 6056,
+    "sure-sepia.png": 3043,
     "surface-sepia.png": 16771,
+    "yake-rust.png": 6056,
+    "sure-rust.png": 3043,
     "surface-rust.png": 16771,
     "kasure.png": 5062
   }

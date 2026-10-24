@@ -6,7 +6,7 @@ import { hash32, mulberry32, noise2, seedFor } from './seed.mjs';
 import { printMarks } from './marks.mjs';
 import { encodeIndexedPng } from './png.mjs';
 // Not params.mjs: the dev server's config loads this, and must not depend on wear.config.json.
-import { OUTLINE_CAPS, TEXT_KINDS, THIN, TILE, VARIANTS } from './presets.mjs';
+import { OUTLINE_CAPS, SHEET, SHEET_SLICE, TEXT_KINDS, THIN, TILE, VARIANTS } from './presets.mjs';
 
 export const LEVELS = 16;
 export const THEMES = ['paper', 'ink', 'sepia', 'rust'];
@@ -49,6 +49,55 @@ export function kasureField(salt, { density, threshold, floor }) {
   return field;
 }
 
+/**
+ * Yake: how far the sheet has browned, 0..1, as a frame image cut into nine for border-image.
+ * Each edge browns inward over at most SHEET_SLICE pixels; low-frequency noise shortens the reach
+ * and thins the colour from place to place (mottle), so the line it stops at wanders. Where two
+ * edges meet the browning adds up, and corner adds more; 1 is the darkest corner. The middle of
+ * the image stays clear, so stretching the edges to any size keeps the corners the same.
+ */
+export function yakeField(salt, { mottle, corner }) {
+  const reachSeed = seedFor(salt, 'texture', 'yake-reach');
+  const toneSeed = seedFor(salt, 'texture', 'yake-tone');
+  const field = new Float32Array(SHEET * SHEET);
+  for (let y = 0; y < SHEET; y++)
+    for (let x = 0; x < SHEET; x++) {
+      const wander =
+        noise2(reachSeed, x / 90, y / 90) * 0.7 +
+        noise2(reachSeed ^ 0x9e3779b9, x / 30, y / 30) * 0.3;
+      const reach = SHEET_SLICE * (1 - mottle * 0.6 * wander);
+      const fall = (d) => (d >= reach ? 0 : (1 - d / reach) ** 2);
+      const across = Math.max(fall(x), fall(SHEET - 1 - x));
+      const down = Math.max(fall(y), fall(SHEET - 1 - y));
+      const browned = (1 - (1 - across) * (1 - down) + corner * across * down) / (1 + corner);
+      field[y * SHEET + x] = browned * (1 - mottle * 0.5 * noise2(toneSeed, x / 48, y / 48));
+    }
+  return field;
+}
+
+/**
+ * Sure: sparse scuffs where the colour has rubbed off, 0..1 on a repeating tile. Mostly short
+ * streaks along the direction of rubbing, gathered in patches; density is how many (0–1).
+ * Where they show (near the edges and along the fold) is a mask in CSS, so the tile repeats.
+ */
+export function sureField(salt, { density }) {
+  const streakSeed = seedFor(salt, 'texture', 'sure-streak');
+  const patchSeed = seedFor(salt, 'texture', 'sure-patch');
+  const speckSeed = seedFor(salt, 'texture', 'sure-speck');
+  const cut = 0.92 - density * 0.3;
+  const field = new Float32Array(TILE * TILE);
+  for (let y = 0; y < TILE; y++)
+    for (let x = 0; x < TILE; x++) {
+      const u = x / TILE;
+      const v = y / TILE;
+      const rubbed =
+        noise2(streakSeed, u * 8, v * 56, [8, 56]) * 0.7 + noise2(patchSeed, u * 5, v * 5, 5) * 0.3;
+      field[y * TILE + x] =
+        smooth(cut, cut + 0.1, rubbed) * (0.55 + 0.45 * hash32(speckSeed, x, y));
+    }
+  return field;
+}
+
 // Kasure rounds up so no step falls below the floor; surfaces stay at or under the strength.
 export function quantise(field, round = Math.round) {
   const indices = new Uint8Array(field.length);
@@ -57,6 +106,7 @@ export function quantise(field, round = Math.round) {
   return indices;
 }
 const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+const blend = (a, b, t) => rgb(a).map((c, i) => Math.round(c + (rgb(b)[i] - c) * t));
 
 /** Text colour of each theme, from tokens.json. */
 export function themeText(tokens, theme) {
@@ -67,8 +117,22 @@ export function themeText(tokens, theme) {
 export function textures(config, tokens, deflate) {
   const surface = quantise(surfaceField(config.salt));
   const kasure = quantise(kasureField(config.salt, config.kasure), Math.ceil);
+  const yake = quantise(yakeField(config.salt, config.yake));
+  const sure = quantise(sureField(config.salt, config.sure));
   const files = {};
   for (const theme of THEMES) {
+    const tone = config.tones[theme];
+    // Paler where it has just begun, the full tone at the edge.
+    const yakePalette = Array.from({ length: LEVELS }, (_, i) => [
+      ...blend('#ffffff', tone.yake, 0.7 + (0.3 * i) / (LEVELS - 1)),
+      Math.round((i / (LEVELS - 1)) * config.yake.strength * tone.amount * 255),
+    ]);
+    files[`yake-${theme}.png`] = encodeIndexedPng(SHEET, yake, yakePalette, deflate);
+    const surePalette = Array.from({ length: LEVELS }, (_, i) => [
+      ...rgb(tone.sure),
+      Math.round((i / (LEVELS - 1)) * config.sure.strength * 255),
+    ]);
+    files[`sure-${theme}.png`] = encodeIndexedPng(TILE, sure, surePalette, deflate);
     const palette = Array.from({ length: LEVELS }, (_, i) => [
       ...rgb(themeText(tokens, theme)),
       Math.round((i / (LEVELS - 1)) * config.stain.strength * 255),
@@ -82,7 +146,7 @@ export function textures(config, tokens, deflate) {
     Math.round((i / (LEVELS - 1)) * 255),
   ]);
   files['kasure.png'] = encodeIndexedPng(TILE, kasure, alpha, deflate);
-  return { pixels: { surface, kasure }, files };
+  return { pixels: { surface, kasure, yake, sure }, files };
 }
 
 /** Where each part's tile starts, for the root, cards and each text kind. */
@@ -128,6 +192,44 @@ export function wearVars(config, kasure) {
     for (let n = 0; n < VARIANTS; n++) vars[`--k-wear-${kind}-pos-${n}`] = at(place[kind][n]);
   }
   return vars;
+}
+
+/**
+ * Where the sheet wears, shared by both modes: how far the browning reaches, and the mask that
+ * keeps scuffs to the edges and to one fold, a little off the middle (placed by the salt).
+ */
+export function sheetVars(config) {
+  const { reach } = config.yake;
+  const fold = 44 + mulberry32(seedFor(config.salt, 'fold'))() * 12;
+  const r = `${reach}px`;
+  const ink = `#000000${hex2(config.sure.fold)}`;
+  return {
+    '--k-wear-yake-reach': r,
+    '--k-wear-sure-mask':
+      `linear-gradient(to right, #000, transparent ${r}, transparent calc(${fold.toFixed(1)}% - 40px), ` +
+      `${ink} ${fold.toFixed(1)}%, transparent calc(${fold.toFixed(1)}% + 40px), ` +
+      `transparent calc(100% - ${r}), #000), ` +
+      `linear-gradient(to bottom, #000, transparent ${r}, transparent calc(100% - ${r}), #000)`,
+  };
+}
+
+/**
+ * Per-theme sheet values: the frame and scuff images, and the browned rim cards and metrics take
+ * when yake.surfaces is above 0 (an inset shadow, so it keeps its width on any size of card).
+ */
+export function sheetThemeVars(config, theme, urls) {
+  const tone = config.tones[theme];
+  const alpha = config.yake.strength * tone.amount * config.yake.surfaces;
+  const [r, g, b] = rgb(tone.yake);
+  const blur = Math.round(config.yake.reach * 0.3);
+  return {
+    '--k-wear-yake': urls.yake,
+    '--k-wear-sure': urls.sure,
+    '--k-wear-rim':
+      alpha > 0
+        ? `inset 0 0 ${blur}px ${Math.round(blur / 6)}px rgb(${r} ${g} ${b} / ${alpha.toFixed(3)})`
+        : 'none',
+  };
 }
 
 /**
