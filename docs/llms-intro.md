@@ -55,4 +55,7 @@ const sorted = useMemo(() => {
 ## 確かめ方
 
 - 型（`tsc --noEmit`）が誤った props の大半を止めます。
-- 次は型では止まりません：KeiProvider の包み忘れ、フォームの Button の `type="submit"` 忘れ、ページ送りで区切った後の並べ替え、Metric の `value` に単位を含めること。書いた後にこの4点を見直してください。
+- 型で止まらない誤用は、`@kei-design/react/lint` の lint ルールが止めます（フォームの Button の `type` 忘れ、ページ送りで区切った後の並べ替え、Metric の `value` の単位、閉じられない Dialog、アイコンだけの Button など11個）。メッセージに直し方が書いてあるので、そのとおりに直します。ESLint と Oxlint は同じプラグイン、Biome は GritQL のファイルで、設定は README の「lint」にあります。
+  - ESLint：`import kei from '@kei-design/react/lint'` を読み込み、flat config に `{ files: ['**/*.tsx'], languageOptions: { parser: tseslint.parser }, ...kei.configs.recommended }` を足します。
+  - Oxlint：`.oxlintrc.json` に `"jsPlugins": ["@kei-design/react/lint"]` と、`"rules"` に `"kei/button-type-in-form": "error"` などを書きます。
+- lint でも見えないもの：KeiProvider の包み忘れ（ファイルをまたぐため）。書いた後に見直してください。

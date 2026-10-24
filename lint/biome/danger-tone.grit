@@ -1,0 +1,26 @@
+// kei/danger-tone: 「削除」 in a ConfirmDialog or a menu item needs the danger tone.
+language js(typescript, jsx);
+
+or {
+  or {
+    JsxOpeningElement(name = "ConfirmDialog", attributes = $attributes) as $element,
+    JsxSelfClosingElement(name = "ConfirmDialog", attributes = $attributes) as $element
+  } where {
+    $attributes <: contains JsxAttribute(name = "confirmLabel", initializer = JsxAttributeInitializerClause(value = $label)) as $attribute,
+    $label <: r".*(?:削除|破棄|消去|解約|退会|初期化|取り消せません).*",
+    $attributes <: not contains or { JsxAttribute(name = "tone"), JsxSpreadAttribute() },
+    $element <: within JsModule() as $module,
+    $module <: contains `import $_ from "@kei-design/react"`,
+    register_diagnostic(span = $attribute, message = "confirmLabel が「削除」など取り消せない操作なのに tone='danger' がありません。ConfirmDialog に tone='danger' を付けて、実行のボタンを赤にしてください。")
+  },
+  JsObjectExpression(members = $members) as $item where {
+    $members <: contains JsPropertyObjectMember(name = "label", value = $label),
+    $label <: r"[\x22\x27\x60].*(?:削除|破棄|消去|解約|退会|初期化|取り消せません).*[\x22\x27\x60]",
+    $members <: not contains or { JsPropertyObjectMember(name = "tone"), JsPropertyObjectMember(name = "type"), JsSpread() },
+    $item <: within JsxAttribute(name = "items") as $items,
+    $items <: within JsxSelfClosingElement(name = "DropdownMenu"),
+    $item <: within JsModule() as $module,
+    $module <: contains `import $_ from "@kei-design/react"`,
+    register_diagnostic(span = $item, message = "「削除」など取り消せない操作のメニューの項目に tone: 'danger' がありません。項目に tone: 'danger' を付けて、赤の文字にしてください。")
+  }
+}

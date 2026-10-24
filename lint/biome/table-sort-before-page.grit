@@ -1,0 +1,15 @@
+// kei/table-sort-before-page: only `rows={all.slice(…)}` written in place. GritQL cannot follow
+// a variable or useMemo to where it was sliced; the ESLint / Oxlint rule does.
+language js(typescript, jsx);
+
+or {
+  JsxOpeningElement(name = "DataTable", attributes = $attributes) as $table,
+  JsxSelfClosingElement(name = "DataTable", attributes = $attributes) as $table
+} where {
+  $attributes <: contains JsxAttribute(name = "rows", initializer = $rows),
+  $rows <: contains `$_.slice($_)`,
+  $attributes <: not contains or { JsxAttribute(name = "sorting"), JsxSpreadAttribute() },
+  $table <: within JsModule() as $module,
+  $module <: contains `import $_ from "@kei-design/react"`,
+  register_diagnostic(span = $table, message = "DataTable は渡された rows の中だけで並べ替えるので、区切った後の1ページ分では、そのページの中だけが並びます。全件を並べ替えてから slice し、sorting と onSortingChange で並べ替えの状態を持ってください（llms.txt「表の並べ替えとページ送り」）。")
+}

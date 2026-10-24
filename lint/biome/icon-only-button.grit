@@ -1,0 +1,21 @@
+// kei/icon-only-button: a Button holding only an icon has no name. GritQL matches one icon
+// child or the `icon` prop alone; the ESLint / Oxlint rule also checks several icons.
+language js(typescript, jsx);
+
+or {
+  JsxElement(opening_element = JsxOpeningElement(name = "Button", attributes = $attributes), elements = $children) as $button where {
+    $children <: or {
+      [JsxSelfClosingElement(name = r"[A-Z].*")],
+      [JsxText(), JsxSelfClosingElement(name = r"[A-Z].*"), JsxText()]
+    }
+  },
+  JsxSelfClosingElement(name = "Button", attributes = $attributes) as $button where {
+    $attributes <: contains JsxAttribute(name = "icon"),
+    $attributes <: not contains JsxAttribute(name = "children")
+  }
+} where {
+  $attributes <: not contains JsxSpreadAttribute(),
+  $button <: within JsModule() as $module,
+  $module <: contains `import $_ from "@kei-design/react"`,
+  register_diagnostic(span = $button, message = "アイコンだけの Button は、読み上げで名前がなく、画面にも説明が出ません。<IconButton label='何をするか' icon={<Icon />} /> を使ってください。label が読み上げとツールチップの両方になります。")
+}
