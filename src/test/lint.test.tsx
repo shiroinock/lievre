@@ -98,6 +98,12 @@ describe('stylelint: KEI rules', () => {
       ),
     ).toEqual([]);
     expect(await cssRules('.panel { background: var(--k-surface); }')).toEqual([]);
+    // The app frame is a theme surface too: a page cannot paint its own sidebar colour.
+    expect(await cssRules('.sidebar { --k-frame: #2424d8; }')).toContain('kei/surface-tokens');
+    expect(await cssRules('.sidebar { --k-on-frame-selected: #fff; }')).toContain(
+      'kei/surface-tokens',
+    );
+    expect(await cssRules('.sidebar { background: var(--k-frame); }')).toEqual([]);
   });
 
   it('requires a line-height in the font shorthand', async () => {
