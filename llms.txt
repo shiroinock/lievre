@@ -1,0 +1,377 @@
+# KEI（@kei-design/react）
+
+> 日本語の業務画面向けの React 部品と CSS トークン。この文書だけで部品を使えるように、使い方の約束と全部品の API をまとめています。後半の「部品」以降は `npm run llms` で型から生成しています。
+
+## 始め方
+
+```tsx
+import { KeiProvider, ToastProvider } from '@kei-design/react';
+import '@kei-design/react/styles.css';
+
+<KeiProvider theme="paper" density="comfortable" typography="interface">
+  <ToastProvider>{app}</ToastProvider>
+</KeiProvider>;
+```
+
+- スタイルは `KeiProvider` が出す `.kei` の内側でだけ効きます。包み忘れても誤りは出ず、見た目が崩れるだけです。
+- `useToast()` は `ToastProvider` の内側で呼びます。
+- 書体は同梱していません（README の「別のプロジェクトで使う」）。
+
+## 約束
+
+- 入力（TextField・Textarea・Select・Checkbox・Switch・RadioGroup）には必ず `label` を渡します。部品が label・補助文・エラーを入力と結ぶので、`id`・外の `<label>`・`aria-*` は自分で書きません。エラーは部品の外に書かず `error` に渡します。
+- 値の変更は Radix と同じ名前です：Switch・Checkbox は `onCheckedChange`、Select・RadioGroup・Tabs は `onValueChange`。`onChange` を受けるのは TextField・Textarea（ネイティブの属性）だけです。
+- `Button` の `type` の既定は `'button'` です。フォームの送信には `type="submit"` を付けます。主要な操作（`variant="primary"`）は1つの作業領域に1つ。危険な操作は `variant="danger"`。画面の移動は `Link` / `ActionLink`。
+- 状態の名前：Badge・Alert の `tone` は `'neutral' | 'success' | 'warning' | 'danger' | 'info'`、Toast の `tone` は `'success' | 'error'`。
+- 状態は色だけでなく文字でも伝えます。Badge には必ず文字を入れます。Metric の `trend` は矢印と色だけなので、向きは `change` に言葉で書きます（「前週比 +0.02 ポイント上昇」）。
+- 数値・時刻・ID・コードは `<span className="k-mono">`、文中の数値は `.k-tabular`。単位（%・円）は `.k-mono` の外に置きます：`<span><span className="k-mono">{n}</span>円</span>`。Metric は `value="99.95" unit="%"` と分けます。
+- Dialog には `title` と `description` が必須です。閉じるだけのボタンは `<DialogClose asChild><Button>キャンセル</Button></DialogClose>` で包みます。処理してから閉じるときは `open` / `onOpenChange` で開閉を持ちます。フォーカスの閉じ込めと復帰は部品が行います。
+- ラベルは日本語で書き、英大文字や記号で飾りません。
+
+## 表の並べ替えとページ送り
+
+DataTable は渡された `rows` の中だけで並べ替えます。ページ送りでは全件を自分で並べ替えてから区切り、並べ替えの状態を `sorting` / `onSortingChange` で持ちます。
+
+```tsx
+const [sort, setSort] = useState<TableSort>(null);
+const [page, setPage] = useState(1);
+const sorted = useMemo(() => {
+  const col = columns.find((c) => c.key === sort?.key);
+  if (!sort || !col?.sortValue) return all;
+  const v = col.sortValue;
+  return [...all].sort((a, b) => (v(a) < v(b) ? -1 : v(a) > v(b) ? 1 : 0) * (sort.direction === 'asc' ? 1 : -1));
+}, [all, sort]);
+<DataTable caption="請求書" rows={sorted.slice((page - 1) * 10, page * 10)} columns={columns}
+  getRowId={(r) => r.id} sorting={sort} onSortingChange={(s) => { setSort(s); setPage(1); }} />
+<Pagination page={page} totalPages={Math.ceil(all.length / 10)} onPageChange={setPage} />
+```
+
+## 確かめ方
+
+- 型（`tsc --noEmit`）が誤った props の大半を止めます。
+- 次は型では止まりません：KeiProvider の包み忘れ、フォームの Button の `type="submit"` 忘れ、ページ送りで区切った後の並べ替え、Metric の `value` に単位を含めること。書いた後にこの4点を見直してください。
+
+## 部品
+
+### KeiProvider
+
+すべての部品の配色と表示密度のスコープ。アプリのルートを包んで使います。部品のスタイルは `.kei`（この部品が出す div）の内側でだけ効きます。
+
+- `theme?: Theme`
+- `density?: Density`
+- `typography?: Typography`
+- ほかに HTMLAttributes<HTMLDivElement> の属性を受け取ります。
+
+### PortalSurface
+
+- `children: ReactNode`
+
+### ToastProvider
+
+- `children: ReactNode`
+
+### Badge
+
+色と文字を併用する状態ラベル。色だけでは状態を表さないため、children（「正常」などの文字）は必須です。
+
+- `children: ReactNode`
+- `tone?: Tone` — 既定 'neutral'。'neutral' | 'success' | 'warning' | 'danger' | 'info'。Toast の 'error' はここでは 'danger'。
+- `dot?: boolean` — 既定 false
+- ほかに HTMLAttributes<HTMLSpanElement> の属性を受け取ります。
+
+### Textarea
+
+複数行の入力。label・hint・error の扱いは TextField と同じです。
+
+- `label: string`
+- `hint?: string`
+- `error?: string`
+- ほかに TextareaHTMLAttributes<HTMLTextAreaElement> の属性を受け取ります。
+
+### Checkbox
+
+- `label: string`
+- `hint?: string`
+- `error?: string` — エラー文。aria-invalid と aria-describedby を付けます。
+- `checked?: boolean | 'indeterminate'`
+- `defaultChecked?: boolean`
+- `onCheckedChange?: ((checked: boolean | 'indeterminate') => void)` — 'indeterminate' も来るため、boolean の state には `(c) => setX(c === true)` で渡します。
+- `disabled?: boolean`
+- `name?: string`
+- `required?: boolean`
+- `id?: string`
+
+### Switch
+
+即時に切り替わる設定。label は部品の中で Switch と結ぶため、id や外の label は使いません。
+
+- `label: string`
+- `hint?: string`
+- `checked?: boolean`
+- `defaultChecked?: boolean`
+- `onCheckedChange?: ((checked: boolean) => void)` — onChange ではなくこちらを使います。
+- `disabled?: boolean`
+- `name?: string`
+
+### Select
+
+矢印キー・文字検索・Escapeに対応した単一選択。
+
+- `label: string`
+- `options: { value: string; label: string; disabled?: boolean | undefined; }[]` — 選択肢。子要素（option）では渡しません。
+- `placeholder?: string` — 既定 '選択してください'
+- `value?: string` — 未選択は ''。
+- `defaultValue?: string`
+- `onValueChange?: ((value: string) => void)` — onChange ではなくこちらを使います。
+- `disabled?: boolean`
+- `required?: boolean`
+- `name?: string`
+- `hint?: string`
+- `error?: string` — エラー文。aria-invalid と aria-describedby を付けます。
+
+### Card
+
+- `title?: string`
+- `eyebrow?: string`
+- `action?: ReactNode`
+- ほかに HTMLAttributes<HTMLElement> の属性を受け取ります。
+
+### Alert
+
+- `title: string`
+- `tone?: Tone` — 既定 'info'
+- ほかに HTMLAttributes<HTMLDivElement> の属性を受け取ります。
+
+### Tabs
+
+- `items: TabItem[]`
+- `label: string` — タブの並びの名前。画面には出さず、読み上げに使います。
+- `defaultValue?: string`
+- `value?: string`
+- `onValueChange?: ((value: string) => void)`
+
+### Tooltip
+
+- `content: string`
+- `children: ReactNode`
+
+### Progress
+
+0〜100に丸め、色に加えて数値を併記します。
+
+- `value: number`
+- `label: string`
+- `showValue?: boolean` — 既定 true
+
+### Skeleton
+
+- `width?: string | number` — 既定 '100%'
+- `height?: string | number` — 既定 16
+- `label?: string` — 既定 '読み込み中'
+
+### EmptyState
+
+- `title: string`
+- `description: string`
+- `action?: ReactNode`
+- `icon?: ReactNode`
+- `eyebrow?: string`
+
+### Divider
+
+- `label?: string`
+
+### Kbd
+
+- `children: ReactNode`
+
+### Avatar
+
+- `name: string`
+- `size?: 'sm' | 'md'` — 既定 'md'
+
+### Breadcrumb
+
+- `items: { label: string; href?: string | undefined; }[]`
+
+### Pagination
+
+前後のページ送り。DataTable と組み合わせるときは、全件を並べ替えてから区切った rows を渡します。
+
+- `page: number` — 1 始まり。
+- `totalPages: number`
+- `onPageChange: (page: number) => void`
+
+### Button
+
+1つの作業領域に主要操作は原則1つ。loading時は再実行を防ぎます。`type` の既定は 'button' なので、フォームの送信には `type="submit"` を付けます。画面の移動には ActionLink を使います。
+
+- `variant?: 'danger' | 'primary' | 'secondary' | 'ghost'` — 既定 'secondary'
+- `size?: 'sm' | 'md' | 'lg'` — 既定 'md'
+- `loading?: boolean` — 既定 false。処理中の表示。押せなくなり、aria-busy が付きます。
+- `icon?: ReactNode`
+- ほかに ButtonHTMLAttributes<HTMLButtonElement> の属性を受け取ります。
+
+### TextField
+
+ラベル・補助文・エラーと入力を関連付けた標準入力。
+
+- `label: string` — 見える名前。input と結びます。placeholder の代わりにはしません。
+- `hint?: string` — 補助文。aria-describedby で入力と結びます。
+- `error?: string` — エラー文。渡すと hint の代わりに表示し、aria-invalid と aria-describedby を付けます。
+- `controlSize?: 'md' | 'lg'` — 既定 'md'
+- ほかに InputHTMLAttributes<HTMLInputElement> の属性を受け取ります。
+
+### Dialog
+
+フォーカストラップ・Escape・閉じた後のフォーカス復帰を備えたダイアログ。
+
+- `trigger: ReactNode`
+- `eyebrow?: string`
+- `title: string`
+- `description: string` — 何が起きるかの説明。aria-describedby で結びます。
+- `children: ReactNode` — 本文。フォームや詳細を置きます。
+- `footer?: ReactNode` — 操作。閉じるだけのボタンは `<DialogClose asChild><Button>…</Button></DialogClose>` で包みます。
+- `open?: boolean`
+- `onOpenChange?: ((open: boolean) => void)`
+
+### DialogClose
+
+押すと Dialog を閉じます。`<DialogClose asChild><Button>キャンセル</Button></DialogClose>` のように asChild で包みます。
+
+### Sparkline
+
+- `values: number[]`
+- `label: string`
+- `color?: 'success' | 'accent' | 'muted'` — 既定 'accent'
+
+### Metric
+
+計器の読み値。value は等幅、unit は本文の書体で並べます。
+
+- `label: string`
+- `value: string` — 数値だけ（"99.95"）。単位は unit に分けます。
+- `unit?: string` — "%"・"円" など。
+- `change?: string` — 変化の文。矢印は読み上げないため、向きは言葉で書きます（"前週比 +0.02 ポイント上昇"）。
+- `trend?: 'neutral' | 'up' | 'down'` — 既定 'neutral'。矢印と色だけを変えます。
+- `values?: number[]`
+- `code?: string`
+
+### Meter
+
+- `value: number`
+- `label: string`
+- `unit?: string` — 既定 '%'
+- `max?: number` — 既定 100
+
+### DataTable
+
+ネイティブtableの意味論を維持。ソート・選択・空/読込状態を備えます。
+
+- `rows: T[]` — 表示する行。並べ替えはここで渡した行の中だけで行うため、ページ送りでは全件を並べ替えてから区切った行を渡し、sorting / onSortingChange で状態を持ちます。
+- `columns: Column<T>[]`
+- `getRowId: (row: T) => string`
+- `caption: string` — 表の名前。画面には出さず、読み上げに使います。
+- `selectable?: boolean` — 既定 false
+- `selectedIds?: string[]`
+- `onSelectionChange?: ((ids: string[]) => void)`
+- `onRowClick?: ((row: T) => void)`
+- `loading?: boolean` — 既定 false
+- `emptyTitle?: string` — 既定 '該当するデータがありません'
+- `emptyDescription?: string` — 既定 '条件を変えてもう一度検索してください。'
+- `sorting?: TableSort` — 渡すと並べ替えの状態を外で持ちます（ページ送りと組み合わせるとき）。見出しを押すたびに昇順と降順を切り替え、解除はしません。
+- `onSortingChange?: ((sort: TableSort) => void)`
+
+### Text
+
+用途に依存しない本文。密度と文字の役割を分けて選びます。
+
+- `as?: 'div' | 'p' | 'span'` — 既定 'p'
+- `size?: 'body' | 'small' | 'lead'` — 既定 'body'
+- `tone?: 'muted' | 'default'` — 既定 'default'
+- ほかに HTMLAttributes<HTMLElement> の属性を受け取ります。
+
+### Link
+
+- ほかに AnchorHTMLAttributes<HTMLAnchorElement> の属性を受け取ります。
+
+### ActionLink
+
+移動にはa要素、処理の実行にはButtonを使います。
+
+- `variant?: 'primary' | 'secondary' | 'ghost'` — 既定 'primary'
+- `size?: 'sm' | 'md' | 'lg'` — 既定 'md'
+- ほかに AnchorHTMLAttributes<HTMLAnchorElement> の属性を受け取ります。
+
+### Container
+
+- `width?: 'reading' | 'wide' | 'full'` — 既定 'wide'
+- ほかに HTMLAttributes<HTMLDivElement> の属性を受け取ります。
+
+### Stack
+
+- `gap?: Space` — 既定 4
+- `direction?: 'row' | 'column'` — 既定 'column'
+- `align?: 'center' | 'stretch' | 'start' | 'end'` — 既定 'stretch'
+- ほかに HTMLAttributes<HTMLDivElement> の属性を受け取ります。
+
+### Grid
+
+- `minWidth?: string` — 既定 '16rem'
+- `gap?: Space` — 既定 6
+- ほかに HTMLAttributes<HTMLDivElement> の属性を受け取ります。
+
+### RadioGroup
+
+ネイティブradioの矢印キー操作・フォーム送信を保つ単一選択。
+
+- `label: string` — まとまりの名前。fieldset の legend になります。
+- `options: RadioOption[]`
+- `value?: string`
+- `defaultValue?: string`
+- `onValueChange?: ((value: string) => void)`
+- `name?: string`
+- `disabled?: boolean` — 既定 false
+- `error?: string` — エラー文。fieldset に aria-describedby で結びます。
+- `required?: boolean` — 既定 false
+
+### Heading
+
+- `level?: 1 | 2 | 3 | 4 | 6 | 5` — 既定 2
+- `size?: 'title' | 'section' | 'display'` — 既定 'section'
+- ほかに HTMLAttributes<HTMLHeadingElement> の属性を受け取ります。
+
+## フック
+
+### useKeiTheme
+
+`useKeiTheme() => { theme: Theme; density: Density; typography: Typography; }`
+
+### useToast
+
+`useToast() => (message: ToastMessage) => void`
+
+ToastProviderの子孫で使用します。保存結果や一時的な通知向け。`const toast = useToast(); toast({ title: '保存しました' })`
+
+## 型とその他
+
+- `type Theme = 'paper' | 'ink';`
+- `type Density = 'comfortable' | 'compact';`
+- `type Typography = 'standard' | 'interface';`
+- `type ToastMessage`
+  - `title: string`
+  - `description?: string`
+  - `tone?: 'success' | 'error'` — 既定は 'success'。失敗は 'error'（Badge・Alert の 'danger' とは名前が違います）。
+- `type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';`
+- `type TabItem = { value: string; label: string; content: ReactNode; disabled?: boolean; count?: number; };`
+- `type Column<T>`
+  - `key: string`
+  - `header: string`
+  - `render: (row: T) => ReactNode` — セルの中身。数値は `<span className="k-mono">` で包み、単位はその外に置きます。
+  - `sortValue?: (row: T) => string | number` — 渡した列だけ並べ替えられます。
+  - `align?: 'left' | 'right'`
+  - `width?: string`
+- `type TableSort = { key: string; direction: 'asc' | 'desc' } | null;`
+- `type Space = 0 | 1 | 2 | 3 | 4 | 6 | 8 | 12;`
+- `type RadioOption = { value: string; label: string; description?: string; disabled?: boolean; };`
+- `cx`: `(...values: (string | false | null | undefined)[]) => string`

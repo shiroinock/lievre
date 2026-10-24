@@ -1,0 +1,216 @@
+{
+  "date": "2026-10-24T12:53:43.114Z",
+  "total": 40,
+  "results": [
+    {
+      "id": "textfield-no-label",
+      "task": "T1",
+      "mistake": "TextField に label を渡さず placeholder だけにする",
+      "caught": "type",
+      "shipped": true,
+      "actionable": true,
+      "score": 3,
+      "message": "Property 'label' is missing in type '{ placeholder: string; }' but required in type '{ label: string; hint?: string | undefined; error?: string | undefined; controlSize?: \"md\" | \"lg\" | undefined; }'."
+    },
+    {
+      "id": "switch-onchange",
+      "task": "T1",
+      "mistake": "Switch に onChange を渡す（正しくは onCheckedChange）",
+      "caught": "type",
+      "shipped": true,
+      "actionable": false,
+      "score": 2,
+      "message": "Type '{ label: string; onChange: () => void; }' is not assignable to type 'IntrinsicAttributes & SwitchProps'.\n  Property 'onChange' does not exist on type 'IntrinsicAttributes & SwitchProps'."
+    },
+    {
+      "id": "button-submit",
+      "task": "T1",
+      "mistake": "form の中の Button を送信ボタンのつもりで置く（既定は type=\"button\"）",
+      "caught": null,
+      "shipped": true,
+      "actionable": false,
+      "score": 0,
+      "message": ""
+    },
+    {
+      "id": "toast-outside-provider",
+      "task": "T1",
+      "mistake": "ToastProvider の外で useToast を呼ぶ",
+      "caught": "runtime",
+      "shipped": true,
+      "actionable": true,
+      "score": 2,
+      "message": "useToast は ToastProvider の内側で呼んでください：<KeiProvider><ToastProvider>{app}</ToastProvider></KeiProvider>"
+    },
+    {
+      "id": "toast-tone-danger",
+      "task": "T3",
+      "mistake": "Toast の tone に Badge と同じ 'danger' を渡す（正しくは 'error'）",
+      "caught": "type",
+      "shipped": true,
+      "actionable": true,
+      "score": 3,
+      "message": "Type '\"danger\"' is not assignable to type '\"success\" | \"error\" | undefined'."
+    },
+    {
+      "id": "no-kei-provider",
+      "task": "T1",
+      "mistake": "KeiProvider で包まずに部品を置く（.kei の外ではスタイルが効かない）",
+      "caught": null,
+      "shipped": true,
+      "actionable": false,
+      "score": 0,
+      "message": ""
+    },
+    {
+      "id": "table-page-before-sort",
+      "task": "T2",
+      "mistake": "区切った1ページ分の rows を DataTable に渡し、並べ替えを DataTable 任せにする",
+      "caught": null,
+      "shipped": true,
+      "actionable": false,
+      "score": 0,
+      "message": ""
+    },
+    {
+      "id": "table-no-caption",
+      "task": "T2",
+      "mistake": "DataTable に caption を渡さない",
+      "caught": "type",
+      "shipped": true,
+      "actionable": true,
+      "score": 3,
+      "message": "Property 'caption' is missing in type '{ rows: { id: string; }[]; getRowId: (r: { id: string; }) => string; columns: { key: string; header: string; render: (r: { id: string; }) => string; }[]; }' but required in type 'DataTableProps<{ id: string; }>'."
+    },
+    {
+      "id": "table-columns-accessor",
+      "task": "T2",
+      "mistake": "TanStack 風に accessorKey / cell で列を書く",
+      "caught": "type",
+      "shipped": true,
+      "actionable": false,
+      "score": 2,
+      "message": "Object literal may only specify known properties, and 'accessorKey' does not exist in type 'Column<{ id: string; }>'."
+    },
+    {
+      "id": "unit-inside-mono",
+      "task": "T2",
+      "mistake": "単位を .k-mono の中に入れる",
+      "caught": "lint",
+      "shipped": false,
+      "actionable": true,
+      "score": 3,
+      "message": "単位（%）は .k-mono の外に出して本文の書体にしてください：<span><span className=\"k-mono\">{n}</span>%</span>"
+    },
+    {
+      "id": "dialog-no-description",
+      "task": "T3",
+      "mistake": "Dialog に description を渡さない",
+      "caught": "type",
+      "shipped": true,
+      "actionable": true,
+      "score": 3,
+      "message": "Property 'description' is missing in type '{ children: string; trigger: Element; title: string; }' but required in type 'DialogProps'."
+    },
+    {
+      "id": "dialog-variant-destructive",
+      "task": "T3",
+      "mistake": "危険な操作に shadcn と同じ variant='destructive' を使う",
+      "caught": "type",
+      "shipped": true,
+      "actionable": true,
+      "score": 3,
+      "message": "Type '\"destructive\"' is not assignable to type '\"primary\" | \"secondary\" | \"ghost\" | \"danger\" | undefined'."
+    },
+    {
+      "id": "dialog-cancel-not-close",
+      "task": "T3",
+      "mistake": "footer のキャンセルを DialogClose で包まない（押しても閉じない）",
+      "caught": null,
+      "shipped": true,
+      "actionable": false,
+      "score": 0,
+      "message": ""
+    },
+    {
+      "id": "select-children",
+      "task": "T4",
+      "mistake": "Select に option を子として渡す（正しくは options）",
+      "caught": "type",
+      "shipped": true,
+      "actionable": false,
+      "score": 2,
+      "message": "Type '{ children: Element; label: string; }' is not assignable to type 'IntrinsicAttributes & SelectProps'.\n  Property 'children' does not exist on type 'IntrinsicAttributes & SelectProps'."
+    },
+    {
+      "id": "radio-onchange",
+      "task": "T4",
+      "mistake": "RadioGroup に onChange を渡す（正しくは onValueChange）",
+      "caught": "type",
+      "shipped": true,
+      "actionable": true,
+      "score": 3,
+      "message": "Type '{ label: string; options: { value: string; label: string; }[]; onChange: () => void; }' is not assignable to type 'IntrinsicAttributes & { label: string; options: RadioOption[]; value?: string | undefined; defaultValue?: string | undefined; onValueChange?: ((value: string) => void) | undefined; name?: string | undefined; disabled?: boolean | undefined; error?: string | undefined; required?: boolean | undefined; }'.\n  Property 'onChange' does not exist on type 'IntrinsicAttributes & { label: string; options: RadioOption[]; value?: string | undefined; defaultValue?: string | undefined; onValueChange?: ((value: string) => void) | undefined; name?: string | undefined; disabled?: boolean | undefined; error?: string | undefined; required?: boolean | undefined; }'."
+    },
+    {
+      "id": "checkbox-checked-change",
+      "task": "T4",
+      "mistake": "Checkbox の onCheckedChange を boolean として受ける（indeterminate がある）",
+      "caught": "type",
+      "shipped": true,
+      "actionable": true,
+      "score": 3,
+      "message": "Type 'Dispatch<SetStateAction<boolean>>' is not assignable to type '(checked: boolean | \"indeterminate\") => void'.\n  Types of parameters 'value' and 'checked' are incompatible.\n    Type 'boolean | \"indeterminate\"' is not assignable to type 'SetStateAction<boolean>'.\n      Type '\"indeterminate\"' is not assignable to type 'SetStateAction<boolean>'."
+    },
+    {
+      "id": "select-error-without-label",
+      "task": "T4",
+      "mistake": "エラー文を部品の外に p で置き、error に渡さない",
+      "caught": null,
+      "shipped": true,
+      "actionable": false,
+      "score": 0,
+      "message": ""
+    },
+    {
+      "id": "metric-unit-in-value",
+      "task": "T5",
+      "mistake": "Metric の value に単位まで入れる（\"99.95%\"）",
+      "caught": null,
+      "shipped": true,
+      "actionable": false,
+      "score": 0,
+      "message": ""
+    },
+    {
+      "id": "badge-color-only",
+      "task": "T5",
+      "mistake": "Badge を色と点だけにして文字を入れない",
+      "caught": "type",
+      "shipped": true,
+      "actionable": true,
+      "score": 3,
+      "message": "Property 'children' is missing in type '{ tone: \"danger\"; dot: true; }' but required in type '{ tone?: Tone | undefined; dot?: boolean | undefined; children: ReactNode; }'."
+    },
+    {
+      "id": "badge-tone-error",
+      "task": "T5",
+      "mistake": "Badge の tone に Toast と同じ 'error' を渡す（正しくは 'danger'）",
+      "caught": "type",
+      "shipped": true,
+      "actionable": false,
+      "score": 2,
+      "message": "Type '\"error\"' is not assignable to type 'Tone | undefined'."
+    },
+    {
+      "id": "tabs-no-label",
+      "task": "T5",
+      "mistake": "Tabs に label を渡さない",
+      "caught": "type",
+      "shipped": true,
+      "actionable": true,
+      "score": 3,
+      "message": "Property 'label' is missing in type '{ items: { value: string; label: string; content: string; }[]; }' but required in type '{ items: TabItem[]; label: string; defaultValue?: string | undefined; value?: string | undefined; onValueChange?: ((value: string) => void) | undefined; }'."
+    }
+  ]
+}
