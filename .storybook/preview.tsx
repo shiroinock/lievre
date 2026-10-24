@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/react-vite';
 import { KeiProvider } from '../src/components/system';
+import '../src/styles/fonts.css';
 import '../src/styles/kei.css';
 import '../src/styles/demo.css';
 const preview: Preview = {

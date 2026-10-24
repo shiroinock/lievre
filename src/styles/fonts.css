@@ -1,0 +1,9 @@
+/*
+ * IBM Plex for the docs site and Storybook. The package itself does not ship fonts:
+ * apps load these (or their own) and the --k-font-* stacks pick them up.
+ */
+@import '@fontsource/ibm-plex-sans-jp/400.css';
+@import '@fontsource/ibm-plex-sans-jp/500.css';
+@import '@fontsource/ibm-plex-sans-jp/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';

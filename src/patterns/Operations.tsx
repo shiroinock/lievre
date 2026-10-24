@@ -250,7 +250,7 @@ function WorkDetails({ item }: { item: WorkItem }) {
           </div>
           <div>
             <dt>最終更新</dt>
-            <dd className="k-tabular">{item.updated}</dd>
+            <dd className="k-mono">{item.updated}</dd>
           </div>
           {item.notes && (
             <div className="work-detail-notes">
@@ -341,7 +341,7 @@ function OperationsContent({ compact }: { compact: boolean }) {
         key: 'updated',
         header: '更新',
         sortValue: (r) => r.updated,
-        render: (r) => <span className="k-tabular k-muted">{r.updated}</span>,
+        render: (r) => <span className="k-mono k-muted">{r.updated}</span>,
       },
       { key: 'actions', header: '詳細', render: (r) => <WorkDetails item={r} /> },
     ],
@@ -532,7 +532,7 @@ function OperationsContent({ compact }: { compact: boolean }) {
               ].map((a, i) => (
                 <li key={a.id}>
                   <span className="activity-dot" data-warning={i === 2} />
-                  <time className="k-tabular">{a.time}</time>
+                  <time className="k-mono">{a.time}</time>
                   <div>
                     {a.label}
                     <small className="k-mono">{a.id}</small>

@@ -64,6 +64,7 @@ export function App() {
 ```
 
 - React / ReactDOM は利用する側で用意します。
+- 書体（IBM Plex Sans JP / IBM Plex Mono）は同梱していません。`npm i @fontsource/ibm-plex-sans-jp @fontsource/ibm-plex-mono` で入れ、使う太さ（Sans 400・500・600、Mono 400・500）を読み込んでください。読み込まない場合はシステムの書体で表示されます。
 - スタイルは `.kei` の内側に限定されます。ページ全体のリセットやアプリのナビゲーションは含みません。
 - `theme`（paper / ink）、`density`（comfortable / compact）、`typography`（standard / interface）はそれぞれ独立して指定できます。
 
@@ -71,6 +72,6 @@ export function App() {
 
 - 入力には必ず `label` を付け、ダイアログには説明を付けます。
 - 状態は色だけでなく、文字でも伝えます。
-- 比べる数値には `.k-tabular`、ID やコードには `.k-mono` を使います。
+- 数値・時刻・ID・コードには `.k-mono`、文中の数値には `.k-tabular` を使います。
 - ページ付きの DataTable では、全件を先に並べ替えてから区切ります（`sorting` / `onSortingChange`）。
 - フォーカスリングは消さず、動きを減らす設定に従います。

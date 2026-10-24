@@ -38,9 +38,9 @@
     --k-focus: var(--k-accent);
 
     /* Type */
-    --k-font-sans: system-ui, -apple-system, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
-      'Noto Sans JP', 'Yu Gothic UI', sans-serif;
-    --k-font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+    --k-font-sans: 'IBM Plex Sans JP', system-ui, -apple-system, 'Hiragino Sans', 'Yu Gothic UI',
+      sans-serif;
+    --k-font-mono: 'IBM Plex Mono', 'IBM Plex Sans JP', ui-monospace, 'SF Mono', Menlo, monospace;
     --k-text-xs: 0.75rem;
     --k-text-sm: 0.8125rem;
     --k-text-md: 0.875rem;
@@ -738,6 +738,7 @@
     border-radius: var(--k-radius-full);
     background: var(--k-surface-sunken);
     font-size: var(--k-text-xs);
+    font-family: var(--k-font-mono);
     font-variant-numeric: tabular-nums;
     font-weight: var(--k-weight-medium);
     line-height: 1.6;
@@ -915,6 +916,7 @@
   .k-pagination > span {
     margin-right: var(--k-space-2);
     color: var(--k-muted);
+    font-family: var(--k-font-mono);
     font-variant-numeric: tabular-nums;
   }
 
@@ -1062,7 +1064,8 @@
   .k-metric-value {
     margin: 10px 0 4px;
     font-size: var(--k-text-3xl);
-    font-weight: var(--k-weight-medium);
+    font-family: var(--k-font-mono);
+    font-weight: var(--k-weight-regular);
     font-variant-numeric: tabular-nums;
     line-height: 1.2;
     letter-spacing: -0.01em;
@@ -1158,7 +1161,8 @@
   }
   .k-meter-reading strong {
     font-size: var(--k-text-2xl);
-    font-weight: var(--k-weight-medium);
+    font-family: var(--k-font-mono);
+    font-weight: var(--k-weight-regular);
     font-variant-numeric: tabular-nums;
     line-height: 1.2;
   }
@@ -1296,12 +1300,12 @@
 /* --------------------------------------------------------------- utilities */
 
 @layer kei.utilities {
-  /* For identifiers and code: values read character by character. */
+  /* For data: figures, times, IDs and code. Japanese units fall back to the sans face. */
   .k-mono {
     font-family: var(--k-font-mono);
     font-variant-numeric: tabular-nums;
   }
-  /* For times and figures compared down a column: keeps the sans face, equalises digits. */
+  /* For figures inside running text: keeps the sans face, equalises digits. */
   .k-tabular {
     font-variant-numeric: tabular-nums;
   }

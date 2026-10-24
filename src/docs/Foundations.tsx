@@ -118,7 +118,8 @@ export function TypeFoundation() {
         <h2>文字</h2>
         <p>
           本文は16px、行間1.75。操作画面では <code>typography="interface"</code>{' '}
-          で14pxにします。表示密度を変えても文字の大きさは変えません。書体はシステムのサンセリフ。等幅はIDやコードにだけ使います。
+          で14pxにします。表示密度を変えても文字の大きさは変えません。書体は IBM Plex Sans JP と IBM
+          Plex Mono の2つです。
         </p>
       </div>
       <div className="type-scale">
@@ -137,21 +138,22 @@ export function TypeFoundation() {
       </div>
       <div className="type-pairs">
         <div>
-          <h3>数値</h3>
-          <p className="type-figure k-tabular">
-            99.2<small>%</small>
-          </p>
+          <h3>言葉</h3>
+          <p className="type-figure">処理の成功率</p>
           <p>
-            数値はサンセリフのまま <code>tabular-nums</code> で桁を揃えます。比べる列には{' '}
-            <code>.k-tabular</code> を。
+            見出し・本文・ラベルは IBM Plex Sans
+            JP。ラベルは日本語で書き、英字の大文字や記号で飾りません。
           </p>
         </div>
         <div>
-          <h3>識別子</h3>
-          <p className="type-figure k-mono">KEI-024</p>
+          <h3>データ</h3>
+          <p className="type-figure k-mono">
+            99.2<small>%</small> 14:05
+          </p>
           <p>
-            一文字ずつ読み取るIDやコードだけ <code>.k-mono</code>{' '}
-            にします。見出しや飾りには使いません。
+            数値・時刻・ID・コードは IBM Plex Mono（<code>.k-mono</code>
+            ）。計器の読み値のように桁が揃い、言葉と区別できます。文中の数値は{' '}
+            <code>.k-tabular</code> で桁だけ揃えます。
           </p>
         </div>
       </div>
