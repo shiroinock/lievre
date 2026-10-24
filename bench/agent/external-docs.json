@@ -1,0 +1,81 @@
+{
+  "$description": "他のデザインシステムで、課題に使う部品の文書を Markdown（なければ最も近い生のテキスト）で取る URL。2026-10-24 に調べた。null は該当なし。",
+  "systems": {
+    "shadcn/ui": {
+      "llms": "https://ui.shadcn.com/llms.txt",
+      "textfield": "https://ui.shadcn.com/docs/components/input.md",
+      "switch": "https://ui.shadcn.com/docs/components/switch.md",
+      "button": "https://ui.shadcn.com/docs/components/button.md",
+      "table": "https://ui.shadcn.com/docs/components/data-table.md",
+      "dialog": "https://ui.shadcn.com/docs/components/alert-dialog.md",
+      "select": "https://ui.shadcn.com/docs/components/select.md",
+      "toast": "https://ui.shadcn.com/docs/components/sonner.md"
+    },
+    "Radix Themes": {
+      "textfield": "https://www.radix-ui.com/themes/docs/components/text-field.md",
+      "switch": "https://www.radix-ui.com/themes/docs/components/switch.md",
+      "button": "https://www.radix-ui.com/themes/docs/components/button.md",
+      "table": "https://www.radix-ui.com/themes/docs/components/table.md",
+      "dialog": "https://www.radix-ui.com/themes/docs/components/alert-dialog.md",
+      "select": "https://www.radix-ui.com/themes/docs/components/select.md",
+      "toast": "https://www.radix-ui.com/primitives/docs/components/toast.md"
+    },
+    "MUI": {
+      "llms": "https://mui.com/material-ui/llms.txt",
+      "textfield": "https://mui.com/material-ui/react-text-field.md",
+      "switch": "https://mui.com/material-ui/react-switch.md",
+      "button": "https://mui.com/material-ui/react-button.md",
+      "table": "https://mui.com/material-ui/react-table.md",
+      "dialog": "https://mui.com/material-ui/react-dialog.md",
+      "select": "https://mui.com/material-ui/react-select.md",
+      "toast": "https://mui.com/material-ui/react-snackbar.md"
+    },
+    "Chakra UI": {
+      "llms": "https://chakra-ui.com/llms.txt",
+      "textfield": "https://chakra-ui.com/docs/components/input.mdx",
+      "switch": "https://chakra-ui.com/docs/components/switch.mdx",
+      "button": "https://chakra-ui.com/docs/components/button.mdx",
+      "table": "https://chakra-ui.com/docs/components/table.mdx",
+      "dialog": "https://chakra-ui.com/docs/components/dialog.mdx",
+      "select": "https://chakra-ui.com/docs/components/select.mdx",
+      "toast": "https://chakra-ui.com/docs/components/toast.mdx"
+    },
+    "Mantine": {
+      "llms": "https://mantine.dev/llms.txt",
+      "textfield": "https://mantine.dev/llms/core-text-input.md",
+      "switch": "https://mantine.dev/llms/core-switch.md",
+      "button": "https://mantine.dev/llms/core-button.md",
+      "table": "https://mantine.dev/llms/core-table.md",
+      "dialog": "https://mantine.dev/llms/core-modal.md",
+      "select": "https://mantine.dev/llms/core-select.md",
+      "toast": "https://mantine.dev/llms/x-notifications.md"
+    },
+    "Primer React": {
+      "textfield": "https://raw.githubusercontent.com/primer/react/main/packages/react/src/TextInput/TextInput.docs.json",
+      "switch": "https://raw.githubusercontent.com/primer/react/main/packages/react/src/ToggleSwitch/ToggleSwitch.docs.json",
+      "button": "https://raw.githubusercontent.com/primer/react/main/packages/react/src/Button/Button.docs.json",
+      "table": "https://raw.githubusercontent.com/primer/react/main/packages/react/src/DataTable/DataTable.docs.json",
+      "dialog": "https://raw.githubusercontent.com/primer/react/main/packages/react/src/ConfirmationDialog/ConfirmationDialog.docs.json",
+      "select": "https://raw.githubusercontent.com/primer/react/main/packages/react/src/Select/Select.docs.json",
+      "toast": null
+    },
+    "SmartHR UI": {
+      "textfield": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/Input.md",
+      "switch": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/Switch.md",
+      "button": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/Button.md",
+      "table": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/Table.md",
+      "dialog": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/ActionDialog.md",
+      "select": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/Select.md",
+      "toast": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/ResponseMessage.md"
+    },
+    "デジタル庁": {
+      "textfield": "https://raw.githubusercontent.com/digital-go-jp/design-system-example-components-react/main/src/components/Input/Input.tsx",
+      "switch": "https://raw.githubusercontent.com/digital-go-jp/design-system-example-components-react/main/src/components/Switch/component-spec.md",
+      "button": "https://raw.githubusercontent.com/digital-go-jp/design-system-example-components-react/main/src/components/Button/Button.tsx",
+      "table": null,
+      "dialog": "https://raw.githubusercontent.com/digital-go-jp/design-system-example-components-react/main/src/components/ModalDialog/component-spec.md",
+      "select": "https://raw.githubusercontent.com/digital-go-jp/design-system-example-components-react/main/src/components/Select/Select.tsx",
+      "toast": null
+    }
+  }
+}
