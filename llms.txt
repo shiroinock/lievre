@@ -29,6 +29,7 @@ import '@kei-design/react/styles.css';
 - アイコンだけのボタンは `<IconButton label="行の操作" icon={<MoreHorizontal />} />`。`label` が読み上げの名前とツールチップの両方になるので、`aria-label` は書きません。`Button` に svg だけを入れません。
 - 押して開く操作できる中身（絞り込み・表示の設定）は `Popover`、説明の短い文だけなら `Tooltip`。Popover の中の「適用」で閉じるときは `open` / `onOpenChange` で開閉を持ちます。
 - 操作の一覧は `DropdownMenu` に `items` の配列で渡します（子要素では渡しません）。区切りは `{ type: 'separator' }`、入り切りは `type: 'checkbox'`、1つを選ぶ組は `type: 'radio'`。削除などは `tone: 'danger'` にし、label にも「削除」と書きます。
+- 削除・送信の確認は Dialog で組まず `ConfirmDialog` を使います。`confirmLabel` には何が起きるかを動詞で書きます（「3件を削除」。「OK」「はい」にしない）。取り消せない操作は `tone="danger"`。`onConfirm` が Promise を返すと終わるまで閉じず、reject すると開いたままです。メニューの項目から開くときは `trigger` を省き、`open` / `onOpenChange` で持ちます。
 - ラベルは日本語で書き、英大文字や記号で飾りません。
 
 ## 表の並べ替えとページ送り
@@ -249,6 +250,21 @@ const sorted = useMemo(() => {
 - `open?: boolean`
 - `onOpenChange?: ((open: boolean) => void)`
 
+### ConfirmDialog
+
+取り消せない操作の前の確認。初めのフォーカスは取り消し側に置き、Escape・外側を押す・閉じるボタンはどれも取り消しになります。
+
+- `trigger?: ReactNode` — 開くボタン。メニューの項目などから開くときは省き、open と onOpenChange で開閉を持ちます。
+- `title: string` — 確かめる問い。「3件の作業を削除しますか？」のように、何に何をするかを書きます。
+- `description: string` — 実行すると何が起きるか、取り消せるか。aria-describedby で結びます。
+- `children?: ReactNode` — 補足。対象の一覧など。
+- `confirmLabel: string` — 実行のボタンの文字。何が起きるかを動詞で書きます（「3件を削除」）。「OK」「はい」にはしません。
+- `cancelLabel?: string` — 既定 'キャンセル'
+- `tone?: 'danger' | 'default'` — 既定 'default'。'danger' は削除など取り消せない操作。実行のボタンを赤にします。
+- `onConfirm: () => void | Promise<unknown>` — 実行したときに呼びます。Promise を返すと、終わるまで実行のボタンを処理中にして閉じさせず、終わったら閉じます。失敗（reject）したら開いたままにして、もう一度押せるようにします。部品は失敗の理由を出さないので、onConfirm の中で Toast などで知らせます。
+- `open?: boolean`
+- `onOpenChange?: ((open: boolean) => void)`
+
 ### DialogClose
 
 押すと Dialog を閉じます。`<DialogClose asChild><Button>キャンセル</Button></DialogClose>` のように asChild で包みます。
@@ -302,7 +318,7 @@ const sorted = useMemo(() => {
 
 - `as?: 'div' | 'p' | 'span'` — 既定 'p'
 - `size?: 'body' | 'small' | 'lead'` — 既定 'body'
-- `tone?: 'muted' | 'default'` — 既定 'default'
+- `tone?: 'default' | 'muted'` — 既定 'default'
 - ほかに HTMLAttributes<HTMLElement> の属性を受け取ります。
 
 ### Link

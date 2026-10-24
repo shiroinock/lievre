@@ -1,6 +1,6 @@
 import { DropdownMenu as MenuPrimitive, Popover as PopoverPrimitive } from 'radix-ui';
 import { Check } from 'lucide-react';
-import { Fragment, useId, type ReactNode } from 'react';
+import { Fragment, useId, useRef, type ReactNode } from 'react';
 import { PortalSurface } from './system';
 
 export type PopoverProps = {
@@ -57,6 +57,7 @@ export type MenuItem =
   | {
       type?: 'item';
       label: string;
+      /** メニューを閉じて、フォーカスを開いた元に戻してから呼びます。ここから ConfirmDialog や Dialog を開くと、閉じた後のフォーカスもメニューを開いたボタンに戻ります。 */
       onSelect: () => void;
       /** 先頭のアイコン。どれか1つにあれば、全項目の文字の開始位置をアイコンの列の分だけそろえます。 */
       icon?: ReactNode;
@@ -94,6 +95,10 @@ export type DropdownMenuProps = {
 /** 押すと開く操作の一覧。矢印キー・Home / End・文字での選択・Escape に対応し、閉じるとフォーカスを開いた元に戻します。 */
 export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuProps) {
   const id = useId();
+  // Run the chosen action once the menu has given focus back to its trigger. A dialog opened
+  // from the item then remembers the trigger, not the vanishing item, as where focus returns.
+  const chosen = useRef<(() => void) | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   // One icon column for every row, so the text starts at the same place with or without an icon.
   const lead = items.some(
     (item) =>
@@ -109,7 +114,9 @@ export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuPr
     );
   return (
     <MenuPrimitive.Root>
-      <MenuPrimitive.Trigger asChild>{trigger}</MenuPrimitive.Trigger>
+      <MenuPrimitive.Trigger asChild ref={triggerRef}>
+        {trigger}
+      </MenuPrimitive.Trigger>
       <MenuPrimitive.Portal>
         <PortalSurface>
           <MenuPrimitive.Content
@@ -118,6 +125,15 @@ export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuPr
             sideOffset={4}
             collisionPadding={8}
             data-lead={lead || undefined}
+            onCloseAutoFocus={(event) => {
+              const run = chosen.current;
+              if (!run) return;
+              chosen.current = null;
+              // Focus first, so an action that moves focus itself keeps it.
+              event.preventDefault();
+              triggerRef.current?.focus();
+              run();
+            }}
           >
             {items.map((item, i) => {
               if (item.type === 'separator')
@@ -173,7 +189,9 @@ export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuPr
                 <MenuPrimitive.Item
                   key={i}
                   className="k-menu-item"
-                  onSelect={item.onSelect}
+                  onSelect={() => {
+                    chosen.current = item.onSelect;
+                  }}
                   disabled={item.disabled}
                   data-tone={item.tone}
                 >

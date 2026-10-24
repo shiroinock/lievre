@@ -1,11 +1,19 @@
 // Every part that opens over the page keeps the same contract, whatever it is built on:
 // it opens from its trigger, carries the theme into the portal, closes on Escape and on a press
 // outside, and gives focus back to the trigger after Escape.
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import type { ReactNode } from 'react';
-import { KeiProvider, Button, Dialog, Select, Popover, DropdownMenu } from '../index';
+import {
+  KeiProvider,
+  Button,
+  Dialog,
+  Select,
+  Popover,
+  DropdownMenu,
+  ConfirmDialog,
+} from '../index';
 
 type Overlay = {
   name: string;
@@ -51,6 +59,20 @@ const OVERLAYS: Overlay[] = [
     ),
     trigger: '操作',
     role: 'menu',
+  },
+  {
+    name: 'ConfirmDialog',
+    ui: (
+      <ConfirmDialog
+        trigger={<Button>削除</Button>}
+        title="削除しますか？"
+        description="元に戻せません。"
+        confirmLabel="削除"
+        onConfirm={() => {}}
+      />
+    ),
+    trigger: '削除',
+    role: 'alertdialog',
   },
 ];
 
@@ -131,5 +153,51 @@ describe('DropdownMenu の項目', () => {
     expect(remove).toHaveBeenCalledOnce();
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
+  });
+});
+
+describe('ConfirmDialog の実行', () => {
+  const confirmDialog = (onConfirm: () => Promise<unknown>) => (
+    <ConfirmDialog
+      trigger={<Button>3件を削除</Button>}
+      title="3件の作業を削除しますか？"
+      description="削除した作業は元に戻せません。"
+      confirmLabel="3件を削除する"
+      tone="danger"
+      onConfirm={onConfirm}
+    />
+  );
+
+  it('初めのフォーカスを取り消し側に置き、終わるまで閉じずに処理中を示す', async () => {
+    let finish = () => {};
+    setup(confirmDialog(() => new Promise<void>((resolve) => (finish = resolve))));
+    const u = user();
+    await u.click(screen.getByRole('button', { name: '3件を削除' }));
+    const dialog = screen.getByRole('alertdialog', { name: '3件の作業を削除しますか？' });
+    expect(dialog).toHaveAccessibleDescription('削除した作業は元に戻せません。');
+    expect(screen.getByRole('button', { name: 'キャンセル' })).toHaveFocus();
+    const run = screen.getByRole('button', { name: '3件を削除する' });
+    expect(run).toHaveClass('k-button--danger');
+    await u.click(run);
+    expect(run).toHaveAttribute('aria-busy', 'true');
+    await u.keyboard('{Escape}');
+    expect(dialog).toBeInTheDocument();
+    finish();
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  });
+
+  it('失敗したら開いたままにして、もう一度押せるようにする', async () => {
+    const onConfirm = vi.fn(() => Promise.reject(new Error('通信できません')));
+    setup(confirmDialog(onConfirm));
+    const u = user();
+    await u.click(screen.getByRole('button', { name: '3件を削除' }));
+    await u.click(screen.getByRole('button', { name: '3件を削除する' }));
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: '3件を削除する' })).not.toHaveAttribute(
+        'aria-busy',
+      ),
+    );
+    expect(onConfirm).toHaveBeenCalledOnce();
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
   });
 });
