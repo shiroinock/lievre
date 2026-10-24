@@ -28,12 +28,14 @@ const comboLabel = (c: Combo) =>
 const usedBaseline = new Set<number>();
 const foundParts = new Map<string, number>();
 const measuredCombos = new Map<string, number>();
-const known = (title: string, v: Violation, combo: Combo) =>
+const known = (title: string, name: string, v: Violation, combo: Combo) =>
   BASELINE.findIndex(
     (b) =>
       b.story === title &&
+      (b.example === undefined || b.example === name) &&
       b.part === v.part &&
       b.check === v.check &&
+      (b.element === undefined || v.element.includes(b.element)) &&
       Object.entries(b.when ?? {}).every(([k, value]) => combo[k as keyof Combo] === value),
   );
 
@@ -112,7 +114,7 @@ for (const { file, module } of files) {
             const key = `${meta.title} › ${part.name}`;
             if (!gate.screen) foundParts.set(key, (foundParts.get(key) ?? 0) + found);
             for (const v of violations) {
-              const index = known(meta.title, v, combo);
+              const index = known(meta.title, name, v, combo);
               if (index >= 0) usedBaseline.add(index);
               else
                 failures.push(
@@ -150,7 +152,7 @@ describe('宣言と例外の後始末', () => {
       (b, i) => !usedBaseline.has(i) && measuredCombos.get(b.story) === COMBOS.length,
     ).map(
       (b) =>
-        `baseline.ts の例外「${b.story} › ${b.part} › ${b.check}${b.when ? ` ${JSON.stringify(b.when)}` : ''}」はもう起きていません。直った部品の例外は一覧から消してください。`,
+        `baseline.ts の例外「${[b.story, b.example, b.part, b.check, b.element].filter(Boolean).join(' › ')}${b.when ? ` ${JSON.stringify(b.when)}` : ''}」はもう起きていません。直った部品の例外は一覧から消してください。`,
     );
     pass(stale);
   });

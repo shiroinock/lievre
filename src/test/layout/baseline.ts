@@ -13,6 +13,13 @@ export type KnownIssue = {
   part: string;
   /** 検査の名前（'inset-y'、'padding'、'icon .k-checkbox' など） */
   check: string;
+  /** その Story（export の名前）でだけ起きる場合 */
+  example?: string;
+  /**
+   * メッセージに出る要素（button.k-button「整える」など）がこの文字列を含むときだけ。
+   * 画面の例外は、ずれる要素か Story に絞る。部品ごとに外すと、同じ画面のほかのずれも見逃す。
+   */
+  element?: string;
   /** この組み合わせのときだけ起きる場合 */
   when?: Partial<Combo>;
   reason: string;
@@ -95,12 +102,16 @@ export const BASELINE: KnownIssue[] = [
     story: 'Patterns/Workspace',
     part: 'ボタン',
     check: 'control-height',
+    example: 'NarrowReading',
+    element: '「詳細」',
     reason: '行高 1.5・文字間隔を広げた点検用の Story で、sm のボタンが 41px になる。',
   },
   {
     story: 'Patterns/Workspace',
     part: 'ボタン',
     check: 'inset-y',
+    example: 'NarrowReading',
+    element: '「詳細」',
     reason:
       '行高 1.5 を当てた点検用の Story で、sm のボタンの文字が上に 1.7px 寄る（基準 1.3px）。',
   },
@@ -108,12 +119,14 @@ export const BASELINE: KnownIssue[] = [
     story: 'Patterns/Workspace',
     part: 'バッジ',
     check: 'grid-height',
+    example: 'NarrowReading',
     reason: '行高 1.5 を当てた点検用の Story で、バッジが 18px になる。',
   },
   ...['Patterns/Application', 'Patterns/Everyday'].map((story) => ({
     story,
     part: 'ボタン',
     check: 'inset-y',
+    element: '「整える」',
     reason:
       '資料の絞り込みの「整える」ボタンで、文字の輪郭が上に 1.5px 寄る（基準 1.4px）。ほかのラベルは基準内なので、字形によるずれか確かめる。',
   })),
@@ -143,6 +156,7 @@ export const BASELINE: KnownIssue[] = [
     story: 'Patterns/Workspace',
     part: '進み具合の見出し',
     check: 'line-grid',
+    example: 'NarrowReading',
     reason:
       '行高 1.5 を当てた点検用の Story で、ラベルの行が 21.6px になる（KEI Mono 14.4px × 1.5）。Progress の Story と画面例の標準の行高では 20px に収まっている。',
   },
