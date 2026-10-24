@@ -64,7 +64,7 @@ export function App() {
 ```
 
 - React / ReactDOM は利用する側で用意します。
-- 書体（IBM Plex Sans JP / IBM Plex Mono）は同梱していません。`npm i @fontsource/ibm-plex-sans-jp @fontsource/ibm-plex-mono` で入れ、使う太さ（Sans 400・500・600、Mono 400・500）を読み込んでください。読み込まない場合はシステムの書体で表示されます。
+- 書体（IBM Plex Sans JP / IBM Plex Mono）は同梱していません。`npm i @fontsource/ibm-plex-sans-jp @fontsource/ibm-plex-mono` で入れ、Sans の 400・500・600 を読み込んでください。等幅は英数字と日本語を 1:2 にするため、`src/styles/fonts.css` と同じ `'KEI Mono'` の `@font-face` を定義するか、PlemolJP を読み込みます。読み込まない場合はシステムの書体で表示されます。
 - スタイルは `.kei` の内側に限定されます。ページ全体のリセットやアプリのナビゲーションは含みません。
 - `theme`（paper / ink）、`density`（comfortable / compact）、`typography`（standard / interface）はそれぞれ独立して指定できます。
 

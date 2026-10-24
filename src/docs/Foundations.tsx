@@ -152,7 +152,7 @@ export function TypeFoundation() {
           </p>
           <p>
             数値・時刻・ID・コードは IBM Plex Mono（<code>.k-mono</code>
-            ）。計器の読み値のように桁が揃い、言葉と区別できます。文中の数値は{' '}
+            ）。英数字と日本語の幅を 1:2 に揃え、端末と同じように桁が並びます。文中の数値は{' '}
             <code>.k-tabular</code> で桁だけ揃えます。
           </p>
         </div>

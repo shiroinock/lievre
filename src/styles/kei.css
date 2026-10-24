@@ -40,7 +40,8 @@
     /* Type */
     --k-font-sans: 'IBM Plex Sans JP', system-ui, -apple-system, 'Hiragino Sans', 'Yu Gothic UI',
       sans-serif;
-    --k-font-mono: 'IBM Plex Mono', 'IBM Plex Sans JP', ui-monospace, 'SF Mono', Menlo, monospace;
+    --k-font-mono: 'KEI Mono', 'PlemolJP', 'IBM Plex Mono', 'IBM Plex Sans JP', ui-monospace,
+      'SF Mono', Menlo, monospace;
     --k-text-xs: 0.75rem;
     --k-text-sm: 0.8125rem;
     --k-text-md: 0.875rem;
