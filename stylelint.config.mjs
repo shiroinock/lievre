@@ -8,6 +8,7 @@ export default {
     'kei/mono-unicode-range': true,
     'kei/mono-weights': true,
     'kei/forced-colors-state': true,
+    'kei/surface-tokens': true,
     // The `font` shorthand resets line-height to `normal`, so always give it one.
     'declaration-property-value-allowed-list': [
       { font: ['inherit', '/\\//'] },
