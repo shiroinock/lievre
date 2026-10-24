@@ -1,26 +1,26 @@
 {
   "config": {
-    "preset": "standard",
+    "preset": "custom",
     "salt": "kei",
     "outline": {
-      "rough": 7,
-      "roughScale": 26,
-      "swell": 4,
-      "swellScale": 220,
-      "step": 12
+      "rough": 3.5,
+      "roughScale": 20,
+      "swell": 5,
+      "swellScale": 250,
+      "step": 15
     },
     "kasure": {
-      "density": 6,
-      "threshold": 0.64,
-      "floor": 0.8
+      "density": 9,
+      "threshold": 0.7,
+      "floor": 0.7
     },
     "stain": {
-      "strength": 0.08
+      "strength": 0.04
     },
     "yake": {
-      "strength": 0.35,
+      "strength": 0.2,
       "reach": 160,
-      "mottle": 0.5,
+      "mottle": 0.7,
       "corner": 0.4,
       "surfaces": 0.3
     },
@@ -66,17 +66,17 @@
   },
   "pixels": {
     "surface": "24cbd0f38917608c",
-    "kasure": "0331ecef9dbea1d8",
-    "yake": "252a1631b415dfdc",
+    "kasure": "2366133b09102344",
+    "yake": "023e5f76f94559b9",
     "sure": "89342154ecf77cc3"
   },
   "bytes": {
-    "yake-paper.png": 6056,
+    "yake-paper.png": 6718,
     "sure-paper.png": 3043,
     "surface-paper.png": 16771,
-    "yake-ink.png": 6056,
+    "yake-ink.png": 6718,
     "sure-ink.png": 3043,
     "surface-ink.png": 16771,
-    "kasure.png": 5062
+    "kasure.png": 4872
   }
 }
