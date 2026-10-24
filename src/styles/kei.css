@@ -1369,5 +1369,43 @@
     .k-meter-hand {
       background: Highlight;
     }
+    /* Shapes drawn only with a background vanish once the browser forces colours,
+       so paint them with system colours instead. */
+    .k-checkbox[data-state='checked'],
+    .k-checkbox[data-state='indeterminate'],
+    .k-switch,
+    .k-switch-thumb,
+    .k-tab::after {
+      forced-color-adjust: none;
+    }
+    .k-checkbox[data-state='checked'],
+    .k-checkbox[data-state='indeterminate'] {
+      background: Highlight;
+      border-color: Highlight;
+      color: HighlightText;
+    }
+    .k-switch {
+      background: Canvas;
+    }
+    .k-switch-thumb {
+      background: ButtonText;
+    }
+    .k-switch[data-state='checked'] {
+      background: Highlight;
+      border-color: Highlight;
+    }
+    .k-switch[data-state='checked'] .k-switch-thumb {
+      background: HighlightText;
+    }
+    .k-switch:disabled {
+      background: Canvas;
+      border-color: GrayText;
+    }
+    .k-switch:disabled .k-switch-thumb {
+      background: GrayText;
+    }
+    .k-tab[data-state='active']::after {
+      background: Highlight;
+    }
   }
 }
