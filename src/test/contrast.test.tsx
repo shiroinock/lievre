@@ -145,4 +145,21 @@ describe('Semantic color contrast and token synchronization', () => {
         expect(ratio(resolve(set, foreground), grained)).toBeGreaterThanOrEqual(4.5);
       });
   }
+
+  // The meter's ticks are border-strong straight on the card's surface: wear draws no band under
+  // the scale, so the dial ages with the surface like every other part.
+  it('draws the meter ticks in border-strong, with nothing under them', () => {
+    const css = readFileSync('src/styles/kei.css', 'utf8');
+    expect(css).toMatch(/\.k-meter-ticks \{[^}]*var\(--k-border-strong\)/);
+    expect(wear).not.toContain('k-meter-face');
+  });
+  for (const theme of themes) {
+    const set = themeTokens(theme);
+    it(`${theme}: meter ticks reach 3:1 on the surface, plain and grained`, () => {
+      const surface = resolve(set, 'surface');
+      const grained = mix(surface, resolve(set, 'text'), grain);
+      for (const ground of [surface, grained])
+        expect(ratio(resolve(set, 'border-strong'), ground)).toBeGreaterThanOrEqual(3);
+    });
+  }
 });
