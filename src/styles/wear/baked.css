@@ -8,7 +8,6 @@
   }
   .kei[data-wear='baked'] {
     --k-wear-kasure: url('./kasure.png');
-    --k-wear-shift: 0.035em 0.022em;
     --k-wear-rule: repeating-linear-gradient(90deg, #000 0px 34px, transparent 34px 37px, #000 37px 101px, #0005 101px 113px, #000 113px 161px, transparent 161px 164px, #000 164px 227px, #0005 227px 239px, #000 239px 300px, transparent 300px 303px);
     --k-wear-dash: 19 2 13 2 18 2;
   }

@@ -34,7 +34,7 @@
 - `npm run wear`：[scripts/build-wear.mjs](../scripts/build-wear.mjs) が、[src/styles/wear/](../src/styles/wear/) に次のものを書き出します。依存するのは Node の zlib だけです。`npm run build` に組み込みました。
   - 粒と汚れ：256px 四方のタイルを、テーマごとに4枚（各16KB）。文字色を、最も濃い点でも不透明度 0.10 まで重ねます。
   - 文字のカスレ：マスク画像1枚（9KB）。最も薄い点でも不透明度 0.72 を残します。
-  - `baked.css`：部品の種類と位置ごとの模様の位置、刷りのずれの量、罫線の欠け方。
+  - `baked.css`：部品の種類と位置ごとの模様の位置と罫線の欠け方。
   - `wear.json`：ソルトと、画素のハッシュ。テストで、生成し直した結果と一致するかを調べます。
 - WebP ではなく PNG（16階調のパレット）にしました。WebP を書き出すには外部の部品が必要で、PNG でも十分に小さいためです。
 - `npm run wear:font`：Plex Sans JP（400 / 500 / 600）と、KEI Mono の元になっている Plex Mono の英数字（latin、400 / 500 / 600）の、全ての字形を変形します。

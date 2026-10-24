@@ -27,10 +27,9 @@ function surfaceImage(salt: string, theme: string) {
 
 /** Custom properties a live provider (and its portals) needs. */
 export function liveWearStyle(prefix: string, salt: string, theme: string): CSSProperties {
-  const { shift, rule, dash } = printMarks(salt);
+  const { rule, dash } = printMarks(salt);
   const style: Record<string, string> = {
     '--k-wear-surface': surfaceImage(salt, theme),
-    '--k-wear-shift': shift,
     '--k-wear-rule': rule,
     '--k-wear-dash': dash,
   };

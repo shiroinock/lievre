@@ -49,13 +49,6 @@
       mask-clip: no-clip;
     }
 
-    /* Misregistration: large numerals and display headings carry a second impression in the
-       accent. Zero blur — it is a print offset, not a shadow. */
-    .kei:is([data-wear='baked'], [data-wear='live'])
-      :is(.k-heading--display, .k-metric-value, .k-meter-reading strong) {
-      text-shadow: var(--k-wear-shift) 0 color-mix(in srgb, var(--k-accent) 38%, transparent);
-    }
-
     /* Worn rules: decorative dividers and chart grids break up. Control outlines and table rules
        carry meaning, so they stay whole. */
     .kei:is([data-wear='baked'], [data-wear='live']) .k-divider::before,

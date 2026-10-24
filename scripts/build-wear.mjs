@@ -102,7 +102,7 @@ export function buildWear(salt, tokens) {
   );
 
   const place = placements(salt);
-  const { shift, rule, dash } = printMarks(salt);
+  const { rule, dash } = printMarks(salt);
 
   const css = [];
   css.push(
@@ -115,7 +115,6 @@ export function buildWear(salt, tokens) {
     );
   css.push(`  .kei[data-wear='baked'] {
     --k-wear-kasure: url('./kasure.png');
-    --k-wear-shift: ${shift};
     --k-wear-rule: ${rule};
     --k-wear-dash: ${dash};
   }`);
