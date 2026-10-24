@@ -13,7 +13,11 @@ const columns: Column<Row>[] = [
     key: 'value',
     header: '使用率',
     align: 'right',
-    render: (r) => <span className="k-mono">{r.value}%</span>,
+    render: (r) => (
+      <span>
+        <span className="k-mono">{r.value}</span>%
+      </span>
+    ),
     sortValue: (r) => r.value,
   },
   {

@@ -450,7 +450,11 @@ export function Progress({
     <div className="k-progress-wrap">
       <div className="k-progress-label">
         <span>{label}</span>
-        {showValue && <span className="k-mono">{safe}%</span>}
+        {showValue && (
+          <span>
+            <span className="k-mono">{safe}</span>%
+          </span>
+        )}
       </div>
       <ProgressPrimitive.Root className="k-progress" value={safe} aria-label={label}>
         <ProgressPrimitive.Indicator

@@ -64,7 +64,20 @@ export function App() {
 ```
 
 - React / ReactDOM は利用する側で用意します。
-- 書体（IBM Plex Sans JP / IBM Plex Mono）は同梱していません。`npm i @fontsource/ibm-plex-sans-jp @fontsource/ibm-plex-mono` で入れ、Sans の 400・500・600 を読み込んでください。等幅は英数字と日本語を 1:2 にするため、`src/styles/fonts.css` と同じ `'KEI Mono'` の `@font-face` を定義するか、PlemolJP を読み込みます。読み込まない場合はシステムの書体で表示されます。
+- 書体（IBM Plex Sans JP / IBM Plex Mono）は同梱していません。`npm i @fontsource/ibm-plex-sans-jp @fontsource/ibm-plex-mono` で入れ、Sans の 400・500・600 を読み込んでください。等幅は英数字と日本語を 1:2 にするため、次の `'KEI Mono'` を 400・500・600 の太さごとに定義するか、PlemolJP を読み込みます。どちらもない場合、等幅の英数字は縮まず、周りより一回り大きく表示されます。
+
+  ```css
+  @font-face {
+    font-family: 'KEI Mono';
+    font-weight: 400;
+    font-display: swap;
+    size-adjust: 83.333%; /* 0.6em 幅を 0.5em 幅にする */
+    src: url('@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+2010-2011, U+20AC, U+2122, U+2212;
+  }
+  ```
+
+- スタイルは `@layer kei.*` に入っています。層に入っていない CSS は層の中より強いため、アプリのリセット（`button { background: none }` や Tailwind の preflight など）は `@layer` に入れて、KEI より先に宣言してください（例：`@layer reset, kei.tokens, kei.base, kei.components, kei.utilities;`）。
 - スタイルは `.kei` の内側に限定されます。ページ全体のリセットやアプリのナビゲーションは含みません。
 - `theme`（paper / ink）、`density`（comfortable / compact）、`typography`（standard / interface）はそれぞれ独立して指定できます。
 

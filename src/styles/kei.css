@@ -131,6 +131,10 @@
 /* -------------------------------------------------------------------- base */
 
 @layer kei.base {
+  /* Plain .k-mono text never drops below --k-text-mono-min, so the narrowed Latin stays readable. */
+  .k-mono {
+    font-size: max(1em, var(--k-text-mono-min));
+  }
   .kei {
     color: var(--k-text);
     background: var(--k-bg);
@@ -1065,7 +1069,7 @@
   }
   .k-metric-code {
     color: var(--k-subtle);
-    font: var(--k-text-mono-min) var(--k-font-mono);
+    font: var(--k-text-mono-min) / 1.4 var(--k-font-mono);
   }
   .k-metric-value {
     margin: 10px 0 4px;
@@ -1310,9 +1314,8 @@
 
 @layer kei.utilities {
   /* For data: figures, times, IDs and code. Japanese units fall back to the sans face.
-     Never smaller than --k-text-mono-min, so the narrowed Latin stays readable. */
+     The size floor lives in kei.base so a component's own font-size still wins. */
   .k-mono {
-    font-size: max(1em, var(--k-text-mono-min));
     font-family: var(--k-font-mono);
     font-variant-numeric: tabular-nums;
   }
