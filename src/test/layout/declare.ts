@@ -33,6 +33,10 @@ export type LayoutCheck =
   | 'control-height'
   /** 高さが 4px の倍数。 */
   | 'grid-height'
+  /** 幅と高さが同じ（アイコンだけのボタン）。 */
+  | 'square'
+  /** フォーカスの輪郭（2px の線と 2px の隙間）が、はみ出しを切る親の内側に収まる。 */
+  | 'focus-room'
   /** padding と罫線を除いた行の箱の高さが 4px の倍数（書体や大きさの違う文字が混ざる行で崩れる）。 */
   | 'line-grid'
   /** padding が上下左右で同じ（パネル）。 */
@@ -53,7 +57,9 @@ export type LayoutCheck =
   /** 描いた中身（svg の線や図形）が、箱の左右いっぱいに広がっている。 */
   | 'fills-x'
   /** 部品の中で selector に当たり、同じ行に並ぶ文字のベースラインがそろっている。 */
-  | { baseline: string };
+  | { baseline: string }
+  /** 部品の中で selector に当たる要素の文字の左端（start）か右端（end）がそろっている。 */
+  | { textEdge: 'start' | 'end'; of: string };
 
 export const CRITERIA = {
   /** 中央揃えの部品の左右のずれ（左右の余白の差の半分）。 */
@@ -76,6 +82,8 @@ export const CRITERIA = {
   line: 0.1,
   /** 同じ行の文字のベースラインの差。 */
   baseline: 0.5,
+  /** フォーカスの輪郭が要素の外に出る幅（outline 2px + outline-offset 2px）。 */
+  focusRing: 4,
 } as const;
 
 /**
@@ -99,13 +107,17 @@ export const checkId = (check: LayoutCheck) =>
         ? `icon ${check.icon}`
         : 'baseline' in check
           ? 'baseline'
-          : 'same-height';
+          : 'textEdge' in check
+            ? 'text-edge'
+            : 'same-height';
 
 export const CHECK_LABEL: Record<string, string> = {
   'inset-x': '左右の中央',
   'inset-y': '上下の中央',
   'control-height': '操作の高さ',
   'grid-height': '高さの格子',
+  square: '正方形',
+  'focus-room': 'フォーカスの輪郭の余地',
   'line-grid': '行の箱の格子',
   'padding-equal': 'パネルの内側の余白',
   'action-band': '操作の帯の余白',
@@ -115,4 +127,5 @@ export const CHECK_LABEL: Record<string, string> = {
   'same-height': '並んだ部品の高さ',
   'fills-x': '中身の広がり',
   baseline: '文字のベースライン',
+  'text-edge': '文字の端',
 };

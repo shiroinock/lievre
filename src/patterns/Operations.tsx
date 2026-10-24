@@ -7,6 +7,7 @@ import {
   Card,
   Checkbox,
   DataTable,
+  DescriptionList,
   Dialog,
   DialogClose,
   EmptyState,
@@ -233,32 +234,25 @@ function WorkDetails({ item }: { item: WorkItem }) {
       }
     >
       <div className="k-form-stack">
-        <dl className="work-detail-grid">
-          <div>
-            <dt>状態</dt>
-            <dd>
-              <WorkBadge status={item.status} />
-            </dd>
-          </div>
-          <div>
-            <dt>担当</dt>
-            <dd>{item.owner}</dd>
-          </div>
-          <div>
-            <dt>優先度</dt>
-            <dd>{priorityNames[item.priority]}</dd>
-          </div>
-          <div>
-            <dt>最終更新</dt>
-            <dd className="k-mono">{item.updated}</dd>
-          </div>
-          {item.notes && (
-            <div className="work-detail-notes">
-              <dt>メモ</dt>
-              <dd>{item.notes}</dd>
-            </div>
-          )}
-        </dl>
+        <DescriptionList
+          layout="stack"
+          columns={2}
+          items={[
+            { label: '状態', value: <WorkBadge status={item.status} /> },
+            { label: '担当', value: item.owner },
+            { label: '優先度', value: priorityNames[item.priority] },
+            { label: '最終更新', value: item.updated, mono: true },
+            ...(item.notes
+              ? [
+                  {
+                    label: 'メモ',
+                    value: <span className="work-detail-notes">{item.notes}</span>,
+                    wide: true,
+                  },
+                ]
+              : []),
+          ]}
+        />
         <Progress
           value={item.status === '稼働中' ? 68 : item.status === '待機中' ? 0 : 32}
           label="処理の進捗（サンプル）"

@@ -7,6 +7,7 @@ import {
   Card,
   Checkbox,
   Container,
+  DescriptionList,
   EmptyState,
   Grid,
   Heading,
@@ -372,14 +373,13 @@ export function RegistrationExample() {
         ) : step === 2 ? (
           <Stack gap={6}>
             <Card title="入力内容の確認">
-              <dl className="everyday-summary">
-                <dt>お名前</dt>
-                <dd>{name}</dd>
-                <dt>メールアドレス</dt>
-                <dd>{email}</dd>
-                <dt>使い方</dt>
-                <dd>{plan === 'personal' ? 'ひとりで使う' : 'チームで使う'}</dd>
-              </dl>
+              <DescriptionList
+                items={[
+                  { label: 'お名前', value: name },
+                  { label: 'メールアドレス', value: email },
+                  { label: '使い方', value: plan === 'personal' ? 'ひとりで使う' : 'チームで使う' },
+                ]}
+              />
             </Card>
             <Stack direction="row" gap={3}>
               <Button onClick={() => setStep(1)}>修正する</Button>

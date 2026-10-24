@@ -1,4 +1,11 @@
-import { useId, useMemo, useState, type ReactNode } from 'react';
+import {
+  useId,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react';
 import {
   ArrowDown,
   ArrowDownRight,
@@ -8,7 +15,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { cx } from './system';
-import { EmptyState, Skeleton } from './primitives';
+import { EmptyState, Skeleton, VisuallyHidden } from './primitives';
 
 export function Sparkline({
   values,
@@ -294,7 +301,7 @@ export function DataTable<T>({
             ))}
             {onRowClick && (
               <th scope="col">
-                <span className="k-sr-only">操作</span>
+                <VisuallyHidden>操作</VisuallyHidden>
               </th>
             )}
           </tr>
@@ -371,5 +378,55 @@ export function DataTable<T>({
         </tbody>
       </table>
     </div>
+  );
+}
+
+export type DescriptionItem = {
+  /** 項目名。 */
+  label: string;
+  value: ReactNode;
+  /** 値が数値・ID・日時・コードのとき true。等幅で桁をそろえます。単位は value の中で `.k-mono` の外に置けないので、単位のある値は false のまま `<span className="k-mono">` で包みます。 */
+  mono?: boolean;
+  /** layout="stack" で段を組むとき、行の幅いっぱいに広げます（メモなど長い値）。 */
+  wide?: boolean;
+};
+/** 「項目名：値」の一覧。`<dl>` の意味を保ちます。layout="row" は項目名の列と値を横に並べ、幅が足りないと値を項目名の下に回します。 */
+export function DescriptionList({
+  items,
+  layout = 'row',
+  columns = 1,
+  labelWidth,
+  className,
+  style,
+  ...props
+}: HTMLAttributes<HTMLDListElement> & {
+  items: DescriptionItem[];
+  /** 'row' は詳細や確認の画面向けに項目名と値を横に並べ、'stack' は項目名の下に値を置きます。 */
+  layout?: 'row' | 'stack';
+  /** layout="stack" のときの段の数。幅が足りないと段を減らします。 */
+  columns?: 1 | 2 | 3;
+  /** layout="row" の項目名の列の幅。既定は '8em'。どの行も同じ幅になります。 */
+  labelWidth?: string;
+}) {
+  return (
+    <dl
+      {...props}
+      className={cx('k-dl', className)}
+      data-layout={layout}
+      style={
+        {
+          ...style,
+          '--dl-columns': columns,
+          ...(labelWidth && { '--dl-label-width': labelWidth }),
+        } as CSSProperties
+      }
+    >
+      {items.map((item, i) => (
+        <div key={i} className="k-dl-item" data-wide={item.wide || undefined}>
+          <dt className="k-dl-label">{item.label}</dt>
+          <dd className={cx('k-dl-value', item.mono && 'k-mono')}>{item.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

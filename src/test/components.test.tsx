@@ -16,6 +16,10 @@ import {
   Meter,
   Progress,
   Sparkline,
+  IconButton,
+  DescriptionList,
+  Spinner,
+  VisuallyHidden,
   type Column,
 } from '../index';
 import { OperationsExample, SettingsExample } from '../patterns/Operations';
@@ -84,6 +88,37 @@ describe('Input and focus contracts', () => {
     await userEvent.keyboard('{Escape}');
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
+  });
+  it('names an icon-only button by its label, shows the same words as a tooltip and keeps focus while loading', async () => {
+    const { rerender } = setup(<IconButton label="行の操作" icon={<svg data-testid="icon" />} />);
+    const button = screen.getByRole('button', { name: '行の操作' });
+    expect(button).toHaveAttribute('type', 'button');
+    expect(screen.getByTestId('icon').parentElement).toHaveAttribute('aria-hidden', 'true');
+    await userEvent.tab();
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('行の操作');
+    rerender(
+      <KeiProvider>
+        <ToastProvider>
+          <IconButton label="行の操作" icon={<svg />} loading />
+        </ToastProvider>
+      </KeiProvider>,
+    );
+    expect(screen.getByRole('button', { name: '行の操作' })).toBe(button);
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('aria-busy', 'true');
+  });
+  it('announces a spinner by its label and adds hidden words to a button name', () => {
+    setup(
+      <>
+        <Spinner label="一覧を読み込み中" />
+        <Button>
+          詳細<VisuallyHidden>（W-1024）</VisuallyHidden>
+        </Button>
+      </>,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('一覧を読み込み中');
+    expect(screen.getByText('一覧を読み込み中')).toHaveClass('k-sr-only');
+    expect(screen.getByRole('button')).toHaveAccessibleName(/詳細\s*（W-1024）/);
   });
   it('traps dialog focus and restores it to the trigger on Escape', async () => {
     setup(
@@ -161,6 +196,25 @@ describe('Tables and measures', () => {
       'preserveAspectRatio',
       'none',
     );
+  });
+  it('keeps a description list as dl, dt and dd, and sets figures in the monospaced face', async () => {
+    const { container } = setup(
+      <DescriptionList
+        items={[
+          { label: '申請番号', value: 'REQ-00481', mono: true },
+          { label: '申請者', value: '計 花子' },
+        ]}
+      />,
+    );
+    const list = container.querySelector('dl')!;
+    expect([...list.children].map((row) => [...row.children].map((c) => c.tagName))).toEqual([
+      ['DT', 'DD'],
+      ['DT', 'DD'],
+    ]);
+    expect(screen.getByText('REQ-00481')).toHaveClass('k-mono');
+    expect(screen.getByText('計 花子')).not.toHaveClass('k-mono');
+    const results = await axe.run(container);
+    expect(results.violations.map((v) => v.id)).toEqual([]);
   });
   it('renders an informative empty table instead of a blank panel', () => {
     setup(<DataTable rows={[]} columns={columns} getRowId={(r) => r.id} caption="測定値" />);
