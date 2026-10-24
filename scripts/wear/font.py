@@ -9,7 +9,8 @@ must not carry that name, so they are published as "KEI Worn Sans" and "KEI Worn
 
 Sans JP and Mono take the same salt and the same AMPLITUDE, so words and figures wear alike.
 Only outlines move: advance widths stay as they were, so Latin keeps half the width of kana and
-kanji and table figures stay aligned. `check` compares every advance with the original.
+kanji and table figures stay aligned. `check` compares every advance with the original and
+checks that each glyph's left side bearing matches its moved outline.
 
 Usage: python3 scripts/wear/font.py <salt> <out-dir> [weights...]
        python3 scripts/wear/font.py check <out-dir>
@@ -129,6 +130,11 @@ def check(out):
         a, b = advances(before), advances(after)
         changed = [k for k in a if a[k] != b.get(k)]
         assert not changed, f'{target.name}: advance changed for {changed[:5]}'
+        # The origin stays put: lsb is the left edge of the moved outline, as TrueType expects.
+        glyf, hmtx = after['glyf'], after['hmtx']
+        shifted = [n for n in after.getGlyphOrder()
+                   if glyf[n].numberOfContours and hmtx[n][1] != glyf[n].xMin]
+        assert not shifted, f'{target.name}: lsb does not match the outline for {shifted[:5]}'
         checked, glyphs = checked + 1, glyphs + len(a)
     assert checked, f'no worn fonts in {out}'
     print(json.dumps({'checked': checked, 'advances': glyphs}))

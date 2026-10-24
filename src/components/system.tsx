@@ -12,6 +12,10 @@ import {
 import { Toast as ToastPrimitive } from 'radix-ui';
 import { X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { LiveWearFilters, liveWearStyle } from '../wear/live';
+import { WEAR_CONFIG } from '../wear/params.mjs';
+import type { WearConfig } from '../wear/presets.mjs';
+
+export type { WearConfig };
 
 /** sepia と rust は試作のテーマです。 */
 export type Theme = 'paper' | 'ink' | 'sepia' | 'rust';
@@ -30,13 +34,15 @@ const ThemeContext = createContext<{
   typography: Typography;
   wear: Wear;
   wearSeed: string;
+  wearConfig: WearConfig;
   wearStyle?: CSSProperties;
 }>({
   theme: 'paper',
   density: 'comfortable',
   typography: 'standard',
   wear: 'off',
-  wearSeed: 'kei',
+  wearSeed: WEAR_CONFIG.salt,
+  wearConfig: WEAR_CONFIG,
 });
 export function useKeiTheme() {
   return useContext(ThemeContext);
@@ -70,6 +76,7 @@ export function KeiProvider({
   typography: givenTypography,
   wear: givenWear,
   wearSeed: givenWearSeed,
+  wearConfig: givenWearConfig,
   className,
   style,
   children,
@@ -80,22 +87,31 @@ export function KeiProvider({
   typography?: Typography;
   /** 試作：質感の段階。既定は off。 */
   wear?: Wear;
-  /** 試作：live の模様を決めるソルト。baked はビルド時のソルト（npm run wear）で決まります。 */
+  /**
+   * 試作：live の模様を決めるソルト。既定は wear.config.json のソルトで、baked と同じ模様になります。
+   * baked はビルド時の値（npm run wear）で決まります。
+   */
   wearSeed?: string;
+  /** 試作：live の強さ。既定は wear.config.json の値。調整の画面（npm run wear:tune）が使います。 */
+  wearConfig?: WearConfig;
 }) {
   const inherited = useKeiTheme();
   const theme = givenTheme ?? inherited.theme;
   const density = givenDensity ?? inherited.density;
   const typography = givenTypography ?? inherited.typography;
-  const wearSeed = givenWearSeed ?? inherited.wearSeed;
+  const wearSeed = givenWearSeed ?? givenWearConfig?.salt ?? inherited.wearSeed;
+  const baseConfig = givenWearConfig ?? inherited.wearConfig;
+  const wearConfig = useMemo(() => ({ ...baseConfig, salt: wearSeed }), [baseConfig, wearSeed]);
   const wear = useEffectiveWear(givenWear ?? inherited.wear);
   const prefix = 'kw' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const wearStyle = useMemo(
-    () => (wear === 'live' ? liveWearStyle(prefix, wearSeed, theme) : undefined),
-    [wear, prefix, wearSeed, theme],
+    () => (wear === 'live' ? liveWearStyle(prefix, wearConfig, theme) : undefined),
+    [wear, prefix, wearConfig, theme],
   );
   return (
-    <ThemeContext.Provider value={{ theme, density, typography, wear, wearSeed, wearStyle }}>
+    <ThemeContext.Provider
+      value={{ theme, density, typography, wear, wearSeed, wearConfig, wearStyle }}
+    >
       <div
         {...props}
         className={cx('kei', className)}
@@ -107,7 +123,7 @@ export function KeiProvider({
         data-wear-seed={wear === 'live' ? wearSeed : undefined}
       >
         {children}
-        {wear === 'live' && <LiveWearFilters prefix={prefix} salt={wearSeed} />}
+        {wear === 'live' && <LiveWearFilters prefix={prefix} config={wearConfig} />}
       </div>
     </ThemeContext.Provider>
   );

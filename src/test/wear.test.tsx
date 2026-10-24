@@ -1,27 +1,49 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { deflateSync } from 'node:zlib';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import tokens from '../../tokens/tokens.json';
-import { buildWear, kasureField } from '../../scripts/build-wear.mjs';
+import { buildWear, readConfig } from '../../scripts/build-wear.mjs';
 import { seedFor, mulberry32, noise2 } from '../wear/seed.mjs';
 import { KASURE_FLOOR, SURFACE_MAX } from '../wear/params.mjs';
+import { normaliseConfig, PRESETS } from '../wear/presets.mjs';
+import { kasureField, textures, wearVars } from '../wear/textures.mjs';
+import { contrastGauge, distortionGauge, gauges } from '../wear/gauges.mjs';
+import { liveWearStyle } from '../wear/live';
 import { KeiProvider, Dialog, Button } from '../index';
 
 describe('Wear: seeded and reproducible', () => {
-  it('keeps the baked CSS and texture hashes identical to what the salt generates', () => {
-    // Run `npm run wear` after changing the generator or params.
+  const config = readConfig();
+  it('keeps src/styles/wear identical to what wear.config.json generates', () => {
+    // Run `npm run wear` after changing wear.config.json, the generator or the text kinds.
     const meta = JSON.parse(readFileSync('src/styles/wear/wear.json', 'utf8'));
-    const built = buildWear(meta.salt, tokens);
+    const built = buildWear(config, tokens);
+    expect(meta.config).toEqual(config);
     expect(readFileSync('src/styles/wear/baked.css', 'utf8')).toBe(built.css);
+    expect(readFileSync('src/styles/wear/rules.css', 'utf8')).toBe(built.rules);
     expect(meta.pixels).toEqual(built.meta.pixels);
-    expect(meta.surfaceMax).toBe(SURFACE_MAX);
-    expect(meta.kasureFloor).toBe(KASURE_FLOOR);
+    expect(SURFACE_MAX).toBe(config.stain.strength);
+    expect(KASURE_FLOOR).toBe(config.kasure.floor);
   });
 
-  it('draws the same wear for the same salt and different wear for another', () => {
-    expect(buildWear('kei', tokens).meta.pixels).toEqual(buildWear('kei', tokens).meta.pixels);
-    expect(buildWear('ash', tokens).meta.pixels).not.toEqual(buildWear('kei', tokens).meta.pixels);
+  it.runIf(existsSync('wear-fonts/current.json'))(
+    'keeps the worn fonts in step with wear.config.json',
+    () => {
+      // Run `npm run wear:font` after changing the salt or the distortion.
+      const fonts = JSON.parse(readFileSync('wear-fonts/current.json', 'utf8'));
+      expect({ salt: fonts.salt, distortion: fonts.distortion }).toEqual({
+        salt: config.salt,
+        distortion: config.distortion,
+      });
+    },
+  );
+
+  it('draws the same wear for the same values and different wear for another salt', () => {
+    expect(buildWear(config, tokens).meta.pixels).toEqual(buildWear(config, tokens).meta.pixels);
+    expect(buildWear({ ...config, salt: 'ash' }, tokens).meta.pixels).not.toEqual(
+      buildWear(config, tokens).meta.pixels,
+    );
     expect(seedFor('kei', 'card', 2)).toBe(seedFor('kei', 'card', 2));
     expect(seedFor('kei', 'card', 2)).not.toBe(seedFor('kei', 'card', 3));
     const [a, b] = [mulberry32(7), mulberry32(7)];
@@ -34,12 +56,44 @@ describe('Wear: seeded and reproducible', () => {
   });
 
   it('never lets the dry brush fade a glyph below the floor', () => {
-    expect(Math.min(...kasureField('kei'))).toBeGreaterThanOrEqual(KASURE_FLOOR - 1e-6);
+    for (const preset of Object.values(PRESETS))
+      expect(Math.min(...kasureField(preset.salt, preset.kasure))).toBeGreaterThanOrEqual(
+        preset.kasure.floor - 1e-6,
+      );
+  });
+
+  it('gives live the same textures and offsets as the baked build', () => {
+    const live = liveWearStyle('t', config, 'sepia') as Record<string, string>;
+    const shared = wearVars(config, 'KASURE');
+    for (const [name, value] of Object.entries(shared))
+      if (name !== '--k-wear-kasure') expect(live[name]).toBe(value);
+    // The same pixels, stored rather than compressed.
+    const stored = textures(config, tokens);
+    expect(stored.pixels).toEqual(textures(config, tokens, (rows) => deflateSync(rows)).pixels);
+  });
+});
+
+describe('Wear: presets and gauges', () => {
+  it('keeps the standard preset within every readability guide', () => {
+    expect(gauges(normaliseConfig(PRESETS.standard), tokens).level).toBe('ok');
+  });
+  it('keeps text contrast at 4.5:1 at the darkest point for every preset', () => {
+    for (const preset of Object.values(PRESETS))
+      for (const { min } of Object.values(contrastGauge(normaliseConfig(preset), tokens)))
+        expect(min).toBeGreaterThanOrEqual(4.5);
+  });
+  it('flags strong distortion and small distorted text', () => {
+    const config = normaliseConfig({ distortion: { amplitude: 40, wavelength: 110 } });
+    expect(distortionGauge(config, 'text', 16).level).toBe('warn');
+    const small = normaliseConfig({ kinds: { small: { distort: true, kasure: 0 } } });
+    expect(distortionGauge(small, 'small', 12).level).toBe('caution');
   });
 });
 
 describe('Wear: what it may touch', () => {
-  const css = readFileSync('src/styles/kei-wear.css', 'utf8');
+  const css = ['kei-wear.css', 'wear/rules.css', 'wear/baked.css']
+    .map((file) => readFileSync(`src/styles/${file}`, 'utf8'))
+    .join('\n');
   it('leaves focus, controls and status marks alone', () => {
     for (const untouched of [
       ':focus',
@@ -60,9 +114,11 @@ describe('Wear: what it may touch', () => {
     const allowed = new Set([
       'background-image',
       'background-size',
+      'background-position',
       'mask',
       'mask-image',
       'mask-size',
+      'mask-position',
       'mask-clip',
       'text-shadow',
       'stroke-dasharray',
@@ -73,11 +129,16 @@ describe('Wear: what it may touch', () => {
       'border-radius',
       'background',
       'clip-path',
-      '--k-font-sans',
+      // Worn faces keep every advance width (checked by npm run wear:font), so text does not move.
+      'font-family',
       '--k-font-mono',
     ]);
     // position/inset only appear on the meter's ::before, which is absolutely placed inside it.
-    expect(declarations.map((d) => d.trim()).filter((d) => !allowed.has(d))).toEqual([]);
+    expect(
+      declarations
+        .map((d) => d.trim())
+        .filter((d) => !allowed.has(d) && !d.startsWith('--k-wear-')),
+    ).toEqual([]);
   });
 });
 
@@ -118,7 +179,9 @@ describe('Wear: provider', () => {
     const id = filter.match(/url\(#(.+)\)/)![1];
     const turbulence = scope.querySelector(`#${id} feTurbulence`)!;
     expect(turbulence.getAttribute('seed')).toBe(String(seedFor('ash', 'heading', 0) % 100000));
-    expect(scope.style.getPropertyValue('--k-wear-surface')).toContain('data:image/svg+xml');
+    expect(scope.style.getPropertyValue('--k-wear-surface')).toMatch(
+      /^url\((blob:|data:image\/png)/,
+    );
     await userEvent.click(screen.getByRole('button', { name: '開く' }));
     const portal = screen.getByRole('dialog', { name: '表示設定' }).closest('.kei') as HTMLElement;
     expect(portal).toHaveAttribute('data-wear', 'live');

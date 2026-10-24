@@ -3,43 +3,10 @@ import tokens from '../../tokens/tokens.json';
 import { readFileSync } from 'node:fs';
 import { buildTokens } from '../../scripts/build-tokens.mjs';
 import { KASURE_FLOOR, SURFACE_MAX } from '../wear/params.mjs';
-type TokenSet = Record<string, { $value: string }>;
+import { mix, ratio, resolve, themeTokens as tokensFor } from '../wear/contrast.mjs';
 const themes = ['paper', 'ink', 'sepia', 'rust'] as const;
-function themeTokens(theme: (typeof themes)[number]) {
-  return { ...tokens.paper, ...(theme === 'paper' ? {} : tokens[theme]) } as TokenSet;
-}
-function resolve(set: TokenSet, key: string): string {
-  const value = set[key].$value;
-  const alias = value.match(/^var\(--k-(.+)\)$/);
-  return alias ? resolve(set, alias[1]) : value;
-}
-function luminance(hex: string) {
-  const c = hex
-    .slice(1)
-    .match(/.{2}/g)!
-    .map((v) => parseInt(v, 16) / 255)
-    .map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
-  return c[0] * 0.2126 + c[1] * 0.7152 + c[2] * 0.0722;
-}
-function mix(a: string, b: string, amount: number) {
-  const channels = (hex: string) =>
-    hex
-      .slice(1)
-      .match(/.{2}/g)!
-      .map((v) => parseInt(v, 16));
-  const [x, y] = [channels(a), channels(b)];
-  return (
-    '#' +
-    x
-      .map((v, i) => Math.round(v + (y[i] - v) * amount))
-      .map((v) => v.toString(16).padStart(2, '0'))
-      .join('')
-  );
-}
-function ratio(a: string, b: string) {
-  const [lo, hi] = [luminance(a), luminance(b)].sort((a, b) => a - b);
-  return (hi + 0.05) / (lo + 0.05);
-}
+const themeTokens = (theme: (typeof themes)[number]) => tokensFor(tokens, theme);
+
 describe('Semantic color contrast and token synchronization', () => {
   it('keeps tokens.json identical to what kei.css generates', () => {
     // Every scope, both directions: run `npm run tokens` after editing kei.css.

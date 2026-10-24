@@ -1,17 +1,51 @@
 {
-  "salt": "kei",
-  "surfaceMax": 0.1,
-  "kasureFloor": 0.72,
-  "tile": 256,
+  "config": {
+    "preset": "standard",
+    "salt": "kei",
+    "distortion": {
+      "amplitude": 13,
+      "wavelength": 140
+    },
+    "kasure": {
+      "density": 6,
+      "threshold": 0.64,
+      "floor": 0.8
+    },
+    "stain": {
+      "strength": 0.08
+    },
+    "kinds": {
+      "small": {
+        "distort": false,
+        "kasure": 0.3
+      },
+      "text": {
+        "distort": true,
+        "kasure": 0.7
+      },
+      "heading": {
+        "distort": true,
+        "kasure": 1
+      },
+      "figure": {
+        "distort": true,
+        "kasure": 1
+      },
+      "data": {
+        "distort": false,
+        "kasure": 0
+      }
+    }
+  },
   "pixels": {
     "surface": "24cbd0f38917608c",
-    "kasure": "44cd81c3b365194e"
+    "kasure": "0331ecef9dbea1d8"
   },
   "bytes": {
     "surface-paper.png": 16771,
     "surface-ink.png": 16771,
     "surface-sepia.png": 16771,
     "surface-rust.png": 16771,
-    "kasure.png": 8769
+    "kasure.png": 5062
   }
 }

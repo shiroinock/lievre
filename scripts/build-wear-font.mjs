@@ -1,14 +1,15 @@
-// Bakes worn glyphs for the current salt: `npm run wear:font` (same salt rules as `npm run wear`).
-// Needs Python 3 with fontTools and brotli. Results are cached per salt under wear-fonts/,
-// and wear-fonts/fonts.css always points at the current salt.
+// Bakes worn glyphs from wear.config.json (salt and distortion): `npm run wear:font`.
+// Needs Python 3 with fontTools and brotli. Results are cached per salt and strength under
+// wear-fonts/; wear-fonts/fonts.css always points at the current values, and wear-fonts/current.json
+// records them so src/test/wear.test.tsx can tell when the fonts are out of date.
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { resolveSalt } from './build-wear.mjs';
+import { readConfig } from './build-wear.mjs';
 import { hashString } from '../src/wear/seed.mjs';
 
 // Bump when scripts/wear/font.py changes how it writes the fonts.
 const FONT_VERSION = 2;
-const salt = resolveSalt();
+const { salt, distortion } = readConfig();
 const python = process.env.KEI_WEAR_PYTHON || 'python3';
 try {
   execFileSync(python, ['-c', 'import fontTools, brotli'], { stdio: 'ignore' });
@@ -20,11 +21,16 @@ try {
   process.exit(1);
 }
 // The cache key covers everything that changes the outlines, not only the salt.
-const strength = `${process.env.KEI_WEAR_AMPLITUDE ?? 28}/${process.env.KEI_WEAR_WAVELENGTH ?? 110}`;
+const strength = `${distortion.amplitude}/${distortion.wavelength}`;
+const env = {
+  ...process.env,
+  KEI_WEAR_AMPLITUDE: String(distortion.amplitude),
+  KEI_WEAR_WAVELENGTH: String(distortion.wavelength),
+};
 const dir = `wear-fonts/${hashString(`${salt}:${strength}:${FONT_VERSION}`).toString(16)}`;
 const started = Date.now();
 if (!existsSync(`${dir}/report.json`))
-  execFileSync(python, ['scripts/wear/font.py', salt, dir], { stdio: 'inherit' });
+  execFileSync(python, ['scripts/wear/font.py', salt, dir], { stdio: 'inherit', env });
 // KEI Mono only covers the Latin range in fonts.css; the worn copy takes exactly the same range.
 const monoRange = readFileSync('src/styles/fonts.css', 'utf8').match(
   /font-family: 'KEI Mono';[\s\S]*?unicode-range: ([^;]+);/,
@@ -38,6 +44,7 @@ const css = readFileSync(`${dir}/fonts.css`, 'utf8')
 // Advance widths must match the originals glyph for glyph, or the 1:2 grid and figure columns break.
 execFileSync(python, ['scripts/wear/font.py', 'check', dir], { stdio: 'inherit' });
 writeFileSync('wear-fonts/fonts.css', css);
+writeFileSync('wear-fonts/current.json', JSON.stringify({ salt, distortion, dir }, null, 2) + '\n');
 const report = JSON.parse(readFileSync(`${dir}/report.json`, 'utf8'));
 console.log(
   `salt "${salt}": ${report.files} files, ${(report.bytes / 1048576).toFixed(2)} MiB, ${((Date.now() - started) / 1000).toFixed(1)}s`,

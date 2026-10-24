@@ -35,7 +35,8 @@
     "format": "prettier --write .",
     "tokens": "node scripts/build-tokens.mjs",
     "wear": "node scripts/build-wear.mjs",
-    "wear:font": "node scripts/build-wear-font.mjs"
+    "wear:font": "node scripts/build-wear-font.mjs",
+    "wear:tune": "vite --open /tune.html"
   },
   "peerDependencies": {
     "react": "^18.3.0 || ^19.0.0",

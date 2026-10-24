@@ -1,0 +1,38 @@
+{
+  "preset": "standard",
+  "salt": "kei",
+  "distortion": {
+    "amplitude": 13,
+    "wavelength": 140
+  },
+  "kasure": {
+    "density": 6,
+    "threshold": 0.64,
+    "floor": 0.8
+  },
+  "stain": {
+    "strength": 0.08
+  },
+  "kinds": {
+    "small": {
+      "distort": false,
+      "kasure": 0.3
+    },
+    "text": {
+      "distort": true,
+      "kasure": 0.7
+    },
+    "heading": {
+      "distort": true,
+      "kasure": 1
+    },
+    "figure": {
+      "distort": true,
+      "kasure": 1
+    },
+    "data": {
+      "distort": false,
+      "kasure": 0
+    }
+  }
+}
