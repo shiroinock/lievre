@@ -100,6 +100,12 @@ describe('stylelint: KEI rules', () => {
     expect(await cssRules('.panel { background: var(--k-surface); }')).toEqual([]);
   });
 
+  it('rejects shadows on text', async () => {
+    expect(await cssRules('.a { text-shadow: 0.05em 0.035em 0 var(--k-accent); }')).toContain(
+      'property-disallowed-list',
+    );
+  });
+
   it('requires a line-height in the font shorthand', async () => {
     expect(await cssRules('.a { font: 14px sans-serif; }')).toContain(
       'declaration-property-value-allowed-list',

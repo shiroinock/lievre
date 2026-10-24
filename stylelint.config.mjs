@@ -21,6 +21,14 @@ export default {
           'font の一括指定には「/ 行の高さ」を書いてください（書かないと normal に戻ります）。',
       },
     ],
+    // DESIGN.md 約束3: no shadows. A misregistered second print was tried on text and dropped.
+    'property-disallowed-list': [
+      ['text-shadow'],
+      {
+        message:
+          '文字に影や二重の刷りを付けないでください（DESIGN.md の約束3）。強めたいときは太さか色のトークンで表します。',
+      },
+    ],
     // Layout gate (docs/quality-gate.md).
     'kei/padding-symmetry': true,
     'kei/height-grid': [true, { known: heightGridKnown }],

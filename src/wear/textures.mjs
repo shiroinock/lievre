@@ -174,12 +174,11 @@ const hex2 = (v) =>
  * 1 - (1 - floor) * f (mask layers add: a + m * (1 - a), with a = 1 - f).
  */
 export function wearVars(config, kasure) {
-  const { shift, rule, dash } = printMarks(config.salt);
+  const { rule, dash } = printMarks(config.salt);
   const place = placements(config.salt);
   const at = ([x, y]) => `${x}px ${y}px`;
   const vars = {
     '--k-wear-kasure': kasure,
-    '--k-wear-shift': shift,
     '--k-wear-rule': rule,
     '--k-wear-dash': dash,
     '--k-wear-root-pos': at(place.root[0]),

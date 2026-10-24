@@ -156,7 +156,6 @@ describe('Wear: what it may touch', () => {
       'mask-size',
       'mask-position',
       'mask-clip',
-      'text-shadow',
       'stroke-dasharray',
       'filter',
       'content',
