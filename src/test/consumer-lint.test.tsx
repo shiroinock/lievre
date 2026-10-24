@@ -50,6 +50,7 @@ const cases: Record<RuleName, { valid: Case[]; invalid: Case[] }> = {
   'table-sort-before-page': {
     valid: [
       `<DataTable caption="c" rows={all} columns={[]} getRowId={(r) => r.id} />`,
+      `<DataTable caption="c" rows={all.slice()} columns={[]} getRowId={(r) => r.id} />`,
       `<DataTable caption="c" rows={all.slice(0, 10)} sorting={null} onSortingChange={() => {}} columns={[]} getRowId={(r) => r.id} />`,
     ],
     invalid: [
@@ -130,6 +131,7 @@ const cases: Record<RuleName, { valid: Case[]; invalid: Case[] }> = {
     invalid: [
       `<ConfirmDialog trigger={<Button>削除</Button>} title="t" description="d" confirmLabel="3件を削除" onConfirm={save} />`,
       `<DropdownMenu trigger={<Button>操作</Button>} items={[{ label: '複製', onSelect: save }, { label: '削除', onSelect: save }]} />`,
+      `<DropdownMenu trigger={<Button>操作</Button>} items={[{ type: 'item', label: '削除', onSelect: save }]} />`,
     ],
   },
   'icon-button-label': {

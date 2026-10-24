@@ -232,12 +232,15 @@ const rules = {
         const prop = (key) =>
           item.properties.find((p) => p.type === 'Property' && (p.key.name ?? p.key.value) === key);
         const label = prop('label')?.value;
+        // `type: 'item'` is an item too; other types (a separator) have no tone.
+        const type = prop('type')?.value;
+        const isItem = !type || (type.type === 'Literal' && type.value === 'item');
         const hasSpreadProp = item.properties.some((p) => p.type !== 'Property');
         if (
           label?.type === 'Literal' &&
           destructive.test(String(label.value)) &&
           !prop('tone') &&
-          !prop('type') &&
+          isItem &&
           !hasSpreadProp
         )
           context.report({ node: item, messageId: 'menu' });
@@ -319,7 +322,9 @@ function isPaged(context, expression, from, depth) {
   if (expression.type === 'ChainExpression') expression = expression.expression;
   if (expression.type === 'CallExpression') {
     const callee = expression.callee;
-    if (callee.type === 'MemberExpression' && callee.property.name === 'slice') return true;
+    // `all.slice()` with no arguments copies every row, which is not a page.
+    if (callee.type === 'MemberExpression' && callee.property.name === 'slice')
+      return expression.arguments.length > 0;
     // useMemo(() => all.slice(…), […])
     const fn = expression.arguments[0];
     if (

@@ -16,7 +16,7 @@ or {
   JsObjectExpression(members = $members) as $item where {
     $members <: contains JsPropertyObjectMember(name = "label", value = $label),
     $label <: r"[\x22\x27\x60].*(?:削除|破棄|消去|解約|退会|初期化|取り消せません).*[\x22\x27\x60]",
-    $members <: not contains or { JsPropertyObjectMember(name = "tone"), JsPropertyObjectMember(name = "type"), JsSpread() },
+    $members <: not contains or { JsPropertyObjectMember(name = "tone"), JsPropertyObjectMember(name = "type", value = not r"[\x22\x27\x60]item[\x22\x27\x60]"), JsSpread() },
     $item <: within JsxAttribute(name = "items") as $items,
     $items <: within JsxSelfClosingElement(name = "DropdownMenu"),
     $item <: within JsModule() as $module,
