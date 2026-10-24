@@ -26,22 +26,6 @@ export type KnownIssue = {
 };
 
 export const BASELINE: KnownIssue[] = [
-  // 直すと見た目が大きく変わるため、基準の当て方と合わせて相談するもの。
-  {
-    story: 'Components/Overlays/Dialog',
-    part: 'ダイアログの操作',
-    check: 'padding-equal',
-    reason:
-      'padding が 16px 24px。上下も 24px にすると操作の帯が 72px から 88px に伸び、左右を 16px にするとボタンの右端が本文（24px）とそろわない。罫線で区切った帯をパネルとして扱うかを決めてから直す。',
-  },
-  {
-    story: 'Components/Layout/Card',
-    part: 'カードの見出し',
-    check: 'icon :scope > .k-button',
-    reason:
-      '右の操作（32px）が、見出しの1行目（小見出し、行の高さ 20px）の中心より 6px 下にある。1行目に合わせると margin-top: -6px で枠の内側の余白にはみ出し、見出し（2行目）に合わせると 1行目から 16px 下になる。どの行に合わせるかを決めてから直す。',
-  },
-
   // 字形によるずれ。行の高さと padding は上下で同じ。
   {
     story: 'Components/Display/Kbd',
