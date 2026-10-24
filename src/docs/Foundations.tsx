@@ -49,8 +49,8 @@ export const palette: { group: string; swatches: Swatch[] }[] = [
       {
         token: '--k-selected',
         name: '選択の面',
-        paper: '#E7E8FD',
-        ink: '#23286C',
+        paper: '#D5D8FB',
+        ink: '#2E358C',
         use: '選択行・選択中の項目',
       },
     ],
