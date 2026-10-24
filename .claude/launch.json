@@ -2,6 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     { "name": "storybook", "runtimeExecutable": "npm", "runtimeArgs": ["run", "storybook"], "port": 6006 },
-    { "name": "demo", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 5173 }
+    { "name": "demo", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 5173 },
+    { "name": "combobox-spike", "runtimeExecutable": "npm", "runtimeArgs": ["--prefix", "spikes/combobox", "run", "dev"], "port": 5180 }
   ]
 }

@@ -154,6 +154,19 @@ function checkOne(el: Element, check: LayoutCheck): string | null {
     return `padding が上 ${px(sides[0])}・右 ${px(sides[1])}・下 ${px(sides[2])}・左 ${px(sides[3])} です。基準：パネルの padding は上下左右で同じ値。`;
   }
 
+  if (check === 'action-band') {
+    const [t, r, b, l] = ['Top', 'Right', 'Bottom', 'Left'].map((k) =>
+      parseFloat(s.getPropertyValue(`padding-${k.toLowerCase()}`)),
+    );
+    // The band's sides line up with the section above it (the panel's body).
+    const above = el.previousElementSibling;
+    const side = above ? parseFloat(getComputedStyle(above).paddingLeft) : l;
+    const near = (a: number, want: number) => Math.abs(a - want) <= CRITERIA.size;
+    if (near(t, CRITERIA.bandY) && near(b, CRITERIA.bandY) && near(l, side) && near(r, side))
+      return null;
+    return `padding が上 ${px(t)}・右 ${px(r)}・下 ${px(b)}・左 ${px(l)} です。基準：操作の帯は上下 ${CRITERIA.bandY}px、左右は上の区画と同じ ${px(side)}。`;
+  }
+
   if (check === 'fits') {
     // Glyphs may rise above a tight line box without harm; they are only cut where the box clips.
     const over = el.scrollWidth - el.clientWidth;
@@ -219,13 +232,20 @@ function checkOne(el: Element, check: LayoutCheck): string | null {
       if (!visible(icon)) continue;
       const textRoot = check.text ? el.querySelector(check.text) : el;
       const text = textRoot && firstText(textRoot, icon);
-      const line = text && firstLineCentre(text);
+      let line = text && firstLineCentre(text);
+      if (check.block && textRoot) {
+        const box = textRoot.getBoundingClientRect();
+        line = (box.top + box.bottom) / 2;
+      }
       if (!text || line == null) continue;
       const r = icon.getBoundingClientRect();
       const dy = (r.top + r.bottom) / 2 - line;
       if (Math.abs(dy) <= CRITERIA.icon) continue;
+      const target = check.block
+        ? `文字のまとまり「${(textRoot!.textContent ?? '').trim().slice(0, 12)}」の中心`
+        : `文字「${text.textContent!.trim().slice(0, 12)}」の1行目の行ボックスの中心`;
       problems.push(
-        `${describe(icon)} の縦の中心が、文字「${text.textContent!.trim().slice(0, 12)}」の1行目の行ボックスの中心より ${px(Math.abs(dy))} ${dy > 0 ? '下' : '上'}にあります。基準：${CRITERIA.icon}px 以内。`,
+        `${describe(icon)} の縦の中心が、${target}より ${px(Math.abs(dy))} ${dy > 0 ? '下' : '上'}にあります。基準：${CRITERIA.icon}px 以内。`,
       );
     }
     return problems.length ? problems.join(' ') : null;
