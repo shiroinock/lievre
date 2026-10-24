@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { KeiProvider, Button, TextField, Badge, Card, DataTable } from '../index';
 import {
   ColorFoundation,
@@ -10,6 +11,9 @@ import {
 const meta = {
   title: 'Foundations/Design language',
   parameters: {
+    layoutGate: {
+      skip: '配色・文字・密度を比べる見本。部品はそれぞれの Story で測っている。',
+    } satisfies LayoutGate,
     layout: 'padded',
     docs: {
       description: {

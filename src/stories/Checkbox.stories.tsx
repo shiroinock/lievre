@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Checkbox, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,20 @@ const meta = {
   title: 'Components/Inputs/Checkbox',
   component: Checkbox,
   parameters: {
+    layoutGate: {
+      parts: [
+        {
+          name: 'チェックボックスの欄',
+          selector: '.k-check-field',
+          checks: [{ icon: '.k-checkbox', text: '.k-check-label' }],
+        },
+        {
+          name: 'チェックの箱',
+          selector: '.k-checkbox',
+          checks: ['inset-x', 'inset-y', 'grid-height'],
+        },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

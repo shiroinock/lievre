@@ -1,0 +1,286 @@
+{
+  "date": "2026-10-24T12:53:35.792Z",
+  "kei": {
+    "tasks": [
+      {
+        "task": "T1",
+        "types": 4050,
+        "typesAndDesign": 6237,
+        "llms": 4410
+      },
+      {
+        "task": "T2",
+        "types": 4405,
+        "typesAndDesign": 6592,
+        "llms": 4410
+      },
+      {
+        "task": "T3",
+        "types": 4371,
+        "typesAndDesign": 6558,
+        "llms": 4410
+      },
+      {
+        "task": "T4",
+        "types": 4700,
+        "typesAndDesign": 6887,
+        "llms": 4410
+      },
+      {
+        "task": "T5",
+        "types": 4405,
+        "typesAndDesign": 6592,
+        "llms": 4410
+      }
+    ],
+    "allTypes": 7983,
+    "source": 10459,
+    "implementation": 57607
+  },
+  "external": {
+    "shadcn/ui": {
+      "llms": {
+        "url": "https://ui.shadcn.com/llms.txt",
+        "tokens": 3065
+      },
+      "textfield": {
+        "url": "https://ui.shadcn.com/docs/components/input.md",
+        "tokens": 3164
+      },
+      "switch": {
+        "url": "https://ui.shadcn.com/docs/components/switch.md",
+        "tokens": 1788
+      },
+      "button": {
+        "url": "https://ui.shadcn.com/docs/components/button.md",
+        "tokens": 3123
+      },
+      "table": {
+        "url": "https://ui.shadcn.com/docs/components/data-table.md",
+        "tokens": 11857
+      },
+      "dialog": {
+        "url": "https://ui.shadcn.com/docs/components/alert-dialog.md",
+        "tokens": 3760
+      },
+      "select": {
+        "url": "https://ui.shadcn.com/docs/components/select.md",
+        "tokens": 3958
+      },
+      "toast": {
+        "url": "https://ui.shadcn.com/docs/components/sonner.md",
+        "tokens": 1227
+      }
+    },
+    "Radix Themes": {
+      "textfield": {
+        "url": "https://www.radix-ui.com/themes/docs/components/text-field.md",
+        "tokens": 1118
+      },
+      "switch": {
+        "url": "https://www.radix-ui.com/themes/docs/components/switch.md",
+        "tokens": 1051
+      },
+      "button": {
+        "url": "https://www.radix-ui.com/themes/docs/components/button.md",
+        "tokens": 1485
+      },
+      "table": {
+        "url": "https://www.radix-ui.com/themes/docs/components/table.md",
+        "tokens": 2163
+      },
+      "dialog": {
+        "url": "https://www.radix-ui.com/themes/docs/components/alert-dialog.md",
+        "tokens": 1608
+      },
+      "select": {
+        "url": "https://www.radix-ui.com/themes/docs/components/select.md",
+        "tokens": 2853
+      },
+      "toast": {
+        "url": "https://www.radix-ui.com/primitives/docs/components/toast.md",
+        "tokens": 3167
+      }
+    },
+    "MUI": {
+      "llms": {
+        "url": "https://mui.com/material-ui/llms.txt",
+        "tokens": 5697
+      },
+      "textfield": {
+        "url": "https://mui.com/material-ui/react-text-field.md",
+        "tokens": 22124
+      },
+      "switch": {
+        "url": "https://mui.com/material-ui/react-switch.md",
+        "tokens": 6860
+      },
+      "button": {
+        "url": "https://mui.com/material-ui/react-button.md",
+        "tokens": 8199
+      },
+      "table": {
+        "url": "https://mui.com/material-ui/react-table.md",
+        "tokens": 18955
+      },
+      "dialog": {
+        "url": "https://mui.com/material-ui/react-dialog.md",
+        "tokens": 12114
+      },
+      "select": {
+        "url": "https://mui.com/material-ui/react-select.md",
+        "tokens": 10879
+      },
+      "toast": {
+        "url": "https://mui.com/material-ui/react-snackbar.md",
+        "tokens": 6420
+      }
+    },
+    "Chakra UI": {
+      "llms": {
+        "url": "https://chakra-ui.com/llms.txt",
+        "tokens": 271
+      },
+      "textfield": {
+        "url": "https://chakra-ui.com/docs/components/input.mdx",
+        "tokens": 3950
+      },
+      "switch": {
+        "url": "https://chakra-ui.com/docs/components/switch.mdx",
+        "tokens": 2656
+      },
+      "button": {
+        "url": "https://chakra-ui.com/docs/components/button.mdx",
+        "tokens": 3332
+      },
+      "table": {
+        "url": "https://chakra-ui.com/docs/components/table.mdx",
+        "tokens": 9105
+      },
+      "dialog": {
+        "url": "https://chakra-ui.com/docs/components/dialog.mdx",
+        "tokens": 9553
+      },
+      "select": {
+        "url": "https://chakra-ui.com/docs/components/select.mdx",
+        "tokens": 14532
+      },
+      "toast": {
+        "url": "https://chakra-ui.com/docs/components/toast.mdx",
+        "tokens": 3361
+      }
+    },
+    "Mantine": {
+      "llms": {
+        "url": "https://mantine.dev/llms.txt",
+        "tokens": 11432
+      },
+      "textfield": {
+        "url": "https://mantine.dev/llms/core-text-input.md",
+        "tokens": 2141
+      },
+      "switch": {
+        "url": "https://mantine.dev/llms/core-switch.md",
+        "tokens": 3124
+      },
+      "button": {
+        "url": "https://mantine.dev/llms/core-button.md",
+        "tokens": 4236
+      },
+      "table": {
+        "url": "https://mantine.dev/llms/core-table.md",
+        "tokens": 5034
+      },
+      "dialog": {
+        "url": "https://mantine.dev/llms/core-modal.md",
+        "tokens": 7031
+      },
+      "select": {
+        "url": "https://mantine.dev/llms/core-select.md",
+        "tokens": 8048
+      },
+      "toast": {
+        "url": "https://mantine.dev/llms/x-notifications.md",
+        "tokens": 7809
+      }
+    },
+    "Primer React": {
+      "textfield": {
+        "url": "https://raw.githubusercontent.com/primer/react/main/packages/react/src/TextInput/TextInput.docs.json",
+        "tokens": 1693
+      },
+      "switch": {
+        "url": "https://raw.githubusercontent.com/primer/react/main/packages/react/src/ToggleSwitch/ToggleSwitch.docs.json",
+        "tokens": 1058
+      },
+      "button": {
+        "url": "https://raw.githubusercontent.com/primer/react/main/packages/react/src/Button/Button.docs.json",
+        "tokens": 1434
+      },
+      "table": {
+        "url": "https://raw.githubusercontent.com/primer/react/main/packages/react/src/DataTable/DataTable.docs.json",
+        "tokens": 5387
+      },
+      "dialog": {
+        "url": "https://raw.githubusercontent.com/primer/react/main/packages/react/src/ConfirmationDialog/ConfirmationDialog.docs.json",
+        "tokens": 556
+      },
+      "select": {
+        "url": "https://raw.githubusercontent.com/primer/react/main/packages/react/src/Select/Select.docs.json",
+        "tokens": 475
+      }
+    },
+    "SmartHR UI": {
+      "textfield": {
+        "url": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/Input.md",
+        "tokens": 2266
+      },
+      "switch": {
+        "url": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/Switch.md",
+        "tokens": 451
+      },
+      "button": {
+        "url": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/Button.md",
+        "tokens": 3714
+      },
+      "table": {
+        "url": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/Table.md",
+        "tokens": 831
+      },
+      "dialog": {
+        "url": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/ActionDialog.md",
+        "tokens": 1625
+      },
+      "select": {
+        "url": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/Select.md",
+        "tokens": 1012
+      },
+      "toast": {
+        "url": "https://raw.githubusercontent.com/kufu/smarthr-design-system/main/plugins/smarthr-design-system/skills/component-guidelines/components/ResponseMessage.md",
+        "tokens": 994
+      }
+    },
+    "デジタル庁": {
+      "textfield": {
+        "url": "https://raw.githubusercontent.com/digital-go-jp/design-system-example-components-react/main/src/components/Input/Input.tsx",
+        "tokens": 343
+      },
+      "switch": {
+        "url": "https://raw.githubusercontent.com/digital-go-jp/design-system-example-components-react/main/src/components/Switch/component-spec.md",
+        "tokens": 3668
+      },
+      "button": {
+        "url": "https://raw.githubusercontent.com/digital-go-jp/design-system-example-components-react/main/src/components/Button/Button.tsx",
+        "tokens": 750
+      },
+      "dialog": {
+        "url": "https://raw.githubusercontent.com/digital-go-jp/design-system-example-components-react/main/src/components/ModalDialog/component-spec.md",
+        "tokens": 1695
+      },
+      "select": {
+        "url": "https://raw.githubusercontent.com/digital-go-jp/design-system-example-components-react/main/src/components/Select/Select.tsx",
+        "tokens": 586
+      }
+    }
+  }
+}

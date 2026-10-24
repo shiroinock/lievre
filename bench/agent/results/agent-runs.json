@@ -1,0 +1,25 @@
+{
+  "$description": "サブエージェント（Claude Sonnet、Claude Code の general-purpose）に tasks.md の課題を agent-prompt.md の指示で解かせた記録。tokens はサブエージェントの合計トークン（システムの指示を含む）、floor は何も調べない対照（T0）の値。before は main（241182a）、after はこのブランチのパッケージ。",
+  "date": "2026-10-24",
+  "model": "sonnet",
+  "floor": { "tokens": 51679, "toolUses": 2 },
+  "before": {
+    "note": "準備の誤りで利用側アプリに node_modules/.bin が無く、npm run typecheck が環境の古い tsc を呼んだ。各エージェントはローカルの tsc を直接呼んで確かめたため、道具の呼び出しが1〜2回多い。",
+    "runs": {
+      "T1": { "tokens": 65530, "toolUses": 10, "seconds": 42, "typeErrors": 0, "readImplementation": true, "read": ["README.md", "DESIGN.md", "lib/index.d.ts", "primitives.d.ts（一部）", "system.d.ts", "foundation.d.ts（一部）", "lib/kei.js（grep）"] },
+      "T2": { "tokens": 75302, "toolUses": 13, "seconds": 59, "typeErrors": 0, "readImplementation": true, "read": ["README.md", "DESIGN.md（grep）", "lib/index.d.ts", "data.d.ts", "primitives.d.ts（一部）", "lib/kei.js（DataTable の実装）", "lib/kei.css（誤って全体）"] },
+      "T3": { "tokens": 59521, "toolUses": 7, "seconds": 33, "typeErrors": 0, "readImplementation": false, "read": ["README.md", "dialog.d.ts", "primitives.d.ts（grep）", "system.d.ts（grep）"] },
+      "T4": { "tokens": 64864, "toolUses": 9, "seconds": 43, "typeErrors": 0, "readImplementation": false, "read": ["README.md", "lib/index.d.ts", "primitives.d.ts", "system.d.ts", "foundation.d.ts（grep）"] },
+      "T5": { "tokens": 64648, "toolUses": 12, "seconds": 47, "typeErrors": 0, "readImplementation": true, "read": ["README.md", "DESIGN.md", "lib/index.d.ts", "data.d.ts（grep）", "primitives.d.ts（grep）", "foundation.d.ts（grep）", "lib/kei.js（Metric の実装）"] }
+    }
+  },
+  "after": {
+    "runs": {
+      "T1": { "tokens": 60302, "toolUses": 4, "seconds": 22, "typeErrors": 0, "readImplementation": false, "read": ["llms.txt"] },
+      "T2": { "tokens": 60882, "toolUses": 4, "seconds": 31, "typeErrors": 0, "readImplementation": false, "read": ["llms.txt"] },
+      "T3": { "tokens": 58723, "toolUses": 5, "seconds": 24, "typeErrors": 0, "readImplementation": false, "read": ["llms.txt（一部と grep）"] },
+      "T4": { "tokens": 60523, "toolUses": 4, "seconds": 23, "typeErrors": 0, "readImplementation": false, "read": ["llms.txt"] },
+      "T5": { "tokens": 59996, "toolUses": 4, "seconds": 20, "typeErrors": 0, "readImplementation": false, "read": ["llms.txt"] }
+    }
+  }
+}

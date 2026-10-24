@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Kbd, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,9 @@ const meta = {
   title: 'Components/Display/Kbd',
   component: Kbd,
   parameters: {
+    layoutGate: {
+      parts: [{ name: 'キー', selector: '.k-kbd', checks: ['inset-x', 'inset-y', 'grid-height'] }],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

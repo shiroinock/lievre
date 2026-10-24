@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import {
   Pagination,
   Button,
@@ -16,6 +17,20 @@ const meta = {
   title: 'Components/Navigation/Pagination',
   component: Pagination,
   parameters: {
+    layoutGate: {
+      parts: [
+        {
+          name: 'ページ送り',
+          selector: '.k-pagination',
+          checks: [{ sameHeight: '.k-button' }, { icon: '.k-button', text: ':scope > span' }],
+        },
+        {
+          name: 'ページ送りのボタン',
+          selector: '.k-pagination .k-button',
+          checks: ['inset-x', 'inset-y', 'control-height'],
+        },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

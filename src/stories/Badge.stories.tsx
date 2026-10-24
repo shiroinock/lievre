@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Badge, Button, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,15 @@ const meta = {
   title: 'Components/Feedback/Badge',
   component: Badge,
   parameters: {
+    layoutGate: {
+      parts: [
+        {
+          name: 'バッジ',
+          selector: '.k-badge',
+          checks: ['inset-x', 'inset-y', 'grid-height', 'fits', { icon: '.k-status-dot' }],
+        },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:
