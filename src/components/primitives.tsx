@@ -24,6 +24,8 @@ import {
   AlertTriangle,
   CircleCheck,
   CircleX,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { cx, PortalSurface } from './system';
 
@@ -192,7 +194,11 @@ export function Checkbox({ label, hint, error, id: givenId, ...props }: Checkbox
         aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
       >
         <CheckboxPrimitive.Indicator>
-          {props.checked === 'indeterminate' ? <Minus size={13} /> : <Check size={13} />}
+          {props.checked === 'indeterminate' ? (
+            <Minus size={14} strokeWidth={3} />
+          ) : (
+            <Check size={14} strokeWidth={3} />
+          )}
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>
       <div>
@@ -542,8 +548,8 @@ export function Pagination({
   const current = Math.min(total, Math.max(1, page));
   return (
     <nav className="k-pagination" aria-label="ページ切り替え">
-      <span className="k-mono">
-        {String(current).padStart(2, '0')} / {String(total).padStart(2, '0')}
+      <span>
+        {current} / {total}
       </span>
       <Button
         size="sm"
@@ -551,7 +557,7 @@ export function Pagination({
         onClick={() => onPageChange(current - 1)}
         aria-label="前のページ"
       >
-        ←
+        <ChevronLeft size={16} aria-hidden />
       </Button>
       <Button
         size="sm"
@@ -559,7 +565,7 @@ export function Pagination({
         onClick={() => onPageChange(current + 1)}
         aria-label="次のページ"
       >
-        →
+        <ChevronRight size={16} aria-hidden />
       </Button>
     </nav>
   );

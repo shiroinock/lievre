@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import tokens from '../../tokens/tokens.json';
 import { readFileSync } from 'node:fs';
-const css = readFileSync('src/styles/kei.css', 'utf8');
+const css = readFileSync('src/styles/kei.css', 'utf8').replace(/\s+/g, ' ');
 type TokenSet = Record<string, { $value: string }>;
 function themeTokens(theme: 'paper' | 'ink') {
   return { ...tokens.paper, ...(theme === 'ink' ? tokens.ink : {}) } as TokenSet;
@@ -61,17 +61,17 @@ describe('Semantic color contrast and token synchronization', () => {
       'surface-raised',
       'surface-sunken',
       'accent-soft',
-      'success-soft',
+      'selected',
     ]) {
       it(`${theme}: focus / ${background} reaches 3:1`, () => {
         expect(ratio(resolve(set, 'focus'), resolve(set, background))).toBeGreaterThanOrEqual(3);
       });
     }
     it(`${theme}: selected row text reaches 4.5:1`, () => {
-      expect(ratio(resolve(set, 'text'), resolve(set, 'success-soft'))).toBeGreaterThanOrEqual(4.5);
+      expect(ratio(resolve(set, 'text'), resolve(set, 'selected'))).toBeGreaterThanOrEqual(4.5);
     });
     it(`${theme}: selected menu text reaches 4.5:1`, () => {
-      expect(ratio(resolve(set, 'success'), resolve(set, 'accent-soft'))).toBeGreaterThanOrEqual(
+      expect(ratio(resolve(set, 'accent'), resolve(set, 'selected'))).toBeGreaterThanOrEqual(
         4.5,
       );
     });
@@ -93,10 +93,10 @@ describe('Semantic color contrast and token synchronization', () => {
       );
     });
     it(`${theme}: danger action text reaches 4.5:1`, () => {
-      expect(ratio(resolve(set, 'surface'), resolve(set, 'danger'))).toBeGreaterThanOrEqual(4.5);
+      expect(ratio(resolve(set, 'on-danger'), resolve(set, 'danger'))).toBeGreaterThanOrEqual(4.5);
     });
     it(`${theme}: enabled switch thumb reaches 3:1`, () => {
-      expect(ratio(resolve(set, 'surface-raised'), resolve(set, 'success'))).toBeGreaterThanOrEqual(
+      expect(ratio(resolve(set, 'on-accent'), resolve(set, 'accent'))).toBeGreaterThanOrEqual(
         3,
       );
     });

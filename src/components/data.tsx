@@ -1,5 +1,12 @@
 import { useId, useMemo, useState, type ReactNode } from 'react';
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowDownRight,
+  ArrowUp,
+  ArrowUpDown,
+  ArrowUpRight,
+  ChevronRight,
+} from 'lucide-react';
 import { cx } from './system';
 import { EmptyState, Skeleton } from './primitives';
 
@@ -77,7 +84,8 @@ export function Metric({
           trend === 'down' && 'k-text-danger',
         )}
       >
-        {trend === 'up' ? '↗ ' : trend === 'down' ? '↘ ' : ''}
+        {trend === 'up' && <ArrowUpRight size={14} aria-hidden />}
+        {trend === 'down' && <ArrowDownRight size={14} aria-hidden />}
         {change ?? '—'}
       </div>
       {values && (
@@ -333,7 +341,8 @@ export function DataTable<T>({
                         aria-label={`${id} の詳細を開く`}
                         onClick={() => onRowClick(row)}
                       >
-                        詳細 ↗
+                        詳細
+                        <ChevronRight size={14} aria-hidden />
                       </button>
                     </td>
                   )}
