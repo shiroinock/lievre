@@ -1364,6 +1364,14 @@
       min-width: 44px;
       min-height: 44px;
     }
+    /* The 44px close buttons keep their 16px icon on the padding line and centred on the
+       title's line (32px in a dialog, 24px in a toast). */
+    .k-dialog-header > .k-icon-button {
+      margin: calc((32px - 44px) / 2) calc((16px - 44px) / 2) calc((32px - 44px) / 2) 0;
+    }
+    .k-toast > .k-icon-button {
+      margin: calc((24px - 44px) / 2) calc((16px - 44px) / 2) calc((24px - 44px) / 2) 0;
+    }
   }
 }
 

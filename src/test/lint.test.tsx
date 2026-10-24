@@ -79,7 +79,7 @@ describe('stylelint: KEI rules', () => {
     // An exception has to say why.
     expect(
       await cssRules('/* stylelint-disable-next-line kei/spacing-grid */\n.a { padding: 2px; }'),
-    ).not.toEqual([]);
+    ).toContain('--report-descriptionless-disables');
     expect(
       await cssRules(
         '/* stylelint-disable-next-line kei/spacing-grid -- 18px thumb */\n.a { padding: 2px; }',
