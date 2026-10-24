@@ -11,8 +11,8 @@ const preview: Preview = {
         title: '配色',
         icon: 'paintbrush',
         items: [
-          { value: 'paper', title: 'Paper / 白と青' },
-          { value: 'ink', title: 'Ink / 深い青' },
+          { value: 'paper', title: 'Paper（明るい面）' },
+          { value: 'ink', title: 'Ink（深い紺の面）' },
         ],
         dynamicTitle: true,
       },
@@ -23,8 +23,8 @@ const preview: Preview = {
         title: '本文',
         icon: 'paragraph',
         items: [
-          { value: 'standard', title: '標準 / 16px' },
-          { value: 'interface', title: '操作画面 / 14px' },
+          { value: 'standard', title: '標準 16px' },
+          { value: 'interface', title: '操作画面 14px' },
         ],
         dynamicTitle: true,
       },

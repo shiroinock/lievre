@@ -35,5 +35,13 @@ for (const [scope, pattern] of Object.entries(scopes)) {
     tokens[scope][name] = { $type: typeOf(name, value), $value: value };
   }
 }
-writeFileSync(new URL('../tokens/tokens.json', import.meta.url), JSON.stringify(tokens, null, 2) + '\n');
-console.log(Object.entries(tokens).filter(([k]) => k !== '$description').map(([k, v]) => `${k}: ${Object.keys(v).length}`).join(', '));
+writeFileSync(
+  new URL('../tokens/tokens.json', import.meta.url),
+  JSON.stringify(tokens, null, 2) + '\n',
+);
+console.log(
+  Object.entries(tokens)
+    .filter(([k]) => k !== '$description')
+    .map(([k, v]) => `${k}: ${Object.keys(v).length}`)
+    .join(', '),
+);
