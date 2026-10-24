@@ -97,16 +97,5 @@
     .kei:is([data-wear='baked'], [data-wear='live']) .k-chart-grid {
       stroke-dasharray: var(--k-wear-dash);
     }
-
-    /* Aged dial: a sunken band under the scale. Ticks keep 3:1 via border-strong. */
-    .kei:is([data-wear='baked'], [data-wear='live']) .k-meter-face::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      background: var(--k-surface-sunken);
-      mask: radial-gradient(circle, transparent 59%, #000 60% 71%, transparent 72%);
-      clip-path: polygon(0 0, 100% 0, 100% 100%, 78% 100%, 50% 54%, 22% 100%, 0 100%);
-    }
   }
 }

@@ -1,25 +1,25 @@
 {
-  "preset": "standard",
+  "preset": "custom",
   "salt": "kei",
   "outline": {
-    "rough": 7,
-    "roughScale": 26,
-    "swell": 4,
-    "swellScale": 220,
-    "step": 12
+    "rough": 3.5,
+    "roughScale": 20,
+    "swell": 5,
+    "swellScale": 250,
+    "step": 15
   },
   "kasure": {
-    "density": 6,
-    "threshold": 0.64,
-    "floor": 0.8
+    "density": 9,
+    "threshold": 0.7,
+    "floor": 0.7
   },
   "stain": {
-    "strength": 0.08
+    "strength": 0.04
   },
   "yake": {
-    "strength": 0.35,
+    "strength": 0.2,
     "reach": 160,
-    "mottle": 0.5,
+    "mottle": 0.7,
     "corner": 0.4,
     "surfaces": 0.3
   },
