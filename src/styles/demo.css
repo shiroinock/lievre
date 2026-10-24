@@ -628,6 +628,7 @@ body:has(.kei-app) {
 }
 .type-figure small {
   margin-left: 2px;
+  font-family: var(--k-font-sans);
   font-size: 0.5em;
   color: var(--k-muted);
 }

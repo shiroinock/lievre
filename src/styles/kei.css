@@ -1076,9 +1076,11 @@
     line-height: 1.2;
     letter-spacing: -0.01em;
   }
+  /* Units are words, not data: the sans face keeps % the same size as 件 or 秒. */
   .k-metric-value > span {
     margin-left: 4px;
     color: var(--k-muted);
+    font-family: var(--k-font-sans);
     font-size: var(--k-text-md);
     font-weight: var(--k-weight-regular);
     letter-spacing: 0;
@@ -1175,6 +1177,7 @@
   .k-meter-reading small {
     margin-left: 2px;
     color: var(--k-muted);
+    font-family: var(--k-font-sans);
     font-size: var(--k-text-md);
     font-weight: var(--k-weight-regular);
   }
