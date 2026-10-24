@@ -15,7 +15,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { cx } from './system';
-import { EmptyState, Skeleton } from './primitives';
+import { EmptyState, Skeleton, VisuallyHidden } from './primitives';
 
 export function Sparkline({
   values,
@@ -301,7 +301,7 @@ export function DataTable<T>({
             ))}
             {onRowClick && (
               <th scope="col">
-                <span className="k-sr-only">操作</span>
+                <VisuallyHidden>操作</VisuallyHidden>
               </th>
             )}
           </tr>

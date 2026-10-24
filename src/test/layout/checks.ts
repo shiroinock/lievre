@@ -6,7 +6,16 @@ export type Violation = { part: string; check: string; element: string; message:
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const px = (n: number) => `${r1(n)}px`;
-const visible = (el: Element) => el.getClientRects().length > 0;
+// Text kept only for screen readers (VisuallyHidden, .k-sr-only) sits in a box clipped to 1px:
+// it is not on the screen, so no check measures it.
+const clippedAway = (el: Element) => {
+  for (let a: Element | null = el; a && a !== document.body; a = a.parentElement) {
+    const r = a.getBoundingClientRect();
+    if (r.width <= 1 && r.height <= 1 && getComputedStyle(a).overflow !== 'visible') return true;
+  }
+  return false;
+};
+const visible = (el: Element) => el.getClientRects().length > 0 && !clippedAway(el);
 
 export function describe(el: Element) {
   const classes = [...el.classList].map((c) => `.${c}`).join('');

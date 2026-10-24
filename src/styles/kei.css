@@ -430,6 +430,22 @@
   .k-spin {
     animation: k-spin 0.9s linear infinite;
   }
+  /* Spinner: it takes the size and line height of where it sits, and the icon is one line box
+     tall, so it stays on the centre of the text's first line, beside a label or in a sentence. */
+  .k-spinner {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--k-space-2);
+    color: var(--k-muted);
+    vertical-align: top;
+  }
+  .k-spinner > svg {
+    width: 16px;
+    height: 1lh;
+  }
+  .k-spinner--md > svg {
+    width: 24px;
+  }
   @keyframes k-spin {
     to {
       transform: rotate(360deg);

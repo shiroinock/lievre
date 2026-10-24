@@ -552,6 +552,33 @@ export function Skeleton({
 }) {
   return <span className="k-skeleton" role="status" aria-label={label} style={{ width, height }} />;
 }
+/** 画面には出さず、読み上げにだけ伝える文字。表の行の「詳細」ボタンに「（W-1024）」を足すときなどに使います。配置には影響しません。 */
+export function VisuallyHidden({
+  className,
+  ...props
+}: HTMLAttributes<HTMLSpanElement> & { children: ReactNode }) {
+  return <span {...props} className={cx('k-sr-only', className)} />;
+}
+/** 読み込み中の印。label を読み上げ（role="status"）、動きを減らす設定では回転を止めます。ボタンの中は Button の loading、表や一覧の形が分かるときは Skeleton を使います。 */
+export function Spinner({
+  label = '読み込み中',
+  showLabel = false,
+  size = 'sm',
+}: {
+  /** 読み上げる文。何を待っているかを書くと伝わります（「一覧を読み込み中」）。 */
+  label?: string;
+  /** true で label を画面にも出します。パネル全体の読み込みに使います。 */
+  showLabel?: boolean;
+  /** 'sm' は 16px、'md' は 24px。文字の大きさと行の高さは置いた場所から引き継ぎます。 */
+  size?: 'sm' | 'md';
+}) {
+  return (
+    <span className={cx('k-spinner', `k-spinner--${size}`)} role="status">
+      <Loader2 className="k-spin" aria-hidden />
+      {showLabel ? <span>{label}</span> : <VisuallyHidden>{label}</VisuallyHidden>}
+    </span>
+  );
+}
 export function EmptyState({
   title,
   description,

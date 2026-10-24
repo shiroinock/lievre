@@ -18,6 +18,8 @@ import {
   Sparkline,
   IconButton,
   DescriptionList,
+  Spinner,
+  VisuallyHidden,
   type Column,
 } from '../index';
 import { OperationsExample, SettingsExample } from '../patterns/Operations';
@@ -104,6 +106,19 @@ describe('Input and focus contracts', () => {
     expect(screen.getByRole('button', { name: '行の操作' })).toBe(button);
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute('aria-busy', 'true');
+  });
+  it('announces a spinner by its label and adds hidden words to a button name', () => {
+    setup(
+      <>
+        <Spinner label="一覧を読み込み中" />
+        <Button>
+          詳細<VisuallyHidden>（W-1024）</VisuallyHidden>
+        </Button>
+      </>,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('一覧を読み込み中');
+    expect(screen.getByText('一覧を読み込み中')).toHaveClass('k-sr-only');
+    expect(screen.getByRole('button')).toHaveAccessibleName(/詳細\s*（W-1024）/);
   });
   it('traps dialog focus and restores it to the trigger on Escape', async () => {
     setup(

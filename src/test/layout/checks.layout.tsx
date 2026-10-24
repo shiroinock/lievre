@@ -90,6 +90,24 @@ describe('配置の検査', () => {
     expect(messages(row(4), { icon: '.k-box' })).toEqual([]);
   });
 
+  it('読み上げ用に隠した文字は測らない', () => {
+    // Without a visible label there is no line to centre the icon on, so nothing is reported.
+    const spinner = (hidden: string) =>
+      `<span class="k-x" style="display: inline-flex; align-items: flex-start; line-height: 24px">
+        <span class="k-box" style="width: 16px; height: 16px"></span>
+        <span class="k-sr-only"${hidden}>読み込み中</span>
+      </span>`;
+    expect(messages(spinner(''), { icon: '.k-box' })).toEqual([]);
+    expect(
+      messages(
+        spinner(' style="position: static; clip: auto; width: auto; height: auto; margin: 0"'),
+        {
+          icon: '.k-box',
+        },
+      )[0],
+    ).toMatch(/文字「読み込み中」の1行目の行ボックスの中心より 4px 上にあります/);
+  });
+
   it('並んだ部品の高さ', () => {
     const row = (h: number) =>
       `<div class="k-x" style="display: flex; align-items: flex-end">
