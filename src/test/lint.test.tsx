@@ -87,6 +87,19 @@ describe('stylelint: KEI rules', () => {
     ).toEqual([]);
   });
 
+  it('keeps surface tokens in the theme layer', async () => {
+    expect(await cssRules('.panel { --k-surface: #2424d8; }')).toContain('kei/surface-tokens');
+    expect(await cssRules('@layer kei.components { .x { --k-bg: red; } }')).toContain(
+      'kei/surface-tokens',
+    );
+    expect(
+      await cssRules(
+        "@layer kei.tokens { .kei[data-theme='ink'] { --k-surface-sunken: #070920; } }",
+      ),
+    ).toEqual([]);
+    expect(await cssRules('.panel { background: var(--k-surface); }')).toEqual([]);
+  });
+
   it('requires a line-height in the font shorthand', async () => {
     expect(await cssRules('.a { font: 14px sans-serif; }')).toContain(
       'declaration-property-value-allowed-list',
