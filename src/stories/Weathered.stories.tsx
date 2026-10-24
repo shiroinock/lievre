@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import {
   KeiProvider,
   Badge,
@@ -16,6 +17,9 @@ import {
 const meta = {
   title: 'Foundations/試作 配色と擦れ',
   parameters: {
+    layoutGate: {
+      skip: '質感の試作をテーマごとに並べる見本。部品はそれぞれの Story で測っている。',
+    } satisfies LayoutGate,
     layout: 'padded',
     docs: {
       description: {
