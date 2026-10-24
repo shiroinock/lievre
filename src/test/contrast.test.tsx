@@ -152,4 +152,21 @@ describe('Semantic color contrast and token synchronization', () => {
       });
     }
   }
+
+  // The meter's ticks are border-strong straight on the card's surface: wear draws no band under
+  // the scale, so the dial ages with the surface like every other part (off, baked and live).
+  it('draws the meter ticks in border-strong, with nothing under them', () => {
+    const css = readFileSync('src/styles/kei.css', 'utf8');
+    expect(css).toMatch(/\.k-meter-ticks \{[^}]*var\(--k-border-strong\)/);
+    expect(readFileSync('src/styles/kei-wear.css', 'utf8')).not.toContain('k-meter-face');
+  });
+  // On the stained surface the ticks are held like control outlines, from the tuning PR (#12) on.
+  for (const theme of themes) {
+    const set = themeTokens(theme);
+    it(`${theme}: meter ticks reach 3:1 on the surface`, () => {
+      expect(ratio(resolve(set, 'border-strong'), resolve(set, 'surface'))).toBeGreaterThanOrEqual(
+        3,
+      );
+    });
+  }
 });
