@@ -695,8 +695,10 @@
   .k-tabs-list {
     display: flex;
     gap: var(--k-space-6);
-    overflow-x: auto;
-    border-bottom: 1px solid var(--k-border);
+    /* overflow-x: auto also clips vertically, so the baseline is painted inside the
+       box (not as a border) and the active indicator sits on top of it. */
+    overflow: auto hidden;
+    background: linear-gradient(var(--k-border), var(--k-border)) bottom / 100% 1px no-repeat;
   }
   .k-tab {
     position: relative;
@@ -718,7 +720,7 @@
   .k-tab::after {
     content: '';
     position: absolute;
-    inset: auto 0 -1px;
+    inset: auto 0 0;
     height: 2px;
     background: transparent;
   }
