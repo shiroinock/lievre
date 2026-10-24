@@ -40,13 +40,31 @@ describe('stylelint: KEI rules', () => {
   });
 
   it('requires forced-colors styles for states shown by a background', async () => {
-    const state = ".k-x[data-state='on'] { background: blue; }";
+    const forced = (body: string) => `@media (forced-colors: active) { ${body} }`;
+    const state = ".k-x[data-state='on'], .k-y[data-highlighted] .k-z { background: blue; }";
     expect(await cssRules(state)).toContain('kei/forced-colors-state');
+    // Each selector in the list needs its own forced-colors style.
+    expect(
+      await cssRules(state + forced(".k-x[data-state='on'] { background: Highlight; }")),
+    ).toContain('kei/forced-colors-state');
+    // Opting out of forced colours without a system colour does not count.
     expect(
       await cssRules(
-        `${state} @media (forced-colors: active) { .k-x[data-state='on'] { background: Highlight; } }`,
+        state +
+          forced(
+            ".k-x[data-state='on'], .k-y[data-highlighted] .k-z { forced-color-adjust: none; }",
+          ),
+      ),
+    ).toContain('kei/forced-colors-state');
+    expect(
+      await cssRules(
+        state +
+          forced(
+            ".k-x[data-state='on'], .k-y[data-highlighted] .k-z { outline: 2px solid Highlight; }",
+          ),
       ),
     ).toEqual([]);
+    expect(await cssRules('.k-x::after { background: blue; }')).toEqual([]);
   });
 
   it('requires a line-height in the font shorthand', async () => {
@@ -65,5 +83,22 @@ describe('eslint: KEI rules', () => {
     expect(
       await tsxMessages('export const A = <span><span className="k-mono">{1}</span>%</span>;'),
     ).toEqual([]);
+  });
+});
+
+describe('the sources pass their own lint', () => {
+  it('stylelint', async () => {
+    const { results } = await stylelint.lint({
+      files: 'src/**/*.css',
+      configFile: 'stylelint.config.mjs',
+    });
+    expect(results.flatMap((r) => r.warnings.map((w) => `${r.source}: ${w.text}`))).toEqual([]);
+  });
+
+  it('eslint', async () => {
+    const results = await new ESLint().lintFiles(['src']);
+    expect(results.flatMap((r) => r.messages.map((m) => `${r.filePath}: ${m.message}`))).toEqual(
+      [],
+    );
   });
 });

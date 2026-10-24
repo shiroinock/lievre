@@ -40,7 +40,7 @@ export function buildTokens(css) {
   return tokens;
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const css = readFileSync(new URL('../src/styles/kei.css', import.meta.url), 'utf8');
   const tokens = buildTokens(css);
   writeFileSync(

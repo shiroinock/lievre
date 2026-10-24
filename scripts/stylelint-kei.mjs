@@ -81,11 +81,17 @@ const monoWeights = rule('mono-weights', '', (root, fail) => {
 });
 
 // A state shown only by a background colour disappears when the browser forces colours.
-const STATE = /\[data-state=|:checked|\[aria-(selected|checked|current|pressed)/;
+const STATE =
+  /\[data-(state|highlighted|selected)|:checked|\[aria-(selected|checked|current|pressed|expanded)/;
+const SYSTEM_COLOR =
+  /\b(Canvas|CanvasText|Highlight|HighlightText|ButtonFace|ButtonText|GrayText|LinkText|AccentColor|AccentColorText|Mark|MarkText|SelectedItem|SelectedItemText)\b/;
 const forcedColorsState = rule('forced-colors-state', '', (root, fail) => {
   const forced = new Set();
   root.walkRules((r) => {
-    if (inside(r, (a) => a.name === 'media' && /forced-colors:\s*active/.test(a.params)))
+    if (
+      inside(r, (a) => a.name === 'media' && /forced-colors:\s*active/.test(a.params)) &&
+      r.some((d) => d.type === 'decl' && SYSTEM_COLOR.test(d.value))
+    )
       selectors(r).forEach((s) => forced.add(s));
   });
   root.walkRules((r) => {
@@ -95,7 +101,7 @@ const forcedColorsState = rule('forced-colors-state', '', (root, fail) => {
       if (STATE.test(s) && !forced.has(s))
         fail(
           r,
-          `「${s}」は背景色で状態を示しています。@media (forced-colors: active) に同じセレクタで、システムカラーの指定を加えてください。`,
+          `「${s}」は背景色で状態を示しています。@media (forced-colors: active) に同じセレクタで、システムカラー（Highlight など）の指定を加えてください。`,
         );
   });
 });

@@ -1337,4 +1337,7 @@ body:has(.kei-app) {
     background: Highlight;
     color: HighlightText;
   }
+  .app-sidebar :where(button, a, select):focus-visible {
+    outline-color: Highlight;
+  }
 }
