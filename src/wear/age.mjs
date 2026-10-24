@@ -4,7 +4,6 @@
 //   fade    every colour token loses colour toward an old-paper yellow grey (OKLab, at its own
 //           lightness): inks and tints fully, the paper, lines and text by half. One amount for
 //           the whole theme, stopped where any pairing would drop below WCAG AA
-//   shift   the label on a filled control or badge prints a second time, 0.5–1px off
 //   mottle  filled faces take the paper back in blotches where the ink did not hold
 //   rules   1px lines thin and thicken along their length, and break now and then
 //   chips   corners lose a small irregular piece
@@ -91,10 +90,8 @@ export const AGE_PLACES = {
   card: { selectors: ['.k-card', '.k-age-sheet'], rules: 1, chips: 1 },
   fill: {
     selectors: ['.k-button--primary', '.k-button--danger', '.k-age-fill'],
-    shift: 1,
     mottle: 1,
   },
-  print: { selectors: ['.k-badge', '.k-age-print'], shift: 0.7 },
   control: { selectors: ['.k-button', '.k-age-corner'], chips: 0.35 },
   table: { selectors: ['.k-table tbody tr:not(:last-child) td', '.k-age-rule'], rules: 0.7 },
 };
@@ -430,19 +427,15 @@ export function ageInkVars(config, tokens, theme, level, url) {
   return vars;
 }
 
-/** Custom properties age sets for a level in every theme: the per-variant shift, chips and breaks. */
+/** Custom properties age sets for a level in every theme: the per-variant mottle, chips and breaks. */
 export function ageShapeVars(config, level, url) {
   const vars = {};
-  const shift = amountFor(config, level, 'shift', 1);
   const chipUrl = (corner) => url(`age-chip-${corner}.png`);
   for (let n = 0; n < VARIANTS; n++) {
     const next = mulberry32(seedFor(config.salt, 'age', n));
-    // Any direction, so the second impression never reads as a shadow cast one way.
-    const [angle, reach] = [next() * 2 * Math.PI, (0.5 + next() * 0.5) * shift];
-    const [dx, dy] = [Math.cos(angle) * reach, Math.sin(angle) * reach];
-    for (const place of ['fill', 'print'])
-      vars[`--k-age-shift-${place}-${n}`] =
-        `${(dx * AGE_PLACES[place].shift).toFixed(2)}px ${(dy * AGE_PLACES[place].shift).toFixed(2)}px`;
+    // Two draws went to the misregistration, now dropped; spending them keeps the rest in place.
+    next();
+    next();
     vars[`--k-age-mottle-pos-${n}`] =
       `${Math.floor(next() * TILE)}px ${Math.floor(next() * TILE)}px`;
     // One or two corners, never the same pair for every part.
@@ -496,7 +489,7 @@ export function ageRules() {
       ),
     }),
   ];
-  const { card, fill, print, control, table } = AGE_PLACES;
+  const { card, fill, control, table } = AGE_PLACES;
   // Cards: the border is drawn again as a ring inside the card, where it can break, and the
   // corners are chipped. The old border stays, transparent, so nothing moves.
   rules.push(
@@ -526,19 +519,13 @@ export function ageRules() {
       rules.push(
         block(`${aged} ${any(card.selectors)}${nth(n)}::after`, { mask: `var(--k-age-ring-${n})` }),
       );
-    // Filled controls: the label's ink prints a second time a little off, and the paper shows
-    // through the fill in blotches. The box, its outline and its edges are left as they are: an
-    // offset of the fill would show the paper as a light line inside the edge, like a highlight.
+    // Filled controls: the paper shows through the fill in blotches. The box, its outline, its
+    // edges and the label are left as they are.
     rules.push(
       block(`${aged} ${any(fill.selectors)}:not(:disabled)${nth(n)}`, {
-        'text-shadow': `var(--k-age-shift-fill-${n}) 0 color-mix(in srgb, currentColor 30%, transparent)`,
         'background-image': 'var(--k-age-mottle)',
         'background-position': `var(--k-age-mottle-pos-${n})`,
         'background-size': `${TILE}px ${TILE}px`,
-      }),
-      // Badges: the same second impression of the label, a little nearer.
-      block(`${aged} ${any(print.selectors)}${nth(n)}`, {
-        'text-shadow': `var(--k-age-shift-print-${n}) 0 color-mix(in srgb, currentColor 30%, transparent)`,
       }),
       // A mask would also cut off the focus ring, so a focused control is drawn whole.
       block(`${aged} ${any(control.selectors)}:not(:disabled, :focus-visible)${nth(n)}`, {

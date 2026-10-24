@@ -28,7 +28,7 @@ const presets = Object.keys(PRESETS).map((name) =>
 // Every age slider at the top of its range, on the strongest wear.
 const loudest: WearConfig = {
   ...presets.at(-1)!,
-  age: { fade: 1, shift: 1.5, mottle: 1, rules: 1, chips: 1 },
+  age: { fade: 1, mottle: 1, rules: 1, chips: 1 },
 };
 const levels: Age[] = ['light', 'heavy'];
 
@@ -204,7 +204,6 @@ describe('Age: generated and provided', () => {
       'border-radius',
       'pointer-events',
       'mask',
-      'text-shadow',
       'background-image',
       'background-position',
       'background-size',
@@ -227,10 +226,11 @@ describe('Age: generated and provided', () => {
     expect(css).not.toContain('conic-gradient');
     for (const mask of css.match(/--k-age-chips-[\w-]+: [^;]+/g) ?? [])
       expect(mask).toMatch(/no-repeat exclude, linear-gradient\(#000, #000\)$/);
-    // No inner shadow or paper-coloured band: DESIGN.md allows no highlight inside an edge.
+    // No inner shadow or paper-coloured band (DESIGN.md allows no highlight inside an edge), and
+    // no second print of a label: misregistration was tried and dropped.
     expect(css).not.toContain('box-shadow');
-    for (const shadow of css.match(/text-shadow: [^;]+/g) ?? [])
-      expect(shadow).toMatch(/color-mix\(in srgb, currentColor \d+%, transparent\)$/);
+    expect(css).not.toContain('text-shadow');
+    expect(css).not.toContain('--k-age-shift');
   });
 
   it('defaults to none, nests, and turns off for more contrast and forced colours', () => {

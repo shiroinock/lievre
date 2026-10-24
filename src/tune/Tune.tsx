@@ -193,15 +193,6 @@ const sliders: Slider[] = [
   ),
   groupSlider(
     'age',
-    '版ズレ',
-    'px。塗りが輪郭からずれる量（強の値。弱はその半分）',
-    'shift',
-    0,
-    1.5,
-    0.05,
-  ),
-  groupSlider(
-    'age',
     'インクのむら',
     '塗りの濃淡。上の文字の対比が 4.5:1 を保つ濃さで頭打ちになる',
     'mottle',

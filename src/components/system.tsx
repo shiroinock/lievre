@@ -103,7 +103,7 @@ export function KeiProvider({
   /** 試作：live の強さ。既定は wear.config.json の値。調整の画面（npm run wear:tune）が使います。 */
   wearConfig?: WearConfig;
   /**
-   * 試作：経年。none（既定）・light・heavy。褪色・版ズレ・インクのむら・罫線のかすれ・角の欠けを
+   * 試作：経年。none（既定）・light・heavy。褪色・インクのむら・罫線のかすれ・角の欠けを
    * 部品に渡します。入れ子にでき、質感（wear）とは別に効きます。状態（フォーカス・選択・エラー・無効）には
    * かけません。強いコントラストを求める設定と強制カラーモードでは none になります。
    */

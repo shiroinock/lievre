@@ -31,7 +31,6 @@
     },
     "age": {
       "fade": 0.8,
-      "shift": 1,
       "mottle": 0.35,
       "rules": 0.6,
       "chips": 0.6

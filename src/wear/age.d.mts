@@ -9,7 +9,7 @@ export const AGE_STATES: string[];
 export const RULE_PERIOD: number;
 export const AGE_PLACES: Record<
   string,
-  { selectors: string[]; rules?: number; chips?: number; shift?: number; mottle?: number }
+  { selectors: string[]; rules?: number; chips?: number; mottle?: number }
 >;
 export const CHIP: number;
 export function agedTokens(

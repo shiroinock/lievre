@@ -34,7 +34,6 @@ const RANGES = {
   'sure.strength': [0, 0.8],
   'sure.fold': [0, 1],
   'age.fade': [0, 1],
-  'age.shift': [0, 1.5],
   'age.mottle': [0, 1],
   'age.rules': [0, 1],
   'age.chips': [0, 1],

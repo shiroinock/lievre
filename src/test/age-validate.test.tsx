@@ -15,7 +15,7 @@ describe('Age: the tuning page saves only values within WCAG AA', () => {
   const strong = normaliseConfig({ preset: 'strong', ...PRESETS.strong });
   const loudest: WearConfig = {
     ...strong,
-    age: { fade: 1, shift: 1.5, mottle: 1, rules: 1, chips: 1 },
+    age: { fade: 1, mottle: 1, rules: 1, chips: 1 },
   };
 
   it('saves every preset and every age slider at the top of its range', () => {
