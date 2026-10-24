@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Meter, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,9 @@ const meta = {
   title: 'Components/Data/Meter',
   component: Meter,
   parameters: {
+    layoutGate: {
+      parts: [{ name: 'メーター', selector: '.k-meter', checks: ['fits'] }],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

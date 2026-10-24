@@ -32,10 +32,13 @@ npm run dev         # 概要のデモ http://127.0.0.1:5173
 npm run typecheck
 npm run lint        # stylelint・ESLint の KEI 独自ルール（scripts/stylelint-kei.mjs、eslint.config.mjs）
 npm test            # 部品・画面フロー・axe・コントラスト・トークン同期
+npm run test:layout # 配置の基準をブラウザで測る（docs/quality-gate.md、初回は npx playwright install chromium）
 npm run tokens      # kei.css を変更したら tokens.json を書き出す
 npm run format
 npm run build       # lib/・dist/・dist/storybook/
 ```
+
+部品を追加するときの手順は [CONTRIBUTING.md](CONTRIBUTING.md) にあります。
 
 jsdom では色のコントラストを測れないため、トークンの組み合わせを数値で検査するテストを別に用意しています。
 

@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: 型の検査
+        run: npm run typecheck
+
+      - name: lint（stylelint・ESLint）
+        run: npm run lint
+
+      - name: テスト（jsdom）
+        run: npm test
+
+      # The browser is keyed on the installed Playwright version, so it is only downloaded again
+      # when package-lock.json moves Playwright.
+      - name: Playwright の版を調べる
+        id: playwright
+        run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Playwright のブラウザをキャッシュから戻す
+        id: browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
+
+      - name: Chromium を入れる
+        if: steps.browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Chromium の依存ライブラリを入れる
+        if: steps.browsers.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: 配置の検査（ブラウザ）
+        run: npm run test:layout
+
+      - name: build
+        run: npm run build:lib && npm run build:demo && npm run build:storybook

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { OperationsExample, SettingsExample, NewWorkDialog } from '../patterns/Operations';
 import { ToastProvider } from '../index';
 import { expect, fn, userEvent, within } from 'storybook/test';
@@ -6,6 +7,9 @@ const meta = {
   title: 'Patterns/Workspace',
   component: OperationsExample,
   parameters: {
+    layoutGate: {
+      skip: '画面例。中の部品は、それぞれの部品の Story で測っている。',
+    } satisfies LayoutGate,
     layout: 'padded',
     docs: {
       description: {

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import {
   Sparkline,
   Button,
@@ -16,6 +17,9 @@ const meta = {
   title: 'Components/Data/Sparkline',
   component: Sparkline,
   parameters: {
+    layoutGate: {
+      parts: [{ name: '折れ線', selector: '.k-sparkline', checks: ['grid-height'] }],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

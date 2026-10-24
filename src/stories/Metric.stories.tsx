@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Metric, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,12 @@ const meta = {
   title: 'Components/Data/Metric',
   component: Metric,
   parameters: {
+    layoutGate: {
+      parts: [
+        { name: '指標', selector: '.k-metric', checks: ['padding-equal', 'fits'] },
+        { name: '指標の変化', selector: '.k-metric-change', checks: [{ icon: 'svg' }] },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

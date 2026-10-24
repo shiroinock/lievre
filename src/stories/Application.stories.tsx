@@ -1,9 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import App from '../App';
 const meta = {
   title: 'Patterns/Application',
   component: App,
   parameters: {
+    layoutGate: {
+      skip: '画面例。中の部品は、それぞれの部品の Story で測っている。',
+    } satisfies LayoutGate,
     layout: 'fullscreen',
     docs: {
       description: {

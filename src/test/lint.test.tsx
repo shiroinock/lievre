@@ -102,3 +102,80 @@ describe('the sources pass their own lint', () => {
     );
   });
 });
+
+// Layout gate (docs/quality-gate.md): the static rules.
+describe('stylelint: KEI layout rules', () => {
+  const part = (body: string) => `@layer kei.components { .k-x { ${body} } }`;
+
+  it('requires a reason for left and right padding that differ', async () => {
+    for (const body of [
+      'padding: 0 8px 0 4px;',
+      'padding-left: 4px;',
+      'padding-inline: 4px 8px;',
+      'padding: 8px; padding-right: 12px;',
+    ])
+      expect(await cssRules(part(body))).toContain('kei/padding-symmetry');
+    for (const body of [
+      'padding: 4px 8px;',
+      'padding: 8px 12px 4px;',
+      'padding: var(--k-space-2) 0 0;',
+      'padding-left: 8px; padding-right: 8px;',
+    ])
+      expect(await cssRules(part(body))).toEqual([]);
+    // Outside KEI's parts (demo pages, app styles) the rule does not apply.
+    expect(await cssRules('.demo ul { padding-left: 1.5em; }')).toEqual([]);
+    expect(
+      await cssRules(
+        part(
+          '/* stylelint-disable-next-line kei/padding-symmetry -- 左の検索アイコンの分 */\n padding: 0 12px 0 36px;',
+        ),
+      ),
+    ).toEqual([]);
+  });
+
+  it('requires a reason on every disable comment', async () => {
+    const { results } = await stylelint.lint({
+      code: part('/* stylelint-disable-next-line kei/padding-symmetry */\n padding: 0 8px 0 4px;'),
+      configFile: 'stylelint.config.mjs',
+    });
+    expect(results[0].warnings.map((w) => w.rule)).toContain('--report-descriptionless-disables');
+  });
+
+  it('keeps heights on the 4px grid', async () => {
+    expect(await cssRules(part('height: 18px;'))).toContain('kei/height-grid');
+    expect(await cssRules(part('min-height: 41px;'))).toContain('kei/height-grid');
+    for (const body of [
+      'height: 20px;',
+      'min-height: 40px;',
+      'height: 1px;',
+      'height: 2px;',
+      'min-height: var(--k-control-height);',
+      'max-height: calc(100dvh - 40px);',
+      'height: 100%;',
+    ])
+      expect(await cssRules(part(body))).toEqual([]);
+    expect(await cssRules('@layer kei.base { .k-x { height: 18px; } }')).toEqual([]);
+  });
+
+  it('lets known misses through until they are fixed, then asks to drop them', async () => {
+    // @ts-expect-error The plugin module is plain JavaScript without types.
+    const { layoutRules } = await import('../../scripts/stylelint-kei.mjs');
+    const lintKeiCss = async (code: string) => {
+      const { results } = await stylelint.lint({
+        code,
+        codeFilename: 'src/styles/kei.css',
+        config: {
+          plugins: layoutRules,
+          rules: {
+            'kei/height-grid': [true, { known: [{ selector: '.k-x', prop: 'height' }] }],
+          },
+        },
+      });
+      return results[0].warnings.map((w) => w.text);
+    };
+    expect(await lintKeiCss(part('height: 18px;'))).toEqual([]);
+    expect(await lintKeiCss(part('height: 20px;'))).toEqual([
+      expect.stringContaining('「.k-x { height }」はもう起きていません'),
+    ]);
+  });
+});
