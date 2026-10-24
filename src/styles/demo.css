@@ -12,10 +12,10 @@ body {
 #root {
   min-height: 100vh;
 }
-html:has(.kei-app:is([data-theme='paper'], [data-theme='sepia'])) {
+html:has(.kei-app[data-theme='paper']) {
   color-scheme: light;
 }
-html:has(.kei-app:is([data-theme='ink'], [data-theme='rust'])) {
+html:has(.kei-app[data-theme='ink']) {
   color-scheme: dark;
 }
 body:has(.kei-app) {
@@ -45,26 +45,6 @@ body:has(.kei-app) {
   --demo-blue-muted: #c9cbf2;
   --demo-blue-selected: #dce0ff;
   --demo-blue-on-selected: #191953;
-}
-/* Prototype themes: Sepia prints the sidebar in faded ultramarine; Rust sinks it to a bruised indigo. */
-.kei-app[data-theme='sepia'] {
-  --demo-page-bg: #ebe5d6;
-  --demo-blue: #2e3199;
-  --demo-blue-hover: #3a3dab;
-  --demo-blue-inset: #22247a;
-  --demo-blue-line: #5558b4;
-  --demo-blue-muted: #dcdcf0;
-  --demo-blue-on-selected: #22247a;
-}
-.kei-app[data-theme='rust'] {
-  --demo-page-bg: #1b1210;
-  --demo-blue: #262048;
-  --demo-blue-hover: #322a5c;
-  --demo-blue-inset: #1a1533;
-  --demo-blue-line: #453c78;
-  --demo-blue-muted: #d2cde6;
-  --demo-blue-selected: #e4e1f7;
-  --demo-blue-on-selected: #262048;
 }
 .kei-app :where(button, a) {
   -webkit-tap-highlight-color: transparent;
@@ -193,9 +173,7 @@ body:has(.kei-app) {
   padding: 24px 8px 0;
 }
 .theme-segment {
-  /* Four themes: two rows of two, on main's 4px spacing. */
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 4px;
   padding: 4px;
   border-radius: var(--k-radius-md);

@@ -364,7 +364,7 @@ ToastProviderの子孫で使用します。保存結果や一時的な通知向�
 
 ## 型とその他
 
-- `type Theme = 'paper' | 'ink' | 'sepia' | 'rust';` — sepia と rust は試作のテーマです。
+- `type Theme = 'paper' | 'ink';`
 - `type Wear = 'off' | 'baked' | 'live';` — 試作：質感の段階。off は質感なし。baked はビルド時にソルトから焼いた模様を貼るだけで軽い。
 live は wearSeed から SVG のフィルタを作り、文字も歪ませる。重い。
 - `type Density = 'comfortable' | 'compact';`

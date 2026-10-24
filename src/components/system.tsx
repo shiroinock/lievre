@@ -13,8 +13,7 @@ import { Toast as ToastPrimitive } from 'radix-ui';
 import { X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { LiveWearFilters, liveWearStyle } from '../wear/live';
 
-/** sepia と rust は試作のテーマです。 */
-export type Theme = 'paper' | 'ink' | 'sepia' | 'rust';
+export type Theme = 'paper' | 'ink';
 /**
  * 試作：質感の段階。off は質感なし。baked はビルド時にソルトから焼いた模様を貼るだけで軽い。
  * live は wearSeed から SVG のフィルタを作り、文字も歪ませる。重い。

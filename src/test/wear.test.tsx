@@ -107,7 +107,7 @@ describe('Wear: provider', () => {
 
   it('writes seeded live filters and carries them into portals', async () => {
     const { container } = render(
-      <KeiProvider wear="live" wearSeed="ash" theme="sepia">
+      <KeiProvider wear="live" wearSeed="ash" theme="ink">
         <Dialog trigger={<Button>開く</Button>} title="表示設定" description="表示を調整">
           <Button>保存</Button>
         </Dialog>

@@ -79,7 +79,7 @@ export function placements(salt) {
 }
 
 export function buildWear(salt, tokens) {
-  const themes = ['paper', 'ink', 'sepia', 'rust'].map((name) => {
+  const themes = ['paper', 'ink'].map((name) => {
     const set = { ...tokens.paper, ...(name === 'paper' ? {} : tokens[name]) };
     return { name, text: set.text.$value };
   });

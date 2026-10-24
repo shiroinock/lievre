@@ -119,60 +119,6 @@
     --k-overlay: #03041399;
   }
 
-  /* Prototype: paper that has yellowed, printed in a faded ultramarine. */
-  .kei[data-theme='sepia'] {
-    --k-bg: #ebe5d6;
-    --k-surface: #f3eee2;
-    --k-surface-raised: #f8f4ea;
-    --k-surface-sunken: #e0d8c5;
-    --k-text: #26211a;
-    --k-muted: #564d40;
-    --k-subtle: #615746;
-    --k-border: #d2c8b2;
-    --k-border-strong: #7d725d;
-    --k-accent: #2e3199;
-    --k-accent-hover: #22247a;
-    --k-accent-soft: #e2dfea;
-    --k-success: #2c6447;
-    --k-success-soft: #dbe6d3;
-    --k-warning: #744a05;
-    --k-warning-soft: #efe0bf;
-    --k-danger: #9e2f1c;
-    --k-danger-soft: #f1d9cc;
-    --k-info: #30498a;
-    --k-info-soft: #dfe1e8;
-    --k-skeleton: #d9d0bc;
-    --k-overlay: #1c160d66;
-  }
-
-  /* Prototype: a rusted instrument casing, red-brown with a pale ultramarine. */
-  .kei[data-theme='rust'] {
-    --k-bg: #1b1210;
-    --k-surface: #231815;
-    --k-surface-raised: #2c1f1b;
-    --k-surface-sunken: #140c0a;
-    --k-text: #eee2d4;
-    --k-muted: #bba796;
-    --k-subtle: #a8937f;
-    --k-border: #4a342b;
-    --k-border-strong: #977a68;
-    --k-accent: #b2b5f2;
-    --k-accent-hover: #cfd1ff;
-    --k-accent-soft: #33284a;
-    --k-on-accent: #1a1640;
-    --k-success: #92cfa6;
-    --k-success-soft: #1e3326;
-    --k-warning: #e6c079;
-    --k-warning-soft: #3a2c16;
-    --k-danger: #ffa08b;
-    --k-danger-soft: #45201a;
-    --k-on-danger: #2a0d08;
-    --k-info: #a9bdf2;
-    --k-info-soft: #252a46;
-    --k-skeleton: #3a2a24;
-    --k-overlay: #0a050499;
-  }
-
   /* Density changes control height and padding, never the size of reading text. */
   .kei[data-density='compact'] {
     --k-control-height: 32px;
@@ -205,7 +151,7 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  .kei:is([data-theme='ink'], [data-theme='rust']) {
+  .kei[data-theme='ink'] {
     color-scheme: dark;
   }
   .kei-portal {

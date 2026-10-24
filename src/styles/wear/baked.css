@@ -6,12 +6,6 @@
   .kei[data-wear='baked'][data-theme='ink'] {
     --k-wear-surface: url('./surface-ink.png');
   }
-  .kei[data-wear='baked'][data-theme='sepia'] {
-    --k-wear-surface: url('./surface-sepia.png');
-  }
-  .kei[data-wear='baked'][data-theme='rust'] {
-    --k-wear-surface: url('./surface-rust.png');
-  }
   .kei[data-wear='baked'] {
     --k-wear-kasure: url('./kasure.png');
     --k-wear-shift: 0.035em 0.022em;

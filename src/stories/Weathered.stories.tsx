@@ -20,7 +20,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '採用前の試作です。Sepia（焼けた紙）と Rust（錆びた筐体）の2テーマと、質感の3段階 `wear="off | baked | live"` を、既存の Paper / Ink と並べて比べます。baked はビルド時のソルト（`npm run wear`、文字の歪みは `npm run wear:font`）で模様が決まり、live は `wearSeed` から実行時に SVG フィルタで描きます。候補の一覧と根拠は references/weathered-candidates.md にあります。',
+          '採用前の試作です。質感の3段階 `wear="off | baked | live"` を、Paper / Ink で比べます（試作した Sepia と Rust のテーマは採用しませんでした）。baked はビルド時のソルト（`npm run wear`、文字の歪みは `npm run wear:font`）で模様が決まり、live は `wearSeed` から実行時に SVG フィルタで描きます。候補の一覧と根拠は references/weathered-candidates.md にあります。',
       },
     },
   },
@@ -31,8 +31,6 @@ type Story = StoryObj<typeof meta>;
 const themes: { theme: Theme; name: string; note: string }[] = [
   { theme: 'paper', name: 'Paper', note: '青みのある明るい紙（現行）' },
   { theme: 'ink', name: 'Ink', note: '深い紺（現行）' },
-  { theme: 'sepia', name: 'Sepia', note: '焼けた紙と褪せた群青（試作）' },
-  { theme: 'rust', name: 'Rust', note: '錆びた筐体と淡い群青（試作）' },
 ];
 
 function Sample({ name, note }: { name: string; note: string }) {
@@ -111,9 +109,9 @@ const levels: { wear: Wear; note: string }[] = [
   { wear: 'live', note: 'live：実行時の SVG フィルタ' },
 ];
 
-export const Themes: Story = { name: '4つのテーマ（質感なし）', render: () => <Grid wear="off" /> };
-export const Baked: Story = { name: '4つのテーマ（baked）', render: () => <Grid wear="baked" /> };
-export const Live: Story = { name: '4つのテーマ（live）', render: () => <Grid wear="live" /> };
+export const Themes: Story = { name: 'テーマ（質感なし）', render: () => <Grid wear="off" /> };
+export const Baked: Story = { name: 'テーマ（baked）', render: () => <Grid wear="baked" /> };
+export const Live: Story = { name: 'テーマ（live）', render: () => <Grid wear="live" /> };
 export const Levels: Story = {
   name: '3段階の対比',
   render: () => (
@@ -124,10 +122,10 @@ export const Levels: Story = {
         gap: 16,
       }}
     >
-      {(['sepia', 'rust'] as const).flatMap((theme) =>
+      {(['paper', 'ink'] as const).flatMap((theme) =>
         levels.map(({ wear, note }) => (
           <KeiProvider key={theme + wear} theme={theme} wear={wear} style={{ padding: 24 }}>
-            <Sample name={theme === 'sepia' ? 'Sepia' : 'Rust'} note={note} />
+            <Sample name={theme === 'paper' ? 'Paper' : 'Ink'} note={note} />
           </KeiProvider>
         )),
       )}
@@ -145,7 +143,7 @@ export const Seeds: Story = {
       }}
     >
       {['kei', 'ash', 'rust-07'].map((seed) => (
-        <KeiProvider key={seed} theme="sepia" wear="live" wearSeed={seed} style={{ padding: 24 }}>
+        <KeiProvider key={seed} theme="paper" wear="live" wearSeed={seed} style={{ padding: 24 }}>
           <Sample name={seed} note={`wearSeed="${seed}"`} />
         </KeiProvider>
       ))}
