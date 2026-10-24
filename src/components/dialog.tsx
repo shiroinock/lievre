@@ -42,7 +42,7 @@ export function Dialog({
                 </DialogPrimitive.Description>
               </div>
               <DialogPrimitive.Close className="k-icon-button" aria-label="ダイアログを閉じる">
-                <X size={18} />
+                <X size={16} />
               </DialogPrimitive.Close>
             </header>
             <div className="k-dialog-body">{children}</div>

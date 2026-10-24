@@ -94,9 +94,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             }}
           >
             {message.tone === 'error' ? (
-              <AlertCircle size={18} aria-hidden />
+              <AlertCircle size={20} aria-hidden />
             ) : (
-              <CheckCircle2 size={18} aria-hidden />
+              <CheckCircle2 size={20} aria-hidden />
             )}
             <div>
               <ToastPrimitive.Title className="k-toast-title">{message.title}</ToastPrimitive.Title>

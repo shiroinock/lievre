@@ -305,8 +305,8 @@ export function Select({
           aria-describedby={hint || error ? `${id}-description` : undefined}
         >
           <SelectPrimitive.Value placeholder={placeholder} />
-          <SelectPrimitive.Icon>
-            <ChevronDown size={15} />
+          <SelectPrimitive.Icon className="k-select-icon">
+            <ChevronDown size={16} />
           </SelectPrimitive.Icon>
         </SelectPrimitive.Trigger>
         <SelectPrimitive.Portal>
@@ -321,7 +321,7 @@ export function Select({
                     className="k-select-item"
                   >
                     <SelectPrimitive.ItemText>{option.label}</SelectPrimitive.ItemText>
-                    <SelectPrimitive.ItemIndicator>
+                    <SelectPrimitive.ItemIndicator className="k-select-indicator">
                       <Check size={14} />
                     </SelectPrimitive.ItemIndicator>
                   </SelectPrimitive.Item>
@@ -379,7 +379,7 @@ export function Alert({
       className={cx('k-alert', `k-tone-${tone}`, className)}
       role={tone === 'danger' ? 'alert' : 'status'}
     >
-      <Icon size={18} aria-hidden />
+      <Icon size={20} aria-hidden />
       <div>
         <strong>{title}</strong>
         {children && <div className="k-alert-description">{children}</div>}
@@ -535,7 +535,9 @@ export function Kbd({ children }: { children: ReactNode }) {
 export function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' }) {
   return (
     <span className={cx('k-avatar', size === 'sm' && 'k-avatar--sm')} role="img" aria-label={name}>
-      {Array.from(name).slice(0, 2).join('')}
+      {Array.from(name)
+        .slice(0, size === 'sm' ? 1 : 2)
+        .join('')}
     </span>
   );
 }
