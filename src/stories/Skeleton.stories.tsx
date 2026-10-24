@@ -18,7 +18,7 @@ const meta = {
       },
     },
   },
-  args: { width: 240, height: 18, label: '読み込み中' },
+  args: { width: 240, height: 20, label: '読み込み中' },
 } satisfies Meta<typeof Skeleton>;
 export default meta;
 type Story = StoryObj<typeof meta>;

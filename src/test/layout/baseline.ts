@@ -51,7 +51,7 @@ export const BASELINE: KnownIssue[] = [
     part: 'キー',
     check: 'inset-y',
     reason:
-      '記号（⌘ など）の字形が等幅の書体で下に寄り、上下の差の半分が 1.7px になる（基準 1.4px）。',
+      '記号（⌘ など）の字形が等幅の書体で上に寄り、上下の差の半分が 1.7px になる（基準 1.4px）。',
   },
   {
     story: 'Components/Data/DataTable',
@@ -83,13 +83,6 @@ export const BASELINE: KnownIssue[] = [
     reason: '本文14px のとき、ページ番号（等幅）の行の中心とボタンの中心が 0.8px ずれる。',
   },
 
-  // 高さが 4px の格子に乗らない。
-  {
-    story: 'Components/Feedback/Skeleton',
-    part: '仮表示',
-    check: 'grid-height',
-    reason: 'Story の Default が height 18 を渡している。部品の既定値（16px）は格子に乗っている。',
-  },
   // 部品を組み合わせた画面でだけ起きるもの。
   ...['Patterns/Application', 'Patterns/Workspace'].map((story) => ({
     story,

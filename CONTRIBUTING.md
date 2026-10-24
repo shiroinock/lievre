@@ -64,6 +64,8 @@ npm test             # jsdom：部品のふるまい・axe・Story の play
 npm run test:layout  # ブラウザ：配置の基準（初回は npx playwright install chromium）
 ```
 
+部品の props や説明（`/** */`）を書いたら `npm run llms`、`kei.css` のトークンを変えたら `npm run tokens` で書き出します。書き出し忘れは `npm test` が止めます。
+
 `npm run test:layout` が失敗したら、メッセージの「基準」に合わせて CSS を直します。メッセージには Story、配色・密度・文字の組み合わせ、部品の名前、要素、ずれの大きさが出ます。
 
 すぐに直せない理由があるときだけ、`src/test/layout/baseline.ts` に理由付きで例外を足します。直したら例外を消してください（消し忘れると検査が知らせます）。
