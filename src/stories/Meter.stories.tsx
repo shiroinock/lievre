@@ -10,7 +10,10 @@ const meta = {
   component: Meter,
   parameters: {
     layoutGate: {
-      parts: [{ name: 'メーター', selector: '.k-meter', checks: ['fits'] }],
+      parts: [
+        { name: 'メーター', selector: '.k-meter', checks: ['fits'] },
+        { name: 'メーターの読み値', selector: '.k-meter-reading > strong', checks: ['line-grid'] },
+      ],
     } satisfies LayoutGate,
     docs: {
       description: {

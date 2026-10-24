@@ -46,7 +46,7 @@ const meta = {
     layoutGate: {
       parts: [
         { name: '表の見出しのセル', selector: '.k-table th', checks: ['inset-y'] },
-        { name: '表のセル', selector: '.k-table td', checks: ['inset-y'] },
+        { name: '表のセル', selector: '.k-table td', checks: ['inset-y', 'line-grid'] },
         {
           name: '並べ替えのボタン',
           selector: '.k-table-sort',

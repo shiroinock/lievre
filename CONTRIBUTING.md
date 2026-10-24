@@ -50,7 +50,8 @@ const meta = {
 | パネル（Card・Alert・Toast）       | `padding-equal`                                                                |
 | 並べて使う部品                     | 並べた Story を作り、親に `{ sameHeight: '…' }`                                |
 | 図（svg）                          | `fills-x`                                                                      |
-| ラベルと値の行                     | `{ baseline: ':scope > *' }`                                                   |
+| ラベルと値の行                     | `{ baseline: ':scope > *' }` `line-grid`                                       |
+| 数値の読み値（等幅と単位が並ぶ行） | `line-grid`                                                                    |
 
 部品を測らない Story ファイルは、`layoutGate: { skip: '理由' }` と書きます。部品を組み合わせた画面の Story は、`{ screen: '理由', parts: SCREEN_PARTS }` で、画面に出てくる部品をまとめて測ります。
 

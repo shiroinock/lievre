@@ -15,7 +15,7 @@ const meta = {
         {
           name: '進み具合の見出し',
           selector: '.k-progress-label',
-          checks: [{ baseline: ':scope > *' }],
+          checks: [{ baseline: ':scope > *' }, 'line-grid'],
         },
       ],
     } satisfies LayoutGate,

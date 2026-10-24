@@ -33,6 +33,8 @@ export type LayoutCheck =
   | 'control-height'
   /** 高さが 4px の倍数。 */
   | 'grid-height'
+  /** padding と罫線を除いた行の箱の高さが 4px の倍数（書体や大きさの違う文字が混ざる行で崩れる）。 */
+  | 'line-grid'
   /** padding が上下左右で同じ（パネル）。 */
   | 'padding-equal'
   /** 中身が横にはみ出していない。はみ出しを切る要素（overflow が visible でない）では縦も見る。 */
@@ -63,6 +65,8 @@ export const CRITERIA = {
   paddingRatio: { button: 0.4, input: 0.3 },
   /** 描いた中身と箱の左右の空き。線の太さの分だけ許す。 */
   fill: 2,
+  /** 行の箱の高さと 4px の倍数の差。行の高さはレイアウトの値そのものなので小さく取る。 */
+  line: 0.1,
   /** 同じ行の文字のベースラインの差。 */
   baseline: 0.5,
 } as const;
@@ -83,6 +87,7 @@ export const CHECK_LABEL: Record<string, string> = {
   'inset-y': '上下の中央',
   'control-height': '操作の高さ',
   'grid-height': '高さの格子',
+  'line-grid': '行の箱の格子',
   'padding-equal': 'パネルの内側の余白',
   fits: 'はみ出し',
   padding: '左右の内側の余白',

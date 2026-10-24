@@ -24,5 +24,11 @@ export const SCREEN_PARTS: LayoutPart[] = [
   { name: 'メーター', selector: '.k-meter', checks: ['inset-x', 'fits'] },
   { name: '指標の見出し', selector: '.k-metric-top', checks: [{ baseline: ':scope > *' }] },
   { name: '折れ線', selector: '.k-sparkline', checks: ['fills-x'] },
-  { name: '進み具合の見出し', selector: '.k-progress-label', checks: [{ baseline: ':scope > *' }] },
+  {
+    name: '進み具合の見出し',
+    selector: '.k-progress-label',
+    checks: [{ baseline: ':scope > *' }, 'line-grid'],
+  },
+  { name: '指標の値', selector: '.k-metric-value', checks: ['line-grid'] },
+  { name: 'メーターの読み値', selector: '.k-meter-reading > strong', checks: ['line-grid'] },
 ];

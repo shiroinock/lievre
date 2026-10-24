@@ -80,6 +80,33 @@ function checkOne(el: Element, check: LayoutCheck): string | null {
     return `高さが ${px(box.height)} です。基準：${CRITERIA.grid}px の倍数（近いのは ${Math.floor(box.height / 4) * 4}px か ${Math.ceil(box.height / 4) * 4}px）。`;
   }
 
+  if (check === 'line-grid') {
+    const inner =
+      box.height -
+      ['paddingTop', 'paddingBottom', 'borderTopWidth', 'borderBottomWidth'].reduce(
+        (sum, k) => sum + parseFloat(s[k as 'paddingTop']),
+        0,
+      );
+    const off = inner % CRITERIA.grid;
+    if (Math.min(off, CRITERIA.grid - off) <= CRITERIA.line) return null;
+    // Either the line-height itself is off the grid, or text in another face or size on the
+    // same line pushes the line box past it.
+    const lh = parseFloat(s.lineHeight);
+    const lines = Math.max(1, Math.round(inner / lh));
+    const faces = new Set<string>();
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (!n.textContent?.trim()) continue;
+      const t = getComputedStyle(n.parentElement!);
+      faces.add(`${t.fontFamily.split(',')[0].replace(/["']/g, '')} ${t.fontSize}`);
+    }
+    const mixed =
+      inner > lines * lh + CRITERIA.line && faces.size > 1
+        ? `line-height は ${px(lh)} ですが、同じ行に ${[...faces].join('・')} の文字が混ざり、行の箱がそれより高くなっています。混ぜた側（等幅の数字・単位など）の line-height を小さく（1 など）するか、行の高さを 4px に丸めてください。`
+        : `line-height が ${px(lh)} です。4px の倍数になるトークン（--k-line-tight・--k-line-body）を使ってください。`;
+    return `行の箱の高さが ${px(inner)} で、${CRITERIA.grid}px の倍数から ${px(Math.min(off, CRITERIA.grid - off))} ずれています。基準：${CRITERIA.grid}px の倍数（差 ${CRITERIA.line}px 以内）。${mixed}`;
+  }
+
   if (check === 'padding-equal') {
     const sides = ['Top', 'Right', 'Bottom', 'Left'].map((k) =>
       parseFloat(s.getPropertyValue(`padding-${k.toLowerCase()}`)),

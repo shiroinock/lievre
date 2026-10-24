@@ -144,6 +144,35 @@ export const BASELINE: KnownIssue[] = [
     reason:
       '資料の絞り込みの「整える」ボタンで、文字の輪郭が上に 1.5px 寄る（基準 1.4px）。ほかのラベルは基準内なので、字形によるずれか確かめる。',
   })),
+  // 行の箱：文字の行の高さが 4px の格子から外れる。
+  ...['Components/Data/Metric', 'Patterns/Application', 'Patterns/Workspace'].map((story) => ({
+    story,
+    part: '指標の値',
+    check: 'line-grid',
+    reason:
+      '値の行が 51px（Workspace の点検用 Story は 54px）。KEI Mono 36px の line-height 44px を単位の IBM Plex Sans JP 14px も受け継ぎ、ベースラインのずれで行の箱が広がる。単位の span に line-height: 1 を当てれば 44px に戻る。',
+  })),
+  ...['Components/Data/Meter', 'Patterns/Application', 'Patterns/Workspace'].map((story) => ({
+    story,
+    part: 'メーターの読み値',
+    check: 'line-grid',
+    reason:
+      '読み値の行が 33.6px（Workspace の点検用 Story は 42px）。.k-meter-reading strong の line-height が 1.2（28px × 1.2）で、4px に丸めていない。round(1.2em, 4px) にすれば 32px になる。',
+  })),
+  {
+    story: 'Components/Data/DataTable',
+    part: '表のセル',
+    check: 'line-grid',
+    reason:
+      '等幅の数字（KEI Mono 14.4px）を入れたセルの行が、IBM Plex Sans JP 14px の line-height 24px より 0.5px 高い 24.5px になる。border-collapse の罫線の半分を数えるため、同じ表のほかの行は 23.5px と測れる。等幅の側の line-height を小さくすれば揃う。',
+  },
+  {
+    story: 'Patterns/Workspace',
+    part: '進み具合の見出し',
+    check: 'line-grid',
+    reason:
+      '行高 1.5 を当てた点検用の Story で、ラベルの行が 21.6px になる（KEI Mono 14.4px × 1.5）。Progress の Story と画面例の標準の行高では 20px に収まっている。',
+  },
 ];
 
 /** 公開しているが、配置を測る部品ではないもの。 */

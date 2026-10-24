@@ -3,6 +3,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
 import { KeiProvider, Sparkline } from '../../index';
+import '../../styles/fonts.css';
 import '../../styles/kei.css';
 import { checkPart, undeclared } from './checks';
 import type { LayoutCheck } from './declare';
@@ -133,6 +134,21 @@ describe('配置の検査：中身の広がりと文字のベースライン', (
       /span「CPU」（13px）を基準に、span「42%」（14.4px）\+\d(\.\d)?px。基準：差が 0.5px 以内。flex なら align-items: baseline/,
     );
     expect(messages(row('baseline'), { baseline: ':scope > *' })).toEqual([]);
+  });
+
+  it('行の箱の格子', async () => {
+    // A number in another face inherits the line height in px and pushes the line box past it.
+    await document.fonts.load('36px "KEI Mono"', '42');
+    await document.fonts.load('14px "IBM Plex Sans JP"', '%');
+    const value = (unit: string) =>
+      `<div class="k-x" style="font: 36px / 44px 'KEI Mono'">42<span style="font-size: 14px; font-family: 'IBM Plex Sans JP'; ${unit}">%</span></div>`;
+    expect(messages(value(''), 'line-grid')[0]).toMatch(
+      /行の箱の高さが [\d.]+px で、4px の倍数から [\d.]+px ずれています。.*line-height は 44px ですが、同じ行に KEI Mono 36px・IBM Plex Sans JP 14px の文字が混ざり/,
+    );
+    expect(messages(value('line-height: 1'), 'line-grid')).toEqual([]);
+    expect(
+      messages('<div class="k-x" style="font: 28px / 1.2 monospace">68</div>', 'line-grid')[0],
+    ).toMatch(/行の箱の高さが 33.6px.*line-height が 33.6px です。/);
   });
 });
 
