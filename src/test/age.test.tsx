@@ -204,7 +204,7 @@ describe('Age: generated and provided', () => {
       'border-radius',
       'pointer-events',
       'mask',
-      'box-shadow',
+      'text-shadow',
       'background-image',
       'background-position',
       'background-size',
@@ -219,6 +219,18 @@ describe('Age: generated and provided', () => {
     expect(css).toMatch(
       /@media \(not \(prefers-contrast: more\)\) and \(not \(forced-colors: active\)\)/,
     );
+  });
+
+  it('leaves no edge at any zoom: chips are cut out whole, and nothing lights an inner edge', () => {
+    const css = readFileSync('src/styles/wear/age.css', 'utf8');
+    // A chip is its own piece cut out of the box, not a square stitched to the rest of the box.
+    expect(css).not.toContain('conic-gradient');
+    for (const mask of css.match(/--k-age-chips-[\w-]+: [^;]+/g) ?? [])
+      expect(mask).toMatch(/no-repeat exclude, linear-gradient\(#000, #000\)$/);
+    // No inner shadow or paper-coloured band: DESIGN.md allows no highlight inside an edge.
+    expect(css).not.toContain('box-shadow');
+    for (const shadow of css.match(/text-shadow: [^;]+/g) ?? [])
+      expect(shadow).toMatch(/color-mix\(in srgb, currentColor \d+%, transparent\)$/);
   });
 
   it('defaults to none, nests, and turns off for more contrast and forced colours', () => {

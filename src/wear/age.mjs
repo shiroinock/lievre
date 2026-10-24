@@ -4,7 +4,7 @@
 //   fade    every colour token loses colour toward an old-paper yellow grey (OKLab, at its own
 //           lightness): inks and tints fully, the paper, lines and text by half. One amount for
 //           the whole theme, stopped where any pairing would drop below WCAG AA
-//   shift   filled controls print their fill off the key line by 0.5–1px
+//   shift   the label on a filled control or badge prints a second time, 0.5–1px off
 //   mottle  filled faces take the paper back in blotches where the ink did not hold
 //   rules   1px lines thin and thicken along their length, and break now and then
 //   chips   corners lose a small irregular piece
@@ -278,7 +278,10 @@ export function mottleField(salt) {
   return field;
 }
 
-/** A corner chip: opaque except an irregular bite out of one corner of a CHIP-pixel square. */
+/**
+ * A corner chip: the irregular piece one corner of a CHIP-pixel square loses, opaque, and nothing
+ * elsewhere. Only the piece is drawn, so the square itself never leaves an edge in the mask.
+ */
 export function chipField(salt, corner) {
   const seed = seedFor(salt, 'chip', corner);
   const field = new Float32Array(CHIP * CHIP);
@@ -289,7 +292,7 @@ export function chipField(salt, corner) {
       const dy = corner.includes('t') ? y + 0.5 : CHIP - y - 0.5;
       const angle = Math.atan2(dy, dx) / (Math.PI / 2);
       const reach = CHIP * (0.32 + 0.22 * noise2(seed, angle * 5, 0.5) + 0.06 * hash32(seed, x, y));
-      field[y * CHIP + x] = Math.hypot(dx, dy) < reach ? 0 : 1;
+      field[y * CHIP + x] = Math.hypot(dx, dy) < reach ? 1 : 0;
     }
   return field;
 }
@@ -330,31 +333,20 @@ export function ageTextures(config, tokens, themes, deflate) {
   return { pixels: { mottle }, files };
 }
 
-// Where each chipped corner sits, the conic gradient that keeps everything but that corner's
-// square, and the side of the conic that is left out (clockwise from the top).
-const AT = {
-  tl: ['left top', (s) => `${s} ${s}`, [270, 360]],
-  tr: ['right top', (s) => `calc(100% - ${s}) ${s}`, [0, 90]],
-  br: ['right bottom', (s) => `calc(100% - ${s}) calc(100% - ${s})`, [90, 180]],
-  bl: ['left bottom', (s) => `${s} calc(100% - ${s})`, [180, 270]],
-};
-function keepAllBut(corner, size) {
-  const [, at, [from, to]] = AT[corner];
-  return `conic-gradient(at ${at(size)}, #000 0deg ${from}deg, transparent ${from}deg ${to}deg, #000 ${to}deg)`;
-}
+const AT = { tl: 'left top', tr: 'right top', br: 'right bottom', bl: 'left bottom' };
 
 /**
- * A mask that chips the given corners: for each, the chip image over its corner square, added to
- * a conic that keeps the rest; the corners combine by intersection.
+ * A mask that chips the given corners: the whole box, with each corner's piece cut out of it
+ * (exclude: the piece lies inside the box, so the two give the box less the piece). Nothing is
+ * stitched together, so no seam shows at any zoom.
  */
 export function chipMask(corners, size, url) {
   if (!corners.length || size < 1) return 'none';
   const s = `${size.toFixed(1)}px`;
-  const layers = corners.flatMap((corner, i) => [
-    `${url(corner)} ${AT[corner][0]} / ${s} ${s} no-repeat add`,
-    `${keepAllBut(corner, s)} ${i < corners.length - 1 ? 'intersect' : 'add'}`,
-  ]);
-  return layers.join(', ');
+  return [
+    ...corners.map((corner) => `${url(corner)} ${AT[corner]} / ${s} ${s} no-repeat exclude`),
+    'linear-gradient(#000, #000)',
+  ].join(', ');
 }
 
 /** How long a worn line runs before its pattern repeats, in pixels: longer than most lines. */
@@ -445,7 +437,9 @@ export function ageShapeVars(config, level, url) {
   const chipUrl = (corner) => url(`age-chip-${corner}.png`);
   for (let n = 0; n < VARIANTS; n++) {
     const next = mulberry32(seedFor(config.salt, 'age', n));
-    const [dx, dy] = [next(), next()].map((v) => (0.5 + v * 0.5) * shift);
+    // Any direction, so the second impression never reads as a shadow cast one way.
+    const [angle, reach] = [next() * 2 * Math.PI, (0.5 + next() * 0.5) * shift];
+    const [dx, dy] = [Math.cos(angle) * reach, Math.sin(angle) * reach];
     for (const place of ['fill', 'print'])
       vars[`--k-age-shift-${place}-${n}`] =
         `${(dx * AGE_PLACES[place].shift).toFixed(2)}px ${(dy * AGE_PLACES[place].shift).toFixed(2)}px`;
@@ -532,18 +526,19 @@ export function ageRules() {
       rules.push(
         block(`${aged} ${any(card.selectors)}${nth(n)}::after`, { mask: `var(--k-age-ring-${n})` }),
       );
-    // Filled controls: the fill slips off its key line, and the paper shows through in blotches.
+    // Filled controls: the label's ink prints a second time a little off, and the paper shows
+    // through the fill in blotches. The box, its outline and its edges are left as they are: an
+    // offset of the fill would show the paper as a light line inside the edge, like a highlight.
     rules.push(
       block(`${aged} ${any(fill.selectors)}:not(:disabled)${nth(n)}`, {
-        'border-color': 'color-mix(in srgb, var(--k-text) 45%, transparent)',
-        'box-shadow': `inset var(--k-age-shift-fill-${n}) 0 0 color-mix(in srgb, var(--k-bg) 70%, transparent)`,
+        'text-shadow': `var(--k-age-shift-fill-${n}) 0 color-mix(in srgb, currentColor 30%, transparent)`,
         'background-image': 'var(--k-age-mottle)',
         'background-position': `var(--k-age-mottle-pos-${n})`,
         'background-size': `${TILE}px ${TILE}px`,
       }),
-      // Badges: the tint slips off its place a little less, with no key line to slip from.
+      // Badges: the same second impression of the label, a little nearer.
       block(`${aged} ${any(print.selectors)}${nth(n)}`, {
-        'box-shadow': `inset var(--k-age-shift-print-${n}) 0 0 color-mix(in srgb, var(--k-bg) 70%, transparent)`,
+        'text-shadow': `var(--k-age-shift-print-${n}) 0 color-mix(in srgb, currentColor 30%, transparent)`,
       }),
       // A mask would also cut off the focus ring, so a focused control is drawn whole.
       block(`${aged} ${any(control.selectors)}:not(:disabled, :focus-visible)${nth(n)}`, {
