@@ -3,8 +3,15 @@ import tokens from '../../tokens/tokens.json';
 import { readFileSync } from 'node:fs';
 import { buildTokens } from '../../scripts/build-tokens.mjs';
 import { KASURE_FLOOR, SURFACE_MAX, WEAR_CONFIG } from '../wear/params.mjs';
-import { wornBackgrounds } from '../wear/gauges.mjs';
-import { mix, ratio, resolve, themeTokens as tokensFor } from '../wear/contrast.mjs';
+import {
+  heldOutline,
+  mix,
+  ratio,
+  resolve,
+  TEXT_COLOURS,
+  themeTokens as tokensFor,
+  wornBackgrounds,
+} from '../wear/contrast.mjs';
 const themes = ['paper', 'ink', 'sepia', 'rust'] as const;
 const themeTokens = (theme: (typeof themes)[number]) => tokensFor(tokens, theme);
 
@@ -88,8 +95,10 @@ describe('Semantic color contrast and token synchronization', () => {
   // Wear stains the working surface and panels (bg, surface) toward the text colour, at most
   // SURFACE_MAX at the densest speckle; yake browns them toward the theme's tone at the darkest
   // corner, and a scuff lays the rubbed colour on top. Take all three at their strongest, stacked.
-  // Every text colour must still reach 4.5:1 there, and text-coloured glyphs must reach it at the
-  // faintest point of the dry-brush mask (KASURE_FLOOR) on top.
+  // Every text colour (body, muted, status and link) must still reach 4.5:1 there, text-coloured
+  // glyphs must reach it at the faintest point of the dry-brush mask (KASURE_FLOOR) on top, and the
+  // focus ring and control outlines must reach 3:1. Wear darkens the outline with the paper
+  // (heldOutline) where the token alone would fall short.
   for (const theme of themes) {
     const set = themeTokens(theme);
     for (const background of ['bg', 'surface']) {
@@ -102,18 +111,16 @@ describe('Semantic color contrast and token synchronization', () => {
         ['browned', browned],
         ['scuffed', rubbed],
       ]) {
-        for (const foreground of [
-          'text',
-          'muted',
-          'subtle',
-          'success',
-          'warning',
-          'danger',
-          'info',
-        ])
+        for (const foreground of TEXT_COLOURS)
           it(`${theme} wear: ${foreground} / ${layer} ${background} reaches 4.5:1`, () => {
             expect(ratio(resolve(set, foreground), worn)).toBeGreaterThanOrEqual(4.5);
           });
+        it(`${theme} wear: focus ring / ${layer} ${background} reaches 3:1`, () => {
+          expect(ratio(resolve(set, 'focus'), worn)).toBeGreaterThanOrEqual(3);
+        });
+        it(`${theme} wear: control outline (held) / ${layer} ${background} reaches 3:1`, () => {
+          expect(ratio(heldOutline(WEAR_CONFIG, set, theme), worn)).toBeGreaterThanOrEqual(3);
+        });
         it(`${theme} wear: dry-brushed text / ${layer} ${background} reaches 4.5:1`, () => {
           const faint = mix(worn, resolve(set, 'text'), KASURE_FLOOR);
           expect(ratio(faint, worn)).toBeGreaterThanOrEqual(4.5);

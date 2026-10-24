@@ -28,4 +28,5 @@ export function sheetThemeVars(
   config: WearConfig,
   theme: string,
   urls: { yake: string; sure: string },
+  tokens: Tokens,
 ): Record<string, string>;

@@ -34,3 +34,44 @@ export function ratio(a, b) {
   const [lo, hi] = [luminance(a), luminance(b)].sort((a, b) => a - b);
   return (hi + 0.05) / (lo + 0.05);
 }
+
+/** Colours set as text, checked at 4.5:1, and the marks of controls, checked at 3:1. */
+export const TEXT_COLOURS = [
+  'text',
+  'muted',
+  'subtle',
+  'success',
+  'warning',
+  'danger',
+  'info',
+  'accent',
+];
+export const UI_COLOURS = ['focus', 'border-strong'];
+
+/**
+ * The most worn backgrounds of a surface in a theme: stained at the darkest speckle, then browned
+ * at the darkest corner of the yake, and that again with the most rubbed scuff on top. Text sits
+ * on all three somewhere near an edge, so each must hold.
+ */
+export function wornBackgrounds(config, set, theme, background) {
+  const tone = config.tones[theme];
+  const stained = mix(resolve(set, background), resolve(set, 'text'), config.stain.strength);
+  const browned = mix(stained, tone.yake, config.yake.strength * tone.amount);
+  const rubbed = mix(browned, tone.sure, config.sure.strength);
+  return [stained, browned, rubbed];
+}
+
+/**
+ * Control outlines under wear: border-strong moved toward the text colour, by the least amount
+ * that keeps 3:1 on every worn background (the ink darkens with the paper). Unworn, it is the
+ * token itself.
+ */
+export function heldOutline(config, set, theme) {
+  const worn = ['bg', 'surface'].flatMap((b) => wornBackgrounds(config, set, theme, b));
+  const base = resolve(set, 'border-strong');
+  for (let step = 0; step <= 50; step++) {
+    const colour = mix(base, resolve(set, 'text'), step / 50);
+    if (worn.every((w) => ratio(colour, w) >= 3)) return colour;
+  }
+  return resolve(set, 'text');
+}

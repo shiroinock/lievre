@@ -99,7 +99,7 @@ describe('Wear: seeded and reproducible', () => {
       if (name !== '--k-wear-kasure') expect(live[name]).toBe(value);
     for (const [name, value] of Object.entries(sheetVars(config))) expect(live[name]).toBe(value);
     expect(live['--k-wear-rim']).toBe(
-      sheetThemeVars(config, 'sepia', { yake: '', sure: '' })['--k-wear-rim'],
+      sheetThemeVars(config, 'sepia', { yake: '', sure: '' }, tokens)['--k-wear-rim'],
     );
     // The same pixels, stored rather than compressed.
     const stored = textures(config, tokens);
@@ -176,6 +176,8 @@ describe('Wear: what it may touch', () => {
       'border-style',
       'border-width',
       'border-image',
+      // Control outlines darken with the worn paper to keep 3:1 (a colour, not a size).
+      '--k-border-strong',
       // Cards and metrics brown along their edges with an inset shadow, which takes no room.
       'box-shadow',
     ]);

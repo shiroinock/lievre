@@ -58,6 +58,11 @@ export function validate(config, tokens) {
     if (typeof distort !== 'boolean' || !(kasure >= 0 && kasure <= 1))
       problems.push(`kinds.${kind} の値が正しくありません。`);
   }
+  for (const [theme, { ui }] of Object.entries(contrastGauge(config, tokens)))
+    if (ui < 3)
+      problems.push(
+        `${theme} で操作の輪郭かフォーカスのコントラストが ${ui.toFixed(2)}:1 になります（3:1 未満）。`,
+      );
   for (const [theme, { min }] of Object.entries(contrastGauge(config, tokens)))
     if (min < 4.5)
       problems.push(

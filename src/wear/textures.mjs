@@ -5,6 +5,7 @@
 import { hash32, mulberry32, noise2, seedFor } from './seed.mjs';
 import { printMarks } from './marks.mjs';
 import { encodeIndexedPng } from './png.mjs';
+import { heldOutline, resolve, themeTokens } from './contrast.mjs';
 // Not params.mjs: the dev server's config loads this, and must not depend on wear.config.json.
 import { OUTLINE_CAPS, SHEET, SHEET_SLICE, TEXT_KINDS, THIN, TILE, VARIANTS } from './presets.mjs';
 
@@ -214,15 +215,20 @@ export function sheetVars(config) {
 }
 
 /**
- * Per-theme sheet values: the frame and scuff images, and the browned rim cards and metrics take
- * when yake.surfaces is above 0 (an inset shadow, so it keeps its width on any size of card).
+ * Per-theme sheet values: the frame and scuff images, the browned rim cards and metrics take
+ * when yake.surfaces is above 0 (an inset shadow, so it keeps its width on any size of card), and
+ * control outlines held at 3:1 on the worn paper.
  */
-export function sheetThemeVars(config, theme, urls) {
+export function sheetThemeVars(config, theme, urls, tokens) {
   const tone = config.tones[theme];
+  const set = themeTokens(tokens, theme);
+  const outline = heldOutline(config, set, theme);
   const alpha = config.yake.strength * tone.amount * config.yake.surfaces;
   const [r, g, b] = rgb(tone.yake);
   const blur = Math.round(config.yake.reach * 0.3);
   return {
+    // Control outlines darken with the paper just enough to keep 3:1 on it.
+    ...(outline !== resolve(set, 'border-strong') && { '--k-border-strong': outline }),
     '--k-wear-yake': urls.yake,
     '--k-wear-sure': urls.sure,
     '--k-wear-rim':

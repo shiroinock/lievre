@@ -468,8 +468,9 @@ function Gauges({ g }: { g: ReturnType<typeof gauges> }) {
       <div className="k-table-wrap">
         <table className="k-table">
           <caption className="k-label">
-            汚れ・ヤケ・スレが最も濃い点の上で、全ての文字色と、最も薄いカスレの文字が 4.5:1
-            に届くか（いちばん低くなる層を添えます）
+            汚れ・ヤケ・スレが最も濃い点の上で、全ての文字色（本文・補助・状態の色・リンク）と最も薄いカスレの文字が
+            4.5:1 に、フォーカスの枠と操作の輪郭が 3:1
+            に届くか（文字は、いちばん低くなる層を添えます）
           </caption>
           <thead>
             <tr>
@@ -484,8 +485,8 @@ function Gauges({ g }: { g: ReturnType<typeof gauges> }) {
             <tr>
               {Object.entries(g.contrast).map(([t, c]) => (
                 <td key={t}>
-                  <span className="k-mono">{c.min.toFixed(2)}:1</span>（{c.at}）{' '}
-                  <Level level={c.level} />
+                  文字 <span className="k-mono">{c.min.toFixed(2)}:1</span>（{c.at}）／ 輪郭{' '}
+                  <span className="k-mono">{c.ui.toFixed(2)}:1</span> <Level level={c.level} />
                 </td>
               ))}
             </tr>

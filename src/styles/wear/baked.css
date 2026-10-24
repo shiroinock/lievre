@@ -2,6 +2,7 @@
 @layer kei.components {
   .kei[data-wear='baked'][data-theme='paper'] {
     --k-wear-surface: url('./surface-paper.png');
+    --k-border-strong: #767c9e;
     --k-wear-yake: url('./yake-paper.png');
     --k-wear-sure: url('./sure-paper.png');
     --k-wear-rim: inset 0 0 48px 8px rgb(242 220 166 / 0.105);

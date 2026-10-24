@@ -60,7 +60,12 @@ export function liveWearStyle(prefix: string, config: WearConfig, theme: string)
     ...wearVars(config, `url(${urls.kasure})`),
     '--k-wear-surface': `url(${urls.surface})`,
     ...sheetVars(config),
-    ...sheetThemeVars(config, theme, { yake: `url(${urls.yake})`, sure: `url(${urls.sure})` }),
+    ...sheetThemeVars(
+      config,
+      theme,
+      { yake: `url(${urls.yake})`, sure: `url(${urls.sure})` },
+      tokens,
+    ),
   };
   for (const kind of kinds)
     if (config.kinds[kind].distort)

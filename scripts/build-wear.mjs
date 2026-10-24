@@ -91,10 +91,15 @@ export function buildWear(config, tokens) {
     css.push(
       block(`.kei[data-wear='baked'][data-theme='${theme}']`, {
         '--k-wear-surface': `url('./surface-${theme}.png')`,
-        ...sheetThemeVars(config, theme, {
-          yake: `url('./yake-${theme}.png')`,
-          sure: `url('./sure-${theme}.png')`,
-        }),
+        ...sheetThemeVars(
+          config,
+          theme,
+          {
+            yake: `url('./yake-${theme}.png')`,
+            sure: `url('./sure-${theme}.png')`,
+          },
+          tokens,
+        ),
       }),
     );
   css.push(

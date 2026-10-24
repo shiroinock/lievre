@@ -1,7 +1,18 @@
 // Readability gauges for a wear config, shown on the tuning page and checked for the presets.
 // They estimate from the same values the build uses; the font check (npm run wear:font) and the
 // contrast tests are the hard limits.
-import { mix, ratio, resolve, themeTokens } from './contrast.mjs';
+import {
+  heldOutline,
+  mix,
+  ratio,
+  resolve,
+  TEXT_COLOURS,
+  themeTokens,
+  UI_COLOURS,
+  wornBackgrounds,
+} from './contrast.mjs';
+
+export { wornBackgrounds };
 import { OUTLINE_CAPS, TEXT_KINDS, THIN } from './presets.mjs';
 import { kasureField, THEMES } from './textures.mjs';
 
@@ -10,6 +21,7 @@ export const GUIDES = {
   edge: [0.2, 0.3], // how far an edge is asked to move, as a share of the thinnest stroke
   thinned: [0.15, 0.3], // share of a glyph's pixels the dry brush thins
   contrast: 4.5, // the darkest point must still reach this
+  uiContrast: 3, // focus rings and control outlines
   smallSize: 14, // below this, any worn edge is a caution
 };
 const level = (value, [ok, warn]) => (value <= ok ? 'ok' : value <= warn ? 'caution' : 'warn');
@@ -62,22 +74,11 @@ export function kasureGauge(config, kind, field = kasureField(config.salt, confi
 }
 
 /**
- * The most worn backgrounds of a surface in a theme: stained at the darkest speckle, then browned
- * at the darkest corner of the yake, and that again with the most rubbed scuff on top. Text sits
- * on all three somewhere near an edge, so each must hold.
- */
-export function wornBackgrounds(config, set, theme, background) {
-  const tone = config.tones[theme];
-  const stained = mix(resolve(set, background), resolve(set, 'text'), config.stain.strength);
-  const browned = mix(stained, tone.yake, config.yake.strength * tone.amount);
-  const rubbed = mix(browned, tone.sure, config.sure.strength);
-  return [stained, browned, rubbed];
-}
-
-/**
- * Contrast at the darkest point, per theme: every text colour on the most worn surface (stain,
- * yake and scuffs at their strongest), and text-coloured glyphs at the faintest point of the
- * deepest dry brush on top of that. at says which layer was the worst.
+ * Contrast at the darkest point, per theme: every text colour (body, muted, status and link) on
+ * the most worn surface (stain, yake and scuffs at their strongest), and text-coloured glyphs at
+ * the faintest point of the deepest dry brush on top of that, against 4.5:1. at says which layer
+ * was the worst. ui is the same for the focus ring and control outlines against 3:1, with the
+ * outline as wear draws it (heldOutline).
  */
 export function contrastGauge(config, tokens) {
   const depth = Math.max(...Object.values(config.kinds).map((k) => k.kasure));
@@ -86,6 +87,7 @@ export function contrastGauge(config, tokens) {
     THEMES.map((theme) => {
       const set = themeTokens(tokens, theme);
       let min = Infinity;
+      let ui = Infinity;
       let at = '';
       const layers = ['汚れ', 'ヤケ', 'スレ'];
       for (const background of ['bg', 'surface'])
@@ -93,11 +95,16 @@ export function contrastGauge(config, tokens) {
           const check = (value) => {
             if (value < min) [min, at] = [value, layers[i]];
           };
-          for (const fg of ['text', 'muted', 'subtle', 'success', 'warning', 'danger', 'info'])
-            check(ratio(resolve(set, fg), worn));
+          for (const fg of TEXT_COLOURS) check(ratio(resolve(set, fg), worn));
           check(ratio(mix(worn, resolve(set, 'text'), faintest), worn));
+          for (const fg of UI_COLOURS) {
+            const colour =
+              fg === 'border-strong' ? heldOutline(config, set, theme) : resolve(set, fg);
+            ui = Math.min(ui, ratio(colour, worn));
+          }
         });
-      return [theme, { min, at, level: min >= GUIDES.contrast ? 'ok' : 'warn' }];
+      const fine = min >= GUIDES.contrast && ui >= GUIDES.uiContrast;
+      return [theme, { min, at, ui, level: fine ? 'ok' : 'warn' }];
     }),
   );
 }

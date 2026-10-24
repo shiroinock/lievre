@@ -14,6 +14,7 @@ export const GUIDES: {
   edge: [number, number];
   thinned: [number, number];
   contrast: number;
+  uiContrast: number;
   smallSize: number;
 };
 export const SAMPLES: { size: number; kind: WearKind; label: string }[];
@@ -22,7 +23,7 @@ export function kasureGauge(config: WearConfig, kind: WearKind, field?: Float32A
 export function contrastGauge(
   config: WearConfig,
   tokens: unknown,
-): Record<string, { min: number; at: string; level: GaugeLevel }>;
+): Record<string, { min: number; at: string; ui: number; level: GaugeLevel }>;
 export function gauges(
   config: WearConfig,
   tokens: unknown,
@@ -35,7 +36,7 @@ export function gauges(
     outline: OutlineGauge;
     kasure: KasureGauge;
   }[];
-  contrast: Record<string, { min: number; at: string; level: GaugeLevel }>;
+  contrast: Record<string, { min: number; at: string; ui: number; level: GaugeLevel }>;
   level: GaugeLevel;
 };
 export function wornBackgrounds(
