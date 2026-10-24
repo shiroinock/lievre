@@ -26,10 +26,10 @@ function ratio(a: string, b: string) {
 describe('Semantic color contrast and token synchronization', () => {
   it('keeps exchanged token values in sync with the CSS source', () => {
     for (const [name, token] of Object.entries(tokens.paper)) {
-      expect(css).toContain(`--k-${name}:${token.$value}`);
+      expect(css).toContain(`--k-${name}: ${token.$value}`);
     }
     for (const [name, token] of Object.entries(tokens.ink)) {
-      expect(css).toContain(`--k-${name}:${token.$value}`);
+      expect(css).toContain(`--k-${name}: ${token.$value}`);
     }
   });
   for (const theme of ['paper', 'ink'] as const) {
