@@ -22,29 +22,11 @@ body:has(.kei-app) {
   background: var(--demo-page-bg);
 }
 
-/* The sidebar is the app's frame, not content, so it alone is solid ultramarine; Ink calms it to a deep blue. */
+/* The sidebar is the app's frame: it takes the theme's frame tokens (ultramarine on Paper). */
 .kei-app {
-  --demo-page-bg: #f3f4f8;
-  --demo-blue: #2424d8;
-  --demo-blue-hover: #3535e4;
-  --demo-blue-inset: #1b1ba6;
-  --demo-blue-line: #5b5bea;
-  --demo-blue-text: #ffffff;
-  --demo-blue-muted: #d6d8ff;
-  --demo-blue-selected: #ffffff;
-  --demo-blue-on-selected: #1b1ba6;
+  --demo-page-bg: var(--k-bg);
   --demo-sidebar-width: 240px;
   min-height: 100vh;
-}
-.kei-app[data-theme='ink'] {
-  --demo-page-bg: #0b0d26;
-  --demo-blue: #191953;
-  --demo-blue-hover: #26266e;
-  --demo-blue-inset: #10103e;
-  --demo-blue-line: #3a3a80;
-  --demo-blue-muted: #c9cbf2;
-  --demo-blue-selected: #dce0ff;
-  --demo-blue-on-selected: #191953;
 }
 .kei-app :where(button, a) {
   -webkit-tap-highlight-color: transparent;
@@ -75,11 +57,11 @@ body:has(.kei-app) {
   width: var(--demo-sidebar-width);
   padding: 24px 16px 20px;
   overflow-y: auto;
-  background: var(--demo-blue);
-  color: var(--demo-blue-text);
+  background: var(--k-frame);
+  color: var(--k-on-frame);
 }
 .app-sidebar :where(button, a, select):focus-visible {
-  outline-color: var(--demo-blue-text);
+  outline-color: var(--k-on-frame);
 }
 .brand {
   display: flex;
@@ -107,7 +89,7 @@ body:has(.kei-app) {
   display: block;
   margin-top: 4px;
   font-size: var(--k-text-xs);
-  color: var(--demo-blue-muted);
+  color: var(--k-frame-muted);
 }
 .sidebar-close {
   display: none;
@@ -134,11 +116,11 @@ body:has(.kei-app) {
   text-align: left;
 }
 .main-nav button:hover {
-  background: var(--demo-blue-hover);
+  background: var(--k-frame-hover);
 }
 .main-nav button[aria-current='page'] {
-  background: var(--demo-blue-selected);
-  color: var(--demo-blue-on-selected);
+  background: var(--k-frame-selected);
+  color: var(--k-on-frame-selected);
   font-weight: var(--k-weight-bold);
 }
 
@@ -148,7 +130,7 @@ body:has(.kei-app) {
   gap: 12px;
   margin-top: 24px;
   padding: 16px 12px 0;
-  border-top: 1px solid var(--demo-blue-line);
+  border-top: 1px solid var(--k-frame-line);
   color: inherit;
   font-size: var(--k-text-md);
   text-decoration: none;
@@ -160,7 +142,7 @@ body:has(.kei-app) {
   display: block;
   margin-top: 4px;
   font-size: var(--k-text-xs);
-  color: var(--demo-blue-muted);
+  color: var(--k-frame-muted);
 }
 .sidebar-link:hover > span {
   text-decoration: underline;
@@ -177,7 +159,7 @@ body:has(.kei-app) {
   gap: 4px;
   padding: 4px;
   border-radius: var(--k-radius-md);
-  background: var(--demo-blue-inset);
+  background: var(--k-frame-inset);
 }
 .theme-segment button {
   display: flex;
@@ -189,12 +171,12 @@ body:has(.kei-app) {
   border: 0;
   border-radius: var(--k-radius-sm);
   background: none;
-  color: var(--demo-blue-muted);
+  color: var(--k-frame-muted);
   font-size: var(--k-text-sm);
 }
 .theme-segment button[aria-pressed='true'] {
-  background: var(--demo-blue-selected);
-  color: var(--demo-blue-on-selected);
+  background: var(--k-frame-selected);
+  color: var(--k-on-frame-selected);
   font-weight: var(--k-weight-bold);
 }
 .density-control {
@@ -209,14 +191,14 @@ body:has(.kei-app) {
   padding: 0 8px;
   border: 0;
   border-radius: var(--k-radius-sm);
-  background: var(--demo-blue-inset);
+  background: var(--k-frame-inset);
   color: inherit;
   font: inherit;
 }
 .sidebar-version {
   margin: 0;
   font-size: var(--k-text-xs);
-  color: var(--demo-blue-muted);
+  color: var(--k-frame-muted);
 }
 
 /* ------------------------------------------------------------ main column */
