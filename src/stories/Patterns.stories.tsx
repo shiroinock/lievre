@@ -62,6 +62,8 @@ export const CreateWork: Story = {
 export const NarrowReading: Story = {
   name: '320px · 文字間隔の拡大',
   parameters: {
+    layoutStress:
+      '行高 1.5 と文字間隔を上書きして、狭い幅で崩れないかを見る点検用。行の高さや操作の高さは上書きで格子から外れる。',
     docs: {
       description: {
         story:

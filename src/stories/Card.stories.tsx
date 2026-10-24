@@ -12,10 +12,11 @@ const meta = {
     layoutGate: {
       parts: [
         { name: 'カードの本文', selector: '.k-card-body', checks: ['padding-equal'] },
+        // The action sits on the centre of the heading block (eyebrow and title together).
         {
           name: 'カードの見出し',
           selector: '.k-card-header',
-          checks: [{ icon: ':scope > .k-button', text: ':scope > div' }],
+          checks: [{ icon: ':scope > .k-button', text: ':scope > div', block: true }],
         },
       ],
     } satisfies LayoutGate,
@@ -37,4 +38,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 export const WithAction: Story = { args: { action: <Button size="sm">詳細を開く</Button> } };
+export const WithActionTitleOnly: Story = {
+  args: { eyebrow: undefined, action: <Button size="sm">詳細を開く</Button> },
+};
 export const WithoutHeading: Story = { args: { title: undefined, eyebrow: undefined } };

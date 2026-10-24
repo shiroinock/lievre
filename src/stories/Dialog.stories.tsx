@@ -37,7 +37,7 @@ const meta = {
         {
           name: 'ダイアログの操作',
           selector: '.k-dialog-footer',
-          checks: ['padding-equal', { sameHeight: '.k-button' }],
+          checks: ['action-band', { sameHeight: '.k-button' }],
         },
       ],
     } satisfies LayoutGate,

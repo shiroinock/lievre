@@ -37,12 +37,17 @@ export type LayoutCheck =
   | 'line-grid'
   /** padding が上下左右で同じ（パネル）。 */
   | 'padding-equal'
+  /** 操作の帯（Dialog の下など）：上下の padding が bandY、左右は直前の区画（パネルの本文）と同じ。 */
+  | 'action-band'
   /** 中身が横にはみ出していない。はみ出しを切る要素（overflow が visible でない）では縦も見る。 */
   | 'fits'
   /** 左右の padding が高さの決まった割合（button 0.4、input 0.3 を 4px に丸めた値）。 */
   | { padding: 'button' | 'input' }
-  /** アイコン・箱の縦の中心が、隣の文字の1行目の行ボックスの中央にある。 */
-  | { icon: string; text?: string }
+  /**
+   * アイコン・箱の縦の中心が、隣の文字の1行目の行ボックスの中央にある。
+   * block を付けると、1行目ではなく text の箱（見出しのまとまり）の中央と比べる。
+   */
+  | { icon: string; text?: string; block?: true }
   /** 部品の中で selector に当たる要素の高さが揃っている。 */
   | { sameHeight: string }
   /** 描いた中身（svg の線や図形）が、箱の左右いっぱいに広がっている。 */
@@ -63,6 +68,8 @@ export const CRITERIA = {
   coarseControlHeight: 44,
   grid: 4,
   paddingRatio: { button: 0.4, input: 0.3 },
+  /** 操作の帯の上下の padding。 */
+  bandY: 16,
   /** 描いた中身と箱の左右の空き。線の太さの分だけ許す。 */
   fill: 2,
   /** 行の箱の高さと 4px の倍数の差。行の高さはレイアウトの値そのものなので小さく取る。 */
@@ -70,6 +77,18 @@ export const CRITERIA = {
   /** 同じ行の文字のベースラインの差。 */
   baseline: 0.5,
 } as const;
+
+/**
+ * 行高や文字間隔を利用者の設定のように上書きする点検用の Story（Story の `parameters.layoutStress`
+ * に理由を書く）では見ない検査。上書きした行高で格子や操作の高さから外れるのは意図どおりなので、
+ * はみ出しや並びの崩れだけを見る。
+ */
+export const STRESS_SKIPS: ReadonlySet<string> = new Set([
+  'line-grid',
+  'grid-height',
+  'control-height',
+  'inset-y',
+]);
 
 export const checkId = (check: LayoutCheck) =>
   typeof check === 'string'
@@ -89,6 +108,7 @@ export const CHECK_LABEL: Record<string, string> = {
   'grid-height': '高さの格子',
   'line-grid': '行の箱の格子',
   'padding-equal': 'パネルの内側の余白',
+  'action-band': '操作の帯の余白',
   fits: 'はみ出し',
   padding: '左右の内側の余白',
   icon: 'アイコンと文字の縦の中心',
