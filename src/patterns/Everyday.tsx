@@ -40,7 +40,6 @@ const guides = [
     title: '小さく始める、日々の記録',
     description: '気づきやアイデアを、あとから読み返せる形に。',
     time: '5分',
-    number: '01',
   },
   {
     id: 'space',
@@ -48,7 +47,6 @@ const guides = [
     title: '考えが進む作業場所のつくり方',
     description: '道具の選び方から、続けられる環境まで。',
     time: '8分',
-    number: '02',
   },
   {
     id: 'share',
@@ -56,7 +54,6 @@ const guides = [
     title: '伝わるノートのまとめ方',
     description: '自分の記録を、誰かが使える知識に変える。',
     time: '6分',
-    number: '03',
   },
 ];
 export function ResourceLibrary() {
@@ -81,7 +78,7 @@ export function ResourceLibrary() {
       <Stack gap={8} style={{ gap: 'var(--everyday-section-gap,32px)' }}>
         <Stack gap={3}>
           <Text size="small" tone="muted">
-            KEI JOURNAL / LIBRARY
+            読み物
           </Text>
           <Heading level={1} size="display">
             <TitleWords parts={['毎日に、', '使えるアイデア。']} />
@@ -118,7 +115,6 @@ export function ResourceLibrary() {
               <Card key={g.id}>
                 <Stack gap={4}>
                   <div className="everyday-art" aria-hidden>
-                    <span>{g.number}</span>
                     <i />
                     <i />
                     <i />
@@ -283,7 +279,7 @@ export function RegistrationExample() {
     <Container width="reading" className="everyday-page">
       <Stack gap={6}>
         <Text size="small" tone="muted">
-          KEI MEMBERS / DEMO
+          会員登録のサンプル
         </Text>
         <Heading ref={titleRef} tabIndex={-1} level={1} size="title">
           <TitleWords parts={['自分のペースで、', '始めよう。']} />

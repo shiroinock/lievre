@@ -41,19 +41,20 @@ export function ComponentGallery() {
   return (
     <div className="component-gallery">
       <div className="section-intro">
-        <span className="k-eyebrow">COMPONENTS / INTERACTIVE INDEX</span>
-        <h2>小さな部品から、使える画面へ。</h2>
-        <p>すべて操作できます。API・各状態・実装例はStorybookへ。</p>
+        <h2>部品の一覧</h2>
+        <p>
+          ここにある部品はすべて操作できます。props・状態の一覧・実装例は Storybook にあります。
+        </p>
       </div>
       <div className="gallery-grid">
-        <Card title="Typography & Layout" eyebrow="FOUNDATIONS">
+        <Card title="Heading・Text・Link">
           <Stack gap={4}>
             <Heading level={3}>日々の画面を、同じ言葉で。</Heading>
             <Text>本文・見出し・リンクと、余白を共有するレイアウト。</Text>
-            <Link href="#core-choice">基本の選択へ ↓</Link>
+            <Link href="#core-choice">RadioGroup へ移動</Link>
           </Stack>
         </Card>
-        <Card title="RadioGroup" eyebrow="CORE INPUT">
+        <Card title="RadioGroup">
           <div id="core-choice">
             <RadioGroup
               label="利用シーン"
@@ -65,7 +66,7 @@ export function ComponentGallery() {
             />
           </div>
         </Card>
-        <Card title="Button" eyebrow="01 / ACTION">
+        <Card title="Button">
           <div className="gallery-stack">
             <div className="button-row">
               <Button
@@ -98,7 +99,7 @@ export function ComponentGallery() {
             </div>
           </div>
         </Card>
-        <Card title="Badge & Avatar" eyebrow="02 / STATUS">
+        <Card title="Badge & Avatar">
           <div className="gallery-stack">
             <div className="button-row">
               <Badge tone="success" dot>
@@ -121,7 +122,7 @@ export function ComponentGallery() {
             </div>
           </div>
         </Card>
-        <Card title="TextField & Select" eyebrow="03 / INPUT">
+        <Card title="TextField & Select">
           <div className="gallery-stack">
             <TextField
               label="ワークスペース名"
@@ -139,7 +140,7 @@ export function ComponentGallery() {
             />
           </div>
         </Card>
-        <Card title="Validation & Textarea" eyebrow="04 / FEEDBACK">
+        <Card title="Validation & Textarea">
           <div className="gallery-stack">
             <TextField
               label="メールアドレス"
@@ -149,7 +150,7 @@ export function ComponentGallery() {
             <Textarea label="メモ" placeholder="作業の補足を入力" />
           </div>
         </Card>
-        <Card title="Checkbox & Switch" eyebrow="05 / SELECTION">
+        <Card title="Checkbox & Switch">
           <div className="gallery-stack">
             <Checkbox
               label="更新時に通知する"
@@ -165,10 +166,12 @@ export function ComponentGallery() {
               checked={enabled}
               onCheckedChange={setEnabled}
             />
-            <span className="k-mono k-muted">STATE / {enabled ? 'ENABLED' : 'DISABLED'}</span>
+            <span className="k-muted" aria-live="polite">
+              自動同期は{enabled ? 'オン' : 'オフ'}です
+            </span>
           </div>
         </Card>
-        <Card title="Dialog & Toast" eyebrow="06 / OVERLAY">
+        <Card title="Dialog & Toast">
           <div className="gallery-stack">
             <p className="k-muted">操作の区切りを明確にし、結果を短く伝えます。</p>
             <div className="button-row">
@@ -208,7 +211,7 @@ export function ComponentGallery() {
             </Tooltip>
           </div>
         </Card>
-        <Card title="Tabs & Breadcrumb" eyebrow="07 / NAVIGATION">
+        <Card title="Tabs & Breadcrumb">
           <div className="gallery-stack">
             <Breadcrumb
               items={[{ label: 'ワークスペース', href: '#' }, { label: '作業モニター' }]}
@@ -233,7 +236,7 @@ export function ComponentGallery() {
             <Pagination page={page} totalPages={5} onPageChange={setPage} />
           </div>
         </Card>
-        <Card title="Alert" eyebrow="08 / MESSAGE">
+        <Card title="Alert">
           <div className="gallery-stack">
             <Alert tone="warning" title="2件の確認が必要です">
               接続状態を確認してください。
@@ -243,7 +246,7 @@ export function ComponentGallery() {
             </Alert>
           </div>
         </Card>
-        <Card title="Meter & Progress" eyebrow="09 / MEASUREMENT">
+        <Card title="Meter & Progress">
           <div className="gallery-meters">
             <Meter value={68} label="リソース使用率" />
             <div className="gallery-stack">
@@ -253,7 +256,7 @@ export function ComponentGallery() {
             </div>
           </div>
         </Card>
-        <Card title="Metric & Sparkline" eyebrow="10 / DATA">
+        <Card title="Metric & Sparkline">
           <Metric
             label="処理の成功率"
             value="99.2"
@@ -263,7 +266,7 @@ export function ComponentGallery() {
             values={[3, 7, 5, 9, 8, 12, 11, 16, 15, 20]}
           />
         </Card>
-        <Card title="Skeleton" eyebrow="11 / LOADING">
+        <Card title="Skeleton">
           <div className="gallery-stack">
             <Skeleton width="40%" height={14} />
             <Skeleton height={20} />
@@ -272,7 +275,7 @@ export function ComponentGallery() {
             <span className="k-muted">レイアウトを保って、読み込みを待つ。</span>
           </div>
         </Card>
-        <Card title="EmptyState" eyebrow="12 / EMPTY">
+        <Card title="EmptyState">
           <EmptyState
             icon={<FolderOpen size={24} />}
             title="まだ作業がありません"

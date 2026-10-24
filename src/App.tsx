@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  ArrowUpRight,
   ArrowRight,
+  ArrowUpRight,
   BookOpen,
   Box,
   CircleDot,
-  Command,
   Layers3,
   LayoutDashboard,
   Menu,
@@ -16,31 +15,51 @@ import {
 } from 'lucide-react';
 import {
   Tabs,
-  Avatar,
   Badge,
   Button,
   Card,
-  Divider,
   KeiProvider,
-  Kbd,
   Meter,
+  Metric,
+  Progress,
   ToastProvider,
   type Theme,
   type Density,
 } from './index';
 import { ComponentGallery } from './docs/ComponentGallery';
-import { ColorFoundation, Foundations, ReferenceDirection } from './docs/Foundations';
+import { ColorFoundation, Foundations, ReferenceDirection, principles } from './docs/Foundations';
 import { OperationsExample, SettingsExample } from './patterns/Operations';
 import { ResourceLibrary, ArticleExample, RegistrationExample } from './patterns/Everyday';
 import './styles/demo.css';
 
+const version = '0.2.0';
 type Page = 'overview' | 'foundations' | 'components' | 'patterns' | 'references';
-const pages: { id: Page; label: string; code: string; icon: typeof Box }[] = [
-  { id: 'overview', label: 'はじめに', code: '00', icon: LayoutDashboard },
-  { id: 'foundations', label: 'デザインの基礎', code: '01', icon: Ruler },
-  { id: 'components', label: 'コンポーネント', code: '02', icon: Box },
-  { id: 'patterns', label: '画面パターン', code: '03', icon: Layers3 },
-  { id: 'references', label: '参考と方向性', code: '04', icon: CircleDot },
+const pages: { id: Page; label: string; lead: string; icon: typeof Box }[] = [
+  { id: 'overview', label: 'はじめに', lead: '', icon: LayoutDashboard },
+  {
+    id: 'foundations',
+    label: 'デザインの基礎',
+    lead: '設計原則と、色・文字・余白のトークン。部品はすべてこの値から組み立てています。',
+    icon: Ruler,
+  },
+  {
+    id: 'components',
+    label: 'コンポーネント',
+    lead: '入力・選択・通知・データ表示の部品。ここでは主な状態を操作して確かめられます。',
+    icon: Box,
+  },
+  {
+    id: 'patterns',
+    label: '画面パターン',
+    lead: '探す・読む・申し込む・管理する。部品を組み合わせた画面の例です。',
+    icon: Layers3,
+  },
+  {
+    id: 'references',
+    label: '参考と方向性',
+    lead: '81枚の参考画像から、何を取り入れ、何を取り入れなかったか。',
+    icon: CircleDot,
+  },
 ];
 export const storybookUrl = import.meta.env.DEV ? 'http://127.0.0.1:6006/' : './storybook/';
 function Mark() {
@@ -48,48 +67,35 @@ function Mark() {
     <svg viewBox="0 0 28 28" fill="none" aria-hidden>
       <path d="M4 4H11V11H4ZM17 4H24V11H17ZM4 17H11V24H4Z" fill="currentColor" />
       <path d="M17 17H24V24H17Z" stroke="currentColor" strokeWidth="2" />
-      <path d="M20.5 14V27M14 20.5H27" stroke="currentColor" strokeWidth="1" />
     </svg>
   );
 }
-function InstrumentArt() {
+/** The overview's sample panel: real components on the ultramarine instrument face. */
+function InstrumentPanel() {
   return (
-    <div className="instrument-art" aria-label="KEIの計器表現のサンプル">
-      <div className="instrument-top">
-        <span>KEI / CONTROL UNIT</span>
-        <span>TYPE–01</span>
+    <section className="instrument-panel" aria-label="計器表示のサンプル">
+      <header>
+        <h2>計測ラボ</h2>
+        <Badge tone="success" dot>
+          稼働中
+        </Badge>
+      </header>
+      <div className="instrument-panel-body">
+        <Meter value={68} label="リソース使用率" />
+        <Metric
+          label="処理の成功率"
+          value="99.2"
+          unit="%"
+          change="前週比 +0.8%"
+          trend="up"
+          values={[80, 83, 82, 85, 83, 88, 86, 91, 90, 95, 94, 99]}
+        />
       </div>
-      <div className="instrument-inner">
-        <div className="instrument-gauge">
-          <Meter value={68} label="SYSTEM CAPACITY" />
-        </div>
-        <div className="instrument-readout">
-          <span className="k-eyebrow">DESIGN OUTPUT</span>
-          <strong className="k-mono">
-            01<span>.00</span>
-          </strong>
-          <span className="readout-caption">CALIBRATED FOR EVERYDAY WORK</span>
-          <div className="signal-bars" aria-hidden>
-            {[15, 30, 24, 40, 31, 47, 39, 58, 49, 69, 57, 78, 65, 88, 75, 96, 82, 100].map(
-              (h, i) => (
-                <i key={i} style={{ height: h + '%' }} />
-              ),
-            )}
-          </div>
-          <div className="readout-footer">
-            <span>MIN. 0</span>
-            <span>MAX. 100</span>
-          </div>
-        </div>
+      <div className="instrument-panel-bars">
+        <Progress value={42} label="CPU" />
+        <Progress value={31} label="ストレージ" />
       </div>
-      <div className="instrument-bottom">
-        <span>
-          <i /> READY TO BUILD
-        </span>
-        <span>35° 40′ / 139° 45′</span>
-        <span className="instrument-screw">⊕</span>
-      </div>
-    </div>
+    </section>
   );
 }
 
@@ -171,21 +177,16 @@ export default function App() {
               <Mark />
             </span>
             <div>
-              <strong>
-                KEI<span>/ 計</span>
-              </strong>
-              <small>DESIGN SYSTEM</small>
+              <strong>KEI</strong>
+              <small>デザインシステム</small>
             </div>
             <button
               className="sidebar-close k-icon-button"
               aria-label="メニューを閉じる"
               onClick={() => setNavOpen(false)}
             >
-              <X size={17} />
+              <X size={18} />
             </button>
-          </div>
-          <div className="sidebar-caption">
-            WORKBENCH <span>V.0.1</span>
           </div>
           <nav aria-label="メインナビゲーション" className="main-nav">
             {pages.map((p) => (
@@ -194,29 +195,27 @@ export default function App() {
                 onClick={() => go(p.id)}
                 aria-current={page === p.id ? 'page' : undefined}
               >
-                <p.icon size={15} />
+                <p.icon size={16} aria-hidden />
                 <span>{p.label}</span>
-                <small>{p.code}</small>
               </button>
             ))}
           </nav>
-          <div className="sidebar-link">
-            <a href={storybookUrl} target="_blank" rel="noreferrer">
-              <BookOpen size={15} />
-              <span>Storybook</span>
-              <ArrowUpRight size={13} />
-            </a>
-            <span>API · States · Accessibility</span>
-          </div>
+          <a className="sidebar-link" href={storybookUrl} target="_blank" rel="noreferrer">
+            <BookOpen size={16} aria-hidden />
+            <span>
+              Storybook
+              <small>props・状態・アクセシビリティ</small>
+            </span>
+            <ArrowUpRight size={14} aria-hidden />
+          </a>
           <div className="sidebar-bottom">
-            <div className="sidebar-theme-label">APPEARANCE</div>
             <div className="theme-segment" role="group" aria-label="配色">
               <button aria-pressed={theme === 'paper'} onClick={() => setTheme('paper')}>
-                <Sun size={13} />
+                <Sun size={14} aria-hidden />
                 Paper
               </button>
               <button aria-pressed={theme === 'ink'} onClick={() => setTheme('ink')}>
-                <Moon size={13} />
+                <Moon size={14} aria-hidden />
                 Ink
               </button>
             </div>
@@ -231,12 +230,7 @@ export default function App() {
                 <option value="compact">高密度</option>
               </select>
             </div>
-            <div className="sidebar-version">
-              <span className="sidebar-ready">
-                <i /> FIRST EDITION
-              </span>
-              <span>2026.10</span>
-            </div>
+            <p className="sidebar-version">v{version}</p>
           </div>
         </aside>
         {navOpen && (
@@ -248,134 +242,106 @@ export default function App() {
         )}
         <div className="app-main">
           <header className="app-topbar">
-            <div className="topbar-left">
-              <button
-                ref={menuRef}
-                aria-controls="app-navigation"
-                className="mobile-menu k-icon-button"
-                onClick={() => setNavOpen(true)}
-                aria-label="メニューを開く"
-                aria-expanded={navOpen}
-              >
-                <Menu size={18} />
-              </button>
-              <span className="topbar-label">DESIGN SYSTEM</span>
-              <span className="topbar-slash">/</span>
-              <span>{active.label}</span>
-            </div>
-            <div className="topbar-right">
-              <span className="topbar-edition">FIRST PROPOSAL</span>
-              <Badge>v0.1.0</Badge>
-              <Avatar name="計" size="sm" />
-            </div>
+            <button
+              ref={menuRef}
+              aria-controls="app-navigation"
+              className="mobile-menu k-icon-button"
+              onClick={() => setNavOpen(true)}
+              aria-label="メニューを開く"
+              aria-expanded={navOpen}
+            >
+              <Menu size={18} />
+            </button>
+            <span className="topbar-title">{active.label}</span>
           </header>
           <main id="main" className="app-content" tabIndex={-1}>
             {page === 'overview' ? (
               <>
                 <section className="overview-hero">
                   <div className="hero-copy">
-                    <div className="hero-eyebrow">
-                      <span className="hero-cross">＋</span> A SYSTEM FOR EVERYDAY WORK
-                    </div>
-                    <h1>
-                      読む。測る。
-                      <br />
-                      手を動かす<span className="hero-period">。</span>
-                    </h1>
+                    <h1>業務の画面を、読みやすく組み立てる。</h1>
                     <p>
-                      読む・探す・つくる・つながる。
-                      <br />
-                      さまざまな画面を、同じ言葉で組み立てる。
+                      KEI は、日本語の画面を基準に設計した React のコンポーネントと CSS
+                      トークンです。操作の色はウルトラマリン一色。影を使わず、面の明るさと1pxの線で階層をつくります。
                     </p>
                     <div className="button-row">
                       <Button
                         variant="primary"
-                        icon={<ArrowRight size={15} />}
+                        icon={<ArrowRight size={16} />}
                         onClick={() => go('components')}
                       >
-                        部品を見てみる
+                        部品を見る
                       </Button>
-                      <a
-                        className="hero-storybook"
-                        href={storybookUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Storybookを開く <ArrowUpRight size={14} />
-                      </a>
+                      <Button variant="ghost" onClick={() => go('foundations')}>
+                        デザインの基礎
+                      </Button>
                     </div>
-                    <div className="hero-footnote">
-                      <span>JAPANESE FIRST</span>
-                      <span>REACT + CSS TOKENS</span>
-                      <span>81 REFERENCES</span>
-                    </div>
+                    <dl className="hero-facts">
+                      <div>
+                        <dt>本文</dt>
+                        <dd>16px／操作画面は14px</dd>
+                      </div>
+                      <div>
+                        <dt>テーマ</dt>
+                        <dd>Paper と Ink</dd>
+                      </div>
+                      <div>
+                        <dt>コントラスト</dt>
+                        <dd>すべての組み合わせをテストで検査</dd>
+                      </div>
+                    </dl>
                   </div>
-                  <InstrumentArt />
+                  <InstrumentPanel />
                 </section>
-                <div className="overview-strip">
-                  <div>
-                    <span className="strip-number">01</span>
-                    <span>比較できる数値</span>
+                <section className="overview-section" aria-labelledby="principles-title">
+                  <h2 id="principles-title">4つの約束</h2>
+                  <div className="principle-row">
+                    {principles.map((p) => (
+                      <div key={p.title}>
+                        <h3>{p.title}</h3>
+                        <p>{p.text}</p>
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <span className="strip-number">02</span>
-                    <span>意味のある色</span>
-                  </div>
-                  <div>
-                    <span className="strip-number">03</span>
-                    <span>面と線の階層</span>
-                  </div>
-                  <div>
-                    <span className="strip-number">04</span>
-                    <span>読める情報密度</span>
-                  </div>
-                </div>
-                <section className="live-section">
-                  <div className="section-ruler">
-                    <span>01 / IN PRACTICE</span>
-                    <div />
-                    <span>実際の画面で確かめる</span>
-                  </div>
-                  <ResourceLibrary />
                 </section>
-                <section className="overview-foundations">
-                  <div className="section-ruler">
-                    <span>02 / FOUNDATIONS</span>
-                    <div />
-                    <button onClick={() => go('foundations')}>
-                      すべて見る <ArrowRight size={12} />
+                <section className="overview-section" aria-labelledby="practice-title">
+                  <div className="overview-section-head">
+                    <h2 id="practice-title">画面の例：読み物を探す</h2>
+                    <button className="section-more" onClick={() => go('patterns')}>
+                      ほかの画面例 <ArrowRight size={14} aria-hidden />
                     </button>
                   </div>
-                  <ColorFoundation />
+                  <div className="overview-stage">
+                    <ResourceLibrary />
+                  </div>
                 </section>
-                <div className="starter-block">
+                <section className="overview-section">
+                  <ColorFoundation />
+                  <button className="section-more" onClick={() => go('foundations')}>
+                    文字と余白も見る <ArrowRight size={14} aria-hidden />
+                  </button>
+                </section>
+                <section className="starter-block" aria-labelledby="start-title">
                   <div>
-                    <div className="k-eyebrow">QUICK START / REACT</div>
-                    <h2>次の画面から、すぐに。</h2>
-                    <p>テーマとトークンを読み込み、部品を配置する。</p>
+                    <h2 id="start-title">使い始める</h2>
+                    <p>
+                      アプリのルートを <code>KeiProvider</code>{' '}
+                      で包み、スタイルシートを1つ読み込みます。
+                    </p>
                   </div>
                   <pre>
                     <code>{`import { KeiProvider, Button } from '@kei-design/react';\nimport '@kei-design/react/styles.css';\n\n<KeiProvider theme="paper">\n  <Button variant="primary">作業を追加</Button>\n</KeiProvider>`}</code>
                   </pre>
-                </div>
+                </section>
               </>
             ) : (
               <>
                 <div className="page-heading">
-                  <div className="k-eyebrow">KEI / {active.code}</div>
                   <h1>{active.label}</h1>
-                  <p>
-                    {page === 'foundations'
-                      ? '色・文字・余白・状態。画面を支える共通言語。'
-                      : page === 'components'
-                        ? '使い方と状態が揃った、日常の操作部品。'
-                        : page === 'patterns'
-                          ? '読む・探す・申し込む・管理する。共通の部品から組み立てる画面。'
-                          : '81件の参考を、独自の設計ルールへ。'}
-                  </p>
+                  <p>{active.lead}</p>
                   {page === 'components' && (
                     <a className="inline-link" href={storybookUrl} target="_blank" rel="noreferrer">
-                      Storybookで全状態とAPIを見る <ArrowUpRight size={14} />
+                      Storybook ですべての状態と props を見る <ArrowUpRight size={14} />
                     </a>
                   )}
                 </div>
@@ -419,12 +385,8 @@ export default function App() {
                         content: (
                           <>
                             <OperationsExample />
-                            <section className="settings-pattern">
-                              <div className="section-ruler">
-                                <span>02 / SETTINGS</span>
-                                <div />
-                                <span>入力と保存</span>
-                              </div>
+                            <section className="settings-pattern" aria-labelledby="settings-title">
+                              <h2 id="settings-title">設定の入力と保存</h2>
                               <SettingsExample />
                             </section>
                           </>
@@ -437,10 +399,8 @@ export default function App() {
               </>
             )}
             <footer className="app-footer">
-              <span>
-                <strong>KEI / 計</strong> — Form follows work.
-              </span>
-              <span>FIRST PROPOSAL · v0.1.0</span>
+              <span>KEI v{version}</span>
+              <span>画面例のデータはサンプルです。再読み込みで元に戻ります。</span>
             </footer>
           </main>
         </div>

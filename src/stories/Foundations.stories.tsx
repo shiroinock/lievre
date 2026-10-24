@@ -21,13 +21,13 @@ const meta = {
 } satisfies Meta;
 export default meta;
 type Story = StoryObj<typeof meta>;
-export const Principles: Story = { name: '00 · 設計原則', render: () => <PrincipleFoundation /> };
-export const Color: Story = { name: '01 · 配色', render: () => <ColorFoundation /> };
-export const Typography: Story = { name: '02 · 文字', render: () => <TypeFoundation /> };
-export const Spacing: Story = { name: '03 · 余白と形', render: () => <SpaceFoundation /> };
-export const References: Story = { name: '04 · 参考の翻訳', render: () => <ReferenceDirection /> };
+export const Principles: Story = { name: '設計原則', render: () => <PrincipleFoundation /> };
+export const Color: Story = { name: '配色', render: () => <ColorFoundation /> };
+export const Typography: Story = { name: '文字', render: () => <TypeFoundation /> };
+export const Spacing: Story = { name: '余白と形', render: () => <SpaceFoundation /> };
+export const References: Story = { name: '参考の翻訳', render: () => <ReferenceDirection /> };
 export const ThemeComparison: Story = {
-  name: '05 · Paper / Ink',
+  name: 'Paper と Ink',
   render: () => (
     <div
       style={{
@@ -39,7 +39,9 @@ export const ThemeComparison: Story = {
       {(['paper', 'ink'] as const).map((theme) => (
         <KeiProvider key={theme} theme={theme} style={{ padding: 24, borderRadius: 8 }}>
           <div className="gallery-stack">
-            <span className="k-eyebrow">{theme.toUpperCase()}</span>
+            <span className="k-eyebrow">
+              {theme === 'paper' ? 'Paper（明るい面）' : 'Ink（暗い面）'}
+            </span>
             <TextField label="ワークスペース名" defaultValue="計測ラボ" />
             <div className="button-row">
               <Button variant="primary">保存する</Button>
@@ -55,7 +57,7 @@ export const ThemeComparison: Story = {
 };
 
 export const DensityComparison: Story = {
-  name: '06 · 読みやすさと密度',
+  name: '読みやすさと密度',
   render: () => (
     <div
       style={{
@@ -66,10 +68,7 @@ export const DensityComparison: Story = {
     >
       {(['comfortable', 'compact'] as const).map((density) => (
         <KeiProvider key={density} density={density} className="density-comparison">
-          <Card
-            title={density === 'comfortable' ? '標準' : '高密度'}
-            eyebrow="14px BODY / 12px CAPTION"
-          >
+          <Card title={density === 'comfortable' ? '標準' : '高密度'} eyebrow="本文16px・補助12px">
             <div className="gallery-stack">
               <TextField
                 label="ワークスペース名"

@@ -1,6 +1,6 @@
 {
   "name": "@kei-design/react",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "KEI — Japanese-first instrument-inspired design system",
   "type": "module",
   "private": true,

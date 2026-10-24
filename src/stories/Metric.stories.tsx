@@ -20,7 +20,6 @@ const meta = {
     value: '99.2',
     unit: '%',
     change: '通常稼働',
-    code: 'SYS.02',
     values: [12, 16, 14, 22, 20, 26, 24, 32, 30, 38],
   },
 } satisfies Meta<typeof Metric>;

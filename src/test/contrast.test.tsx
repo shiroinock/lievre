@@ -71,9 +71,7 @@ describe('Semantic color contrast and token synchronization', () => {
       expect(ratio(resolve(set, 'text'), resolve(set, 'selected'))).toBeGreaterThanOrEqual(4.5);
     });
     it(`${theme}: selected menu text reaches 4.5:1`, () => {
-      expect(ratio(resolve(set, 'accent'), resolve(set, 'selected'))).toBeGreaterThanOrEqual(
-        4.5,
-      );
+      expect(ratio(resolve(set, 'accent'), resolve(set, 'selected'))).toBeGreaterThanOrEqual(4.5);
     });
     it(`${theme}: OFF switch thumb reaches 3:1`, () => {
       expect(
@@ -96,9 +94,7 @@ describe('Semantic color contrast and token synchronization', () => {
       expect(ratio(resolve(set, 'on-danger'), resolve(set, 'danger'))).toBeGreaterThanOrEqual(4.5);
     });
     it(`${theme}: enabled switch thumb reaches 3:1`, () => {
-      expect(ratio(resolve(set, 'on-accent'), resolve(set, 'accent'))).toBeGreaterThanOrEqual(
-        3,
-      );
+      expect(ratio(resolve(set, 'on-accent'), resolve(set, 'accent'))).toBeGreaterThanOrEqual(3);
     });
     it(`${theme}: primary action text reaches 4.5:1`, () => {
       expect(ratio(resolve(set, 'on-accent'), resolve(set, 'accent'))).toBeGreaterThanOrEqual(4.5);

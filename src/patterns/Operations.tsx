@@ -1,5 +1,5 @@
 import { useId, useMemo, useState } from 'react';
-import { Plus, Download, Search, SlidersHorizontal, ArrowUpRight, Activity } from 'lucide-react';
+import { Plus, Download, Search, SlidersHorizontal, ChevronRight } from 'lucide-react';
 import {
   KeiProvider,
   Badge,
@@ -219,7 +219,7 @@ function WorkDetails({ item }: { item: WorkItem }) {
           size="sm"
           variant="ghost"
           aria-label={`${item.id} の詳細を開く`}
-          icon={<ArrowUpRight size={14} />}
+          icon={<ChevronRight size={14} />}
         >
           詳細
         </Button>
@@ -233,32 +233,32 @@ function WorkDetails({ item }: { item: WorkItem }) {
       }
     >
       <div className="k-form-stack">
-        <div className="work-detail-grid">
+        <dl className="work-detail-grid">
           <div>
-            <span className="k-eyebrow">STATUS</span>
-            <p>
+            <dt>状態</dt>
+            <dd>
               <WorkBadge status={item.status} />
-            </p>
+            </dd>
           </div>
           <div>
-            <span className="k-eyebrow">OWNER</span>
-            <p>{item.owner}</p>
+            <dt>担当</dt>
+            <dd>{item.owner}</dd>
           </div>
           <div>
-            <span className="k-eyebrow">PRIORITY</span>
-            <p>{priorityNames[item.priority]}</p>
+            <dt>優先度</dt>
+            <dd>{priorityNames[item.priority]}</dd>
           </div>
           <div>
-            <span className="k-eyebrow">UPDATED</span>
-            <p className="k-mono">{item.updated}</p>
+            <dt>最終更新</dt>
+            <dd className="k-tabular">{item.updated}</dd>
           </div>
-        </div>
-        {item.notes && (
-          <div>
-            <span className="k-eyebrow">NOTES</span>
-            <p style={{ whiteSpace: 'pre-wrap' }}>{item.notes}</p>
-          </div>
-        )}
+          {item.notes && (
+            <div className="work-detail-notes">
+              <dt>メモ</dt>
+              <dd>{item.notes}</dd>
+            </div>
+          )}
+        </dl>
         <Progress
           value={item.status === '稼働中' ? 68 : item.status === '待機中' ? 0 : 32}
           label="処理の進捗（サンプル）"
@@ -341,7 +341,7 @@ function OperationsContent({ compact }: { compact: boolean }) {
         key: 'updated',
         header: '更新',
         sortValue: (r) => r.updated,
-        render: (r) => <span className="k-mono k-muted">{r.updated}</span>,
+        render: (r) => <span className="k-tabular k-muted">{r.updated}</span>,
       },
       { key: 'actions', header: '詳細', render: (r) => <WorkDetails item={r} /> },
     ],
@@ -384,9 +384,8 @@ function OperationsContent({ compact }: { compact: boolean }) {
     <div className="operations-example">
       <div className="operations-heading">
         <div>
-          <div className="k-eyebrow">WORKSPACE / OPERATIONS</div>
           <h2>
-            作業モニター<span className="sample-label">DEMO</span>
+            作業モニター<Badge>サンプル</Badge>
           </h2>
           <p>いま動いている作業と、次に必要なアクション。</p>
         </div>
@@ -406,16 +405,14 @@ function OperationsContent({ compact }: { compact: boolean }) {
       </div>
       <div className="metrics-grid">
         <Metric
-          code="SYS.01"
           label="稼働中の作業"
-          value={String(rows.filter((r) => r.status === '稼働中').length).padStart(2, '0')}
+          value={String(rows.filter((r) => r.status === '稼働中').length)}
           unit="件"
           change="通常稼働"
           trend="up"
           values={[14, 18, 17, 24, 20, 28, 26, 35, 31, 42, 38, 46]}
         />
         <Metric
-          code="SYS.02"
           label="処理の成功率"
           value="99.2"
           unit="%"
@@ -424,7 +421,6 @@ function OperationsContent({ compact }: { compact: boolean }) {
           values={[80, 83, 82, 85, 83, 88, 86, 91, 90, 95, 94, 99]}
         />
         <Metric
-          code="SYS.03"
           label="平均処理時間"
           value="1.84"
           unit="秒"
@@ -432,9 +428,8 @@ function OperationsContent({ compact }: { compact: boolean }) {
           values={[38, 32, 34, 25, 28, 20, 23, 19, 21, 14, 16, 12]}
         />
         <Metric
-          code="SYS.04"
           label="確認が必要"
-          value={String(rows.filter((r) => r.status === '要確認').length).padStart(2, '0')}
+          value={String(rows.filter((r) => r.status === '要確認').length)}
           unit="件"
           change="接続と更新を確認"
           values={[0, 0, 0, 1, 1, 0, 1, 1, 2, 2, 2, 2]}
@@ -443,9 +438,8 @@ function OperationsContent({ compact }: { compact: boolean }) {
       <section className="queue-panel">
         <div className="queue-title">
           <div>
-            <span className="k-eyebrow">ACTIVE QUEUE</span>
             <h3>
-              作業キュー <span className="k-mono">{String(rows.length).padStart(2, '0')}</span>
+              作業キュー <span className="queue-count">{rows.length}件</span>
             </h3>
           </div>
           <Badge dot tone="success">
@@ -517,18 +511,18 @@ function OperationsContent({ compact }: { compact: boolean }) {
       </section>
       {!compact && (
         <div className="operations-lower">
-          <Card title="システムの負荷" eyebrow="CAPACITY / 24H" action={<Badge>サンプル</Badge>}>
+          <Card title="システムの負荷" action={<Badge>過去24時間</Badge>}>
             <div className="capacity-content">
               <Meter value={68} label="リソース使用率" />
               <div className="capacity-bars">
                 <Progress value={42} label="CPU" />
                 <Progress value={68} label="メモリ" />
                 <Progress value={31} label="ストレージ" />
-                <span className="k-eyebrow">OPTIMAL RANGE / 0–80%</span>
+                <p className="capacity-note">80%を超えたら増設を検討します。</p>
               </div>
             </div>
           </Card>
-          <Card title="最近のアクティビティ" eyebrow="ACTIVITY LOG">
+          <Card title="最近のアクティビティ">
             <ul className="activity-list">
               {[
                 { time: '14:32', label: 'センサーログの同期を開始', id: 'KEI-024' },
@@ -538,7 +532,7 @@ function OperationsContent({ compact }: { compact: boolean }) {
               ].map((a, i) => (
                 <li key={a.id}>
                   <span className="activity-dot" data-warning={i === 2} />
-                  <time className="k-mono">{a.time}</time>
+                  <time className="k-tabular">{a.time}</time>
                   <div>
                     {a.label}
                     <small className="k-mono">{a.id}</small>
@@ -557,7 +551,7 @@ export function SettingsExample() {
   const toast = useToast();
   const [saved, setSaved] = useState(false);
   return (
-    <Card title="ワークスペース設定" eyebrow="WORKSPACE / SETTINGS">
+    <Card title="ワークスペース設定">
       <form
         className="k-form-stack"
         onSubmit={(e) => {

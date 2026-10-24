@@ -17,7 +17,7 @@ const meta = {
   },
   args: {
     title: '稼働状況',
-    eyebrow: 'SYSTEM / STATUS',
+    eyebrow: '計測ラボ',
     children: <p>関連する情報を1つの領域にまとめます。</p>,
   },
 } satisfies Meta<typeof Card>;
