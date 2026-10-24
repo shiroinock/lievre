@@ -8,9 +8,13 @@ import {
   AGE_STATES,
   ageContrast,
   ageInkVars,
-  fadedInks,
+  agedTokens,
+  FADE_GROUPS,
   FADED,
   mottleLimit,
+  RULE_PERIOD,
+  ruleStops,
+  STATE_INKS,
   type Age,
 } from '../wear/age.mjs';
 import { deltaE, fade, hexToOklch } from '../wear/oklch.mjs';
@@ -31,7 +35,8 @@ const levels: Age[] = ['light', 'heavy'];
 describe('Age: faded inks keep WCAG AA', () => {
   it('keeps every faded pairing at 4.5:1 and the focus ring at 3:1, for every preset and the loudest values', () => {
     for (const config of [...presets, loudest])
-      for (const [theme, { text, ui }] of Object.entries(ageContrast(config, tokens))) {
+      for (const [theme, { text, ui, failed }] of Object.entries(ageContrast(config, tokens))) {
+        expect(failed, `${config.preset} ${theme}`).toEqual([]);
         expect(text, `${config.preset} ${theme}`).toBeGreaterThanOrEqual(4.5);
         expect(ui, `${config.preset} ${theme}`).toBeGreaterThanOrEqual(3);
       }
@@ -39,10 +44,12 @@ describe('Age: faded inks keep WCAG AA', () => {
 
   it('fades as far as asked where contrast allows, and stops short where it would not', () => {
     for (const theme of THEMES) {
-      const inks = fadedInks(loudest, tokens, theme, 'heavy');
-      for (const name of FADED) {
-        expect(inks[name].amount).toBeLessThanOrEqual(inks[name].asked);
-        // Fading loses chroma at the same lightness: it is never more colourful than fresh.
+      const { amount, asked, colours: inks } = agedTokens(loudest, tokens, theme, 'heavy');
+      expect(amount).toBeGreaterThan(0);
+      expect(amount).toBeLessThanOrEqual(asked);
+      for (const name of FADED.filter((n) => !FADE_GROUPS.neutrals.names.includes(n))) {
+        // Fading loses chroma at the same lightness: a coloured token is never more colourful
+        // than fresh. (Greys and the paper gain a trace of the old-paper yellow instead.)
         expect(hexToOklch(inks[name].aged)[1]).toBeLessThanOrEqual(
           hexToOklch(inks[name].fresh)[1] + 0.002,
         );
@@ -56,6 +63,30 @@ describe('Age: faded inks keep WCAG AA', () => {
     expect(hue).toBeLessThan(275);
   });
 
+  it('fades every colour token a part can read, so nothing stays fresh beside faded parts', () => {
+    const colours = new Set(
+      THEMES.flatMap((theme) => {
+        const set = themeTokens(tokens, theme);
+        return Object.keys(set).filter((name) => {
+          try {
+            return /^#[0-9a-f]{6,8}$/i.test(resolve(set, name));
+          } catch {
+            return false;
+          }
+        });
+      }),
+    );
+    // The overlay is translucent and darkens whatever it covers; focus follows the fresh accent.
+    const kept = new Set(['overlay', 'focus']);
+    expect([...colours].filter((name) => !kept.has(name) && !FADED.includes(name))).toEqual([]);
+    for (const theme of THEMES) {
+      const { set } = agedTokens(readConfig(), tokens, theme, 'heavy');
+      const fresh = themeTokens(tokens, theme);
+      for (const name of FADE_GROUPS.tints.names)
+        expect(resolve(set, name), `${theme} ${name}`).not.toBe(resolve(fresh, name));
+    }
+  });
+
   it('caps the mottle where the text on a filled control would drop below 4.5:1', () => {
     for (const theme of THEMES)
       for (const level of levels) {
@@ -63,6 +94,39 @@ describe('Age: faded inks keep WCAG AA', () => {
         expect(limit).toBeGreaterThan(0);
         expect(limit).toBeLessThanOrEqual(loudest.age.mottle);
       }
+  });
+});
+
+describe('Age: worn rules', () => {
+  const read = (stops: string) =>
+    stops.split(', ').map((stop) => {
+      const [opacity, at] = stop.split(' ');
+      return [Number(opacity), parseFloat(at)];
+    });
+
+  it('mostly thins and thickens, breaks rarely, and never repeats a dash', () => {
+    for (let seed = 1; seed <= 20; seed++) {
+      const stops = read(ruleStops(seed, 0.6, (o: number) => o.toFixed(2))!);
+      const inked = stops.filter(([o]) => o > 0).map(([o]) => o);
+      // The ink varies along the line, and is never thinner than 1 - 0.75 × the amount.
+      expect(Math.max(...inked) - Math.min(...inked)).toBeGreaterThan(0.15);
+      expect(Math.min(...inked)).toBeGreaterThanOrEqual(1 - 0.75 * 0.6 - 1e-9);
+      // A break is two stops at 0; there are few of them over the whole period, and of 1–3px.
+      const breaks = stops.filter(([o], i) => o === 0 && stops[i + 1]?.[0] === 0);
+      expect(breaks.length).toBeLessThanOrEqual(6);
+      // The stops are irregularly spaced: no single step makes up most of the line.
+      const steps = stops
+        .slice(1)
+        .map(([, at], i) => at - stops[i][1])
+        .filter((d) => d > 3);
+      const counts = steps.reduce(
+        (m, d) => m.set(d, (m.get(d) ?? 0) + 1),
+        new Map<number, number>(),
+      );
+      expect(Math.max(...counts.values())).toBeLessThan(steps.length / 5);
+      expect(stops.at(-1)![1]).toBe(RULE_PERIOD);
+    }
+    expect(ruleStops(1, 0, String)).toBeNull();
   });
 });
 
@@ -75,10 +139,15 @@ describe('Age: states stay fresh', () => {
         const vars = ageInkVars(readConfig(), tokens, theme, level, (n: string) => n);
         const set = themeTokens(tokens, theme);
         expect(vars['--k-focus']).toBe(resolve(set, 'accent'));
-        for (const name of FADED) expect(vars[`--k-age-fresh-${name}`]).toBe(resolve(set, name));
+        for (const name of STATE_INKS)
+          expect(vars[`--k-age-fresh-${name}`]).toBe(resolve(set, name));
       }
     for (const state of AGE_STATES) expect(css).toContain(state);
     expect(css).toMatch(/--k-accent: var\(--k-age-fresh-accent\)/);
+    // The worn table rule must not paint over the selected row's leading edge.
+    expect(css).toMatch(
+      /tr\[data-selected\]:not\(:last-child\) > :first-child \{\s*background-image: linear-gradient\(var\(--k-accent\), var\(--k-accent\)\), var\(--k-age-rule\)/,
+    );
   });
 
   it('draws nothing aged on a disabled or focused control, and leaves focus styling alone', () => {
@@ -91,7 +160,7 @@ describe('Age: states stay fresh', () => {
     // A disabled button is the sunken surface with muted text; an aged primary keeps its ink.
     const rows = THEMES.map((theme) => {
       const set = themeTokens(tokens, theme);
-      const aged = fadedInks(loudest, tokens, theme, 'heavy').accent.aged;
+      const aged = agedTokens(loudest, tokens, theme, 'heavy').colours.accent.aged;
       const sunken = resolve(set, 'surface-sunken');
       return {
         theme,

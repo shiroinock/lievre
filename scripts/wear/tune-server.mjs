@@ -74,7 +74,11 @@ export function validate(config, tokens) {
       problems.push(
         `${theme} で文字のコントラストが ${min.toFixed(2)}:1 になります（4.5:1 未満）。`,
       );
-  for (const [theme, { text, ui }] of Object.entries(ageContrast(config, tokens))) {
+  for (const [theme, { text, ui, failed }] of Object.entries(ageContrast(config, tokens))) {
+    for (const [what, value, min] of failed)
+      problems.push(
+        `${theme} の経年で${what}が ${value.toFixed(2)}:1 になります（${min}:1 未満）。`,
+      );
     if (text < 4.5)
       problems.push(
         `${theme} の経年で文字のコントラストが ${text.toFixed(2)}:1 になります（4.5:1 未満）。`,

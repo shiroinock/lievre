@@ -1,13 +1,16 @@
 // Age: a fourth axis beside theme, density and typography (<KeiProvider age="light">). Parts are
 // never aged one by one. A few materials are made here, as tokens and custom properties, and each
-// part takes them through the selectors in AGE_PLACES:
-//   fade    accent and status inks lose colour (OKLCH), stopping where contrast would fail
+// part takes them through the tokens it already uses or the selectors in AGE_PLACES:
+//   fade    every colour token loses colour toward an old-paper yellow grey (OKLab, at its own
+//           lightness): inks and tints fully, the paper, lines and text by half. One amount for
+//           the whole theme, stopped where any pairing would drop below WCAG AA
 //   shift   filled controls print their fill off the key line by 0.5–1px
 //   mottle  filled faces take the paper back in blotches where the ink did not hold
-//   rules   1px lines break and thin here and there
+//   rules   1px lines thin and thicken along their length, and break now and then
 //   chips   corners lose a small irregular piece
-// States stay outside age: focus, the selected row, the active tab, checked controls and error
-// marks keep the fresh inks, and nothing aged is ever drawn on a disabled control.
+// States stay outside age: the focus outline, the selection marks (the selected row's leading
+// edge, the active tab) and error marks keep the fresh inks, and nothing aged is ever drawn on a
+// disabled control.
 import { hash32, mulberry32, noise2, seedFor } from './seed.mjs';
 import { encodeIndexedPng } from './png.mjs';
 import { mix, ratio, resolve, themeTokens, wornBackgrounds } from './contrast.mjs';
@@ -18,19 +21,62 @@ import { THEMES } from './textures.mjs';
 export const AGES = ['none', 'light', 'heavy'];
 /** How much of each material a level takes; config.age holds the heavy values. */
 export const AGE_SCALE = { light: 0.5, heavy: 1 };
-/** Inks that fade. Their soft tints, the text and the surfaces keep their colour. */
-export const FADED = ['accent', 'accent-hover', 'success', 'warning', 'danger', 'info'];
-/** States drawn with the fresh inks wherever they appear inside an aged scope. */
+/**
+ * The tokens that fade, by how much of the amount they take. Every colour token a part can read is
+ * here, so no part keeps a fresh colour beside faded ones; only the translucent overlay is not.
+ */
+export const FADE_GROUPS = {
+  inks: {
+    share: 1,
+    names: ['accent', 'accent-hover', 'success', 'warning', 'danger', 'info'],
+  },
+  tints: {
+    share: 1,
+    names: [
+      'accent-soft',
+      'selected',
+      'success-soft',
+      'warning-soft',
+      'danger-soft',
+      'info-soft',
+      'skeleton',
+    ],
+  },
+  frame: {
+    share: 1,
+    names: ['frame', 'frame-hover', 'frame-inset', 'frame-line'],
+  },
+  neutrals: {
+    share: 0.5,
+    names: [
+      'bg',
+      'surface',
+      'surface-raised',
+      'surface-sunken',
+      'text',
+      'muted',
+      'subtle',
+      'border',
+      'border-strong',
+      'on-accent',
+      'on-danger',
+      'on-frame',
+      'frame-muted',
+      'frame-selected',
+      'on-frame-selected',
+    ],
+  },
+};
+export const FADED = Object.values(FADE_GROUPS).flatMap((g) => g.names);
+/** Inks a state mark keeps fresh. */
+export const STATE_INKS = FADE_GROUPS.inks.names;
+/**
+ * Marks drawn with the fresh inks inside an aged scope: the focus outline (through --k-focus), the
+ * selected row's leading edge and its checkbox, the active tab's underline, and error marks.
+ */
 export const AGE_STATES = [
-  '[data-selected]',
-  "[data-state='checked']",
-  "[data-state='indeterminate']",
-  ':checked',
-  ':indeterminate',
-  "[data-state='active']",
-  "[aria-sort='ascending']",
-  "[aria-sort='descending']",
-  '[aria-current]',
+  'tr[data-selected] > :first-child',
+  "[role='tab'][data-state='active']",
   "[aria-invalid='true']",
   '.k-field-error',
   "[data-tone='error']",
@@ -50,7 +96,7 @@ export const AGE_PLACES = {
   },
   print: { selectors: ['.k-badge', '.k-age-print'], shift: 0.7 },
   control: { selectors: ['.k-button', '.k-age-corner'], chips: 0.35 },
-  table: { selectors: ['.k-table tbody tr:not(:last-child) td', '.k-age-rule'], rules: 0.5 },
+  table: { selectors: ['.k-table tbody tr:not(:last-child) td', '.k-age-rule'], rules: 0.7 },
 };
 
 /** The mottle is smooth, so it is stored at half the tile and drawn at the full tile. */
@@ -62,53 +108,99 @@ const CORNERS = ['tl', 'tr', 'br', 'bl'];
 const amountFor = (config, level, material, place = 1) =>
   (config.age[material] ?? 0) * (AGE_SCALE[level] ?? 0) * place;
 
-// Contrast a faded ink must keep, as [foreground, background, minimum] by token name; `self` is the
-// faded ink. Text on every surface (and on the worn paper), status text on its soft tint, and the
-// text set on a filled control.
-function needs(name, set, worn) {
-  const surfaces = ['bg', 'surface', 'surface-raised'].map((k) => resolve(set, k)).concat(worn);
-  const asText = surfaces.map((bg) => ['self', bg, 4.5]);
-  switch (name) {
-    case 'accent':
-      return [...asText, [resolve(set, 'on-accent'), 'self', 4.5]];
-    case 'accent-hover':
-      return [[resolve(set, 'on-accent'), 'self', 4.5]];
-    case 'danger':
-      return [
-        ...asText,
-        ['self', resolve(set, 'danger-soft'), 4.5],
-        [resolve(set, 'on-danger'), 'self', 4.5],
-      ];
-    default:
-      return [...asText, ['self', resolve(set, `${name}-soft`), 4.5]];
-  }
+/** A theme's tokens with every faded colour moved by `amount` (its group's share of it). */
+function fadedSet(set, amount) {
+  const out = { ...set };
+  for (const { share, names } of Object.values(FADE_GROUPS))
+    for (const name of names)
+      if (set[name]) out[name] = { $value: fade(resolve(set, name), amount * share) };
+  return out;
 }
 
 /**
- * The faded inks of a theme at a level. Each fades by config.age.fade at most, and less where a
- * pairing would drop below its minimum (or below what the fresh ink had, if that was lower).
+ * Pairings that must hold on a theme, as [foreground, background, minimum, what]: every text
+ * colour on every surface and on the worn paper, status text on its tint, text on filled controls
+ * and on the selected row, control outlines, the focus outline (fresh accent) on every surface,
+ * the state marks that keep their fresh ink, the selected row against what it sits on, and the
+ * app frame. `get` reads a colour by name, `fresh` reads it from the fresh theme.
  */
-export function fadedInks(config, tokens, theme, level) {
+function pairs(get, worn, fresh) {
+  const focus = fresh('accent');
+  const has = (name) => get(name) !== undefined;
+  const surfaces = ['bg', 'surface', 'surface-raised', 'surface-sunken'];
+  const grounds = [...surfaces.map(get), ...worn];
+  const out = [];
+  for (const fg of ['text', 'muted', 'subtle', 'success', 'warning', 'danger', 'info', 'accent'])
+    for (const bg of grounds) out.push([get(fg), bg, 4.5, `${fg} の文字`]);
+  for (const tone of ['success', 'warning', 'danger', 'info'])
+    out.push([get(tone), get(`${tone}-soft`), 4.5, `${tone} の文字（淡い地）`]);
+  out.push([get('on-accent'), get('accent'), 4.5, '主ボタンの文字']);
+  out.push([get('on-accent'), get('accent-hover'), 4.5, '主ボタンの文字（ホバー）']);
+  out.push([get('on-danger'), get('danger'), 4.5, '危険ボタンの文字']);
+  for (const fg of ['text', 'muted', 'accent'])
+    out.push([get(fg), get('selected'), 4.5, `選択した行の ${fg}`]);
+  out.push([get('accent'), get('accent-soft'), 3, '淡い強調の地の上の強調']);
+  for (const bg of ['surface', 'surface-raised', 'surface-sunken'])
+    out.push([get('border-strong'), get(bg), 3, '操作の輪郭']);
+  for (const bg of [...grounds, get('selected'), get('accent-soft')])
+    out.push([focus, bg, 3, 'フォーカスの輪郭']);
+  for (const name of ['accent', 'danger'])
+    for (const bg of grounds) out.push([fresh(name), bg, 4.5, `状態の印の ${name}`]);
+  out.push([get('selected'), get('surface'), 1.3, '選択の面と面']);
+  out.push([get('selected'), get('bg'), 1.25, '選択の面と地']);
+  out.push([get('selected'), get('surface-sunken'), 1.15, '選択の面と凹んだ面']);
+  if (has('frame')) {
+    for (const bg of ['frame', 'frame-hover', 'frame-inset'])
+      for (const fg of ['on-frame', 'frame-muted']) out.push([get(fg), get(bg), 4.5, '枠の文字']);
+    out.push([get('on-frame-selected'), get('frame-selected'), 4.5, '枠の選択中の文字']);
+    for (const bg of ['frame', 'frame-hover']) {
+      out.push([get('frame-selected'), get(bg), 3, '枠の選択中の項目']);
+      out.push([get('on-frame'), get(bg), 3, '枠のフォーカスの輪郭']);
+    }
+  }
+  return out;
+}
+
+/**
+ * Every pairing that fails on an aged set: below its minimum, or below what the fresh theme had
+ * where that was already lower. Returns [what, ratio, minimum] for each failure.
+ */
+function failures(config, tokens, theme, aged) {
+  const fresh = themeTokens(tokens, theme);
+  const look = (set) => (name) => (set[name] ? resolve(set, name) : undefined);
+  const worn = (set) => ['bg', 'surface'].flatMap((b) => wornBackgrounds(config, set, theme, b));
+  const now = pairs(look(aged), worn(aged), look(fresh));
+  const before = pairs(look(fresh), worn(fresh), look(fresh));
+  const out = [];
+  now.forEach(([fg, bg, min, what], i) => {
+    const value = ratio(fg, bg);
+    const floor = Math.min(min, ratio(before[i][0], before[i][1]));
+    if (value < floor - 1e-9) out.push([what, value, min]);
+  });
+  return out;
+}
+
+/**
+ * A theme's tokens at a level: one amount for every faded token (config.age.fade at most, and the
+ * largest 0.05 step below it at which every pairing still holds), with each token fresh and aged.
+ */
+export function agedTokens(config, tokens, theme, level) {
   const set = themeTokens(tokens, theme);
-  const worn = ['bg', 'surface'].flatMap((b) => wornBackgrounds(config, set, theme, b));
-  const target = amountFor(config, level, 'fade');
-  return Object.fromEntries(
-    FADED.map((name) => {
-      const fresh = resolve(set, name);
-      const rules = needs(name, set, worn);
-      const holds = (colour) =>
-        rules.every(([fg, bg, min]) => {
-          const pair = (c) => ratio(fg === 'self' ? c : fg, bg === 'self' ? c : bg);
-          return pair(colour) >= Math.min(min, pair(fresh));
-        });
-      let amount = 0;
-      for (let step = 1; step <= 20 && (step / 20) * 1 <= target + 1e-9; step++) {
-        if (!holds(fade(fresh, step / 20))) break;
-        amount = step / 20;
-      }
-      return [name, { fresh, aged: fade(fresh, amount), amount, asked: target }];
-    }),
+  const asked = amountFor(config, level, 'fade');
+  let amount = 0;
+  for (let step = Math.floor(asked * 20 + 1e-9); step > 0; step--)
+    if (!failures(config, tokens, theme, fadedSet(set, step / 20)).length) {
+      amount = step / 20;
+      break;
+    }
+  const aged = fadedSet(set, amount);
+  const colours = Object.fromEntries(
+    FADED.filter((name) => set[name]).map((name) => [
+      name,
+      { fresh: resolve(set, name), aged: resolve(aged, name) },
+    ]),
   );
+  return { amount, asked, colours, set: aged };
 }
 
 /**
@@ -120,55 +212,52 @@ export function mottleLimit(
   tokens,
   theme,
   level,
-  inks = fadedInks(config, tokens, theme, level),
+  aged = agedTokens(config, tokens, theme, level),
 ) {
-  const set = themeTokens(tokens, theme);
-  const paper = resolve(set, 'bg');
+  const c = (name) => aged.colours[name].aged;
   const fills = [
-    [inks.accent.aged, resolve(set, 'on-accent')],
-    [inks['accent-hover'].aged, resolve(set, 'on-accent')],
-    [inks.danger.aged, resolve(set, 'on-danger')],
+    [c('accent'), c('on-accent')],
+    [c('accent-hover'), c('on-accent')],
+    [c('danger'), c('on-danger')],
   ];
   let limit = amountFor(config, level, 'mottle', AGE_PLACES.fill.mottle);
-  while (limit > 0 && fills.some(([fill, text]) => ratio(text, mix(fill, paper, limit)) < 4.5))
+  while (limit > 0 && fills.some(([fill, text]) => ratio(text, mix(fill, c('bg'), limit)) < 4.5))
     limit = Math.max(0, +(limit - 0.01).toFixed(2));
   return limit;
 }
 
 /**
- * The lowest contrast age leaves, per theme at the heavy level (light is half of it): every faded
- * pairing in `needs`, and the control's text on the most paper the mottle lets through (text,
- * against 4.5:1); the focus ring, which keeps the fresh accent, on every surface (ui, against 3:1).
- * The fade and the mottle stop themselves before these fail; the tuning page checks them anyway.
+ * What age leaves, per theme at both levels: the failures of the aged tokens (none, since the
+ * fade stops before one), the lowest text contrast (4.5:1 pairings, and a filled control's text
+ * on the most paper the mottle lets through) and the lowest outline contrast (3:1 pairings).
+ * The tuning page checks these before it saves.
  */
 export function ageContrast(config, tokens) {
   return Object.fromEntries(
     THEMES.map((theme) => {
-      const set = themeTokens(tokens, theme);
-      const worn = ['bg', 'surface'].flatMap((b) => wornBackgrounds(config, set, theme, b));
+      const fresh = themeTokens(tokens, theme);
       let text = Infinity;
       let ui = Infinity;
+      const failed = [];
       for (const level of ['light', 'heavy']) {
-        const inks = fadedInks(config, tokens, theme, level);
-        for (const name of FADED)
-          for (const [fg, bg] of needs(name, set, worn)) {
-            const c = (v) => (v === 'self' ? inks[name].aged : v);
-            text = Math.min(text, ratio(c(fg), c(bg)));
-          }
-        const paper = resolve(set, 'bg');
-        const limit = mottleLimit(config, tokens, theme, level, inks);
+        const aged = agedTokens(config, tokens, theme, level);
+        failed.push(...failures(config, tokens, theme, aged.set));
+        const look = (name) => (aged.set[name] ? resolve(aged.set, name) : undefined);
+        const worn = ['bg', 'surface'].flatMap((b) => wornBackgrounds(config, aged.set, theme, b));
+        for (const [fg, bg, min] of pairs(look, worn, (name) => resolve(fresh, name))) {
+          if (min === 4.5) text = Math.min(text, ratio(fg, bg));
+          if (min === 3) ui = Math.min(ui, ratio(fg, bg));
+        }
+        const limit = mottleLimit(config, tokens, theme, level, aged);
+        const c = (name) => aged.colours[name].aged;
         for (const [fill, on] of [
           ['accent', 'on-accent'],
           ['accent-hover', 'on-accent'],
           ['danger', 'on-danger'],
         ])
-          text = Math.min(text, ratio(resolve(set, on), mix(inks[fill].aged, paper, limit)));
-        for (const bg of ['bg', 'surface', 'surface-raised']
-          .map((k) => resolve(set, k))
-          .concat(worn))
-          ui = Math.min(ui, ratio(resolve(set, 'accent'), bg));
+          text = Math.min(text, ratio(c(on), mix(c(fill), c('bg'), limit)));
       }
-      return [theme, { text, ui }];
+      return [theme, { text, ui, failed }];
     }),
   );
 }
@@ -216,8 +305,9 @@ export function ageTextures(config, tokens, themes, deflate) {
   const files = {};
   for (const theme of themes)
     for (const level of ['light', 'heavy']) {
-      const paper = resolve(themeTokens(tokens, theme), 'bg');
-      const limit = mottleLimit(config, tokens, theme, level);
+      const aged = agedTokens(config, tokens, theme, level);
+      const paper = aged.colours.bg.aged;
+      const limit = mottleLimit(config, tokens, theme, level, aged);
       const palette = Array.from({ length: LEVELS }, (_, i) => [
         ...rgb(paper),
         Math.round((i / (LEVELS - 1)) * limit * 255),
@@ -267,33 +357,58 @@ export function chipMask(corners, size, url) {
   return layers.join(', ');
 }
 
-/** Breaks in a line: runs of ink and short gaps, a share `share` of the length missing or faint. */
-export function ruleStops(seed, share, ink, faint) {
-  if (share <= 0) return null;
+/** How long a worn line runs before its pattern repeats, in pixels: longer than most lines. */
+export const RULE_PERIOD = 720;
+
+/**
+ * A worn 1px line as gradient stops over RULE_PERIOD pixels, for `amount` 0..1 of wear. Mostly the
+ * ink thins and thickens along the line (smooth noise, down to 1 - 0.75 × amount of its strength);
+ * now and then (a few times per period at most) it breaks for 1–3px. Segment lengths, the noise and
+ * the breaks are all irregular, so the line never reads as a dashed one. tone(opacity) gives the
+ * colour at an opacity.
+ */
+export function ruleStops(seed, amount, tone) {
+  if (amount <= 0) return null;
   const next = mulberry32(seed);
-  let at = 0;
+  // Two scales of noise, wrapping at the period so the repeat has no seam, stretched so the line
+  // runs from full strength to its faintest rather than hovering in between.
+  const strength = (at) => {
+    const n =
+      noise2(seed, at / 90, 0.5, RULE_PERIOD / 90) * 0.7 +
+      noise2(seed ^ 0x2545f491, at / 22.5, 0.5, RULE_PERIOD / 22.5) * 0.3;
+    return 1 - 0.75 * amount * Math.min(1, Math.max(0, (n - 0.3) / 0.4));
+  };
   const stops = [];
-  // Sixteen breaks before the pattern repeats, with runs spread exponentially (long clean
-  // stretches, then breaks close together), so the line reads as worn rather than dashed.
-  for (let i = 0; i < 16; i++) {
-    const gap = 1 + Math.round(next() * 4);
-    const spread = -Math.log(1 - next() * 0.95);
-    const run = Math.max(3, Math.round(((gap * (1 - share)) / share) * spread));
-    stops.push(`${ink} ${at}px ${at + run}px`);
-    at += run;
-    stops.push(`${next() < 0.5 ? 'transparent' : faint} ${at}px ${at + gap}px`);
-    at += gap;
+  const add = (opacity, at) => stops.push(`${tone(+opacity.toFixed(2))} ${at}px`);
+  let at = 0;
+  add(strength(0), 0);
+  while (at < RULE_PERIOD) {
+    at = Math.min(RULE_PERIOD, at + 6 + Math.round(next() * next() * 40));
+    if (at < RULE_PERIOD - 4 && next() < amount * 0.08) {
+      // A break: the ink stops dead and starts again, with nothing between.
+      const gap = 1 + Math.floor(next() * 3);
+      add(strength(at), at);
+      add(0, at);
+      add(0, at + gap);
+      at += gap;
+    }
+    add(strength(at % RULE_PERIOD), at);
   }
   return stops.join(', ');
 }
+
+const maskTone = (opacity) =>
+  `#000000${Math.round(opacity * 255)
+    .toString(16)
+    .padStart(2, '0')}`;
 
 /**
  * The ring a card's border is drawn as under age: four 1px edges with breaks, and the four
  * rounded corners whole (the chips take care of those).
  */
-function ringMask(seed, share, radius) {
-  const h = ruleStops(seed, share, '#000', '#0006');
-  const v = ruleStops(seed ^ 0x51ed270b, share, '#000', '#0006');
+function ringMask(seed, amount, radius) {
+  const h = ruleStops(seed, amount, maskTone);
+  const v = ruleStops(seed ^ 0x51ed270b, amount, maskTone);
   if (!h) return 'none';
   const edge = (dir, stops, pos, size) =>
     `repeating-linear-gradient(${dir}, ${stops}) ${pos} / ${size} no-repeat`;
@@ -308,18 +423,17 @@ function ringMask(seed, share, radius) {
 }
 
 /**
- * Custom properties age sets for one theme and level: the faded inks (and the fresh ones, kept for
- * states and focus) and the mottle. url(name) gives the address of an image from ageTextures.
+ * Custom properties age sets for one theme and level: every faded token (and the fresh inks, kept
+ * for state marks and focus) and the mottle. url(name) gives the address of an image from
+ * ageTextures.
  */
 export function ageInkVars(config, tokens, theme, level, url) {
-  const inks = fadedInks(config, tokens, theme, level);
+  const { colours } = agedTokens(config, tokens, theme, level);
   const vars = {};
-  for (const [name, { fresh, aged }] of Object.entries(inks)) {
-    vars[`--k-${name}`] = aged;
-    vars[`--k-age-fresh-${name}`] = fresh;
-  }
+  for (const [name, { aged }] of Object.entries(colours)) vars[`--k-${name}`] = aged;
+  for (const name of STATE_INKS) vars[`--k-age-fresh-${name}`] = colours[name].fresh;
   // Focus is a state: it keeps the fresh accent, whatever the accent does.
-  vars['--k-focus'] = inks.accent.fresh;
+  vars['--k-focus'] = colours.accent.fresh;
   vars['--k-age-mottle'] = url(`age-mottle-${theme}-${level}.png`);
   return vars;
 }
@@ -345,19 +459,19 @@ export function ageShapeVars(config, level, url) {
       const size = CHIP * amountFor(config, level, 'chips', AGE_PLACES[place].chips);
       vars[`--k-age-chips-${place}-${n}`] = chipMask(corners, size, chipUrl);
     }
-    const share = 0.2 * amountFor(config, level, 'rules', AGE_PLACES.card.rules);
     vars[`--k-age-ring-${n}`] = ringMask(
       seedFor(config.salt, 'ring', n),
-      share,
+      amountFor(config, level, 'rules', AGE_PLACES.card.rules),
       'var(--k-radius-lg)',
     );
   }
-  const tableShare = 0.2 * amountFor(config, level, 'rules', AGE_PLACES.table.rules);
   const stops = ruleStops(
     seedFor(config.salt, 'table-rule'),
-    tableShare,
-    'var(--k-border)',
-    'color-mix(in srgb, var(--k-border) 40%, transparent)',
+    amountFor(config, level, 'rules', AGE_PLACES.table.rules),
+    (opacity) =>
+      opacity >= 1
+        ? 'var(--k-border)'
+        : `color-mix(in srgb, var(--k-border) ${Math.round(opacity * 100)}%, transparent)`,
   );
   vars['--k-age-rule'] = stops ? `repeating-linear-gradient(90deg, ${stops})` : 'none';
   return vars;
@@ -383,7 +497,9 @@ export function ageRules() {
   const any = (selectors) => (selectors.length > 1 ? `:is(${selectors.join(', ')})` : selectors[0]);
   const rules = [
     block(`${aged} ${any(AGE_STATES)}`, {
-      ...Object.fromEntries(FADED.map((name) => [`--k-${name}`, `var(--k-age-fresh-${name})`])),
+      ...Object.fromEntries(
+        STATE_INKS.map((name) => [`--k-${name}`, `var(--k-age-fresh-${name})`]),
+      ),
     }),
   ];
   const { card, fill, print, control, table } = AGE_PLACES;
@@ -442,6 +558,13 @@ export function ageRules() {
       'background-position': 'left bottom',
       'background-size': '100% 1px',
       'background-repeat': 'no-repeat',
+    }),
+    // The worn rule shares the cell's background with the selected row's leading edge: draw both,
+    // so the selection never falls back to the fill alone.
+    block(`${aged} .k-table tbody tr[data-selected]:not(:last-child) > :first-child`, {
+      'background-image': 'linear-gradient(var(--k-accent), var(--k-accent)), var(--k-age-rule)',
+      'background-position': 'left top, left bottom',
+      'background-size': '4px 100%, 100% 1px',
     }),
   );
   return rules;

@@ -136,6 +136,22 @@ const surfaceTokens = rule(
   },
 );
 
+// Every colour a part draws comes through a token, so a theme (and age, which fades the tokens)
+// reaches it. A literal colour outside the themes stays fresh beside faded parts.
+const COLOUR =
+  /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(|\b(?:white|black|red|green|blue|navy|gray|grey|silver|orange|yellow|purple|pink|brown)\b/i;
+const colourTokens = rule(
+  'colour-tokens',
+  '色は kei.tokens のトークン（var(--k-…)）を通して使ってください。値を直接書くと、テーマや経年の褪色が届きません。透明度だけを使うマスクの #000 は例外です。',
+  (root, fail) => {
+    root.walkDecls((decl) => {
+      if (/^(-webkit-)?mask/.test(decl.prop)) return;
+      if (inside(decl, (a) => a.name === 'layer' && a.params.trim() === 'kei.tokens')) return;
+      if (COLOUR.test(decl.value.replace(/(['"]).*?\1/g, ''))) fail(decl);
+    });
+  },
+);
+
 export default [
   utilitiesNoSize,
   monoUnicodeRange,
@@ -143,6 +159,7 @@ export default [
   forcedColorsState,
   spacingGrid,
   surfaceTokens,
+  colourTokens,
 ];
 
 // ------------------------------------------------------------- layout gate

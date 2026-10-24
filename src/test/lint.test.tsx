@@ -2,6 +2,8 @@
 import { describe, it, expect } from 'vitest';
 import stylelint from 'stylelint';
 import { ESLint } from 'eslint';
+import { execSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 
 async function cssRules(code: string) {
   const { results } = await stylelint.lint({ code, configFile: 'stylelint.config.mjs' });
@@ -41,7 +43,8 @@ describe('stylelint: KEI rules', () => {
 
   it('requires forced-colors styles for states shown by a background', async () => {
     const forced = (body: string) => `@media (forced-colors: active) { ${body} }`;
-    const state = ".k-x[data-state='on'], .k-y[data-highlighted] .k-z { background: blue; }";
+    const state =
+      ".k-x[data-state='on'], .k-y[data-highlighted] .k-z { background: var(--k-selected); }";
     expect(await cssRules(state)).toContain('kei/forced-colors-state');
     // Each selector in the list needs its own forced-colors style.
     expect(
@@ -64,7 +67,7 @@ describe('stylelint: KEI rules', () => {
           ),
       ),
     ).toEqual([]);
-    expect(await cssRules('.k-x::after { background: blue; }')).toEqual([]);
+    expect(await cssRules('.k-x::after { background: var(--k-selected); }')).toEqual([]);
   });
 
   it('keeps spacing on the 4px grid', async () => {
@@ -104,6 +107,42 @@ describe('stylelint: KEI rules', () => {
       'kei/surface-tokens',
     );
     expect(await cssRules('.sidebar { background: var(--k-frame); }')).toEqual([]);
+  });
+
+  it('rejects colours that do not come through a token', async () => {
+    for (const code of [
+      '.a { color: #2424d8; }',
+      '@layer kei.components { .a { background: rgb(36 36 216); } }',
+      '.a { border: 1px solid white; }',
+      '.a { --demo-blue: oklch(0.5 0.2 270); }',
+      '.a { box-shadow: 0 0 0 1px color(srgb 0 0 1); }',
+    ])
+      expect(await cssRules(code), code).toContain('kei/colour-tokens');
+    expect(
+      await cssRules(
+        "@layer kei.tokens { .kei[data-theme='ink'] { --k-accent: #a9b1ff; --k-x: var(--k-accent); } }",
+      ),
+    ).toEqual([]);
+    expect(
+      await cssRules(
+        '.a { color: var(--k-text); white-space: nowrap; background: color-mix(in srgb, var(--k-bg) 60%, transparent); mask: radial-gradient(#000, transparent); }',
+      ),
+    ).toEqual([]);
+  });
+
+  it('keeps colour literals out of the components and the demo', () => {
+    // Inline styles in TSX would slip past stylelint; only token references are allowed there.
+    // The foundations page prints each token's value as text.
+    const files = execSync("git ls-files 'src/**/*.tsx' 'src/*.tsx'", { encoding: 'utf8' })
+      .split('\n')
+      .filter((f) => f && !f.startsWith('src/test/') && f !== 'src/docs/Foundations.tsx');
+    const found = files.flatMap((file) =>
+      readFileSync(file, 'utf8')
+        .split('\n')
+        .map((line, i) => [file, i + 1, line] as const)
+        .filter(([, , line]) => /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|oklch|oklab)\(/i.test(line)),
+    );
+    expect(found).toEqual([]);
   });
 
   it('requires a line-height in the font shorthand', async () => {

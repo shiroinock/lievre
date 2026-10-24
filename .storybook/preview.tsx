@@ -47,6 +47,19 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    age: {
+      description: '経年（試作）',
+      toolbar: {
+        title: '経年',
+        icon: 'time',
+        items: [
+          { value: 'none', title: '経年なし' },
+          { value: 'light', title: '経年・弱（試作）' },
+          { value: 'heavy', title: '経年・強（試作）' },
+        ],
+        dynamicTitle: true,
+      },
+    },
     typography: {
       description: '本文の用途',
       toolbar: {
@@ -78,6 +91,7 @@ const preview: Preview = {
     typography: 'standard',
     wear: 'off',
     wearSeed: 'kei',
+    age: 'none',
   },
   decorators: [
     (Story, context) => (
@@ -87,6 +101,7 @@ const preview: Preview = {
         typography={context.globals.typography}
         wear={context.globals.wear}
         wearSeed={context.globals.wearSeed}
+        age={context.globals.age}
         className={context.parameters.layout === 'fullscreen' ? 'kei-story-full' : 'kei-story'}
       >
         <Story />
