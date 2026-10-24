@@ -13,7 +13,8 @@ export function textures(
 ): { pixels: { surface: Uint8Array; kasure: Uint8Array }; files: Record<string, Uint8Array> };
 export function placements(salt: string): Record<string, [number, number][]>;
 export function wearVars(config: WearConfig, kasure: string): Record<string, string>;
-export function liveDistortion(
+export function liveEdge(
   config: WearConfig,
   kind: WearKind,
 ): { baseFrequency: number; scale: number };
+export function faceVars(config: WearConfig): Record<string, string>;

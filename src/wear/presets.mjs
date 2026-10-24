@@ -23,16 +23,18 @@ export const TEXT_KINDS = {
 };
 
 /**
- * distortion: amplitude and wavelength in 1/1000 em, the same units as the font outlines.
+ * outline: how the baked glyph edges wear, in 1/1000 em (scripts/wear/font.py). The skeleton
+ *          stays put; rough and roughScale roughen the edge, swell and swellScale let the ink
+ *          spread or thin from place to place, and step is the length each outline is cut into.
  * kasure: density (streaks across a tile), threshold (0–1, higher thins fewer pixels) and floor
  *         (the faintest opacity a glyph keeps).
  * stain: the darkest point of grain and stains, as the opacity of the text colour.
- * kinds: per text kind, whether glyphs are distorted and how deep the dry brush goes (0–1).
+ * kinds: per text kind, whether the edges wear (distort) and how deep the dry brush goes (0–1).
  */
 export const PRESETS = {
   subtle: {
     salt: 'kei',
-    distortion: { amplitude: 8, wavelength: 160 },
+    outline: { rough: 4, roughScale: 24, swell: 2, swellScale: 240, step: 14 },
     kasure: { density: 4, threshold: 0.7, floor: 0.86 },
     stain: { strength: 0.05 },
     kinds: {
@@ -45,7 +47,7 @@ export const PRESETS = {
   },
   standard: {
     salt: 'kei',
-    distortion: { amplitude: 13, wavelength: 140 },
+    outline: { rough: 7, roughScale: 26, swell: 4, swellScale: 220, step: 12 },
     kasure: { density: 6, threshold: 0.64, floor: 0.8 },
     stain: { strength: 0.08 },
     kinds: {
@@ -58,7 +60,7 @@ export const PRESETS = {
   },
   strong: {
     salt: 'kei',
-    distortion: { amplitude: 20, wavelength: 110 },
+    outline: { rough: 11, roughScale: 28, swell: 6, swellScale: 180, step: 10 },
     kasure: { density: 8, threshold: 0.56, floor: 0.72 },
     stain: { strength: 0.1 },
     kinds: {
@@ -71,6 +73,14 @@ export const PRESETS = {
   },
 };
 
+/**
+ * How far an edge may move, as shares of the weight's thinnest stroke (THIN): the rough edge, the
+ * swell, and both together. scripts/wear/font.py applies the same caps.
+ */
+export const OUTLINE_CAPS = { edge: 0.2, swell: 0.12, total: 0.25 };
+/** Thinnest stroke of Plex Sans JP and Plex Mono at Regular, 1/1000 em (一 二 三, the bar of H). */
+export const THIN = { sans: 60, mono: 70 };
+
 export const PRESET_NAMES = { subtle: '控えめ', standard: '標準', strong: '強め' };
 
 /** Fills anything a saved config leaves out from the standard preset. */
@@ -82,7 +92,7 @@ export function normaliseConfig(config = {}) {
   return {
     preset: config.preset ?? 'standard',
     salt: String(config.salt ?? base.salt),
-    distortion: { ...base.distortion, ...config.distortion },
+    outline: { ...base.outline, ...config.outline },
     kasure: { ...base.kasure, ...config.kasure },
     stain: { ...base.stain, ...config.stain },
     kinds,

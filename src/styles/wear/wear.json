@@ -2,9 +2,12 @@
   "config": {
     "preset": "standard",
     "salt": "kei",
-    "distortion": {
-      "amplitude": 13,
-      "wavelength": 140
+    "outline": {
+      "rough": 7,
+      "roughScale": 26,
+      "swell": 4,
+      "swellScale": 220,
+      "step": 12
     },
     "kasure": {
       "density": 6,

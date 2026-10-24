@@ -1,6 +1,6 @@
 import type { WearConfig, WearKind } from './presets.mjs';
 export type GaugeLevel = 'ok' | 'caution' | 'warn';
-export interface DistortionGauge {
+export interface OutlineGauge {
   px: number;
   ratio: number;
   level: GaugeLevel;
@@ -10,15 +10,14 @@ export interface KasureGauge {
   faintest: number;
   level: GaugeLevel;
 }
-export const STEM: number;
 export const GUIDES: {
-  shift: [number, number];
+  edge: [number, number];
   thinned: [number, number];
   contrast: number;
   smallSize: number;
 };
 export const SAMPLES: { size: number; kind: WearKind; label: string }[];
-export function distortionGauge(config: WearConfig, kind: WearKind, size: number): DistortionGauge;
+export function outlineGauge(config: WearConfig, kind: WearKind, size: number): OutlineGauge;
 export function kasureGauge(config: WearConfig, kind: WearKind, field?: Float32Array): KasureGauge;
 export function contrastGauge(
   config: WearConfig,
@@ -28,12 +27,12 @@ export function gauges(
   config: WearConfig,
   tokens: unknown,
 ): {
-  kinds: Record<WearKind, { distortion: DistortionGauge; kasure: KasureGauge }>;
+  kinds: Record<WearKind, { outline: OutlineGauge; kasure: KasureGauge }>;
   samples: {
     size: number;
     kind: WearKind;
     label: string;
-    distortion: DistortionGauge;
+    outline: OutlineGauge;
     kasure: KasureGauge;
   }[];
   contrast: Record<string, { min: number; level: GaugeLevel }>;

@@ -3,16 +3,22 @@
 //   GET  /__kei-wear/config  the saved wear.config.json
 //   POST /__kei-wear/config  save values, regenerate src/styles/wear/ and start the font build
 //   GET  /__kei-wear/status  the font build's progress
+//   POST /__kei-wear/preview bake only the sample characters with unsaved values (about 2s)
+//   GET  /__kei-wear/preview/<key>/<file>  a face baked by the preview
 import { spawn } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { normaliseConfig, TEXT_KINDS } from '../../src/wear/presets.mjs';
 import { contrastGauge } from '../../src/wear/gauges.mjs';
-import { readConfig, writeWear } from '../build-wear.mjs';
+import { outlineEnv, readConfig, writeWear } from '../build-wear.mjs';
 
 const LOOPBACK = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1']);
 const RANGES = {
-  'distortion.amplitude': [0, 60],
-  'distortion.wavelength': [40, 400],
+  'outline.rough': [0, 20],
+  'outline.roughScale': [8, 60],
+  'outline.swell': [0, 12],
+  'outline.swellScale': [80, 400],
+  'outline.step': [6, 30],
   'kasure.density': [1, 16],
   'kasure.threshold': [0.3, 0.95],
   'kasure.floor': [0.5, 1],
@@ -40,6 +46,37 @@ export function validate(config, tokens) {
         `${theme} で文字のコントラストが ${min.toFixed(2)}:1 になります（4.5:1 未満）。`,
       );
   return problems;
+}
+
+const PREVIEWS = 'node_modules/.kei-wear-preview';
+
+/** Bakes the given characters with the config's salt and outline; resolves to the faces written. */
+function bakePreview(config, text) {
+  const key = createHash('sha256')
+    .update(JSON.stringify([config.salt, config.outline, text]))
+    .digest('hex')
+    .slice(0, 16);
+  const dir = `${PREVIEWS}/${key}`;
+  if (existsSync(`${dir}/faces.json`))
+    return Promise.resolve({ key, ...JSON.parse(readFileSync(`${dir}/faces.json`, 'utf8')) });
+  mkdirSync(dir, { recursive: true });
+  const python = process.env.KEI_WEAR_PYTHON || 'python3';
+  return new Promise((resolve, reject) => {
+    const child = spawn(python, ['scripts/wear/font.py', 'preview', dir], {
+      env: { ...process.env, ...outlineEnv(config.outline) },
+    });
+    let out = '';
+    let err = '';
+    child.stdout.on('data', (chunk) => (out += chunk));
+    child.stderr.on('data', (chunk) => (err = (err + chunk).slice(-2000)));
+    child.on('error', reject);
+    child.on('close', (code) => {
+      if (code !== 0) return reject(new Error(err || `font.py exited with ${code}`));
+      writeFileSync(`${dir}/faces.json`, out);
+      resolve({ key, ...JSON.parse(out) });
+    });
+    child.stdin.end(JSON.stringify({ salt: config.salt, text }));
+  });
 }
 
 export function wearTuneServer() {
@@ -77,20 +114,42 @@ export function wearTuneServer() {
         const { state, log } = font;
         if (req.method === 'GET' && req.url === '/config') return send(200, readConfig());
         if (req.method === 'GET' && req.url === '/status') return send(200, { state, log });
-        if (req.method !== 'POST' || req.url !== '/config')
+        const file =
+          req.method === 'GET' && req.url.match(/^\/preview\/([0-9a-f]{16})\/([\w.-]+\.woff2)$/);
+        if (file) {
+          const path = `${PREVIEWS}/${file[1]}/${file[2]}`;
+          if (!existsSync(path)) return send(404, { error: 'not found' });
+          res.setHeader('Content-Type', 'font/woff2');
+          return res.end(readFileSync(path));
+        }
+        if (req.method !== 'POST' || !['/config', '/preview'].includes(req.url))
           return send(404, { error: 'not found' });
         // A page from another origin must not be able to post here.
         const origin = req.headers.origin;
         if (!origin || new URL(origin).host !== req.headers.host)
           return send(403, { error: 'same origin only' });
         let body = '';
-        req.on('data', (chunk) => (body = (body + chunk).slice(0, 20000)));
+        req.on('data', (chunk) => (body = (body + chunk).slice(0, 40000)));
         req.on('end', () => {
-          let config;
+          let config, text;
           try {
-            config = normaliseConfig(JSON.parse(body));
+            const parsed = JSON.parse(body);
+            config = normaliseConfig(req.url === '/preview' ? parsed.config : parsed);
+            text = String(parsed.text ?? '').slice(0, 2000);
           } catch {
             return send(400, { error: 'JSON を読めません。' });
+          }
+          if (req.url === '/preview') {
+            const problems = validate(
+              config,
+              JSON.parse(readFileSync('tokens/tokens.json', 'utf8')),
+            );
+            if (problems.some((p) => p.startsWith('outline') || p.startsWith('ソルト')))
+              return send(422, { problems });
+            return bakePreview(config, text).then(
+              (result) => send(200, result),
+              (error) => send(500, { error: String(error.message ?? error) }),
+            );
           }
           const tokens = JSON.parse(readFileSync('tokens/tokens.json', 'utf8'));
           const problems = validate(config, tokens);

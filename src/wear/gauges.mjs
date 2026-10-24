@@ -2,17 +2,15 @@
 // They estimate from the same values the build uses; the font check (npm run wear:font) and the
 // contrast tests are the hard limits.
 import { mix, ratio, resolve, themeTokens } from './contrast.mjs';
-import { TEXT_KINDS } from './presets.mjs';
+import { OUTLINE_CAPS, TEXT_KINDS, THIN } from './presets.mjs';
 import { kasureField, THEMES } from './textures.mjs';
 
-/** Vertical stem of Plex Sans JP and Plex Mono Regular, 1/1000 em (600 is 128). */
-export const STEM = 80;
 /** Guides: ok up to the first value, caution up to the second, warn beyond. */
 export const GUIDES = {
-  shift: [0.25, 0.4], // peak outline shift as a share of the stem
+  edge: [0.2, 0.3], // how far an edge is asked to move, as a share of the thinnest stroke
   thinned: [0.15, 0.3], // share of a glyph's pixels the dry brush thins
   contrast: 4.5, // the darkest point must still reach this
-  smallSize: 14, // below this, any distortion is a caution
+  smallSize: 14, // below this, any worn edge is a caution
 };
 const level = (value, [ok, warn]) => (value <= ok ? 'ok' : value <= warn ? 'caution' : 'warn');
 const worst = (levels) =>
@@ -26,15 +24,25 @@ export const SAMPLES = [
   { size: 28, kind: 'heading', label: '28px 見出し' },
 ];
 
-/** How far outlines move at a size: the font's peak shift is 1.35 × amplitude (font.py). */
-export function distortionGauge(config, kind, size) {
+/**
+ * How far a glyph edge moves at a size. The font caps the move against the thinnest stroke
+ * (OUTLINE_CAPS); the share is what the values ask for before that cap, so a share past the cap
+ * means the edge is pinned at its limit across much of the glyph.
+ */
+export function outlineGauge(config, kind, size) {
   if (!config.kinds[kind].distort) return { px: 0, ratio: 0, level: 'ok' };
-  const em = TEXT_KINDS[kind].font === 'mono' ? size * 0.83333 : size;
-  const peak = 1.35 * config.distortion.amplitude;
-  const share = peak / STEM;
-  const base = level(share, GUIDES.shift);
+  const { font } = TEXT_KINDS[kind];
+  const em = font === 'mono' ? size * 0.83333 : size;
+  const thin = THIN[font];
+  const { rough, swell } = config.outline;
+  const moved = Math.min(
+    OUTLINE_CAPS.total * thin,
+    Math.min(rough, OUTLINE_CAPS.edge * thin) + Math.min(swell, OUTLINE_CAPS.swell * thin),
+  );
+  const share = (rough + swell) / thin;
+  const base = level(share, GUIDES.edge);
   return {
-    px: (peak / 1000) * em,
+    px: (moved / 1000) * em,
     ratio: share,
     level: size < GUIDES.smallSize && base === 'ok' && share > 0 ? 'caution' : base,
   };
@@ -80,17 +88,17 @@ export function gauges(config, tokens) {
   const kinds = Object.fromEntries(
     Object.entries(TEXT_KINDS).map(([kind, { size }]) => [
       kind,
-      { distortion: distortionGauge(config, kind, size), kasure: kasureGauge(config, kind, field) },
+      { outline: outlineGauge(config, kind, size), kasure: kasureGauge(config, kind, field) },
     ]),
   );
   const samples = SAMPLES.map((s) => ({
     ...s,
-    distortion: distortionGauge(config, s.kind, s.size),
+    outline: outlineGauge(config, s.kind, s.size),
     kasure: kinds[s.kind].kasure,
   }));
   const contrast = contrastGauge(config, tokens);
   const all = [
-    ...Object.values(kinds).flatMap((k) => [k.distortion.level, k.kasure.level]),
+    ...Object.values(kinds).flatMap((k) => [k.outline.level, k.kasure.level]),
     ...Object.values(contrast).map((c) => c.level),
   ];
   return { kinds, samples, contrast, level: worst(all) };

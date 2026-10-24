@@ -47,17 +47,15 @@
     --k-wear-data-pos-1: 111px 41px;
     --k-wear-data-pos-2: 132px 242px;
     --k-wear-data-pos-3: 188px 124px;
-  }
-  .kei[data-wear='baked'] :is(.k-text--body:not(.k-muted), .k-text--lead:not(.k-muted), .k-card-title):not(:has(a, button, input, select, textarea, [tabindex])) {
-    font-family: var(--k-wear-sans);
-    --k-font-mono: var(--k-wear-mono);
-  }
-  .kei[data-wear='baked'] :is(.k-heading):not(:has(a, button, input, select, textarea, [tabindex])) {
-    font-family: var(--k-wear-sans);
-    --k-font-mono: var(--k-wear-mono);
-  }
-  .kei[data-wear='baked'] :is(.k-metric-value, .k-meter-reading strong):not(:has(a, button, input, select, textarea, [tabindex])) {
-    font-family: var(--k-wear-mono);
-    --k-font-mono: var(--k-wear-mono);
+    --k-wear-small-face: var(--k-font-sans);
+    --k-wear-small-mono: var(--k-font-mono);
+    --k-wear-text-face: var(--k-wear-sans);
+    --k-wear-text-mono: var(--k-wear-mono);
+    --k-wear-heading-face: var(--k-wear-sans);
+    --k-wear-heading-mono: var(--k-wear-mono);
+    --k-wear-figure-face: var(--k-wear-mono);
+    --k-wear-figure-mono: var(--k-wear-mono);
+    --k-wear-data-face: var(--k-font-sans);
+    --k-wear-data-mono: var(--k-font-mono);
   }
 }

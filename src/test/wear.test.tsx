@@ -9,7 +9,7 @@ import { seedFor, mulberry32, noise2 } from '../wear/seed.mjs';
 import { KASURE_FLOOR, SURFACE_MAX } from '../wear/params.mjs';
 import { normaliseConfig, PRESETS } from '../wear/presets.mjs';
 import { kasureField, textures, wearVars } from '../wear/textures.mjs';
-import { contrastGauge, distortionGauge, gauges } from '../wear/gauges.mjs';
+import { contrastGauge, outlineGauge, gauges } from '../wear/gauges.mjs';
 import { liveWearStyle } from '../wear/live';
 import { KeiProvider, Dialog, Button } from '../index';
 
@@ -30,11 +30,11 @@ describe('Wear: seeded and reproducible', () => {
   it.runIf(existsSync('wear-fonts/current.json'))(
     'keeps the worn fonts in step with wear.config.json',
     () => {
-      // Run `npm run wear:font` after changing the salt or the distortion.
+      // Run `npm run wear:font` after changing the salt or the outline.
       const fonts = JSON.parse(readFileSync('wear-fonts/current.json', 'utf8'));
-      expect({ salt: fonts.salt, distortion: fonts.distortion }).toEqual({
+      expect({ salt: fonts.salt, outline: fonts.outline }).toEqual({
         salt: config.salt,
-        distortion: config.distortion,
+        outline: config.outline,
       });
     },
   );
@@ -82,11 +82,13 @@ describe('Wear: presets and gauges', () => {
       for (const { min } of Object.values(contrastGauge(normaliseConfig(preset), tokens)))
         expect(min).toBeGreaterThanOrEqual(4.5);
   });
-  it('flags strong distortion and small distorted text', () => {
-    const config = normaliseConfig({ distortion: { amplitude: 40, wavelength: 110 } });
-    expect(distortionGauge(config, 'text', 16).level).toBe('warn');
+  it('flags edges asked to move too far and small worn text', () => {
+    const config = normaliseConfig({ outline: { rough: 20, swell: 12 } });
+    expect(outlineGauge(config, 'text', 16).level).toBe('warn');
+    // The font caps the move at a quarter of the thinnest stroke, however far it is asked to go.
+    expect(outlineGauge(config, 'text', 16).px).toBeCloseTo((0.25 * 60 * 16) / 1000);
     const small = normaliseConfig({ kinds: { small: { distort: true, kasure: 0 } } });
-    expect(distortionGauge(small, 'small', 12).level).toBe('caution');
+    expect(outlineGauge(small, 'small', 12).level).toBe('caution');
   });
 });
 

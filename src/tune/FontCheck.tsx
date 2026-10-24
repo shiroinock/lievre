@@ -25,7 +25,7 @@ type Result = {
   pass: boolean;
 };
 
-async function measure(amplitude: number): Promise<Result> {
+async function measure(reach: number): Promise<Result> {
   // After a save the new @font-face list arrives by hot update; let it land and load first.
   await new Promise((resolve) => setTimeout(resolve, 800));
   await document.fonts.ready;
@@ -57,7 +57,7 @@ async function measure(amplitude: number): Promise<Result> {
       width(`${w} ${SIZE}px ${PAIRS[0].worn}`, 'あ') /
       width(`${w} ${SIZE}px ${PAIRS[0].worn}`, 'A'),
   );
-  // Left ink edges move by the distortion only; a misplaced origin would shift them all one way.
+  // Left ink edges move by the worn edge only; a misplaced origin would shift them all one way.
   const edges = [...INK].map((ch) => {
     ctx.font = `400 ${SIZE}px ${PAIRS[0].worn}`;
     const worn = -ctx.measureText(ch).actualBoundingBoxLeft;
@@ -66,7 +66,7 @@ async function measure(amplitude: number): Promise<Result> {
   });
   const mean = edges.reduce((a, b) => a + b, 0) / edges.length;
   const max = Math.max(...edges.map(Math.abs));
-  const limit = ((1.35 * amplitude) / 1000) * SIZE * 0.83333 + 1;
+  const limit = (reach / 1000) * SIZE * 0.83333 + 1;
   const pass =
     loaded &&
     widths.every((w) => Math.abs(w.delta) < 0.01) &&
@@ -76,12 +76,15 @@ async function measure(amplitude: number): Promise<Result> {
   return { loaded, widths, ratio, ink: { mean, max, limit }, pass };
 }
 
-/** stamp changes whenever new worn faces have been baked, so the check runs again. */
-export function FontCheck({ amplitude, stamp }: { amplitude: number; stamp: number }) {
+/**
+ * reach is how far the saved values move an edge (1/1000 em); stamp changes whenever new worn
+ * faces have been baked, so the check runs again.
+ */
+export function FontCheck({ reach, stamp }: { reach: number; stamp: number }) {
   const [result, setResult] = useState<Result>();
   useEffect(() => {
     let current = true;
-    measure(amplitude).then((r) => {
+    measure(reach).then((r) => {
       if (!current) return;
       setResult(r);
       (window as unknown as { __keiWearFontCheck: Result }).__keiWearFontCheck = r;
@@ -89,7 +92,7 @@ export function FontCheck({ amplitude, stamp }: { amplitude: number; stamp: numb
     return () => {
       current = false;
     };
-  }, [amplitude, stamp]);
+  }, [reach, stamp]);
   const worst = result ? Math.max(...result.widths.map((w) => Math.abs(w.delta))) : 0;
   return (
     <section aria-labelledby="tune-fonts" className="tune-fonts">

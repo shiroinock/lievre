@@ -6,7 +6,7 @@ import { hash32, mulberry32, noise2, seedFor } from './seed.mjs';
 import { printMarks } from './marks.mjs';
 import { encodeIndexedPng } from './png.mjs';
 // Not params.mjs: the dev server's config loads this, and must not depend on wear.config.json.
-import { TEXT_KINDS, TILE, VARIANTS } from './presets.mjs';
+import { OUTLINE_CAPS, TEXT_KINDS, THIN, TILE, VARIANTS } from './presets.mjs';
 
 export const LEVELS = 16;
 export const THEMES = ['paper', 'ink', 'sepia', 'rust'];
@@ -130,15 +130,37 @@ export function wearVars(config, kasure) {
   return vars;
 }
 
-/** Live distortion for a kind, calibrated so the filter moves about as far as the baked font. */
-export function liveDistortion(config, kind) {
+/**
+ * Which face each text kind is set in under baked wear: the worn faces from npm run wear:font for
+ * the kinds whose edges wear, the plain ones otherwise. The tuning page swaps --k-wear-sans and
+ * --k-wear-mono for faces baked on the spot from unsaved values.
+ */
+export function faceVars(config) {
+  const vars = {};
+  for (const [kind, { font }] of Object.entries(TEXT_KINDS)) {
+    const worn = config.kinds[kind].distort;
+    vars[`--k-wear-${kind}-face`] = worn ? `var(--k-wear-${font})` : `var(--k-font-${font})`;
+    vars[`--k-wear-${kind}-mono`] = worn ? 'var(--k-wear-mono)' : 'var(--k-font-mono)';
+  }
+  return vars;
+}
+
+/**
+ * Live edge wear for a kind, matched to the baked font's rough edge at the kind's size: the same
+ * grain (roughScale) and the same capped reach (rough). A displacement filter moves the drawn
+ * pixels rather than the outline, so it roughens the edge without the baked font's swell, and its
+ * noise is not the font's; the tuning page says so.
+ */
+export function liveEdge(config, kind) {
   const { font, size } = TEXT_KINDS[kind];
   const em = font === 'mono' ? size * 0.83333 : size;
-  const { amplitude, wavelength } = config.distortion;
+  const { rough, roughScale } = config.outline;
+  const reach = Math.min(rough, OUTLINE_CAPS.edge * THIN[font]);
   return {
-    // feTurbulence's lattice spacing is 1 / baseFrequency px; the font's is wavelength/1000 em.
-    baseFrequency: +(1000 / (wavelength * em)).toFixed(4),
+    // feTurbulence's lattice spacing is 1 / baseFrequency px; the font's is roughScale/1000 em.
+    // Finer than about a pixel only aliases into speckle, so stop there.
+    baseFrequency: +Math.min(1, 1000 / (roughScale * em)).toFixed(4),
     // fractalNoise rarely leaves 0.5 ± 0.3, so the peak shift is about scale × 0.3.
-    scale: +((((1.35 * amplitude) / 1000) * em) / 0.3).toFixed(3),
+    scale: +(((reach / 1000) * em) / 0.3).toFixed(3),
   };
 }

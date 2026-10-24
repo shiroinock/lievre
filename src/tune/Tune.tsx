@@ -18,13 +18,17 @@ import {
 import { WEAR_CONFIG } from '../wear/params.mjs';
 import {
   normaliseConfig,
+  OUTLINE_CAPS,
   PRESET_NAMES,
   PRESETS,
   TEXT_KINDS,
+  THIN,
   type WearConfig,
   type WearKind,
 } from '../wear/presets.mjs';
 import { gauges, GUIDES, type GaugeLevel } from '../wear/gauges.mjs';
+import { faceVars } from '../wear/textures.mjs';
+import { liveWearStyle } from '../wear/live';
 import { FontCheck } from './FontCheck';
 
 const themes: Theme[] = ['paper', 'ink', 'sepia', 'rust'];
@@ -57,25 +61,44 @@ type Slider = {
   max: number;
   step: number;
 };
+function outlineSlider(
+  label: string,
+  hint: string,
+  key: keyof WearConfig['outline'],
+  min: number,
+  max: number,
+  step: number,
+): Slider {
+  return {
+    label,
+    hint,
+    get: (c) => c.outline[key],
+    set: (c, v) => ({ ...c, outline: { ...c.outline, [key]: v } }),
+    min,
+    max,
+    step,
+  };
+}
 const sliders: Slider[] = [
-  {
-    label: '歪みの大きさ',
-    hint: '1/1000 em。字形の点が動く量',
-    get: (c) => c.distortion.amplitude,
-    set: (c, v) => ({ ...c, distortion: { ...c.distortion, amplitude: v } }),
-    min: 0,
-    max: 40,
-    step: 1,
-  },
-  {
-    label: '歪みの波の長さ',
-    hint: '1/1000 em。小さいほど細かく揺れる',
-    get: (c) => c.distortion.wavelength,
-    set: (c, v) => ({ ...c, distortion: { ...c.distortion, wavelength: v } }),
-    min: 60,
-    max: 300,
-    step: 5,
-  },
+  outlineSlider('縁の荒れの量', '1/1000 em。縁が線に垂直に動く量', 'rough', 0, 20, 0.5),
+  outlineSlider('縁の荒れの細かさ', '1/1000 em。小さいほど細かく荒れる', 'roughScale', 8, 60, 1),
+  outlineSlider('太さのむらの量', '1/1000 em。インクがにじむ・痩せる量', 'swell', 0, 12, 0.5),
+  outlineSlider(
+    '太さのむらの広さ',
+    '1/1000 em。にじみと痩せが変わる間隔',
+    'swellScale',
+    80,
+    400,
+    10,
+  ),
+  outlineSlider(
+    '輪郭を分ける長さ',
+    '1/1000 em。短いほど細かく荒れるが、フォントが重くなる',
+    'step',
+    6,
+    30,
+    1,
+  ),
   {
     label: 'カスレの密度',
     hint: '1枚の模様を横切る筋の数',
@@ -291,10 +314,15 @@ export function Tune() {
           <div className="tune-columns">
             <Column title="質感なし" wear="off" theme={theme} />
             <Column title="実行時（調整中の値）" wear="live" theme={theme} config={shown} />
+            <PreviewColumn theme={theme} config={shown} />
             <Column title="焼き込み（保存した値）" wear="baked" theme={theme} />
           </div>
+          <Text size="small" tone="muted">
+            実行時の列は、縁の荒れを SVG
+            のフィルタで近似します。画素を動かすので、フォントの太さのむらは表せず、ノイズの形もフォントとは違います。焼き込みと同じ見た目は「焼き込み（調整中の値）」の列で確かめてください。この列は、見本の文字だけを開発サーバーでその場で焼き込みます（2秒ほど）。
+          </Text>
         </section>
-        <FontCheck amplitude={saved.distortion.amplitude} stamp={baked} />
+        <FontCheck reach={edgeReach(saved)} stamp={baked} />
       </main>
     </KeiProvider>
   );
@@ -338,10 +366,11 @@ function Gauges({ g }: { g: ReturnType<typeof gauges> }) {
         読みやすさの目安 <Level level={g.level} />
       </Heading>
       <Text size="small" tone="muted">
-        輪郭のずれは焼き込むフォントの最大値。線の太さは Regular の縦画（80/1000
-        em）に対する割合で、目安は {pct(GUIDES.shift[0])} まで。カスレは 5%
+        縁の動きは、焼き込むフォントで縁が動く最大の量です（細い画の太さに対する上限で抑えた後）。細い画に対する割合は、荒れとむらの量の合計を、Regular
+        の最も細い画（横画、60/1000 em）で割ったもので、目安は {pct(GUIDES.edge[0])}{' '}
+        まで。上限を超えた分は抑えられ、縁が上限に張り付きます。カスレは 5%
         以上薄くなる画素の割合で、目安は {pct(GUIDES.thinned[0])} まで。{GUIDES.smallSize}px
-        未満の文字を歪ませると「注意」にします。
+        未満の文字の縁を荒らすと「注意」にします。
       </Text>
       <div className="k-table-wrap">
         <table className="k-table">
@@ -349,8 +378,8 @@ function Gauges({ g }: { g: ReturnType<typeof gauges> }) {
           <thead>
             <tr>
               <th scope="col">大きさ</th>
-              <th scope="col">輪郭のずれ</th>
-              <th scope="col">線の太さに対して</th>
+              <th scope="col">縁の動き</th>
+              <th scope="col">細い画に対して</th>
               <th scope="col">カスレで薄くなる画素</th>
               <th scope="col">最も薄い点</th>
               <th scope="col">判定</th>
@@ -360,12 +389,12 @@ function Gauges({ g }: { g: ReturnType<typeof gauges> }) {
             {g.samples.map((s) => (
               <tr key={s.label}>
                 <th scope="row">{s.label}</th>
-                <td className="k-mono">{s.distortion.px.toFixed(2)}px</td>
-                <td className="k-mono">{pct(s.distortion.ratio)}</td>
-                <td className="k-mono">{pct(s.kasure.thinned)}</td>
+                <td>{px(s.outline.px)}</td>
+                <td>{pct(s.outline.ratio)}</td>
+                <td>{pct(s.kasure.thinned)}</td>
                 <td className="k-mono">{s.kasure.faintest.toFixed(2)}</td>
                 <td>
-                  <Level level={worse(s.distortion.level, s.kasure.level)} />
+                  <Level level={worse(s.outline.level, s.kasure.level)} />
                 </td>
               </tr>
             ))}
@@ -402,6 +431,101 @@ function Gauges({ g }: { g: ReturnType<typeof gauges> }) {
 }
 const worse = (a: GaugeLevel, b: GaugeLevel): GaugeLevel =>
   a === 'warn' || b === 'warn' ? 'warn' : a === 'caution' || b === 'caution' ? 'caution' : 'ok';
+
+/** How far the baked faces move an edge, 1/1000 em (the same caps as scripts/wear/font.py). */
+function edgeReach({ outline }: WearConfig) {
+  const thin = THIN.mono;
+  return Math.min(
+    OUTLINE_CAPS.total * thin,
+    Math.min(outline.rough, OUTLINE_CAPS.edge * thin) +
+      Math.min(outline.swell, OUTLINE_CAPS.swell * thin),
+  );
+}
+
+type Face = {
+  family: string;
+  weight: number;
+  file: string;
+  unicodeRange: string;
+  sizeAdjust: string;
+};
+type Preview = { key: string; state: 'idle' | 'baking' | 'ready' | 'failed'; error?: string };
+
+/**
+ * Baked wear with unsaved values: the dev server bakes just the sample's characters (font.py
+ * preview), and the column swaps them in for the worn faces. Textures come from the same values.
+ */
+function PreviewColumn({ theme, config }: { theme: Theme; config: WearConfig }) {
+  const [preview, setPreview] = useState<Preview>({ key: '', state: 'idle' });
+  const outline = JSON.stringify([config.salt, config.outline]);
+  useEffect(() => {
+    let current = true;
+    const timer = setTimeout(async () => {
+      setPreview((p) => ({ ...p, state: 'baking' }));
+      const text = document.querySelector('.tune-specimen')?.textContent ?? '';
+      try {
+        const response = await fetch('/__kei-wear/preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ config, text }),
+        });
+        const body = await response.json();
+        if (!response.ok) throw new Error(body.error ?? body.problems?.join(' '));
+        await Promise.all(
+          (body.faces as Face[]).map((f) => {
+            const family = `${f.family === 'KEI Worn Mono' ? 'KEI Preview Mono' : 'KEI Preview Sans'} ${body.key}`;
+            const face = new FontFace(family, `url(/__kei-wear/preview/${body.key}/${f.file})`, {
+              weight: String(f.weight),
+              unicodeRange: f.unicodeRange,
+              // size-adjust is not in TypeScript's DOM types yet.
+              sizeAdjust: f.sizeAdjust,
+            } as FontFaceDescriptors);
+            document.fonts.add(face);
+            return face.load();
+          }),
+        );
+        if (current) setPreview({ key: body.key, state: 'ready' });
+      } catch (error) {
+        // Show only the last line of a Python traceback.
+        const message = String(error).trim().split('\n').pop();
+        if (current) setPreview((p) => ({ ...p, state: 'failed', error: message }));
+      }
+    }, 500);
+    return () => {
+      current = false;
+      clearTimeout(timer);
+    };
+    // config is read only for its salt and outline, which `outline` stands for.
+  }, [outline]);
+  const style = useMemo(() => {
+    const vars: Record<string, string> = {
+      ...(liveWearStyle('kwp', config, theme) as Record<string, string>),
+      ...faceVars(config),
+    };
+    if (preview.key) {
+      vars['--k-wear-sans'] = `'KEI Preview Sans ${preview.key}', 'IBM Plex Sans JP', sans-serif`;
+      vars['--k-wear-mono'] =
+        `'KEI Preview Mono ${preview.key}', 'KEI Mono', 'KEI Preview Sans ${preview.key}', 'IBM Plex Sans JP', monospace`;
+    }
+    return vars as CSSProperties;
+  }, [config, theme, preview.key]);
+  const note = {
+    idle: '',
+    baking: '見本の文字を焼き込んでいます…',
+    ready: '',
+    failed: `その場の焼き込みに失敗しました（Python と fontTools が必要です）。保存した値のフォントで表示しています。${preview.error ?? ''}`,
+  }[preview.state];
+  return (
+    <div className="tune-column">
+      <Text size="small" tone="muted">
+        焼き込み（調整中の値・見本の文字だけ）{note && ` ― ${note}`}
+      </Text>
+      <KeiProvider theme={theme} wear="baked" className="tune-specimen" style={style}>
+        <Specimen />
+      </KeiProvider>
+    </div>
+  );
+}
 
 function Column({
   title,

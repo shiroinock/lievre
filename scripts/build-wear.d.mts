@@ -15,3 +15,4 @@ export function buildWear(
 };
 export function readConfig(path?: string | URL): WearConfig;
 export function writeWear(config?: WearConfig): ReturnType<typeof buildWear>['meta'];
+export function outlineEnv(outline: WearConfig['outline']): Record<string, string>;

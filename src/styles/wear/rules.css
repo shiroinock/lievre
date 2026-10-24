@@ -45,6 +45,10 @@
     .kei[data-wear='live'] :is(.k-text--small:not(.k-muted), .k-label):nth-of-type(4n + 4):not(:has(a, button, input, select, textarea, [tabindex])) {
       filter: var(--k-wear-small-3, none);
     }
+    .kei[data-wear='baked'] :is(.k-text--small:not(.k-muted), .k-label):not(:has(a, button, input, select, textarea, [tabindex])) {
+      font-family: var(--k-wear-small-face);
+      --k-font-mono: var(--k-wear-small-mono);
+    }
     .kei:is([data-wear='baked'], [data-wear='live']) :is(.k-text--body:not(.k-muted), .k-text--lead:not(.k-muted), .k-card-title):not(:has(a, button, input, select, textarea, [tabindex])) {
       mask-image: var(--k-wear-text-mask);
       mask-size: 100% 100%, 256px 256px;
@@ -73,6 +77,10 @@
     }
     .kei[data-wear='live'] :is(.k-text--body:not(.k-muted), .k-text--lead:not(.k-muted), .k-card-title):nth-of-type(4n + 4):not(:has(a, button, input, select, textarea, [tabindex])) {
       filter: var(--k-wear-text-3, none);
+    }
+    .kei[data-wear='baked'] :is(.k-text--body:not(.k-muted), .k-text--lead:not(.k-muted), .k-card-title):not(:has(a, button, input, select, textarea, [tabindex])) {
+      font-family: var(--k-wear-text-face);
+      --k-font-mono: var(--k-wear-text-mono);
     }
     .kei:is([data-wear='baked'], [data-wear='live']) :is(.k-heading):not(:has(a, button, input, select, textarea, [tabindex])) {
       mask-image: var(--k-wear-heading-mask);
@@ -103,6 +111,10 @@
     .kei[data-wear='live'] :is(.k-heading):nth-of-type(4n + 4):not(:has(a, button, input, select, textarea, [tabindex])) {
       filter: var(--k-wear-heading-3, none);
     }
+    .kei[data-wear='baked'] :is(.k-heading):not(:has(a, button, input, select, textarea, [tabindex])) {
+      font-family: var(--k-wear-heading-face);
+      --k-font-mono: var(--k-wear-heading-mono);
+    }
     .kei:is([data-wear='baked'], [data-wear='live']) :is(.k-metric-value, .k-meter-reading strong):not(:has(a, button, input, select, textarea, [tabindex])) {
       mask-image: var(--k-wear-figure-mask);
       mask-size: 100% 100%, 256px 256px;
@@ -132,6 +144,10 @@
     .kei[data-wear='live'] :is(.k-metric-value, .k-meter-reading strong):nth-of-type(4n + 4):not(:has(a, button, input, select, textarea, [tabindex])) {
       filter: var(--k-wear-figure-3, none);
     }
+    .kei[data-wear='baked'] :is(.k-metric-value, .k-meter-reading strong):not(:has(a, button, input, select, textarea, [tabindex])) {
+      font-family: var(--k-wear-figure-face);
+      --k-font-mono: var(--k-wear-figure-mono);
+    }
     .kei:is([data-wear='baked'], [data-wear='live']) :is(.k-table td):not(:has(a, button, input, select, textarea, [tabindex])) {
       mask-image: var(--k-wear-data-mask);
       mask-size: 100% 100%, 256px 256px;
@@ -160,6 +176,10 @@
     }
     .kei[data-wear='live'] :is(.k-table td):nth-of-type(4n + 4):not(:has(a, button, input, select, textarea, [tabindex])) {
       filter: var(--k-wear-data-3, none);
+    }
+    .kei[data-wear='baked'] :is(.k-table td):not(:has(a, button, input, select, textarea, [tabindex])) {
+      font-family: var(--k-wear-data-face);
+      --k-font-mono: var(--k-wear-data-mono);
     }
   }
 }

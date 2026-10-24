@@ -3,7 +3,7 @@
 import type { CSSProperties } from 'react';
 import tokens from '../../tokens/tokens.json';
 import { seedFor } from './seed.mjs';
-import { liveDistortion, textures, wearVars } from './textures.mjs';
+import { liveEdge, textures, wearVars } from './textures.mjs';
 import { TEXT_KINDS, VARIANTS } from './params.mjs';
 import type { WearConfig, WearKind } from './presets.mjs';
 
@@ -57,14 +57,14 @@ export function liveWearStyle(prefix: string, config: WearConfig, theme: string)
   return style as CSSProperties;
 }
 
-/** One distortion filter per distorted kind and variant. */
+/** One edge-wear filter per worn kind and variant. */
 export function LiveWearFilters({ prefix, config }: { prefix: string; config: WearConfig }) {
   return (
     <svg aria-hidden width="0" height="0" style={{ position: 'absolute', width: 0, height: 0 }}>
       {kinds
         .filter((kind) => config.kinds[kind].distort)
         .flatMap((kind) => {
-          const { baseFrequency, scale } = liveDistortion(config, kind);
+          const { baseFrequency, scale } = liveEdge(config, kind);
           return Array.from({ length: VARIANTS }, (_, n) => (
             <filter
               key={`${kind}-${n}`}
