@@ -20,7 +20,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '採用前の試作です。Sepia（焼けた紙）と Rust（錆びた筐体）の2テーマと、紙の粒・刷りのずれ・擦れた罫線を加える `wear="worn"` を、既存の Paper / Ink と並べて比べます。候補の一覧と根拠は references/weathered-candidates.md にあります。',
+          '採用前の試作です。紙の粒・刷りのずれ・擦れた罫線を加える `wear="worn"` を、Paper / Ink で比べます。候補の一覧と根拠は references/weathered-candidates.md にあります（Sepia と Rust のテーマは採用しませんでした）。',
       },
     },
   },
@@ -31,8 +31,6 @@ type Story = StoryObj<typeof meta>;
 const themes: { theme: Theme; name: string; note: string }[] = [
   { theme: 'paper', name: 'Paper', note: '青みのある明るい紙（現行）' },
   { theme: 'ink', name: 'Ink', note: '深い紺（現行）' },
-  { theme: 'sepia', name: 'Sepia', note: '焼けた紙と褪せた群青（試作）' },
-  { theme: 'rust', name: 'Rust', note: '錆びた筐体と淡い群青（試作）' },
 ];
 
 function Sample({ name, note }: { name: string; note: string }) {
@@ -97,10 +95,10 @@ function Grid({ wear }: { wear: Wear }) {
 }
 
 export const Themes: Story = {
-  name: '4つのテーマ（整った面）',
+  name: 'テーマ（整った面）',
   render: () => <Grid wear="clean" />,
 };
-export const Worn: Story = { name: '4つのテーマ（擦れ）', render: () => <Grid wear="worn" /> };
+export const Worn: Story = { name: 'テーマ（擦れ）', render: () => <Grid wear="worn" /> };
 export const SideBySide: Story = {
   name: '整った面と擦れの対比',
   render: () => (
@@ -111,11 +109,11 @@ export const SideBySide: Story = {
         gap: 16,
       }}
     >
-      {(['sepia', 'rust'] as const).flatMap((theme) =>
+      {(['paper', 'ink'] as const).flatMap((theme) =>
         (['clean', 'worn'] as const).map((wear) => (
           <KeiProvider key={theme + wear} theme={theme} wear={wear} style={{ padding: 24 }}>
             <Sample
-              name={theme === 'sepia' ? 'Sepia' : 'Rust'}
+              name={theme === 'paper' ? 'Paper' : 'Ink'}
               note={wear === 'clean' ? '整った面' : '擦れ：粒・刷りのずれ・罫線の欠け'}
             />
           </KeiProvider>

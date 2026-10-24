@@ -3,7 +3,7 @@ import tokens from '../../tokens/tokens.json';
 import { readFileSync } from 'node:fs';
 import { buildTokens } from '../../scripts/build-tokens.mjs';
 type TokenSet = Record<string, { $value: string }>;
-const themes = ['paper', 'ink', 'sepia', 'rust'] as const;
+const themes = ['paper', 'ink'] as const;
 function themeTokens(theme: (typeof themes)[number]) {
   return { ...tokens.paper, ...(theme === 'paper' ? {} : tokens[theme]) } as TokenSet;
 }

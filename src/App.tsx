@@ -10,8 +10,6 @@ import {
   Menu,
   Moon,
   Ruler,
-  Scroll,
-  Cog,
   Sun,
   X,
 } from 'lucide-react';
@@ -221,14 +219,6 @@ export default function App() {
               <button aria-pressed={theme === 'ink'} onClick={() => setTheme('ink')}>
                 <Moon size={14} aria-hidden />
                 Ink
-              </button>
-              <button aria-pressed={theme === 'sepia'} onClick={() => setTheme('sepia')}>
-                <Scroll size={14} aria-hidden />
-                Sepia
-              </button>
-              <button aria-pressed={theme === 'rust'} onClick={() => setTheme('rust')}>
-                <Cog size={14} aria-hidden />
-                Rust
               </button>
             </div>
             <div className="density-control">

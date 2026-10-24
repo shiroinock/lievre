@@ -2,8 +2,7 @@ import { createContext, useContext, useState, type HTMLAttributes, type ReactNod
 import { Toast as ToastPrimitive } from 'radix-ui';
 import { X, CheckCircle2, AlertCircle } from 'lucide-react';
 
-/** sepia と rust は試作のテーマです。 */
-export type Theme = 'paper' | 'ink' | 'sepia' | 'rust';
+export type Theme = 'paper' | 'ink';
 /** 試作：worn は紙の粒・刷りのずれ・擦れた罫線を加えます。 */
 export type Wear = 'clean' | 'worn';
 export type Density = 'comfortable' | 'compact';

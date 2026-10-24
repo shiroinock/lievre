@@ -356,7 +356,7 @@ ToastProviderの子孫で使用します。保存結果や一時的な通知向�
 
 ## 型とその他
 
-- `type Theme = 'paper' | 'ink' | 'sepia' | 'rust';` — sepia と rust は試作のテーマです。
+- `type Theme = 'paper' | 'ink';`
 - `type Wear = 'clean' | 'worn';` — 試作：worn は紙の粒・刷りのずれ・擦れた罫線を加えます。
 - `type Density = 'comfortable' | 'compact';`
 - `type Typography = 'standard' | 'interface';`
