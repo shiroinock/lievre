@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { DataTable, Badge, type Column } from '../index';
 import { expect, userEvent, within } from 'storybook/test';
 type Row = { id: string; name: string; value: number; status: string };
@@ -42,6 +43,23 @@ const meta = {
     selectable: false,
   },
   parameters: {
+    layoutGate: {
+      parts: [
+        { name: '表の見出しのセル', selector: '.k-table th', checks: ['inset-y'] },
+        // The empty state is a block of several lines; like a panel, its half-leading is not
+        // held to the one-line centre. EmptyState is measured in its own story.
+        {
+          name: '表のセル',
+          selector: '.k-table td:not(:has(.k-empty))',
+          checks: ['inset-y', 'line-grid'],
+        },
+        {
+          name: '並べ替えのボタン',
+          selector: '.k-table-sort',
+          checks: ['grid-height', { icon: 'svg' }],
+        },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

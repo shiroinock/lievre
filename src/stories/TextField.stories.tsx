@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { TextField, Button, Badge, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,15 @@ const meta = {
   title: 'Components/Inputs/TextField',
   component: TextField,
   parameters: {
+    layoutGate: {
+      parts: [
+        {
+          name: '入力欄',
+          selector: '.k-input',
+          checks: ['inset-y', 'control-height', { padding: 'input' }],
+        },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

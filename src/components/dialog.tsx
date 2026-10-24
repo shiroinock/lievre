@@ -6,8 +6,11 @@ export type DialogProps = {
   trigger: ReactNode;
   eyebrow?: string;
   title: string;
+  /** 何が起きるかの説明。aria-describedby で結びます。 */
   description: string;
+  /** 本文。フォームや詳細を置きます。 */
   children: ReactNode;
+  /** 操作。閉じるだけのボタンは `<DialogClose asChild><Button>…</Button></DialogClose>` で包みます。 */
   footer?: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -39,7 +42,7 @@ export function Dialog({
                 </DialogPrimitive.Description>
               </div>
               <DialogPrimitive.Close className="k-icon-button" aria-label="ダイアログを閉じる">
-                <X size={18} />
+                <X size={16} />
               </DialogPrimitive.Close>
             </header>
             <div className="k-dialog-body">{children}</div>
@@ -50,4 +53,5 @@ export function Dialog({
     </DialogPrimitive.Root>
   );
 }
+/** 押すと Dialog を閉じます。`<DialogClose asChild><Button>キャンセル</Button></DialogClose>` のように asChild で包みます。 */
 export const DialogClose = DialogPrimitive.Close;

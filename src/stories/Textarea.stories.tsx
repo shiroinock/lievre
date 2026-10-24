@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Textarea, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,9 @@ const meta = {
   title: 'Components/Inputs/Textarea',
   component: Textarea,
   parameters: {
+    layoutGate: {
+      parts: [{ name: '複数行の入力欄', selector: '.k-textarea', checks: ['grid-height'] }],
+    } satisfies LayoutGate,
     docs: { description: { component: '複数行の入力。幅は親に従い、縦方向にリサイズできます。' } },
   },
   args: {
