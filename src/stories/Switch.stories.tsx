@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Switch, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,16 @@ const meta = {
   title: 'Components/Inputs/Switch',
   component: Switch,
   parameters: {
+    layoutGate: {
+      parts: [
+        { name: 'スイッチ', selector: '.k-switch', checks: ['inset-y', 'grid-height'] },
+        {
+          name: 'スイッチの欄',
+          selector: '.k-switch-field',
+          checks: [{ icon: '.k-switch', text: '.k-check-label' }],
+        },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

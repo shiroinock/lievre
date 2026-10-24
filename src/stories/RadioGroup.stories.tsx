@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { RadioGroup, Button, Card, Text } from '../index';
 const meta = {
   title: 'Components/Inputs/RadioGroup',
@@ -9,6 +10,11 @@ const meta = {
       { value: 'email', label: 'メール', description: 'お知らせを受け取ります。' },
       { value: 'none', label: '受け取らない' },
     ],
+  },
+  parameters: {
+    layoutGate: {
+      parts: [{ name: 'ラジオボタン', selector: '.k-radio-option', checks: [{ icon: 'input' }] }],
+    } satisfies LayoutGate,
   },
 } satisfies Meta<typeof RadioGroup>;
 export default meta;

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Tabs, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,17 @@ const meta = {
   title: 'Components/Navigation/Tabs',
   component: Tabs,
   parameters: {
+    layoutGate: {
+      parts: [
+        {
+          name: 'タブ',
+          selector: '.k-tab',
+          checks: ['inset-x', 'inset-y', 'control-height', 'fits'],
+        },
+        { name: 'タブの件数', selector: '.k-tab-count', checks: ['inset-x', 'inset-y'] },
+        { name: 'タブの並び', selector: '.k-tabs-list', checks: [{ sameHeight: '.k-tab' }] },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:

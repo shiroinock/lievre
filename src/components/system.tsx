@@ -69,7 +69,7 @@ export function useEffectiveWear(wear: Wear): Wear {
   if (plain) return 'off';
   return wear === 'live' && still ? 'baked' : wear;
 }
-/** すべての部品の配色と表示密度のスコープ。アプリのルートを包んで使います。 */
+/** すべての部品の配色と表示密度のスコープ。アプリのルートを包んで使います。部品のスタイルは `.kei`（この部品が出す div）の内側でだけ効きます。 */
 export function KeiProvider({
   theme: givenTheme,
   density: givenDensity,
@@ -143,12 +143,20 @@ export function PortalSurface({ children }: { children: ReactNode }) {
     </div>
   );
 }
-type ToastMessage = { title: string; description?: string; tone?: 'success' | 'error' };
+export type ToastMessage = {
+  title: string;
+  description?: string;
+  /** 既定は 'success'。失敗は 'error'（Badge・Alert の 'danger' とは名前が違います）。 */
+  tone?: 'success' | 'error';
+};
 const ToastContext = createContext<((message: ToastMessage) => void) | null>(null);
-/** ToastProviderの子孫で使用します。保存結果や一時的な通知向け。 */
+/** ToastProviderの子孫で使用します。保存結果や一時的な通知向け。`const toast = useToast(); toast({ title: '保存しました' })` */
 export function useToast() {
   const ctx = useContext(ToastContext);
-  if (!ctx) throw new Error('useToast requires ToastProvider');
+  if (!ctx)
+    throw new Error(
+      'useToast は ToastProvider の内側で呼んでください：<KeiProvider><ToastProvider>{app}</ToastProvider></KeiProvider>',
+    );
   return ctx;
 }
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -174,9 +182,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             }}
           >
             {message.tone === 'error' ? (
-              <AlertCircle size={18} aria-hidden />
+              <AlertCircle size={20} aria-hidden />
             ) : (
-              <CheckCircle2 size={18} aria-hidden />
+              <CheckCircle2 size={20} aria-hidden />
             )}
             <div>
               <ToastPrimitive.Title className="k-toast-title">{message.title}</ToastPrimitive.Title>

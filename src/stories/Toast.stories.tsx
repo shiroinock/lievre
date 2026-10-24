@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Button, ToastProvider, useToast } from '../index';
+import { expect, userEvent, within } from 'storybook/test';
 function Demo({ tone = 'success' }: { tone?: 'success' | 'error' }) {
   const toast = useToast();
   return (
@@ -29,6 +31,24 @@ const meta = {
     </ToastProvider>
   ),
   parameters: {
+    layoutGate: {
+      parts: [
+        {
+          name: '通知を出すボタン',
+          selector: '.k-button',
+          checks: [
+            'inset-x',
+            'inset-y',
+            'control-height',
+            { padding: 'button' },
+            'fits',
+            { icon: 'svg' },
+          ],
+        },
+        { name: '通知', selector: '.k-toast', checks: ['padding-equal', { icon: ':scope > svg' }] },
+        { name: '通知を閉じるボタン', selector: '.k-icon-button', checks: ['inset-x', 'inset-y'] },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:
@@ -46,4 +66,13 @@ export const Error: Story = {
       <Demo tone="error" />
     </ToastProvider>
   ),
+};
+/** 通知を出した状態。配置の検査は、この Story で通知を測ります。 */
+export const Shown: Story = {
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: '通知を表示' }));
+    await expect(
+      await within(canvasElement.ownerDocument.body).findByText('設定を保存しました'),
+    ).toBeVisible();
+  },
 };

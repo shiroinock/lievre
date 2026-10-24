@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { LayoutGate } from '../test/layout/declare';
 import { Card, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
@@ -8,6 +9,17 @@ const meta = {
   title: 'Components/Layout/Card',
   component: Card,
   parameters: {
+    layoutGate: {
+      parts: [
+        { name: 'カードの本文', selector: '.k-card-body', checks: ['padding-equal'] },
+        // The action sits on the centre of the heading block (eyebrow and title together).
+        {
+          name: 'カードの見出し',
+          selector: '.k-card-header',
+          checks: [{ icon: ':scope > .k-button', text: ':scope > div', block: true }],
+        },
+      ],
+    } satisfies LayoutGate,
     docs: {
       description: {
         component:
@@ -26,4 +38,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 export const WithAction: Story = { args: { action: <Button size="sm">詳細を開く</Button> } };
+export const WithActionTitleOnly: Story = {
+  args: { eyebrow: undefined, action: <Button size="sm">詳細を開く</Button> },
+};
 export const WithoutHeading: Story = { args: { title: undefined, eyebrow: undefined } };
