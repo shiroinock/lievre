@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import tokens from '../../tokens/tokens.json';
 import { readFileSync } from 'node:fs';
-const css = readFileSync('src/styles/kei.css', 'utf8').replace(/\s+/g, ' ');
+import { buildTokens } from '../../scripts/build-tokens.mjs';
 type TokenSet = Record<string, { $value: string }>;
 function themeTokens(theme: 'paper' | 'ink') {
   return { ...tokens.paper, ...(theme === 'ink' ? tokens.ink : {}) } as TokenSet;
@@ -24,13 +24,9 @@ function ratio(a: string, b: string) {
   return (hi + 0.05) / (lo + 0.05);
 }
 describe('Semantic color contrast and token synchronization', () => {
-  it('keeps exchanged token values in sync with the CSS source', () => {
-    for (const [name, token] of Object.entries(tokens.paper)) {
-      expect(css).toContain(`--k-${name}: ${token.$value}`);
-    }
-    for (const [name, token] of Object.entries(tokens.ink)) {
-      expect(css).toContain(`--k-${name}: ${token.$value}`);
-    }
+  it('keeps tokens.json identical to what kei.css generates', () => {
+    // Every scope, both directions: run `npm run tokens` after editing kei.css.
+    expect(tokens).toEqual(buildTokens(readFileSync('src/styles/kei.css', 'utf8')));
   });
   for (const theme of ['paper', 'ink'] as const) {
     const set = themeTokens(theme);
