@@ -874,6 +874,62 @@
     fill: var(--k-text);
   }
 
+  /* DescriptionList: row puts every label in one fixed column and lets the value wrap below
+     it when the row is too narrow; stack sets label over value in up to N columns. */
+  .k-dl {
+    --dl-label-width: 8em;
+    display: grid;
+    gap: var(--k-space-3) var(--k-space-6);
+    margin: 0;
+  }
+  .kei[data-density='compact'] .k-dl {
+    row-gap: var(--k-space-2);
+  }
+  .k-dl-item {
+    min-width: 0;
+  }
+  .k-dl-label {
+    color: var(--k-muted);
+    font-size: var(--k-text-sm);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+  }
+  .k-dl-value {
+    min-width: 0;
+    margin: 0;
+    line-height: var(--k-line-body);
+    overflow-wrap: anywhere;
+  }
+  /* Baselines line up even when a monospaced value sits beside a Japanese label. */
+  .k-dl[data-layout='row'] .k-dl-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--k-space-4);
+  }
+  .k-dl[data-layout='row'] .k-dl-label {
+    flex: 0 0 var(--dl-label-width);
+  }
+  .k-dl[data-layout='row'] .k-dl-value {
+    flex: 1 1 16rem;
+  }
+  .k-dl[data-layout='stack'] {
+    /* At most --dl-columns columns, fewer once a column would drop below 12rem. */
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(
+        max(12rem, calc((100% - (var(--dl-columns) - 1) * var(--k-space-6)) / var(--dl-columns))),
+        1fr
+      )
+    );
+  }
+  .k-dl[data-layout='stack'] .k-dl-label {
+    margin-bottom: var(--k-space-1);
+  }
+  .k-dl-item[data-wide] {
+    grid-column: 1 / -1;
+  }
+
   /* Popover and menu float on a 1px line and the raised surface, never a shadow. */
   .k-popover,
   .k-menu {

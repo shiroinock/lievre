@@ -285,21 +285,9 @@ body:has(.kei-app) {
   color: var(--k-muted);
 }
 .hero-facts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
   margin: 40px 0 0;
   padding-top: 20px;
   border-top: 1px solid var(--k-border);
-}
-.hero-facts dt {
-  font-size: var(--k-text-xs);
-  font-weight: var(--k-weight-bold);
-  color: var(--k-muted);
-}
-.hero-facts dd {
-  margin: 4px 0 0;
-  font-size: var(--k-text-md);
 }
 
 /* Content sits on the work surface like any card; ultramarine stays on what can be pressed or is selected. */
@@ -687,8 +675,7 @@ body:has(.kei-app) {
   gap: 16px;
   margin: 0;
 }
-.reference-translation dt,
-.work-detail-grid dt {
+.reference-translation dt {
   font-size: var(--k-text-xs);
   font-weight: var(--k-weight-bold);
   color: var(--k-muted);
@@ -924,19 +911,7 @@ body:has(.kei-app) {
     linear-gradient(var(--bar), var(--bar)) 50% 100% / 3px 70% no-repeat,
     linear-gradient(var(--bar), var(--bar)) 100% 100% / 3px 100% no-repeat;
 }
-.work-detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px 24px;
-  margin: 0;
-}
-.work-detail-grid dd {
-  margin: 4px 0 0;
-}
 .work-detail-notes {
-  grid-column: 1 / -1;
-}
-.work-detail-notes dd {
   white-space: pre-wrap;
 }
 .operations-lower {
@@ -1115,19 +1090,6 @@ body:has(.kei-app) {
   text-decoration-thickness: 2px;
   text-underline-offset: 8px;
 }
-.everyday-summary {
-  display: grid;
-  gap: 4px;
-  margin: 0;
-}
-.everyday-summary dt {
-  font-size: var(--k-text-sm);
-  color: var(--k-muted);
-}
-.everyday-summary dd {
-  margin: 0 0 12px;
-  overflow-wrap: anywhere;
-}
 
 /* ------------------------------------------------------------- storybook */
 
@@ -1225,22 +1187,6 @@ body:has(.kei-app) {
   }
   .hero-copy > p {
     font-size: var(--k-text-base);
-  }
-  .hero-facts {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  .hero-facts > div {
-    display: flex;
-    gap: 12px;
-  }
-  .hero-facts dt {
-    width: 6.5em;
-    flex: none;
-    font-size: var(--k-text-sm);
-  }
-  .hero-facts dd {
-    margin: 0;
   }
   .page-heading {
     padding-top: 32px;

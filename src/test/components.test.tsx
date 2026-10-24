@@ -17,6 +17,7 @@ import {
   Progress,
   Sparkline,
   IconButton,
+  DescriptionList,
   type Column,
 } from '../index';
 import { OperationsExample, SettingsExample } from '../patterns/Operations';
@@ -180,6 +181,25 @@ describe('Tables and measures', () => {
       'preserveAspectRatio',
       'none',
     );
+  });
+  it('keeps a description list as dl, dt and dd, and sets figures in the monospaced face', async () => {
+    const { container } = setup(
+      <DescriptionList
+        items={[
+          { label: '申請番号', value: 'REQ-00481', mono: true },
+          { label: '申請者', value: '計 花子' },
+        ]}
+      />,
+    );
+    const list = container.querySelector('dl')!;
+    expect([...list.children].map((row) => [...row.children].map((c) => c.tagName))).toEqual([
+      ['DT', 'DD'],
+      ['DT', 'DD'],
+    ]);
+    expect(screen.getByText('REQ-00481')).toHaveClass('k-mono');
+    expect(screen.getByText('計 花子')).not.toHaveClass('k-mono');
+    const results = await axe.run(container);
+    expect(results.violations.map((v) => v.id)).toEqual([]);
   });
   it('renders an informative empty table instead of a blank panel', () => {
     setup(<DataTable rows={[]} columns={columns} getRowId={(r) => r.id} caption="測定値" />);

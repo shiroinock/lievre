@@ -30,6 +30,7 @@ import '@kei-design/react/styles.css';
 - 押して開く操作できる中身（絞り込み・表示の設定）は `Popover`、説明の短い文だけなら `Tooltip`。Popover の中の「適用」で閉じるときは `open` / `onOpenChange` で開閉を持ちます。
 - 操作の一覧は `DropdownMenu` に `items` の配列で渡します（子要素では渡しません）。区切りは `{ type: 'separator' }`、入り切りは `type: 'checkbox'`、1つを選ぶ組は `type: 'radio'`。削除などは `tone: 'danger'` にし、label にも「削除」と書きます。
 - 削除・送信の確認は Dialog で組まず `ConfirmDialog` を使います。`confirmLabel` には何が起きるかを動詞で書きます（「3件を削除」。「OK」「はい」にしない）。取り消せない操作は `tone="danger"`。`onConfirm` が Promise を返すと終わるまで閉じず、reject すると開いたままです。メニューの項目から開くときは `trigger` を省き、`open` / `onOpenChange` で持ちます。
+- 「項目名：値」の一覧は `<dl>` を手で組まず `DescriptionList` に `items` で渡します。数値・ID・日時は `mono: true`。詳細や確認の画面は既定の `layout="row"`、項目を段に並べるときは `layout="stack" columns={2}`。
 - ラベルは日本語で書き、英大文字や記号で飾りません。
 
 ## 表の並べ替えとページ送り
@@ -312,6 +313,16 @@ const sorted = useMemo(() => {
 - `sorting?: TableSort` — 渡すと並べ替えの状態を外で持ちます（ページ送りと組み合わせるとき）。見出しを押すたびに昇順と降順を切り替え、解除はしません。
 - `onSortingChange?: ((sort: TableSort) => void)`
 
+### DescriptionList
+
+「項目名：値」の一覧。`<dl>` の意味を保ちます。layout="row" は項目名の列と値を横に並べ、幅が足りないと値を項目名の下に回します。
+
+- `items: DescriptionItem[]`
+- `layout?: 'row' | 'stack'` — 既定 'row'。'row' は詳細や確認の画面向けに項目名と値を横に並べ、'stack' は項目名の下に値を置きます。
+- `columns?: 1 | 2 | 3` — 既定 1。layout="stack" のときの段の数。幅が足りないと段を減らします。
+- `labelWidth?: string` — layout="row" の項目名の列の幅。既定は '8em'。どの行も同じ幅になります。
+- ほかに HTMLAttributes<HTMLDListElement> の属性を受け取ります。
+
 ### Text
 
 用途に依存しない本文。密度と文字の役割を分けて選びます。
@@ -422,6 +433,11 @@ ToastProviderの子孫で使用します。保存結果や一時的な通知向�
   - `align?: 'left' | 'right'`
   - `width?: string`
 - `type TableSort = { key: string; direction: 'asc' | 'desc' } | null;`
+- `type DescriptionItem`
+  - `label: string` — 項目名。
+  - `value: ReactNode`
+  - `mono?: boolean` — 値が数値・ID・日時・コードのとき true。等幅で桁をそろえます。単位は value の中で `.k-mono` の外に置けないので、単位のある値は false のまま `<span className="k-mono">` で包みます。
+  - `wide?: boolean` — layout="stack" で段を組むとき、行の幅いっぱいに広げます（メモなど長い値）。
 - `type Space = 0 | 1 | 2 | 3 | 4 | 6 | 8 | 12;`
 - `type RadioOption = { value: string; label: string; description?: string; disabled?: boolean; };`
 - `type MenuItem = | { type?: 'item'; label: string; onSelect: () => void; icon?: ReactNode; shortcut?: string; tone?: 'danger'; disabled?: boolean; } | { type: 'checkbox'; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; disabled?: boolean; } | { type: 'radio'; label: string; value: string; onValueChange: (value: string) => void; options: { value: string; label: string; disabled?: boolean }[]; } | { type: 'separator' };`

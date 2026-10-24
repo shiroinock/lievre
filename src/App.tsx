@@ -26,6 +26,7 @@ import {
   type Theme,
   type Density,
   IconButton,
+  DescriptionList,
 } from './index';
 import { ComponentGallery } from './docs/ComponentGallery';
 import { ColorFoundation, Foundations, ReferenceDirection, principles } from './docs/Foundations';
@@ -279,20 +280,16 @@ export default function App() {
                         デザインの基礎
                       </Button>
                     </div>
-                    <dl className="hero-facts">
-                      <div>
-                        <dt>本文</dt>
-                        <dd>16px／操作画面は14px</dd>
-                      </div>
-                      <div>
-                        <dt>テーマ</dt>
-                        <dd>Paper と Ink</dd>
-                      </div>
-                      <div>
-                        <dt>コントラスト</dt>
-                        <dd>すべての組み合わせをテストで検査</dd>
-                      </div>
-                    </dl>
+                    <DescriptionList
+                      className="hero-facts"
+                      layout="stack"
+                      columns={3}
+                      items={[
+                        { label: '本文', value: '16px／操作画面は14px' },
+                        { label: 'テーマ', value: 'Paper と Ink' },
+                        { label: 'コントラスト', value: 'すべての組み合わせをテストで検査' },
+                      ]}
+                    />
                   </div>
                   <InstrumentPanel />
                 </section>
