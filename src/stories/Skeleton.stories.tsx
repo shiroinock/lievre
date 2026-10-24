@@ -4,9 +4,29 @@ import { useState } from 'react';
 import { Plus, Settings2, FolderOpen } from 'lucide-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
-const meta = {title:'Components/Feedback/Skeleton',component:Skeleton,parameters:{docs:{description:{component:'読込後のレイアウトを保つ仮表示。動きを減らす設定ではアニメーションを止めます。'}}},args:{width:240,height:18,label:'読み込み中'},} satisfies Meta<typeof Skeleton>;
+const meta = {
+  title: 'Components/Feedback/Skeleton',
+  component: Skeleton,
+  parameters: {
+    docs: {
+      description: {
+        component: '読込後のレイアウトを保つ仮表示。動きを減らす設定ではアニメーションを止めます。',
+      },
+    },
+  },
+  args: { width: 240, height: 18, label: '読み込み中' },
+} satisfies Meta<typeof Skeleton>;
 export default meta;
-type Story=StoryObj<typeof meta>;
+type Story = StoryObj<typeof meta>;
 
-export const Default:Story={};
-export const Panel:Story={render:()=> <div className="gallery-stack" style={{width:320}}><Skeleton width="40%"/><Skeleton height={24}/><Skeleton height={24}/><Skeleton width="70%"/></div>};
+export const Default: Story = {};
+export const Panel: Story = {
+  render: () => (
+    <div className="gallery-stack" style={{ width: 320 }}>
+      <Skeleton width="40%" />
+      <Skeleton height={24} />
+      <Skeleton height={24} />
+      <Skeleton width="70%" />
+    </div>
+  ),
+};

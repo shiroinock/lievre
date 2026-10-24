@@ -1,8 +1,412 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
-import { ActionLink, Alert, Badge, Button, Card, Checkbox, Container, EmptyState, Grid, Heading, Link, RadioGroup, Stack, Text, TextField } from '../index';
-function TitleWords({parts}:{parts:string[]}){return <>{parts.map((part,i)=><Fragment key={part}><span className="everyday-title-word">{part}</span>{i<parts.length-1&&<wbr/>}</Fragment>)}</>}
-const titleParts:Record<string,string[]>={start:['小さく始める、','日々の記録'],space:['考えが進む','作業場所の','つくり方'],share:['伝わるノートの','まとめ方']};
-const guides=[{id:'start',category:'はじめる',title:'小さく始める、日々の記録',description:'気づきやアイデアを、あとから読み返せる形に。',time:'5分',number:'01'},{id:'space',category:'整える',title:'考えが進む作業場所のつくり方',description:'道具の選び方から、続けられる環境まで。',time:'8分',number:'02'},{id:'share',category:'共有する',title:'伝わるノートのまとめ方',description:'自分の記録を、誰かが使える知識に変える。',time:'6分',number:'03'}];
-export function ResourceLibrary(){const [query,setQuery]=useState('');const [category,setCategory]=useState('すべて');const [selected,setSelected]=useState<string|null>(null);const lastSelected=useRef<string|null>(null);const articleButtons=useRef<Record<string,HTMLButtonElement|null>>({});useEffect(()=>{if(selected===null&&lastSelected.current)articleButtons.current[lastSelected.current]?.focus()},[selected]);const matches=guides.filter(g=>(category==='すべて'||g.category===category)&&`${g.title} ${g.description}`.includes(query));if(selected)return <ArticleExample focusOnMount articleId={selected} onBack={()=>setSelected(null)}/>;return <Container className="everyday-page everyday-page--library"><Stack gap={8} style={{gap:"var(--everyday-section-gap,32px)"}}><Stack gap={3}><Text size="small" tone="muted">KEI JOURNAL / LIBRARY</Text><Heading level={1} size="display"><TitleWords parts={["毎日に、","使えるアイデア。"]}/></Heading><Text size="lead" tone="muted">仕事にも暮らしにも。考えること、つくることを少し心地よくする読み物。</Text></Stack><TextField label="読み物を検索" value={query} onChange={e=>setQuery(e.target.value)} placeholder="例：記録、ノート" controlSize="lg"/><Stack direction="row" gap={2} className="everyday-filters">{['すべて','はじめる','整える','共有する'].map(c=><Button key={c} variant={category===c?'primary':'secondary'} aria-pressed={category===c} onClick={()=>setCategory(c)}>{c}</Button>)}</Stack><Text size="small" tone="muted" aria-live="polite">{matches.length}件の読み物</Text>{matches.length?<Grid>{matches.map(g=><Card key={g.id}><Stack gap={4}><div className="everyday-art" aria-hidden><span>{g.number}</span><i/><i/><i/></div><Stack direction="row" gap={2}><Badge tone="info">{g.category}</Badge><Text as="span" size="small" tone="muted">{g.time}で読めます</Text></Stack><Heading level={2}><TitleWords parts={titleParts[g.id]}/></Heading><Text tone="muted">{g.description}</Text><Button variant="ghost" ref={node=>{articleButtons.current[g.id]=node}} onClick={()=>{lastSelected.current=g.id;setSelected(g.id)}} aria-label={`記事を読む：${g.title}`}>記事を読む<span aria-hidden> →</span></Button></Stack></Card>)}</Grid>:<EmptyState title="読み物が見つかりません" description="別のキーワードやカテゴリで探してみてください。" action={<Button onClick={()=>{setQuery('');setCategory('すべて')}}>検索条件をリセット</Button>}/>}</Stack></Container>}
-export function ArticleExample({articleId='start',onBack,focusOnMount=false}:{articleId?:string;onBack?:()=>void;focusOnMount?:boolean}){const titleRef=useRef<HTMLHeadingElement>(null);useEffect(()=>{if(focusOnMount)titleRef.current?.focus()},[focusOnMount]);const g=guides.find(g=>g.id===articleId)??guides[0];const [saved,setSaved]=useState(false);return <Container width="reading" className="everyday-page"><Stack gap={8} style={{gap:"var(--everyday-section-gap,32px)"}}><nav aria-label="記事内ナビゲーション">{onBack?<Button variant="ghost" onClick={onBack}>← 読み物一覧へ</Button>:<Link href="#article-body">本文へ進む ↓</Link>}</nav><header><Stack gap={4}><Badge tone="info">{g.category}</Badge><Heading ref={titleRef} tabIndex={-1} level={1} size="display"><TitleWords parts={titleParts[g.id]}/></Heading><Text size="lead" tone="muted">{g.description}</Text><Text size="small" tone="muted">KEI編集部 · 2026年10月24日 · 約{g.time}</Text></Stack></header><article id="article-body" className="everyday-prose"><Text>新しいことを始めるとき、最初から完璧な仕組みを用意する必要はありません。まずは、今日の気づきをひとつ書き留めるところから始めてみましょう。</Text><Heading level={2}>続けられる、小さな単位に。</Heading><Text>大切なのは情報の量よりも、あとで自分が使えること。見出しをつけ、背景を書き添え、次の一歩を短い言葉にします。余白と段落が、考えを整理する助けになります。</Text><blockquote>記録は、未来の自分に渡すための、小さな道具です。</blockquote><Heading level={2}>試して、読み返して、整える。</Heading><Text>一週間たったら読み返し、役に立った部分を残してみてください。自分のリズムに合う方法は、使いながら少しずつ見つかります。</Text><ul><li>まずは一日ひとつ、気づきを残す</li><li>見出しと本文を分ける</li><li>次に試したいことを最後に書く</li></ul></article><Card><Stack gap={4}><Heading level={2}>あとで、もう一度。</Heading><Text tone="muted">この画面内で保存状態を試せます。再読み込みで元に戻ります。</Text><Stack direction="row" gap={3}><Button variant={saved?'secondary':'primary'} aria-pressed={saved} onClick={()=>setSaved(!saved)}>{saved?'保存済み':'この記事を保存'}</Button><ActionLink variant="ghost" href="#article-body">本文へ戻る ↑</ActionLink></Stack><Text size="small" aria-live="polite">{saved?'この記事を保存しました。':'保存していない記事です。'}</Text></Stack></Card></Stack></Container>}
-export function RegistrationExample(){const [step,setStep]=useState(1);const titleRef=useRef<HTMLHeadingElement>(null);const initialized=useRef(false);useEffect(()=>{if(initialized.current)titleRef.current?.focus();initialized.current=true},[step]);const [name,setName]=useState('');const [email,setEmail]=useState('');const [plan,setPlan]=useState('personal');const [accepted,setAccepted]=useState(false);const [error,setError]=useState('');const formRef=useRef<HTMLFormElement>(null);const [attempt,setAttempt]=useState(0);useEffect(()=>{if(attempt){const invalid=formRef.current?.querySelector<HTMLElement>('[aria-invalid=true]');invalid?.focus();invalid?.closest('.k-field,.k-check-field')?.scrollIntoView({block:'center',behavior:'instant'})}},[attempt]);return <Container width="reading" className="everyday-page"><Stack gap={6}><Text size="small" tone="muted">KEI MEMBERS / DEMO</Text><Heading ref={titleRef} tabIndex={-1} level={1} size="title"><TitleWords parts={["自分のペースで、","始めよう。"]}/></Heading><Text tone="muted">入力 → 確認 → 完了を試せるサンプルです。アカウント作成・外部送信は行いません。</Text><ol className="everyday-steps" aria-label="登録の進み具合">{['入力','確認','完了'].map((label,i)=><li key={label} aria-current={step===i+1?'step':undefined}>{i+1} · {label}</li>)}</ol>{step===1?<form ref={formRef} noValidate onSubmit={e=>{e.preventDefault();if(!name.trim()||!/^\S+@\S+\.\S+$/.test(email)||!accepted){setError('お名前・メールアドレス・確認チェックを見直してください。');setAttempt(n=>n+1);return}setError('');setStep(2)}}><Stack gap={6}>{error&&<Alert tone="danger" title="入力内容を確認してください">{error}</Alert>}<TextField label="お名前" autoComplete="name" value={name} onChange={e=>setName(e.target.value)} required controlSize="lg" error={error&&!name.trim()?'お名前を入力してください。':undefined}/><TextField label="メールアドレス" type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} required controlSize="lg" error={error&&!/^\S+@\S+\.\S+$/.test(email)?'有効なメールアドレスを入力してください。':undefined}/><RadioGroup label="使い方" name="plan" value={plan} onValueChange={setPlan} options={[{value:'personal',label:'ひとりで使う',description:'アイデアや日々の記録に。'},{value:'team',label:'チームで使う',description:'知識やプロジェクトの共有に。'}]}/><div><Checkbox label="デモであり、外部送信されないことを確認しました" checked={accepted} onCheckedChange={v=>setAccepted(v===true)} error={error&&!accepted?"確認チェックを入れてください。":undefined}/></div><Button type="submit" variant="primary" size="lg">入力内容を確認</Button></Stack></form>:step===2?<Stack gap={6}><Card title="入力内容の確認"><dl className="everyday-summary"><dt>お名前</dt><dd>{name}</dd><dt>メールアドレス</dt><dd>{email}</dd><dt>使い方</dt><dd>{plan==='personal'?'ひとりで使う':'チームで使う'}</dd></dl></Card><Stack direction="row" gap={3}><Button onClick={()=>setStep(1)}>修正する</Button><Button variant="primary" size="lg" onClick={()=>setStep(3)}>デモを完了する</Button></Stack></Stack>:<Stack gap={6}><Alert tone="success" title="準備ができました">入力内容の確認が完了しました。データは送信されていません。</Alert><Button onClick={()=>{setStep(1);setName('');setEmail('');setAccepted(false);setPlan('personal')}}>最初から試す</Button></Stack>}</Stack></Container>}
+import {
+  ActionLink,
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Checkbox,
+  Container,
+  EmptyState,
+  Grid,
+  Heading,
+  Link,
+  RadioGroup,
+  Stack,
+  Text,
+  TextField,
+} from '../index';
+function TitleWords({ parts }: { parts: string[] }) {
+  return (
+    <>
+      {parts.map((part, i) => (
+        <Fragment key={part}>
+          <span className="everyday-title-word">{part}</span>
+          {i < parts.length - 1 && <wbr />}
+        </Fragment>
+      ))}
+    </>
+  );
+}
+const titleParts: Record<string, string[]> = {
+  start: ['小さく始める、', '日々の記録'],
+  space: ['考えが進む', '作業場所の', 'つくり方'],
+  share: ['伝わるノートの', 'まとめ方'],
+};
+const guides = [
+  {
+    id: 'start',
+    category: 'はじめる',
+    title: '小さく始める、日々の記録',
+    description: '気づきやアイデアを、あとから読み返せる形に。',
+    time: '5分',
+  },
+  {
+    id: 'space',
+    category: '整える',
+    title: '考えが進む作業場所のつくり方',
+    description: '道具の選び方から、続けられる環境まで。',
+    time: '8分',
+  },
+  {
+    id: 'share',
+    category: '共有する',
+    title: '伝わるノートのまとめ方',
+    description: '自分の記録を、誰かが使える知識に変える。',
+    time: '6分',
+  },
+];
+export function ResourceLibrary() {
+  const [query, setQuery] = useState('');
+  const [category, setCategory] = useState('すべて');
+  const [selected, setSelected] = useState<string | null>(null);
+  const lastSelected = useRef<string | null>(null);
+  const articleButtons = useRef<Record<string, HTMLButtonElement | null>>({});
+  useEffect(() => {
+    if (selected === null && lastSelected.current)
+      articleButtons.current[lastSelected.current]?.focus();
+  }, [selected]);
+  const matches = guides.filter(
+    (g) =>
+      (category === 'すべて' || g.category === category) &&
+      `${g.title} ${g.description}`.includes(query),
+  );
+  if (selected)
+    return <ArticleExample focusOnMount articleId={selected} onBack={() => setSelected(null)} />;
+  return (
+    <Container className="everyday-page everyday-page--library">
+      <Stack gap={8} style={{ gap: 'var(--everyday-section-gap,32px)' }}>
+        <Stack gap={3}>
+          <Text size="small" tone="muted">
+            読み物
+          </Text>
+          <Heading level={1} size="display">
+            <TitleWords parts={['毎日に、', '使えるアイデア。']} />
+          </Heading>
+          <Text size="lead" tone="muted">
+            仕事にも暮らしにも。考えること、つくることを少し心地よくする読み物。
+          </Text>
+        </Stack>
+        <TextField
+          label="読み物を検索"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="例：記録、ノート"
+          controlSize="lg"
+        />
+        <Stack direction="row" gap={2} className="everyday-filters">
+          {['すべて', 'はじめる', '整える', '共有する'].map((c) => (
+            <Button
+              key={c}
+              variant={category === c ? 'primary' : 'secondary'}
+              aria-pressed={category === c}
+              onClick={() => setCategory(c)}
+            >
+              {c}
+            </Button>
+          ))}
+        </Stack>
+        <Text size="small" tone="muted" aria-live="polite">
+          {matches.length}件の読み物
+        </Text>
+        {matches.length ? (
+          <Grid>
+            {matches.map((g) => (
+              <Card key={g.id}>
+                <Stack gap={4}>
+                  <div className="everyday-art" aria-hidden>
+                    <i />
+                    <i />
+                    <i />
+                  </div>
+                  <Stack direction="row" gap={2}>
+                    <Badge tone="info">{g.category}</Badge>
+                    <Text as="span" size="small" tone="muted">
+                      {g.time}で読めます
+                    </Text>
+                  </Stack>
+                  <Heading level={2}>
+                    <TitleWords parts={titleParts[g.id]} />
+                  </Heading>
+                  <Text tone="muted">{g.description}</Text>
+                  <Button
+                    variant="ghost"
+                    ref={(node) => {
+                      articleButtons.current[g.id] = node;
+                    }}
+                    onClick={() => {
+                      lastSelected.current = g.id;
+                      setSelected(g.id);
+                    }}
+                    aria-label={`記事を読む：${g.title}`}
+                  >
+                    記事を読む<span aria-hidden> →</span>
+                  </Button>
+                </Stack>
+              </Card>
+            ))}
+          </Grid>
+        ) : (
+          <EmptyState
+            title="読み物が見つかりません"
+            description="別のキーワードやカテゴリで探してみてください。"
+            action={
+              <Button
+                onClick={() => {
+                  setQuery('');
+                  setCategory('すべて');
+                }}
+              >
+                検索条件をリセット
+              </Button>
+            }
+          />
+        )}
+      </Stack>
+    </Container>
+  );
+}
+export function ArticleExample({
+  articleId = 'start',
+  onBack,
+  focusOnMount = false,
+}: {
+  articleId?: string;
+  onBack?: () => void;
+  focusOnMount?: boolean;
+}) {
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (focusOnMount) titleRef.current?.focus();
+  }, [focusOnMount]);
+  const g = guides.find((g) => g.id === articleId) ?? guides[0];
+  const [saved, setSaved] = useState(false);
+  return (
+    <Container width="reading" className="everyday-page">
+      <Stack gap={8} style={{ gap: 'var(--everyday-section-gap,32px)' }}>
+        <nav aria-label="記事内ナビゲーション">
+          {onBack ? (
+            <Button variant="ghost" onClick={onBack}>
+              ← 読み物一覧へ
+            </Button>
+          ) : (
+            <Link href="#article-body">本文へ進む ↓</Link>
+          )}
+        </nav>
+        <header>
+          <Stack gap={4}>
+            <Badge tone="info">{g.category}</Badge>
+            <Heading ref={titleRef} tabIndex={-1} level={1} size="display">
+              <TitleWords parts={titleParts[g.id]} />
+            </Heading>
+            <Text size="lead" tone="muted">
+              {g.description}
+            </Text>
+            <Text size="small" tone="muted">
+              KEI編集部 · 2026年10月24日 · 約{g.time}
+            </Text>
+          </Stack>
+        </header>
+        <article id="article-body" className="everyday-prose">
+          <Text>
+            新しいことを始めるとき、最初から完璧な仕組みを用意する必要はありません。まずは、今日の気づきをひとつ書き留めるところから始めてみましょう。
+          </Text>
+          <Heading level={2}>続けられる、小さな単位に。</Heading>
+          <Text>
+            大切なのは情報の量よりも、あとで自分が使えること。見出しをつけ、背景を書き添え、次の一歩を短い言葉にします。余白と段落が、考えを整理する助けになります。
+          </Text>
+          <blockquote>記録は、未来の自分に渡すための、小さな道具です。</blockquote>
+          <Heading level={2}>試して、読み返して、整える。</Heading>
+          <Text>
+            一週間たったら読み返し、役に立った部分を残してみてください。自分のリズムに合う方法は、使いながら少しずつ見つかります。
+          </Text>
+          <ul>
+            <li>まずは一日ひとつ、気づきを残す</li>
+            <li>見出しと本文を分ける</li>
+            <li>次に試したいことを最後に書く</li>
+          </ul>
+        </article>
+        <Card>
+          <Stack gap={4}>
+            <Heading level={2}>あとで、もう一度。</Heading>
+            <Text tone="muted">この画面内で保存状態を試せます。再読み込みで元に戻ります。</Text>
+            <Stack direction="row" gap={3}>
+              <Button
+                variant={saved ? 'secondary' : 'primary'}
+                aria-pressed={saved}
+                onClick={() => setSaved(!saved)}
+              >
+                {saved ? '保存済み' : 'この記事を保存'}
+              </Button>
+              <ActionLink variant="ghost" href="#article-body">
+                本文へ戻る ↑
+              </ActionLink>
+            </Stack>
+            <Text size="small" aria-live="polite">
+              {saved ? 'この記事を保存しました。' : '保存していない記事です。'}
+            </Text>
+          </Stack>
+        </Card>
+      </Stack>
+    </Container>
+  );
+}
+export function RegistrationExample() {
+  const [step, setStep] = useState(1);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const initialized = useRef(false);
+  useEffect(() => {
+    if (initialized.current) titleRef.current?.focus();
+    initialized.current = true;
+  }, [step]);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [plan, setPlan] = useState('personal');
+  const [accepted, setAccepted] = useState(false);
+  const [error, setError] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    if (attempt) {
+      const invalid = formRef.current?.querySelector<HTMLElement>('[aria-invalid=true]');
+      invalid?.focus();
+      invalid
+        ?.closest('.k-field,.k-check-field')
+        ?.scrollIntoView({ block: 'center', behavior: 'instant' });
+    }
+  }, [attempt]);
+  return (
+    <Container width="reading" className="everyday-page">
+      <Stack gap={6}>
+        <Text size="small" tone="muted">
+          会員登録のサンプル
+        </Text>
+        <Heading ref={titleRef} tabIndex={-1} level={1} size="title">
+          <TitleWords parts={['自分のペースで、', '始めよう。']} />
+        </Heading>
+        <Text tone="muted">
+          入力 → 確認 → 完了を試せるサンプルです。アカウント作成・外部送信は行いません。
+        </Text>
+        <ol className="everyday-steps" aria-label="登録の進み具合">
+          {['入力', '確認', '完了'].map((label, i) => (
+            <li key={label} aria-current={step === i + 1 ? 'step' : undefined}>
+              {i + 1} · {label}
+            </li>
+          ))}
+        </ol>
+        {step === 1 ? (
+          <form
+            ref={formRef}
+            noValidate
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!name.trim() || !/^\S+@\S+\.\S+$/.test(email) || !accepted) {
+                setError('お名前・メールアドレス・確認チェックを見直してください。');
+                setAttempt((n) => n + 1);
+                return;
+              }
+              setError('');
+              setStep(2);
+            }}
+          >
+            <Stack gap={6}>
+              {error && (
+                <Alert tone="danger" title="入力内容を確認してください">
+                  {error}
+                </Alert>
+              )}
+              <TextField
+                label="お名前"
+                autoComplete="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                controlSize="lg"
+                error={error && !name.trim() ? 'お名前を入力してください。' : undefined}
+              />
+              <TextField
+                label="メールアドレス"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                controlSize="lg"
+                error={
+                  error && !/^\S+@\S+\.\S+$/.test(email)
+                    ? '有効なメールアドレスを入力してください。'
+                    : undefined
+                }
+              />
+              <RadioGroup
+                label="使い方"
+                name="plan"
+                value={plan}
+                onValueChange={setPlan}
+                options={[
+                  {
+                    value: 'personal',
+                    label: 'ひとりで使う',
+                    description: 'アイデアや日々の記録に。',
+                  },
+                  {
+                    value: 'team',
+                    label: 'チームで使う',
+                    description: '知識やプロジェクトの共有に。',
+                  },
+                ]}
+              />
+              <div>
+                <Checkbox
+                  label="デモであり、外部送信されないことを確認しました"
+                  checked={accepted}
+                  onCheckedChange={(v) => setAccepted(v === true)}
+                  error={error && !accepted ? '確認チェックを入れてください。' : undefined}
+                />
+              </div>
+              <Button type="submit" variant="primary" size="lg">
+                入力内容を確認
+              </Button>
+            </Stack>
+          </form>
+        ) : step === 2 ? (
+          <Stack gap={6}>
+            <Card title="入力内容の確認">
+              <dl className="everyday-summary">
+                <dt>お名前</dt>
+                <dd>{name}</dd>
+                <dt>メールアドレス</dt>
+                <dd>{email}</dd>
+                <dt>使い方</dt>
+                <dd>{plan === 'personal' ? 'ひとりで使う' : 'チームで使う'}</dd>
+              </dl>
+            </Card>
+            <Stack direction="row" gap={3}>
+              <Button onClick={() => setStep(1)}>修正する</Button>
+              <Button variant="primary" size="lg" onClick={() => setStep(3)}>
+                デモを完了する
+              </Button>
+            </Stack>
+          </Stack>
+        ) : (
+          <Stack gap={6}>
+            <Alert tone="success" title="準備ができました">
+              入力内容の確認が完了しました。データは送信されていません。
+            </Alert>
+            <Button
+              onClick={() => {
+                setStep(1);
+                setName('');
+                setEmail('');
+                setAccepted(false);
+                setPlan('personal');
+              }}
+            >
+              最初から試す
+            </Button>
+          </Stack>
+        )}
+      </Stack>
+    </Container>
+  );
+}
