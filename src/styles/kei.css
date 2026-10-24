@@ -803,15 +803,18 @@
   }
 
   /* Progress */
+  /* The value mixes KEI Mono (14.4px) with a sans %; baseline keeps it level with the label. */
   .k-progress-label {
     display: flex;
+    align-items: baseline;
     justify-content: space-between;
     gap: var(--k-space-3);
     margin-bottom: var(--k-space-2);
     font-size: var(--k-text-sm);
     line-height: var(--k-line-tight);
   }
-  .k-progress-label > :last-child {
+  /* Only the value is muted; without showValue the label is the last child. */
+  .k-progress-label > :last-child:not(:first-child) {
     color: var(--k-muted);
   }
   .k-progress {
