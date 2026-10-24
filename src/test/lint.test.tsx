@@ -67,6 +67,26 @@ describe('stylelint: KEI rules', () => {
     expect(await cssRules('.k-x::after { background: blue; }')).toEqual([]);
   });
 
+  it('keeps spacing on the 4px grid', async () => {
+    expect(await cssRules('.a { padding: 6px 12px; }')).toContain('kei/spacing-grid');
+    expect(await cssRules('.a { gap: 10px; }')).toContain('kei/spacing-grid');
+    expect(await cssRules('.kei { --k-cell-padding: 10px 12px; }')).toContain('kei/spacing-grid');
+    expect(
+      await cssRules(
+        '.a { padding: 0 16px; margin: -1px; gap: var(--k-space-2); margin-top: calc((1lh - 20px) / 2); width: 6px; }',
+      ),
+    ).toEqual([]);
+    // An exception has to say why.
+    expect(
+      await cssRules('/* stylelint-disable-next-line kei/spacing-grid */\n.a { padding: 2px; }'),
+    ).not.toEqual([]);
+    expect(
+      await cssRules(
+        '/* stylelint-disable-next-line kei/spacing-grid -- 18px thumb */\n.a { padding: 2px; }',
+      ),
+    ).toEqual([]);
+  });
+
   it('requires a line-height in the font shorthand', async () => {
     expect(await cssRules('.a { font: 14px sans-serif; }')).toContain(
       'declaration-property-value-allowed-list',
