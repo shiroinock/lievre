@@ -43,6 +43,8 @@
     --k-font-mono: 'KEI Mono', 'PlemolJP', 'IBM Plex Mono', 'IBM Plex Sans JP', ui-monospace,
       'SF Mono', Menlo, monospace;
     --k-text-xs: 0.75rem;
+    /* Smallest size for monospace text: KEI Mono draws Latin at 5/6 size, so 0.9rem reads as 12px. */
+    --k-text-mono-min: 0.9rem;
     --k-text-sm: 0.8125rem;
     --k-text-md: 0.875rem;
     --k-text-base: 1rem;
@@ -738,11 +740,11 @@
     padding: 0 6px;
     border-radius: var(--k-radius-full);
     background: var(--k-surface-sunken);
-    font-size: var(--k-text-xs);
+    font-size: var(--k-text-mono-min);
     font-family: var(--k-font-mono);
     font-variant-numeric: tabular-nums;
     font-weight: var(--k-weight-medium);
-    line-height: 1.6;
+    line-height: 1.35;
   }
   .k-tab-content {
     padding: var(--k-space-6) 0 0;
@@ -859,7 +861,7 @@
     border-radius: var(--k-radius-sm);
     background: var(--k-surface-raised);
     color: var(--k-muted);
-    font: var(--k-text-xs) / 1.7 var(--k-font-mono);
+    font: var(--k-text-mono-min) / 1.4 var(--k-font-mono);
   }
 
   /* Avatar */
@@ -917,6 +919,7 @@
   .k-pagination > span {
     margin-right: var(--k-space-2);
     color: var(--k-muted);
+    font-size: var(--k-text-mono-min);
     font-family: var(--k-font-mono);
     font-variant-numeric: tabular-nums;
   }
@@ -1060,7 +1063,7 @@
   }
   .k-metric-code {
     color: var(--k-subtle);
-    font: var(--k-text-xs) var(--k-font-mono);
+    font: var(--k-text-mono-min) var(--k-font-mono);
   }
   .k-metric-value {
     margin: 10px 0 4px;
@@ -1301,8 +1304,10 @@
 /* --------------------------------------------------------------- utilities */
 
 @layer kei.utilities {
-  /* For data: figures, times, IDs and code. Japanese units fall back to the sans face. */
+  /* For data: figures, times, IDs and code. Japanese units fall back to the sans face.
+     Never smaller than --k-text-mono-min, so the narrowed Latin stays readable. */
   .k-mono {
+    font-size: max(1em, var(--k-text-mono-min));
     font-family: var(--k-font-mono);
     font-variant-numeric: tabular-nums;
   }

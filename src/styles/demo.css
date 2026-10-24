@@ -435,7 +435,7 @@ body:has(.kei-app) {
   border-radius: var(--k-radius-lg);
   background: var(--demo-blue);
   color: var(--demo-blue-text);
-  font: var(--k-text-sm) / 1.8 var(--k-font-mono);
+  font: var(--k-text-mono-min) / 1.7 var(--k-font-mono);
 }
 
 .app-footer {
@@ -497,7 +497,7 @@ body:has(.kei-app) {
 .starter-block code,
 .type-pairs code {
   font-family: var(--k-font-mono);
-  font-size: 0.9em;
+  font-size: max(0.9em, var(--k-text-mono-min));
 }
 .foundation-note {
   max-width: 48em;
@@ -557,7 +557,7 @@ body:has(.kei-app) {
 .swatch code,
 .swatch-values {
   font-family: var(--k-font-mono);
-  font-size: var(--k-text-xs);
+  font-size: var(--k-text-mono-min);
   color: var(--k-muted);
   overflow-wrap: anywhere;
 }
@@ -594,7 +594,7 @@ body:has(.kei-app) {
 .type-scale-meta code {
   grid-column: 2;
   font-family: var(--k-font-mono);
-  font-size: var(--k-text-xs);
+  font-size: var(--k-text-mono-min);
 }
 .type-pairs {
   display: grid;
@@ -648,7 +648,7 @@ body:has(.kei-app) {
 }
 .spacing-scale code {
   font-family: var(--k-font-mono);
-  font-size: var(--k-text-xs);
+  font-size: var(--k-text-mono-min);
   color: var(--k-muted);
 }
 .spacing-scale > div > span {
@@ -684,7 +684,7 @@ body:has(.kei-app) {
 }
 .radius-grid code {
   font-family: var(--k-font-mono);
-  font-size: var(--k-text-xs);
+  font-size: var(--k-text-mono-min);
 }
 .radius-grid p {
   margin: 2px 0 0;
@@ -999,13 +999,13 @@ body:has(.kei-app) {
 }
 .activity-list time {
   flex: none;
-  font-size: var(--k-text-sm);
+  font-size: var(--k-text-mono-min);
   color: var(--k-muted);
 }
 .activity-list small {
   display: block;
   margin-top: 2px;
-  font-size: var(--k-text-xs);
+  font-size: var(--k-text-mono-min);
   color: var(--k-muted);
 }
 .activity-dot {

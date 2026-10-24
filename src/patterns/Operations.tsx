@@ -302,8 +302,8 @@ function OperationsContent({ compact }: { compact: boolean }) {
         render: (r) => (
           <div className="work-name">
             <span>{r.name}</span>
-            <small className="k-mono">
-              {r.id} · {r.category}
+            <small>
+              <span className="k-mono">{r.id}</span> · {r.category}
             </small>
           </div>
         ),

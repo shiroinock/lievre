@@ -20,6 +20,7 @@ KEI（計）は、日本語の業務画面を読みやすく組み立てるた�
 | 操作         | `--k-accent` / `--k-selected`                             | Paper `#2424D8` / `#E7E8FD`、Ink `#A9B1FF` / `#23286C` |
 | 状態         | `--k-success` / `--k-warning` / `--k-danger` / `--k-info` | 状態表示専用                                           |
 | 文字の大きさ | `--k-text-xs` 〜 `--k-text-3xl`                           | 12 / 13 / 14 / 16 / 18 / 22 / 28 / 36px                |
+| 等幅の最小   | `--k-text-mono-min`                                       | 14.4px（英数字は12px相当）                             |
 | 余白         | `--k-space-1` 〜 `--k-space-12`                           | 4pxの倍数                                              |
 | 角丸         | `--k-radius-sm` / `md` / `lg`                             | 3 / 5 / 8px                                            |
 
