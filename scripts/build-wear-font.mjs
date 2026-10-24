@@ -6,6 +6,8 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolveSalt } from './build-wear.mjs';
 import { hashString } from '../src/wear/seed.mjs';
 
+// Bump when scripts/wear/font.py changes how it writes the fonts.
+const FONT_VERSION = 2;
 const salt = resolveSalt();
 const python = process.env.KEI_WEAR_PYTHON || 'python3';
 try {
@@ -17,7 +19,9 @@ try {
   );
   process.exit(1);
 }
-const dir = `wear-fonts/${hashString(salt).toString(16)}`;
+// The cache key covers everything that changes the outlines, not only the salt.
+const strength = `${process.env.KEI_WEAR_AMPLITUDE ?? 28}/${process.env.KEI_WEAR_WAVELENGTH ?? 110}`;
+const dir = `wear-fonts/${hashString(`${salt}:${strength}:${FONT_VERSION}`).toString(16)}`;
 const started = Date.now();
 if (!existsSync(`${dir}/report.json`))
   execFileSync(python, ['scripts/wear/font.py', salt, dir], { stdio: 'inherit' });
@@ -31,6 +35,8 @@ const css = readFileSync(`${dir}/fonts.css`, 'utf8')
     /(font-family: 'KEI Worn Mono';[\s\S]*?unicode-range: )[^;]+;/g,
     (_, head) => `${head}${monoRange};`,
   );
+// Advance widths must match the originals glyph for glyph, or the 1:2 grid and figure columns break.
+execFileSync(python, ['scripts/wear/font.py', 'check', dir], { stdio: 'inherit' });
 writeFileSync('wear-fonts/fonts.css', css);
 const report = JSON.parse(readFileSync(`${dir}/report.json`, 'utf8'));
 console.log(

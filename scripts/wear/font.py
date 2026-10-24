@@ -7,7 +7,12 @@ the Google Fonts unicode-range split from @fontsource, so a page loads only the 
 IBM Plex is licensed under the SIL OFL 1.1 with the Reserved Font Name "Plex": the modified fonts
 must not carry that name, so they are published as "KEI Worn Sans" and "KEI Worn Mono".
 
+Sans JP and Mono take the same salt and the same AMPLITUDE, so words and figures wear alike.
+Only outlines move: advance widths stay as they were, so Latin keeps half the width of kana and
+kanji and table figures stay aligned. `check` compares every advance with the original.
+
 Usage: python3 scripts/wear/font.py <salt> <out-dir> [weights...]
+       python3 scripts/wear/font.py check <out-dir>
 Requires fontTools and brotli (pip install fonttools brotli).
 """
 
@@ -68,7 +73,16 @@ def noise2(seed, x, y):
 
 def wear_glyphs(font, salt):
     glyf = font['glyf']
-    for name in font.getGlyphOrder():
+    hmtx = font['hmtx'].metrics
+    vmtx = font['vmtx'].metrics if 'vmtx' in font else {}
+    order = font.getGlyphOrder()
+    tops = {}
+    for name in order:
+        glyph = glyf[name]
+        if glyph.numberOfContours:
+            glyph.recalcBounds(glyf)
+            tops[name] = glyph.yMax
+    for name in order:
         glyph = glyf[name]
         if hasattr(glyph, 'program'):
             glyph.program = ttProgram.Program()
@@ -83,11 +97,41 @@ def wear_glyphs(font, salt):
             dx = noise2(sx, u, v) - 0.5 + (noise2(sx, u * 3, v * 3) - 0.5) * 0.35
             dy = noise2(sy, u, v) - 0.5 + (noise2(sy, u * 3, v * 3) - 0.5) * 0.35
             coords[i] = (round(x + dx * 2 * AMPLITUDE), round(y + dy * 2 * AMPLITUDE))
+    # Outlines move inside the glyph's own box; the origin and the advance stay where they were.
+    # lsb follows the new xMin (and tsb the new yMax), composites included.
+    for name in tops:
+        glyph = glyf[name]
         glyph.recalcBounds(glyf)
+        hmtx[name] = (hmtx[name][0], glyph.xMin)
+        if name in vmtx:
+            vmtx[name] = (vmtx[name][0], vmtx[name][1] + tops[name] - glyph.yMax)
     # Moved outlines no longer match the hinting programs.
     for table in ('fpgm', 'prep', 'cvt '):
         if table in font:
             del font[table]
+
+
+def advances(font):
+    tables = [t for t in ('hmtx', 'vmtx') if t in font]
+    return {(t, name): font[t].metrics[name][0] for t in tables for name in font.getGlyphOrder()}
+
+
+def check(out):
+    """Every worn file keeps the original advance of every glyph, and the same glyph order."""
+    sources = {'kei-worn-sans': SANS, 'kei-worn-mono': MONO}
+    checked, glyphs = 0, 0
+    for target in sorted(out.glob('kei-worn-*.woff2')):
+        family = 'kei-worn-sans' if target.name.startswith('kei-worn-sans') else 'kei-worn-mono'
+        original = 'ibm-plex-sans-jp' if family == 'kei-worn-sans' else 'ibm-plex-mono'
+        before = TTFont(sources[family] / 'files' / target.name.replace(family, original), lazy=True)
+        after = TTFont(target, lazy=True)
+        assert before.getGlyphOrder() == after.getGlyphOrder(), f'{target.name}: glyph order changed'
+        a, b = advances(before), advances(after)
+        changed = [k for k in a if a[k] != b.get(k)]
+        assert not changed, f'{target.name}: advance changed for {changed[:5]}'
+        checked, glyphs = checked + 1, glyphs + len(a)
+    assert checked, f'no worn fonts in {out}'
+    print(json.dumps({'checked': checked, 'advances': glyphs}))
 
 
 def rename(font, family):
@@ -118,10 +162,13 @@ def faces(css_path, family_from, family_to, out_prefix):
 
 
 def main():
+    if sys.argv[1] == 'check':
+        return check(Path(sys.argv[2]))
     salt, out = sys.argv[1], Path(sys.argv[2])
     weights = sys.argv[3:] or ['400', '500', '600']
     out.mkdir(parents=True, exist_ok=True)
-    blocks, report = [], {'salt': salt, 'files': 0, 'bytes': 0}
+    blocks, report = [], {'salt': salt, 'amplitude': AMPLITUDE, 'wavelength': WAVELENGTH,
+                          'files': 0, 'bytes': 0}
     jobs = []
     for weight in weights:
         jobs += [(SANS, f'{weight}.css', 'IBM Plex Sans JP', 'KEI Worn Sans', s, b)
