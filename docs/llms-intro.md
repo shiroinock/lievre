@@ -27,6 +27,7 @@ import '@kei-design/react/styles.css';
 - 数値・時刻・ID・コードは `<span className="k-mono">`、文中の数値は `.k-tabular`。単位（%・円）は `.k-mono` の外に置きます：`<span><span className="k-mono">{n}</span>円</span>`。Metric は `value="99.95" unit="%"` と分けます。
 - Dialog には `title` と `description` が必須です。閉じるだけのボタンは `<DialogClose asChild><Button>キャンセル</Button></DialogClose>` で包みます。処理してから閉じるときは `open` / `onOpenChange` で開閉を持ちます。フォーカスの閉じ込めと復帰は部品が行います。
 - アイコンだけのボタンは `<IconButton label="行の操作" icon={<MoreHorizontal />} />`。`label` が読み上げの名前とツールチップの両方になるので、`aria-label` は書きません。`Button` に svg だけを入れません。
+- 押して開く操作できる中身（絞り込み・表示の設定）は `Popover`、説明の短い文だけなら `Tooltip`。Popover の中の「適用」で閉じるときは `open` / `onOpenChange` で開閉を持ちます。
 - ラベルは日本語で書き、英大文字や記号で飾りません。
 
 ## 表の並べ替えとページ送り

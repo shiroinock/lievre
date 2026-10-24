@@ -569,8 +569,10 @@
   .k-select-icon {
     color: var(--k-muted);
   }
+  /* Floating layers share one z-index above dialogs (101) and below toasts (120), so the one
+     opened last, appended last to the body, sits on top: a select inside a popover or dialog. */
   .k-select-content {
-    z-index: 80;
+    z-index: 110;
     min-width: var(--radix-select-trigger-width);
     max-height: var(--radix-select-content-available-height);
     padding: 4px;
@@ -758,10 +760,12 @@
   }
   /* A panel's padding alone sets its inner space: the margins of its first and last
      children (a <p>'s default 1em, say) would make one side deeper than the other. */
-  :is(.k-card-body, .k-dialog-body, .k-tab-content, .k-alert-description) > :where(:first-child) {
+  :is(.k-card-body, .k-dialog-body, .k-tab-content, .k-alert-description, .k-popover-body)
+    > :where(:first-child) {
     margin-top: 0;
   }
-  :is(.k-card-body, .k-dialog-body, .k-tab-content, .k-alert-description) > :where(:last-child) {
+  :is(.k-card-body, .k-dialog-body, .k-tab-content, .k-alert-description, .k-popover-body)
+    > :where(:last-child) {
     margin-bottom: 0;
   }
 
@@ -857,7 +861,7 @@
 
   /* Tooltip */
   .k-tooltip {
-    z-index: 90;
+    z-index: 110;
     max-width: 260px;
     padding: 4px 8px;
     border-radius: var(--k-radius-sm);
@@ -868,6 +872,42 @@
   }
   .k-tooltip-arrow {
     fill: var(--k-text);
+  }
+
+  /* Popover and menu float on a 1px line and the raised surface, never a shadow. */
+  .k-popover,
+  .k-menu {
+    z-index: 110;
+    border: 1px solid var(--k-border-strong);
+    border-radius: var(--k-radius-md);
+    background: var(--k-surface-raised);
+    color: var(--k-text);
+    animation: k-fade 120ms ease-out;
+  }
+  /* The same padding as a panel; the width keeps a form readable and shrinks at the edge. */
+  .k-popover {
+    width: 320px;
+    max-width: var(--radix-popover-content-available-width);
+    max-height: var(--radix-popover-content-available-height);
+    overflow: auto;
+    padding: var(--k-panel-padding);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-body);
+  }
+  .k-popover:focus-visible {
+    outline-offset: -2px;
+  }
+  .k-popover-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--k-space-2);
+  }
+  .k-popover-title {
+    margin: 0 0 var(--k-space-3);
+    font-size: var(--k-text-base);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
   }
 
   /* Progress */
