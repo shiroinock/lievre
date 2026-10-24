@@ -41,15 +41,13 @@ export const TEXT_KINDS = {
  *       many there are (0–1), strength their opacity at the most rubbed point, fold how strongly
  *       the fold takes them (0–1).
  * tones: per theme, the colour the sheet browns toward (yake), how much of strength it takes
- *        (amount), and the colour a scuff shows (sure). Paper and Sepia yellow toward a tone of
- *        nearly their own lightness, so the hue turns while text keeps its contrast; Ink and Rust
- *        only dull toward a warmer, greyer dark, at 0.6 of the strength.
+ *        (amount), and the colour a scuff shows (sure). Paper yellows toward a tone of nearly its
+ *        own lightness, so the hue turns while text keeps its contrast; Ink only dulls toward a
+ *        warmer, greyer dark, at 0.6 of the strength.
  */
 const TONES = {
   paper: { yake: '#f2dca6', amount: 1, sure: '#ffffff' },
   ink: { yake: '#2a2f4a', amount: 0.6, sure: '#262b5c' },
-  sepia: { yake: '#e9c886', amount: 1, sure: '#fbf7ec' },
-  rust: { yake: '#3e2f28', amount: 0.6, sure: '#382722' },
 };
 
 export const PRESETS = {

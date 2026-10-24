@@ -38,16 +38,6 @@
       "yake": "#2a2f4a",
       "amount": 0.6,
       "sure": "#262b5c"
-    },
-    "sepia": {
-      "yake": "#e9c886",
-      "amount": 1,
-      "sure": "#fbf7ec"
-    },
-    "rust": {
-      "yake": "#3e2f28",
-      "amount": 0.6,
-      "sure": "#382722"
     }
   },
   "kinds": {

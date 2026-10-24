@@ -12,7 +12,7 @@ import {
   themeTokens as tokensFor,
   wornBackgrounds,
 } from '../wear/contrast.mjs';
-const themes = ['paper', 'ink', 'sepia', 'rust'] as const;
+const themes = ['paper', 'ink'] as const;
 const themeTokens = (theme: (typeof themes)[number]) => tokensFor(tokens, theme);
 
 describe('Semantic color contrast and token synchronization', () => {

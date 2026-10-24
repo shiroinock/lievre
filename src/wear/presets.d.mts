@@ -3,7 +3,7 @@ export interface WearKindSettings {
   distort: boolean;
   kasure: number;
 }
-export type WearTheme = 'paper' | 'ink' | 'sepia' | 'rust';
+export type WearTheme = 'paper' | 'ink';
 export interface WearTone {
   yake: string;
   amount: number;

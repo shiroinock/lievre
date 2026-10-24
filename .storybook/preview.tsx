@@ -17,8 +17,6 @@ const preview: Preview = {
         items: [
           { value: 'paper', title: 'Paper（明るい面）' },
           { value: 'ink', title: 'Ink（深い紺の面）' },
-          { value: 'sepia', title: 'Sepia（焼けた紙・試作）' },
-          { value: 'rust', title: 'Rust（錆びた筐体・試作）' },
         ],
         dynamicTitle: true,
       },
