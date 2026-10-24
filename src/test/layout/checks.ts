@@ -222,6 +222,32 @@ function checkOne(el: Element, check: LayoutCheck): string | null {
     return problems.length ? problems.join(' ') : null;
   }
 
+  if ('textEdge' in check) {
+    const start = check.textEdge === 'start';
+    const edges = [...el.querySelectorAll(check.of)]
+      .filter(visible)
+      .map((item) => {
+        const range = document.createRange();
+        range.selectNodeContents(item);
+        const rects = [...range.getClientRects()].filter((r) => r.width > 0);
+        if (!rects.length) return null;
+        return {
+          item,
+          x: start ? Math.min(...rects.map((r) => r.left)) : Math.max(...rects.map((r) => r.right)),
+        };
+      })
+      .filter((e): e is { item: Element; x: number } => !!e);
+    const xs = edges.map((e) => e.x);
+    if (edges.length < 2 || Math.max(...xs) - Math.min(...xs) <= CRITERIA.size) return null;
+    const list = edges
+      .map(
+        ({ item, x }, n) =>
+          `${describe(item)} ${n === 0 ? 'を基準に' : `${x > xs[0] ? '+' : ''}${r1(x - xs[0])}px`}`,
+      )
+      .join('、');
+    return `文字の${start ? '左端' : '右端'}がそろっていません：${list}。基準：差が ${CRITERIA.size}px 以内。アイコンの列は中身がなくても同じ幅を取ってください。`;
+  }
+
   const items = [...el.querySelectorAll(check.sameHeight)].filter(visible);
   const heights = items.map((i) => i.getBoundingClientRect().height);
   if (items.length < 2 || Math.max(...heights) - Math.min(...heights) <= CRITERIA.size) return null;

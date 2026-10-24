@@ -5,7 +5,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { flushSync } from 'react-dom';
 import { userEvent } from 'vitest/browser';
 import type { ReactNode } from 'react';
-import { KeiProvider, Button, Popover } from '../../index';
+import { KeiProvider, Button, Popover, DropdownMenu } from '../../index';
 import '../../styles/fonts.css';
 import '../../styles/kei.css';
 import { CRITERIA } from './declare';
@@ -18,6 +18,19 @@ const PANELS: { name: string; selector: string; render: () => ReactNode }[] = [
       <Popover trigger={<Button>開く</Button>} title="表示の設定">
         <p>表の行の高さと、数値の桁区切りを選びます。</p>
       </Popover>
+    ),
+  },
+  {
+    name: 'メニュー',
+    selector: '.k-menu',
+    render: () => (
+      <DropdownMenu
+        trigger={<Button>操作</Button>}
+        items={[
+          { label: '編集', shortcut: '⌘E', onSelect: () => {} },
+          { label: '担当をほかの人に変える', onSelect: () => {} },
+        ]}
+      />
     ),
   },
 ];

@@ -910,6 +910,86 @@
     line-height: var(--k-line-tight);
   }
 
+  /* Menu: 4px around the list and 4px above and below a separator, like the select list. */
+  .k-menu {
+    min-width: max(180px, var(--radix-dropdown-menu-trigger-width));
+    max-width: var(--radix-dropdown-menu-content-available-width);
+    max-height: var(--radix-dropdown-menu-content-available-height);
+    overflow: auto;
+    padding: 4px;
+  }
+  .k-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--k-space-2);
+    min-height: var(--k-control-height);
+    /* 4px list padding + 8px = the 12px a select or input leaves before its text. */
+    padding: 4px 8px;
+    border-radius: var(--k-radius-sm);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-tight);
+    outline: 0;
+    cursor: pointer;
+  }
+  .k-menu-item[data-highlighted] {
+    background: var(--k-accent-soft);
+  }
+  .k-menu-item[data-tone='danger'] {
+    color: var(--k-danger);
+  }
+  .k-menu-item[data-tone='danger'][data-highlighted] {
+    background: var(--k-danger-soft);
+  }
+  .k-menu-item[data-disabled] {
+    color: var(--k-subtle);
+    background: transparent;
+    cursor: not-allowed;
+  }
+  .k-menu-item[data-state='checked'] {
+    color: var(--k-accent);
+    font-weight: var(--k-weight-bold);
+  }
+  /* A fixed 16px column for icons and check marks, empty on rows without one. */
+  .k-menu-lead,
+  .k-menu-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+  }
+  .k-menu-lead svg {
+    width: 16px;
+    height: 16px;
+  }
+  .k-menu-item:not([data-tone='danger']):not([data-state='checked']) .k-menu-lead {
+    color: var(--k-muted);
+  }
+  .k-menu-label {
+    flex: 1;
+    min-width: 0;
+  }
+  .k-menu-shortcut {
+    margin-inline-start: var(--k-space-4);
+    color: var(--k-muted);
+    font: var(--k-weight-regular) var(--k-text-mono-min) / var(--k-line-tight) var(--k-font-mono);
+  }
+  .k-menu-heading {
+    padding: 4px 8px;
+    color: var(--k-muted);
+    font-size: var(--k-text-xs);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+  }
+  .k-menu[data-lead] .k-menu-heading {
+    /* stylelint-disable-next-line kei/padding-symmetry -- アイコンの列（16px）と間（8px）の分だけ空けて、見出しを項目の文字と同じ位置から始める */
+    padding-inline-start: calc(8px + 16px + var(--k-space-2));
+  }
+  .k-menu-separator {
+    height: 1px;
+    margin: 4px 0;
+    background: var(--k-border);
+  }
+
   /* Progress */
   /* The value mixes KEI Mono (14.4px) with a sans %; baseline keeps it level with the label. */
   .k-progress-label {
@@ -1474,7 +1554,8 @@
     .k-button,
     .k-select-trigger,
     .k-tab,
-    .k-select-item {
+    .k-select-item,
+    .k-menu-item {
       min-height: 44px;
     }
     .k-icon-button {
@@ -1557,7 +1638,9 @@
     .k-checkbox[data-state='indeterminate'],
     .k-switch,
     .k-tab::after,
-    .k-select-item[data-highlighted] {
+    .k-select-item[data-highlighted],
+    .k-menu-item[data-highlighted],
+    .k-menu-item[data-tone='danger'][data-highlighted] {
       forced-color-adjust: none;
     }
     /* Opting out also keeps the brand focus colour, so give focus a system colour back. */
@@ -1578,7 +1661,9 @@
       background: GrayText;
       color: Canvas;
     }
-    .k-select-item[data-highlighted] {
+    .k-select-item[data-highlighted],
+    .k-menu-item[data-highlighted],
+    .k-menu-item[data-tone='danger'][data-highlighted] {
       background: Highlight;
       color: HighlightText;
     }

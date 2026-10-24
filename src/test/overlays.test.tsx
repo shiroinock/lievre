@@ -3,9 +3,9 @@
 // outside, and gives focus back to the trigger after Escape.
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import type { ReactNode } from 'react';
-import { KeiProvider, Button, Dialog, Select, Popover } from '../index';
+import { KeiProvider, Button, Dialog, Select, Popover, DropdownMenu } from '../index';
 
 type Overlay = {
   name: string;
@@ -40,6 +40,17 @@ const OVERLAYS: Overlay[] = [
     ),
     trigger: '開く',
     role: 'dialog',
+  },
+  {
+    name: 'DropdownMenu',
+    ui: (
+      <DropdownMenu
+        trigger={<Button>操作</Button>}
+        items={[{ label: '複製', onSelect: () => {} }]}
+      />
+    ),
+    trigger: '操作',
+    role: 'menu',
   },
 ];
 
@@ -88,3 +99,37 @@ for (const overlay of OVERLAYS)
       expect(screen.queryByRole(role)).not.toBeInTheDocument();
     });
   });
+
+describe('DropdownMenu の項目', () => {
+  it('文字で項目に移り、選ぶと閉じてフォーカスを開いた元に戻す', async () => {
+    const remove = vi.fn();
+    setup(
+      <DropdownMenu
+        trigger={<Button>操作</Button>}
+        items={[
+          { label: '編集', icon: <svg />, onSelect: () => {} },
+          { label: '担当を変える', onSelect: () => {} },
+          { type: 'separator' },
+          { label: '削除', tone: 'danger', onSelect: remove },
+        ]}
+      />,
+    );
+    const u = user();
+    const trigger = screen.getByRole('button', { name: '操作' });
+    trigger.focus();
+    await u.keyboard('{Enter}');
+    expect(await screen.findByRole('menuitem', { name: '編集' })).toHaveFocus();
+    await u.keyboard('削');
+    const danger = screen.getByRole('menuitem', { name: '削除' });
+    expect(danger).toHaveFocus();
+    expect(danger).toHaveAttribute('data-tone', 'danger');
+    // Rows without an icon keep the empty icon column, so their text starts in line.
+    expect(
+      screen.getByRole('menuitem', { name: '担当を変える' }).querySelector('.k-menu-lead'),
+    ).toBeInTheDocument();
+    await u.keyboard('{Enter}');
+    expect(remove).toHaveBeenCalledOnce();
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+  });
+});

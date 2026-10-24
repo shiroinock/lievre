@@ -52,7 +52,9 @@ export type LayoutCheck =
   /** 描いた中身（svg の線や図形）が、箱の左右いっぱいに広がっている。 */
   | 'fills-x'
   /** 部品の中で selector に当たり、同じ行に並ぶ文字のベースラインがそろっている。 */
-  | { baseline: string };
+  | { baseline: string }
+  /** 部品の中で selector に当たる要素の文字の左端（start）か右端（end）がそろっている。 */
+  | { textEdge: 'start' | 'end'; of: string };
 
 export const CRITERIA = {
   /** 中央揃えの部品の左右のずれ（左右の余白の差の半分）。 */
@@ -86,7 +88,9 @@ export const checkId = (check: LayoutCheck) =>
         ? `icon ${check.icon}`
         : 'baseline' in check
           ? 'baseline'
-          : 'same-height';
+          : 'textEdge' in check
+            ? 'text-edge'
+            : 'same-height';
 
 export const CHECK_LABEL: Record<string, string> = {
   'inset-x': '左右の中央',
@@ -103,4 +107,5 @@ export const CHECK_LABEL: Record<string, string> = {
   'same-height': '並んだ部品の高さ',
   'fills-x': '中身の広がり',
   baseline: '文字のベースライン',
+  'text-edge': '文字の端',
 };

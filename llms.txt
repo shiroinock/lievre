@@ -28,6 +28,7 @@ import '@kei-design/react/styles.css';
 - Dialog には `title` と `description` が必須です。閉じるだけのボタンは `<DialogClose asChild><Button>キャンセル</Button></DialogClose>` で包みます。処理してから閉じるときは `open` / `onOpenChange` で開閉を持ちます。フォーカスの閉じ込めと復帰は部品が行います。
 - アイコンだけのボタンは `<IconButton label="行の操作" icon={<MoreHorizontal />} />`。`label` が読み上げの名前とツールチップの両方になるので、`aria-label` は書きません。`Button` に svg だけを入れません。
 - 押して開く操作できる中身（絞り込み・表示の設定）は `Popover`、説明の短い文だけなら `Tooltip`。Popover の中の「適用」で閉じるときは `open` / `onOpenChange` で開閉を持ちます。
+- 操作の一覧は `DropdownMenu` に `items` の配列で渡します（子要素では渡しません）。区切りは `{ type: 'separator' }`、入り切りは `type: 'checkbox'`、1つを選ぶ組は `type: 'radio'`。削除などは `tone: 'danger'` にし、label にも「削除」と書きます。
 - ラベルは日本語で書き、英大文字や記号で飾りません。
 
 ## 表の並べ替えとページ送り
@@ -366,6 +367,14 @@ const sorted = useMemo(() => {
 - `open?: boolean` — 中の「適用」などで閉じるときは、open と onOpenChange で開閉を持ちます。
 - `onOpenChange?: ((open: boolean) => void)`
 
+### DropdownMenu
+
+押すと開く操作の一覧。矢印キー・Home / End・文字での選択・Escape に対応し、閉じるとフォーカスを開いた元に戻します。
+
+- `trigger: ReactNode` — 開くボタン。Button か IconButton を渡します。メニューの名前はこのボタンの名前になります。
+- `items: MenuItem[]` — 項目。並べた順に出します。区切りは `{ type: 'separator' }`。
+- `align?: 'start' | 'end'` — 既定 'start'。開いた元の部品とのそろえ方。表の行の端に置くときは 'end'。
+
 ## フック
 
 ### useKeiTheme
@@ -399,4 +408,5 @@ ToastProviderの子孫で使用します。保存結果や一時的な通知向�
 - `type TableSort = { key: string; direction: 'asc' | 'desc' } | null;`
 - `type Space = 0 | 1 | 2 | 3 | 4 | 6 | 8 | 12;`
 - `type RadioOption = { value: string; label: string; description?: string; disabled?: boolean; };`
+- `type MenuItem = | { type?: 'item'; label: string; onSelect: () => void; icon?: ReactNode; shortcut?: string; tone?: 'danger'; disabled?: boolean; } | { type: 'checkbox'; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; disabled?: boolean; } | { type: 'radio'; label: string; value: string; onValueChange: (value: string) => void; options: { value: string; label: string; disabled?: boolean }[]; } | { type: 'separator' };`
 - `cx`: `(...values: (string | false | null | undefined)[]) => string`

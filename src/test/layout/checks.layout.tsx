@@ -125,6 +125,20 @@ describe('配置の検査', () => {
     ).toEqual([]);
   });
 
+  it('文字の端', () => {
+    const menu = (lead: string) =>
+      `<div class="k-x">
+        <div style="display: flex; gap: 8px"><span style="width: 16px">✓</span><span class="k-t">表示する</span></div>
+        <div style="display: flex; gap: 8px">${lead}<span class="k-t">隠す</span></div>
+      </div>`;
+    expect(messages(menu(''), { textEdge: 'start', of: '.k-t' })[0]).toMatch(
+      /文字の左端がそろっていません：span\.k-t「表示する」 を基準に、span\.k-t「隠す」 -24px/,
+    );
+    expect(
+      messages(menu('<span style="width: 16px"></span>'), { textEdge: 'start', of: '.k-t' }),
+    ).toEqual([]);
+  });
+
   it('宣言のない操作の要素を見つける', () => {
     host.innerHTML =
       '<div class="k-x"><button>保存</button></div><button class="k-new">追加</button>';

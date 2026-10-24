@@ -28,6 +28,7 @@ import '@kei-design/react/styles.css';
 - Dialog には `title` と `description` が必須です。閉じるだけのボタンは `<DialogClose asChild><Button>キャンセル</Button></DialogClose>` で包みます。処理してから閉じるときは `open` / `onOpenChange` で開閉を持ちます。フォーカスの閉じ込めと復帰は部品が行います。
 - アイコンだけのボタンは `<IconButton label="行の操作" icon={<MoreHorizontal />} />`。`label` が読み上げの名前とツールチップの両方になるので、`aria-label` は書きません。`Button` に svg だけを入れません。
 - 押して開く操作できる中身（絞り込み・表示の設定）は `Popover`、説明の短い文だけなら `Tooltip`。Popover の中の「適用」で閉じるときは `open` / `onOpenChange` で開閉を持ちます。
+- 操作の一覧は `DropdownMenu` に `items` の配列で渡します（子要素では渡しません）。区切りは `{ type: 'separator' }`、入り切りは `type: 'checkbox'`、1つを選ぶ組は `type: 'radio'`。削除などは `tone: 'danger'` にし、label にも「削除」と書きます。
 - ラベルは日本語で書き、英大文字や記号で飾りません。
 
 ## 表の並べ替えとページ送り
