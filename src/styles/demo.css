@@ -1328,3 +1328,16 @@ body:has(.kei-app) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* The selected page and theme are shown by a fill, which forced colours would remove. */
+@media (forced-colors: active) {
+  .main-nav button[aria-current='page'],
+  .theme-segment button[aria-pressed='true'] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+  .app-sidebar :where(button, a, select):focus-visible {
+    outline-color: Highlight;
+  }
+}

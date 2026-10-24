@@ -1369,5 +1369,65 @@
     .k-meter-hand {
       background: Highlight;
     }
+    /* Shapes drawn only with a background vanish once the browser forces colours,
+       so paint them with system colours instead. */
+    .k-checkbox[data-state='checked'],
+    .k-checkbox[data-state='indeterminate'],
+    .k-switch,
+    .k-tab::after,
+    .k-select-item[data-highlighted] {
+      forced-color-adjust: none;
+    }
+    /* Opting out also keeps the brand focus colour, so give focus a system colour back. */
+    .kei :focus-visible {
+      outline-color: Highlight;
+    }
+    .k-checkbox[data-state='checked'],
+    .k-checkbox[data-state='indeterminate'] {
+      background: Highlight;
+      border-color: Highlight;
+      color: HighlightText;
+    }
+    .k-checkbox:disabled {
+      border-color: GrayText;
+    }
+    .k-checkbox:disabled[data-state='checked'],
+    .k-checkbox:disabled[data-state='indeterminate'] {
+      background: GrayText;
+      color: Canvas;
+    }
+    .k-select-item[data-highlighted] {
+      background: Highlight;
+      color: HighlightText;
+    }
+    /* Rows keep forced colours for their contents; the selection becomes an outline. */
+    .k-table tbody tr[data-selected],
+    .k-table tbody tr[data-selected]:hover {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+    .k-switch {
+      background: Canvas;
+    }
+    .k-switch-thumb {
+      background: ButtonText;
+    }
+    .k-switch[data-state='checked'] {
+      background: Highlight;
+      border-color: Highlight;
+    }
+    .k-switch[data-state='checked'] .k-switch-thumb {
+      background: HighlightText;
+    }
+    .k-switch:disabled {
+      background: Canvas;
+      border-color: GrayText;
+    }
+    .k-switch:disabled .k-switch-thumb {
+      background: GrayText;
+    }
+    .k-tab[data-state='active']::after {
+      background: Highlight;
+    }
   }
 }
