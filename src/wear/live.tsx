@@ -6,6 +6,7 @@ import { seedFor } from './seed.mjs';
 import { liveEdge, sheetThemeVars, sheetVars, textures, wearVars } from './textures.mjs';
 import { TEXT_KINDS, VARIANTS } from './params.mjs';
 import type { WearConfig, WearKind } from './presets.mjs';
+import { ageTextures, ageVars, type Age } from './age.mjs';
 
 const kinds = Object.keys(TEXT_KINDS) as WearKind[];
 // feTurbulence seeds are read as numbers; keep them small enough to stay exact.
@@ -72,6 +73,30 @@ export function liveWearStyle(prefix: string, config: WearConfig, theme: string)
       for (let n = 0; n < VARIANTS; n++)
         style[`--k-wear-${kind}-${n}`] = `url(#${prefix}-${kind}-${n})`;
   return style as CSSProperties;
+}
+
+// Age images depend on the whole config (the fade stops on the worn paper too) and the theme.
+const ageCache = new Map<string, Record<string, string>>();
+/** Age's custom properties with this config, for a provider given its own config (the tuning page). */
+export function liveAgeStyle(config: WearConfig, theme: string, level: Age): CSSProperties {
+  const key = JSON.stringify([config, theme]);
+  let urls = ageCache.get(key);
+  if (!urls) {
+    urls = Object.fromEntries(
+      Object.entries(ageTextures(config, tokens, [theme]).files).map(([name, bytes]) => [
+        name,
+        toUrl(bytes),
+      ]),
+    );
+    ageCache.set(key, urls);
+    for (const [old, list] of ageCache)
+      if (ageCache.size > 8 && old !== key) {
+        ageCache.delete(old);
+        Object.values(list).forEach((u) => u.startsWith('blob:') && URL.revokeObjectURL(u));
+      }
+  }
+  const found = urls;
+  return ageVars(config, tokens, theme, level, (name) => `url(${found[name]})`) as CSSProperties;
 }
 
 /** One edge-wear filter per worn kind and variant. */

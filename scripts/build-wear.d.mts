@@ -7,6 +7,7 @@ export function buildWear(
   files: Record<string, Uint8Array>;
   css: string;
   rules: string;
+  age: string;
   meta: {
     config: WearConfig;
     pixels: Record<string, string>;

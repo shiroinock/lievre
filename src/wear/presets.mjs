@@ -40,6 +40,11 @@ export const TEXT_KINDS = {
  * sure: scuffs where the colour has rubbed off, near the edges and along one fold. density is how
  *       many there are (0–1), strength their opacity at the most rubbed point, fold how strongly
  *       the fold takes them (0–1).
+ * age: the heavy level of each age material (src/wear/age.mjs); light takes half. fade (0–1)
+ *      is how far accent and status inks lose colour, before contrast stops it; shift (px, at
+ *      most) how far a fill slips off its key line; mottle (0–1) how much paper shows through a
+ *      fill, before contrast stops it; rules (0–1) how broken 1px lines get; chips (0–1) how big
+ *      a bite corners lose.
  * tones: per theme, the colour the sheet browns toward (yake), how much of strength it takes
  *        (amount), and the colour a scuff shows (sure). Paper and Sepia yellow toward a tone of
  *        nearly their own lightness, so the hue turns while text keeps its contrast; Ink and Rust
@@ -60,6 +65,7 @@ export const PRESETS = {
     stain: { strength: 0.05 },
     yake: { strength: 0.2, reach: 120, mottle: 0.4, corner: 0.3, surfaces: 0 },
     sure: { density: 0.35, strength: 0.25, fold: 0.4 },
+    age: { fade: 0.5, shift: 0.8, mottle: 0.25, rules: 0.4, chips: 0.4 },
     kinds: {
       small: { distort: false, kasure: 0 },
       text: { distort: false, kasure: 0.5 },
@@ -76,6 +82,7 @@ export const PRESETS = {
     stain: { strength: 0.08 },
     yake: { strength: 0.35, reach: 160, mottle: 0.5, corner: 0.4, surfaces: 0.3 },
     sure: { density: 0.5, strength: 0.35, fold: 0.6 },
+    age: { fade: 0.8, shift: 1, mottle: 0.35, rules: 0.6, chips: 0.6 },
     kinds: {
       small: { distort: false, kasure: 0.3 },
       text: { distort: true, kasure: 0.7 },
@@ -92,6 +99,7 @@ export const PRESETS = {
     stain: { strength: 0.09 },
     yake: { strength: 0.4, reach: 220, mottle: 0.6, corner: 0.5, surfaces: 0.5 },
     sure: { density: 0.7, strength: 0.5, fold: 0.8 },
+    age: { fade: 1, shift: 1.5, mottle: 0.5, rules: 1, chips: 1 },
     kinds: {
       small: { distort: false, kasure: 0.5 },
       text: { distort: true, kasure: 1 },
@@ -127,6 +135,7 @@ export function normaliseConfig(config = {}) {
     stain: { ...base.stain, ...config.stain },
     yake: { ...base.yake, ...config.yake },
     sure: { ...base.sure, ...config.sure },
+    age: { ...base.age, ...config.age },
     tones: Object.fromEntries(
       Object.keys(base.tones).map((theme) => [
         theme,

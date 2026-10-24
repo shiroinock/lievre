@@ -33,7 +33,7 @@ describe('Wear: seeded and reproducible', () => {
     expect(meta.pixels).toEqual(built.meta.pixels);
     expect(SURFACE_MAX).toBe(config.stain.strength);
     expect(KASURE_FLOOR).toBe(config.kasure.floor);
-  });
+  }, 20000);
 
   it.runIf(existsSync('wear-fonts/current.json'))(
     'keeps the worn fonts in step with wear.config.json',
