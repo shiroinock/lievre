@@ -5,7 +5,7 @@ import { composeStories, setProjectAnnotations } from '@storybook/react';
 import preview from '../../../.storybook/preview';
 import * as kei from '../../index';
 import { checkPart, undeclared, type Violation } from './checks';
-import { CHECK_LABEL, type LayoutGate } from './declare';
+import { CHECK_LABEL, STRESS_SKIPS, type LayoutGate } from './declare';
 import { BASELINE, NOT_A_PART, type Combo } from './baseline';
 
 setProjectAnnotations(preview);
@@ -101,7 +101,7 @@ for (const { file, module } of files) {
       it(comboLabel(combo), async () => {
         const stories = composeStories(module, { initialGlobals: combo }) as unknown as Record<
           string,
-          { run: () => Promise<void> }
+          { run: () => Promise<void>; parameters?: { layoutStress?: string } }
         >;
         const failures: string[] = [];
         for (const [name, Story] of Object.entries(stories)) {
@@ -109,11 +109,17 @@ for (const { file, module } of files) {
           await document.fonts.ready;
           await new Promise(requestAnimationFrame);
           const where = `[${meta.title} › ${name}｜${comboLabel(combo)}]`;
+          const stress = Story.parameters?.layoutStress;
+          if (stress !== undefined && !stress.trim())
+            failures.push(
+              `${where} parameters.layoutStress に、行高などを上書きする理由を書いてください。`,
+            );
           for (const part of gate.parts) {
             const { found, violations } = checkPart(part, document.body);
             const key = `${meta.title} › ${part.name}`;
             if (!gate.screen) foundParts.set(key, (foundParts.get(key) ?? 0) + found);
             for (const v of violations) {
+              if (stress && STRESS_SKIPS.has(v.check.split(' ')[0])) continue;
               const index = known(meta.title, name, v, combo);
               if (index >= 0) usedBaseline.add(index);
               else

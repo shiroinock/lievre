@@ -71,6 +71,18 @@ export const CRITERIA = {
   baseline: 0.5,
 } as const;
 
+/**
+ * 行高や文字間隔を利用者の設定のように上書きする点検用の Story（Story の `parameters.layoutStress`
+ * に理由を書く）では見ない検査。上書きした行高で格子や操作の高さから外れるのは意図どおりなので、
+ * はみ出しや並びの崩れだけを見る。
+ */
+export const STRESS_SKIPS: ReadonlySet<string> = new Set([
+  'line-grid',
+  'grid-height',
+  'control-height',
+  'inset-y',
+]);
+
 export const checkId = (check: LayoutCheck) =>
   typeof check === 'string'
     ? check

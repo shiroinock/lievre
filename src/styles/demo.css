@@ -330,8 +330,9 @@ body:has(.kei-app) {
   gap: 24px;
   padding: 24px 0;
 }
+/* As narrow as the 180px face, so the dial never spills past the meter's own box. */
 .instrument-panel-body .k-meter {
-  width: 168px;
+  width: 180px;
 }
 .instrument-panel .k-metric {
   padding: 0;
@@ -952,7 +953,7 @@ body:has(.kei-app) {
 }
 .capacity-content .k-meter {
   flex: none;
-  width: 168px;
+  width: 180px;
 }
 .capacity-bars {
   display: grid;
