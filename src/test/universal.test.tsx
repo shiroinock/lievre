@@ -4,9 +4,96 @@ import { expect, it } from 'vitest';
 import axe from 'axe-core';
 import { ActionLink, Button, Dialog, EmptyState, KeiProvider, RadioGroup, Text } from '../index';
 import { RegistrationExample, ResourceLibrary, ArticleExample } from '../patterns/Everyday';
-it('inherits theme, density and typography independently through nested providers and portals',async()=>{render(<KeiProvider theme="ink" density="compact"><KeiProvider typography="interface"><Dialog trigger={<Button>開く</Button>} title="詳細" description="読み物の補足"><Text>説明</Text></Dialog></KeiProvider></KeiProvider>);await userEvent.click(screen.getByRole('button',{name:'開く'}));const scope=screen.getByRole('dialog').closest('.kei');expect(scope).toHaveAttribute('data-theme','ink');expect(scope).toHaveAttribute('data-density','compact');expect(scope).toHaveAttribute('data-typography','interface');expect(screen.queryByText('WORKSPACE / EDIT')).not.toBeInTheDocument()});
-it('keeps navigation links semantic and supports native radio keyboard selection',async()=>{render(<KeiProvider><ActionLink href="#destination">次へ</ActionLink><RadioGroup label="形式" defaultValue="a" options={[{value:'a',label:'一覧'},{value:'b',label:'カード'}]}/></KeiProvider>);expect(screen.getByRole('link',{name:'次へ'})).toHaveAttribute('href','#destination');const first=screen.getByRole('radio',{name:'一覧'});first.focus();await userEvent.keyboard('{ArrowRight}');expect(screen.getByRole('radio',{name:'カード'})).toBeChecked()});
-it('does not force a database label into generic empty content',()=>{render(<KeiProvider><EmptyState title="まだ写真がありません" description="写真を追加しましょう。"/></KeiProvider>);expect(screen.queryByText('NO RECORDS')).not.toBeInTheDocument()});
-for(const theme of ['paper','ink'] as const)for(const [name,Example] of [['library',ResourceLibrary],['article',ArticleExample],['registration',RegistrationExample]] as const){it(`${theme} ${name}: no automatically detectable structural accessibility violations`,async()=>{const {container}=render(<KeiProvider theme={theme}><Example/></KeiProvider>);const result=await axe.run(container,{rules:{'color-contrast':{enabled:false}}});expect(result.violations.map(v=>v.id)).toEqual([])})}
+it('inherits theme, density and typography independently through nested providers and portals', async () => {
+  render(
+    <KeiProvider theme="ink" density="compact">
+      <KeiProvider typography="interface">
+        <Dialog trigger={<Button>開く</Button>} title="詳細" description="読み物の補足">
+          <Text>説明</Text>
+        </Dialog>
+      </KeiProvider>
+    </KeiProvider>,
+  );
+  await userEvent.click(screen.getByRole('button', { name: '開く' }));
+  const scope = screen.getByRole('dialog').closest('.kei');
+  expect(scope).toHaveAttribute('data-theme', 'ink');
+  expect(scope).toHaveAttribute('data-density', 'compact');
+  expect(scope).toHaveAttribute('data-typography', 'interface');
+  expect(screen.queryByText('WORKSPACE / EDIT')).not.toBeInTheDocument();
+});
+it('keeps navigation links semantic and supports native radio keyboard selection', async () => {
+  render(
+    <KeiProvider>
+      <ActionLink href="#destination">次へ</ActionLink>
+      <RadioGroup
+        label="形式"
+        defaultValue="a"
+        options={[
+          { value: 'a', label: '一覧' },
+          { value: 'b', label: 'カード' },
+        ]}
+      />
+    </KeiProvider>,
+  );
+  expect(screen.getByRole('link', { name: '次へ' })).toHaveAttribute('href', '#destination');
+  const first = screen.getByRole('radio', { name: '一覧' });
+  first.focus();
+  await userEvent.keyboard('{ArrowRight}');
+  expect(screen.getByRole('radio', { name: 'カード' })).toBeChecked();
+});
+it('does not force a database label into generic empty content', () => {
+  render(
+    <KeiProvider>
+      <EmptyState title="まだ写真がありません" description="写真を追加しましょう。" />
+    </KeiProvider>,
+  );
+  expect(screen.queryByText('NO RECORDS')).not.toBeInTheDocument();
+});
+for (const theme of ['paper', 'ink'] as const)
+  for (const [name, Example] of [
+    ['library', ResourceLibrary],
+    ['article', ArticleExample],
+    ['registration', RegistrationExample],
+  ] as const) {
+    it(`${theme} ${name}: no automatically detectable structural accessibility violations`, async () => {
+      const { container } = render(
+        <KeiProvider theme={theme}>
+          <Example />
+        </KeiProvider>,
+      );
+      const result = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } });
+      expect(result.violations.map((v) => v.id)).toEqual([]);
+    });
+  }
 
-it('focuses each failed registration field, including the acknowledgement, and returns to the originating article button',async()=>{const u=userEvent.setup();const first=render(<KeiProvider><RegistrationExample/></KeiProvider>);await u.click(screen.getByRole('button',{name:'入力内容を確認'}));expect(screen.getByRole('textbox',{name:'お名前'})).toHaveFocus();await u.type(screen.getByRole('textbox',{name:'お名前'}),'計 花子');await u.click(screen.getByRole('button',{name:'入力内容を確認'}));expect(screen.getByRole('textbox',{name:'メールアドレス'})).toHaveFocus();await u.type(screen.getByRole('textbox',{name:'メールアドレス'}),'demo@example.com');await u.click(screen.getByRole('button',{name:'入力内容を確認'}));const check=screen.getByRole('checkbox');expect(check).toHaveFocus();expect(check).toHaveAccessibleDescription('確認チェックを入れてください。');first.unmount();render(<KeiProvider><ResourceLibrary/></KeiProvider>);const open=screen.getByRole('button',{name:'記事を読む：小さく始める、日々の記録'});await u.click(open);expect(screen.getByRole('heading',{level:1})).toHaveFocus();await u.click(screen.getByRole('button',{name:'← 読み物一覧へ'}));expect(screen.getByRole('button',{name:'記事を読む：小さく始める、日々の記録'})).toHaveFocus()});
+it('focuses each failed registration field, including the acknowledgement, and returns to the originating article button', async () => {
+  const u = userEvent.setup();
+  const first = render(
+    <KeiProvider>
+      <RegistrationExample />
+    </KeiProvider>,
+  );
+  await u.click(screen.getByRole('button', { name: '入力内容を確認' }));
+  expect(screen.getByRole('textbox', { name: 'お名前' })).toHaveFocus();
+  await u.type(screen.getByRole('textbox', { name: 'お名前' }), '計 花子');
+  await u.click(screen.getByRole('button', { name: '入力内容を確認' }));
+  expect(screen.getByRole('textbox', { name: 'メールアドレス' })).toHaveFocus();
+  await u.type(screen.getByRole('textbox', { name: 'メールアドレス' }), 'demo@example.com');
+  await u.click(screen.getByRole('button', { name: '入力内容を確認' }));
+  const check = screen.getByRole('checkbox');
+  expect(check).toHaveFocus();
+  expect(check).toHaveAccessibleDescription('確認チェックを入れてください。');
+  first.unmount();
+  render(
+    <KeiProvider>
+      <ResourceLibrary />
+    </KeiProvider>,
+  );
+  const open = screen.getByRole('button', { name: '記事を読む：小さく始める、日々の記録' });
+  await u.click(open);
+  expect(screen.getByRole('heading', { level: 1 })).toHaveFocus();
+  await u.click(screen.getByRole('button', { name: '← 読み物一覧へ' }));
+  expect(
+    screen.getByRole('button', { name: '記事を読む：小さく始める、日々の記録' }),
+  ).toHaveFocus();
+});

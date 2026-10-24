@@ -4,9 +4,23 @@
   "description": "KEI — Japanese-first instrument-inspired design system",
   "type": "module",
   "private": true,
-  "sideEffects": ["**/*.css"],
-  "exports": {".": {"types": "./lib/index.d.ts", "import": "./lib/kei.js"}, "./styles.css": "./lib/kei.css", "./tokens.json": "./tokens/tokens.json"},
-  "files": ["lib", "tokens", "README.md", "DESIGN.md"],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/kei.js"
+    },
+    "./styles.css": "./lib/kei.css",
+    "./tokens.json": "./tokens/tokens.json"
+  },
+  "files": [
+    "lib",
+    "tokens",
+    "README.md",
+    "DESIGN.md"
+  ],
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "storybook": "storybook dev -p 6006 --host 127.0.0.1 --no-open --disable-telemetry",
@@ -16,16 +30,39 @@
     "build": "npm run typecheck && npm run build:lib && npm run build:demo && npm run build:storybook",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "preview": "vite preview --host 127.0.0.1"
+    "preview": "vite preview --host 127.0.0.1",
+    "format": "prettier --write ."
   },
-  "peerDependencies": {"react": "^18.3.0 || ^19.0.0", "react-dom": "^18.3.0 || ^19.0.0"},
-  "dependencies": {"radix-ui": "1.8.1", "lucide-react": "^0.468.0"},
+  "peerDependencies": {
+    "react": "^18.3.0 || ^19.0.0",
+    "react-dom": "^18.3.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "lucide-react": "^0.468.0",
+    "radix-ui": "1.8.1"
+  },
   "devDependencies": {
-    "react": "^19.2.0", "react-dom": "^19.2.0",
-    "@types/react": "^19.2.0", "@types/react-dom": "^19.2.0", "@types/node": "^22.0.0",
-    "typescript": "~5.9.3", "vite": "^7.0.0", "@vitejs/plugin-react": "^5.0.0",
-    "storybook": "10.6.3", "@storybook/react-vite": "10.6.3", "@storybook/addon-docs": "10.6.3", "@storybook/addon-a11y": "10.6.3",
-    "vitest": "^4.0.0", "jsdom": "^26.1.0", "@testing-library/react": "^16.3.0", "@testing-library/user-event": "^14.6.1", "@testing-library/jest-dom": "^6.9.0", "axe-core": "^4.11.0"
+    "@storybook/addon-a11y": "10.6.3",
+    "@storybook/addon-docs": "10.6.3",
+    "@storybook/react-vite": "10.6.3",
+    "@testing-library/jest-dom": "^6.9.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "axe-core": "^4.11.0",
+    "jsdom": "^26.1.0",
+    "prettier": "^3.3.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "storybook": "10.6.3",
+    "typescript": "~5.9.3",
+    "vite": "^7.0.0",
+    "vitest": "^4.0.0"
   },
-  "engines": {"node": ">=22.12.0"}
+  "engines": {
+    "node": ">=22.12.0"
+  }
 }
