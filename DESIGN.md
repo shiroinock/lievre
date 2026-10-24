@@ -38,7 +38,7 @@ KEI（計）は、日本語の業務画面を読みやすく組み立てるた�
 - **Paper**：青みのある明るい作業面。
 - **Ink**：深い紺の面。アクセントは明るいウルトラマリンに置き換える。
 
-- **試作中**：焼けた紙の **Sepia** と、錆びた筐体の **Rust**。紙の粒・刷りのずれ・擦れた罫線を加える `wear="worn"` もあります。採用は未定で、候補と根拠は [references/weathered-candidates.md](references/weathered-candidates.md) にあります。
+- **試作中**：焼けた紙の **Sepia** と、錆びた筐体の **Rust**。紙の粒・汚れ・文字のカスレと歪み・刷りのずれ・擦れた罫線を加える `wear="off | baked | live"` もあります（[references/wear-prototype.md](references/wear-prototype.md)）。採用は未定で、候補と根拠は [references/weathered-candidates.md](references/weathered-candidates.md) にあります。
 
 トークンの名前と意味は共通で、値だけが入れ替わります。ダイアログやメニューなどのポータルにもテーマが引き継がれます。
 

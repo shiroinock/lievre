@@ -1,0 +1,17 @@
+{
+  "salt": "kei",
+  "surfaceMax": 0.1,
+  "kasureFloor": 0.72,
+  "tile": 256,
+  "pixels": {
+    "surface": "24cbd0f38917608c",
+    "kasure": "44cd81c3b365194e"
+  },
+  "bytes": {
+    "surface-paper.png": 16771,
+    "surface-ink.png": 16771,
+    "surface-sepia.png": 16771,
+    "surface-rust.png": 16771,
+    "kasure.png": 8769
+  }
+}

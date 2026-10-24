@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import tokens from '../../tokens/tokens.json';
 import { readFileSync } from 'node:fs';
 import { buildTokens } from '../../scripts/build-tokens.mjs';
+import { KASURE_FLOOR, SURFACE_MAX } from '../wear/params.mjs';
 type TokenSet = Record<string, { $value: string }>;
 const themes = ['paper', 'ink', 'sepia', 'rust'] as const;
 function themeTokens(theme: (typeof themes)[number]) {
@@ -116,16 +117,22 @@ describe('Semantic color contrast and token synchronization', () => {
     });
   }
 
-  // Worn grain darkens (or lightens) the working surface toward the text colour in speckles.
-  // At the densest speckle, text that sits directly on the surface must still reach 4.5:1.
-  const wear = readFileSync('src/styles/kei-wear.css', 'utf8');
-  const grain = Number(wear.match(/::before \{[^}]*?opacity: ([\d.]+);/)![1]);
+  // Wear stains the working surface and panels (bg, surface) toward the text colour, at most
+  // SURFACE_MAX at the densest speckle.
+  // Every text colour must still reach 4.5:1 there, and text-coloured glyphs must reach it at the
+  // faintest point of the dry-brush mask (KASURE_FLOOR) on top of that stain.
   for (const theme of themes) {
     const set = themeTokens(theme);
-    for (const foreground of ['text', 'muted', 'subtle', 'success', 'warning', 'danger', 'info'])
-      it(`${theme} worn: ${foreground} / grained bg reaches 4.5:1`, () => {
-        const grained = mix(resolve(set, 'bg'), resolve(set, 'text'), grain);
-        expect(ratio(resolve(set, foreground), grained)).toBeGreaterThanOrEqual(4.5);
+    for (const background of ['bg', 'surface']) {
+      const stained = mix(resolve(set, background), resolve(set, 'text'), SURFACE_MAX);
+      for (const foreground of ['text', 'muted', 'subtle', 'success', 'warning', 'danger', 'info'])
+        it(`${theme} wear: ${foreground} / stained ${background} reaches 4.5:1`, () => {
+          expect(ratio(resolve(set, foreground), stained)).toBeGreaterThanOrEqual(4.5);
+        });
+      it(`${theme} wear: dry-brushed text / stained ${background} reaches 4.5:1`, () => {
+        const faint = mix(stained, resolve(set, 'text'), KASURE_FLOOR);
+        expect(ratio(faint, stained)).toBeGreaterThanOrEqual(4.5);
       });
+    }
   }
 });

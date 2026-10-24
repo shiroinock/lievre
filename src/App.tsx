@@ -34,6 +34,9 @@ import { ColorFoundation, Foundations, ReferenceDirection, principles } from './
 import { OperationsExample, SettingsExample } from './patterns/Operations';
 import { ResourceLibrary, ArticleExample, RegistrationExample } from './patterns/Everyday';
 import './styles/demo.css';
+// Worn glyphs exist only after `npm run wear:font`. Their @font-face list is as long as Plex's own
+// (about 150 KB gzipped), so it is fetched only once baked wear is chosen.
+const wornFonts = Object.values(import.meta.glob('../wear-fonts/fonts.css'));
 
 const version = '0.2.0';
 type Page = 'overview' | 'foundations' | 'components' | 'patterns' | 'references';
@@ -105,7 +108,10 @@ function InstrumentPanel() {
 export default function App() {
   const [theme, setTheme] = useState<Theme>('paper');
   const [density, setDensity] = useState<Density>('comfortable');
-  const [wear, setWear] = useState<Wear>('clean');
+  const [wear, setWear] = useState<Wear>('off');
+  useEffect(() => {
+    if (wear === 'baked') wornFonts.forEach((load) => load());
+  }, [wear]);
   const [page, setPage] = useState<Page>('overview');
   const [navOpen, setNavOpen] = useState(false);
   const active = pages.find((p) => p.id === page)!;
@@ -245,8 +251,9 @@ export default function App() {
             <div className="density-control">
               <label htmlFor="wear">質感（試作）</label>
               <select id="wear" value={wear} onChange={(e) => setWear(e.target.value as Wear)}>
-                <option value="clean">整った面</option>
-                <option value="worn">擦れ</option>
+                <option value="off">なし</option>
+                <option value="baked">焼き込み</option>
+                <option value="live">実行時</option>
               </select>
             </div>
             <p className="sidebar-version">v{version}</p>
