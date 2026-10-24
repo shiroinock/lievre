@@ -42,7 +42,10 @@ function glyphInk(weight, family, ch) {
         break;
       }
     }
-    glyphs.set(key, top < 0 ? null : { ascent: baseline - top, descent: bottom - baseline });
+    const g = top < 0 ? null : { ascent: baseline - top, descent: bottom - baseline };
+    // A web font still loading draws in the fallback: measure again once it has arrived.
+    if (!document.fonts.check(inkCtx.font, ch)) return g;
+    glyphs.set(key, g);
   }
   return glyphs.get(key);
 }
