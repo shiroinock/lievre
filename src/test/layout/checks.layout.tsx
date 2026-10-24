@@ -153,7 +153,7 @@ describe('配置の検査：中身の広がりと文字のベースライン', (
 });
 
 describe('実際の部品で検出する', () => {
-  it('Sparkline の折れ線が箱の中央に縮んでいるのを見つける', () => {
+  it('Sparkline の折れ線が箱の左右いっぱいに広がる', () => {
     const root = createRoot(host);
     flushSync(() =>
       root.render(
@@ -169,9 +169,7 @@ describe('実際の部品で検出する', () => {
       host,
     );
     root.unmount();
-    // Today's Sparkline keeps the viewBox's aspect ratio; baseline.ts lists it until it is fixed.
-    expect(violations.map((v) => v.message)).toEqual([
-      expect.stringMatching(/箱の幅 296px、左に \d+(\.\d)?px・右に \d+(\.\d)?px の空き/),
-    ]);
+    // The fixture above shows the miss; the real part stretches its viewBox to the box.
+    expect(violations.map((v) => v.message)).toEqual([]);
   });
 });

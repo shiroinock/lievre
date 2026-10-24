@@ -90,20 +90,6 @@ export const BASELINE: KnownIssue[] = [
     check: 'grid-height',
     reason: 'Story の Default が height 18 を渡している。部品の既定値（16px）は格子に乗っている。',
   },
-  // 描いた中身が箱いっぱいに広がらない。
-  ...[
-    'Components/Data/Sparkline',
-    'Components/Data/Metric',
-    'Patterns/Application',
-    'Patterns/Workspace',
-  ].map((story) => ({
-    story,
-    part: '折れ線',
-    check: 'fills-x',
-    reason:
-      'Sparkline の svg に preserveAspectRatio がなく、既定の xMidYMid meet で viewBox（200×50）の縦横比が保たれ、折れ線が箱の中央に縮む。',
-  })),
-
   // 部品を組み合わせた画面でだけ起きるもの。
   ...['Patterns/Application', 'Patterns/Workspace'].map((story) => ({
     story,
@@ -111,13 +97,7 @@ export const BASELINE: KnownIssue[] = [
     check: 'fits',
     reason: 'Meter は幅 200px で、それより狭い枠（計器パネル）に入れると 6px はみ出す。',
   })),
-  {
-    story: 'Patterns/Workspace',
-    part: '進み具合の見出し',
-    check: 'baseline',
-    reason:
-      '幅 320px・行高 1.5・文字間隔を広げた点検用の Story で、値の側のベースラインが 2px 下になる。.k-progress-label が align-items: baseline でない。',
-  },
+
   {
     story: 'Patterns/Workspace',
     part: 'ボタン',
