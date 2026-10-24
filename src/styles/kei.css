@@ -813,7 +813,8 @@
     font-size: var(--k-text-sm);
     line-height: var(--k-line-tight);
   }
-  .k-progress-label > :last-child {
+  /* Only the value is muted; without showValue the label is the last child. */
+  .k-progress-label > :last-child:not(:first-child) {
     color: var(--k-muted);
   }
   .k-progress {
