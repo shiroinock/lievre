@@ -11,6 +11,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { normaliseConfig, TEXT_KINDS } from '../../src/wear/presets.mjs';
 import { contrastGauge } from '../../src/wear/gauges.mjs';
 import { outlineEnv, readConfig, writeWear } from '../build-wear.mjs';
+import { missingMessage, wearPython } from './python.mjs';
 
 const LOOPBACK = new Set(['127.0.0.1', '::1', '::ffff:127.0.0.1']);
 const RANGES = {
@@ -60,7 +61,7 @@ function bakePreview(config, text) {
   if (existsSync(`${dir}/faces.json`))
     return Promise.resolve({ key, ...JSON.parse(readFileSync(`${dir}/faces.json`, 'utf8')) });
   mkdirSync(dir, { recursive: true });
-  const python = process.env.KEI_WEAR_PYTHON || 'python3';
+  const python = wearPython();
   return new Promise((resolve, reject) => {
     const child = spawn(python, ['scripts/wear/font.py', 'preview', dir], {
       env: { ...process.env, ...outlineEnv(config.outline) },
@@ -69,8 +70,11 @@ function bakePreview(config, text) {
     let err = '';
     child.stdout.on('data', (chunk) => (out += chunk));
     child.stderr.on('data', (chunk) => (err = (err + chunk).slice(-2000)));
-    child.on('error', reject);
+    // A missing python3 or module ends with the fix as the last line, which the page shows.
+    child.on('error', () => reject(new Error(missingMessage(python))));
     child.on('close', (code) => {
+      if (/ModuleNotFoundError/.test(err))
+        return reject(new Error(`${err}\n${missingMessage(python)}`));
       if (code !== 0) return reject(new Error(err || `font.py exited with ${code}`));
       writeFileSync(`${dir}/faces.json`, out);
       resolve({ key, ...JSON.parse(out) });

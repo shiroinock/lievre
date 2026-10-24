@@ -335,7 +335,8 @@ function SaveStatus({ status }: { status: Status }) {
     saving: '保存しています…',
     running: '保存しました。フォントを焼き込んでいます（1分ほど）…',
     done: '保存し、画像とフォントを焼き込みました。',
-    failed: '保存しました。フォントの焼き込みは失敗しました（Python と fontTools が必要です）。',
+    failed:
+      '保存しました。フォントの焼き込みは失敗しました。Python の環境がなければ、npm run wear:setup を実行してから、もう一度保存してください。',
     rejected: '保存できませんでした。',
   };
   return (
@@ -513,7 +514,7 @@ function PreviewColumn({ theme, config }: { theme: Theme; config: WearConfig }) 
     idle: '',
     baking: '見本の文字を焼き込んでいます…',
     ready: '',
-    failed: `その場の焼き込みに失敗しました（Python と fontTools が必要です）。保存した値のフォントで表示しています。${preview.error ?? ''}`,
+    failed: `その場の焼き込みに失敗しました。保存した値のフォントで表示しています。${preview.error ?? ''}`,
   }[preview.state];
   return (
     <div className="tune-column">

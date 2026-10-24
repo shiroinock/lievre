@@ -37,6 +37,14 @@ npm run format
 npm run build       # lib/・dist/・dist/storybook/
 ```
 
+質感の試作（[references/wear-prototype.md](references/wear-prototype.md)）の強さを調整するときは、はじめに一度だけ `npm run wear:setup` を実行します。リポジトリの中の `.venv-wear/` に、フォントを焼くための fontTools と brotli を入れます。
+
+```sh
+npm run wear:setup  # .venv-wear/ を作る（uv があれば uv、なければ python3 -m venv と pip）
+npm run wear:tune   # 調整の画面を開く
+npm run wear:font   # wear.config.json の値でフォントを焼く
+```
+
 jsdom では色のコントラストを測れないため、トークンの組み合わせを数値で検査するテストを別に用意しています。
 
 ## 別のプロジェクトで使う

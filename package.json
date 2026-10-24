@@ -36,6 +36,7 @@
     "tokens": "node scripts/build-tokens.mjs",
     "wear": "node scripts/build-wear.mjs",
     "wear:font": "node scripts/build-wear-font.mjs",
+    "wear:setup": "node scripts/wear/setup.mjs",
     "wear:tune": "vite --open /tune.html"
   },
   "peerDependencies": {

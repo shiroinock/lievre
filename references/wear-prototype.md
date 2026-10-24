@@ -51,7 +51,7 @@
   - @fontsource と同じ unicode-range の区切り（ウェイトごとに123ファイル）のまま書き出します。ページは使う区切りだけを読み込みます。実際に使う文字だけに絞る方式は使っていません。
   - 字形の左の余白（lsb）が、動かした後の輪郭の左端と一致することも調べます。
   - 結果は、ソルト・`outline` の値・生成方法の版ごとに `wear-fonts/<ハッシュ>/` へキャッシュします（git の管理外）。3ウェイトで372ファイル・19.4MB（前の歪ませる方式では 5.0MB）、8コアで生成に65〜110秒かかりました。輪郭を細かく分けて点が増えるためです。`step` を長くすると軽くなります。2回目以降はキャッシュを使います。
-  - Python 3 と fontTools・brotli が必要なので、`npm run build` には入れていません。入っていない環境では、`'KEI Worn Sans'` が見つからず、普通の Plex で表示されます。worn フォントを使うのは、設定で「縁の荒れ」を入れた文字の種類（`distort`）だけです。
+  - Python 3 と fontTools・brotli が必要なので（`npm run wear:setup` で入ります）、`npm run build` には入れていません。入っていない環境では、`'KEI Worn Sans'` が見つからず、普通の Plex で表示されます。worn フォントを使うのは、設定で「縁の荒れ」を入れた文字の種類（`distort`）だけです。
 
 ## live
 
@@ -62,7 +62,17 @@
 
 ## 強さの調整
 
-`npm run wear:tune` で、手元の開発サーバーに調整の画面（`tune.html`）を開きます。
+`npm run wear:tune` で、手元の開発サーバーに調整の画面（`tune.html`）を開きます。フォントを焼くには Python の環境が要るので、はじめに一度だけ次を実行します。
+
+```sh
+npm run wear:setup   # .venv-wear/ を作り、fontTools と brotli を入れる
+npm run wear:tune
+```
+
+- `npm run wear:setup` は、リポジトリの中に `.venv-wear/`（git の管理外）を作り、[scripts/wear/requirements.txt](../scripts/wear/requirements.txt) の版（fontTools 4.55.3、brotli 1.1.0）を PyPI から入れます。uv があれば uv を、なければ `python3 -m venv` と pip を使います。何度実行しても同じ結果になります。
+- 焼き込みに使う Python は、`KEI_WEAR_PYTHON`、`.venv-wear/bin/python3`、`python3` の順に選びます（[scripts/wear/python.mjs](../scripts/wear/python.mjs)）。`npm run wear:font` と、調整画面の「保存して焼き込む」「その場の焼き込み」で共通です。
+- 必要なモジュールがないときは、ターミナルにも調整画面にも「npm run wear:setup を実行してください」と出します。
+
 
 - スライダーで変えられる値：縁の荒れの量と細かさ、太さのむらの量と広さ、輪郭を分ける長さ、カスレの密度・しきい値・最も薄い点、汚れの濃さ、ソルト。文字の種類ごとに、縁を荒らすかどうかと、カスレの深さも変えられます。
 - 変えた値は「実行時（live）」の列にすぐ反映します。隣に「質感なし」「焼き込み（保存した値）」と「焼き込みの試し（今の値）」を並べます。「焼き込みの試し」は、開発サーバーが見本の文字に使う区切りだけを今の値で焼いて（約2秒）返すもので、保存しなくても焼き込みの見た目を確かめられます。見本は、12 / 14 / 16px の本文と見出し、KEI Mono の数値・ID・時刻、表、ボタン、入力欄、Metric、Meter です。テーマは4つから選べます。

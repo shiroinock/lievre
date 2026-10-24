@@ -1,22 +1,22 @@
 // Bakes worn glyphs from wear.config.json (salt and outline): `npm run wear:font`.
-// Needs Python 3 with fontTools and brotli. Results are cached per salt and strength under
+// Needs Python 3 with fontTools and brotli (`npm run wear:setup`). Results are cached per salt and strength under
 // wear-fonts/; wear-fonts/fonts.css always points at the current values, and wear-fonts/current.json
 // records them so src/test/wear.test.tsx can tell when the fonts are out of date.
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { outlineEnv, readConfig } from './build-wear.mjs';
 import { hashString } from '../src/wear/seed.mjs';
+import { missingMessage, wearPython } from './wear/python.mjs';
 
 // Bump when scripts/wear/font.py changes how it writes the fonts.
 const FONT_VERSION = 3;
 const { salt, outline } = readConfig();
-const python = process.env.KEI_WEAR_PYTHON || 'python3';
+const python = wearPython();
 try {
   execFileSync(python, ['-c', 'import fontTools, brotli'], { stdio: 'ignore' });
 } catch {
   console.error(
-    `${python} に fontTools と brotli が必要です：${python} -m pip install fonttools brotli\n` +
-      '別の Python を使う場合は KEI_WEAR_PYTHON で指定してください。',
+    `${missingMessage(python)}\n別の Python を使う場合は KEI_WEAR_PYTHON で指定してください。`,
   );
   process.exit(1);
 }
