@@ -7,12 +7,12 @@ import {
   Card,
   Checkbox,
   DataTable,
+  DescriptionList,
   Dialog,
   DialogClose,
   EmptyState,
   Meter,
   Metric,
-  Pagination,
   Progress,
   Select,
   TextField,
@@ -20,7 +20,6 @@ import {
   ToastProvider,
   useToast,
   type Column,
-  type TableSort,
 } from '../index';
 
 export type WorkItem = {
@@ -233,32 +232,25 @@ function WorkDetails({ item }: { item: WorkItem }) {
       }
     >
       <div className="k-form-stack">
-        <dl className="work-detail-grid">
-          <div>
-            <dt>状態</dt>
-            <dd>
-              <WorkBadge status={item.status} />
-            </dd>
-          </div>
-          <div>
-            <dt>担当</dt>
-            <dd>{item.owner}</dd>
-          </div>
-          <div>
-            <dt>優先度</dt>
-            <dd>{priorityNames[item.priority]}</dd>
-          </div>
-          <div>
-            <dt>最終更新</dt>
-            <dd className="k-mono">{item.updated}</dd>
-          </div>
-          {item.notes && (
-            <div className="work-detail-notes">
-              <dt>メモ</dt>
-              <dd>{item.notes}</dd>
-            </div>
-          )}
-        </dl>
+        <DescriptionList
+          layout="stack"
+          columns={2}
+          items={[
+            { label: '状態', value: <WorkBadge status={item.status} /> },
+            { label: '担当', value: item.owner },
+            { label: '優先度', value: priorityNames[item.priority] },
+            { label: '最終更新', value: item.updated, mono: true },
+            ...(item.notes
+              ? [
+                  {
+                    label: 'メモ',
+                    value: <span className="work-detail-notes">{item.notes}</span>,
+                    wide: true,
+                  },
+                ]
+              : []),
+          ]}
+        />
         <Progress
           value={item.status === '稼働中' ? 68 : item.status === '待機中' ? 0 : 32}
           label="処理の進捗（サンプル）"
@@ -282,7 +274,6 @@ function OperationsContent({ compact }: { compact: boolean }) {
   const [status, setStatus] = useState('all');
   const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState(1);
-  const [sorting, setSorting] = useState<TableSort>(null);
   const toast = useToast();
   const filtered = rows.filter(
     (row) =>
@@ -291,8 +282,6 @@ function OperationsContent({ compact }: { compact: boolean }) {
         .toLowerCase()
         .includes(query.toLowerCase()),
   );
-  const totalPages = Math.max(1, Math.ceil(filtered.length / 5));
-  const current = Math.min(page, totalPages);
   const columns = useMemo<Column<WorkItem>[]>(
     () => [
       {
@@ -347,21 +336,6 @@ function OperationsContent({ compact }: { compact: boolean }) {
     ],
     [],
   );
-  const sortColumn = columns.find((c) => c.key === sorting?.key);
-  const ordered =
-    sorting && sortColumn?.sortValue
-      ? [...filtered].sort((a, b) => {
-          const av = sortColumn.sortValue!(a),
-            bv = sortColumn.sortValue!(b);
-          return (
-            (typeof av === 'number' && typeof bv === 'number'
-              ? av - bv
-              : String(av).localeCompare(String(bv), 'ja', { numeric: true })) *
-            (sorting.direction === 'asc' ? 1 : -1)
-          );
-        })
-      : filtered;
-  const pageRows = ordered.slice((current - 1) * 5, current * 5);
   const exportCsv = () => {
     const csv =
       '\uFEFFID,作業名,状態,担当\n' +
@@ -486,28 +460,17 @@ function OperationsContent({ compact }: { compact: boolean }) {
           </div>
         )}
         <DataTable
-          rows={pageRows}
+          rows={filtered}
           columns={columns}
           getRowId={(r) => r.id}
           caption="作業キュー：作業名・状態・担当・優先度・更新時刻"
           selectable
           selectedIds={selected}
           onSelectionChange={setSelected}
-          sorting={sorting}
-          onSortingChange={(value) => {
-            setSorting(value);
-            setPage(1);
-          }}
+          pageSize={5}
+          page={page}
+          onPageChange={setPage}
         />
-        <footer className="queue-footer">
-          <span className="k-muted">
-            {filtered.length
-              ? `${(current - 1) * 5 + 1}–${Math.min(current * 5, filtered.length)}`
-              : '0'}{' '}
-            / {filtered.length} 件
-          </span>
-          <Pagination page={current} totalPages={totalPages} onPageChange={setPage} />
-        </footer>
       </section>
       {!compact && (
         <div className="operations-lower">

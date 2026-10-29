@@ -363,24 +363,106 @@
     color: var(--k-muted);
   }
 
+  /* A square: width = height = the control height of its size. The border is transparent
+     unless the variant draws one, so every variant has the same box. */
   .k-icon-button {
+    --icon-button-size: 32px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: 0;
+    flex-shrink: 0;
+    width: var(--icon-button-size);
+    height: var(--icon-button-size);
+    padding: 0;
+    border: 1px solid transparent;
     border-radius: var(--k-radius-md);
     background: transparent;
     color: var(--k-muted);
+    transition:
+      background-color var(--k-motion) var(--k-ease),
+      border-color var(--k-motion) var(--k-ease),
+      color var(--k-motion) var(--k-ease);
   }
-  .k-icon-button:hover {
+  .k-icon-button:hover:not(:disabled) {
     background: var(--k-surface-sunken);
     color: var(--k-text);
+  }
+  .k-icon-button--md {
+    --icon-button-size: var(--k-control-height);
+  }
+  .k-icon-button--lg {
+    --icon-button-size: 48px;
+  }
+  .k-icon-button-icon {
+    display: flex;
+  }
+  .k-icon-button-icon > svg {
+    width: 16px;
+    height: 16px;
+  }
+  .k-icon-button--lg .k-icon-button-icon > svg {
+    width: 20px;
+    height: 20px;
+  }
+  .k-icon-button--secondary {
+    background: var(--k-surface-raised);
+    border-color: var(--k-border-strong);
+    color: var(--k-text);
+  }
+  .k-icon-button--secondary:active:not(:disabled) {
+    background: var(--k-accent-soft);
+    border-color: var(--k-accent);
+  }
+  .k-icon-button--ghost:active:not(:disabled) {
+    background: var(--k-accent-soft);
+  }
+  .k-icon-button--primary {
+    background: var(--k-accent);
+    color: var(--k-on-accent);
+  }
+  .k-icon-button--primary:where(:hover, :active):not(:disabled) {
+    background: var(--k-accent-hover);
+    color: var(--k-on-accent);
+  }
+  .k-icon-button--danger {
+    background: var(--k-danger);
+    color: var(--k-on-danger);
+  }
+  .k-icon-button--danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--k-danger) 86%, var(--k-text));
+    color: var(--k-on-danger);
+  }
+  .k-icon-button:disabled {
+    color: var(--k-muted);
+    cursor: not-allowed;
+  }
+  .k-icon-button:where(
+      .k-icon-button--primary,
+      .k-icon-button--secondary,
+      .k-icon-button--danger
+    ):disabled {
+    background: var(--k-surface-sunken);
+    border-color: var(--k-border);
   }
 
   .k-spin {
     animation: k-spin 0.9s linear infinite;
+  }
+  /* Spinner: it takes the size and line height of where it sits, and the icon is one line box
+     tall, so it stays on the centre of the text's first line, beside a label or in a sentence. */
+  .k-spinner {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--k-space-2);
+    color: var(--k-muted);
+    vertical-align: top;
+  }
+  .k-spinner > svg {
+    width: 16px;
+    height: 1lh;
+  }
+  .k-spinner--md > svg {
+    width: 24px;
   }
   @keyframes k-spin {
     to {
@@ -522,8 +604,10 @@
   .k-select-icon {
     color: var(--k-muted);
   }
+  /* Floating layers share one z-index above dialogs (101) and below toasts (120), so the one
+     opened last, appended last to the body, sits on top: a select inside a popover or dialog. */
   .k-select-content {
-    z-index: 80;
+    z-index: 110;
     min-width: var(--radix-select-trigger-width);
     max-height: var(--radix-select-content-available-height);
     padding: 4px;
@@ -715,10 +799,12 @@
   }
   /* A panel's padding alone sets its inner space: the margins of its first and last
      children (a <p>'s default 1em, say) would make one side deeper than the other. */
-  :is(.k-card-body, .k-dialog-body, .k-tab-content, .k-alert-description) > :where(:first-child) {
+  :is(.k-card-body, .k-dialog-body, .k-tab-content, .k-alert-description, .k-popover-body)
+    > :where(:first-child) {
     margin-top: 0;
   }
-  :is(.k-card-body, .k-dialog-body, .k-tab-content, .k-alert-description) > :where(:last-child) {
+  :is(.k-card-body, .k-dialog-body, .k-tab-content, .k-alert-description, .k-popover-body)
+    > :where(:last-child) {
     margin-bottom: 0;
   }
 
@@ -814,7 +900,7 @@
 
   /* Tooltip */
   .k-tooltip {
-    z-index: 90;
+    z-index: 110;
     max-width: 260px;
     padding: 4px 8px;
     border-radius: var(--k-radius-sm);
@@ -825,6 +911,178 @@
   }
   .k-tooltip-arrow {
     fill: var(--k-text);
+  }
+
+  /* DescriptionList: row puts every label in one fixed column and lets the value wrap below
+     it when the row is too narrow; stack sets label over value in up to N columns. */
+  .k-dl {
+    --dl-label-width: 8em;
+    display: grid;
+    gap: var(--k-space-3) var(--k-space-6);
+    margin: 0;
+  }
+  .kei[data-density='compact'] .k-dl {
+    row-gap: var(--k-space-2);
+  }
+  .k-dl-item {
+    min-width: 0;
+  }
+  .k-dl-label {
+    color: var(--k-muted);
+    font-size: var(--k-text-sm);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+  }
+  .k-dl-value {
+    min-width: 0;
+    margin: 0;
+    line-height: var(--k-line-body);
+    overflow-wrap: anywhere;
+  }
+  /* Baselines line up even when a monospaced value sits beside a Japanese label. */
+  .k-dl[data-layout='row'] .k-dl-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--k-space-4);
+  }
+  .k-dl[data-layout='row'] .k-dl-label {
+    flex: 0 0 var(--dl-label-width);
+  }
+  .k-dl[data-layout='row'] .k-dl-value {
+    flex: 1 1 16rem;
+  }
+  .k-dl[data-layout='stack'] {
+    /* At most --dl-columns columns, fewer once a column would drop below 12rem. */
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(
+        max(12rem, calc((100% - (var(--dl-columns) - 1) * var(--k-space-6)) / var(--dl-columns))),
+        1fr
+      )
+    );
+  }
+  .k-dl[data-layout='stack'] .k-dl-label {
+    margin-bottom: var(--k-space-1);
+  }
+  .k-dl-item[data-wide] {
+    grid-column: 1 / -1;
+  }
+
+  /* Popover and menu float on a 1px line and the raised surface, never a shadow. */
+  .k-popover,
+  .k-menu {
+    z-index: 110;
+    border: 1px solid var(--k-border-strong);
+    border-radius: var(--k-radius-md);
+    background: var(--k-surface-raised);
+    color: var(--k-text);
+    animation: k-fade 120ms ease-out;
+  }
+  /* The same padding as a panel; the width keeps a form readable and shrinks at the edge. */
+  .k-popover {
+    width: 320px;
+    max-width: var(--radix-popover-content-available-width);
+    max-height: var(--radix-popover-content-available-height);
+    overflow: auto;
+    padding: var(--k-panel-padding);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-body);
+  }
+  .k-popover:focus-visible {
+    outline-offset: -2px;
+  }
+  .k-popover-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--k-space-2);
+  }
+  .k-popover-title {
+    margin: 0 0 var(--k-space-3);
+    font-size: var(--k-text-base);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+  }
+
+  /* Menu: 4px around the list and 4px above and below a separator, like the select list. */
+  .k-menu {
+    min-width: max(180px, var(--radix-dropdown-menu-trigger-width));
+    max-width: var(--radix-dropdown-menu-content-available-width);
+    max-height: var(--radix-dropdown-menu-content-available-height);
+    overflow: auto;
+    padding: 4px;
+  }
+  .k-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--k-space-2);
+    min-height: var(--k-control-height);
+    /* 4px list padding + 8px = the 12px a select or input leaves before its text. */
+    padding: 4px 8px;
+    border-radius: var(--k-radius-sm);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-tight);
+    outline: 0;
+    cursor: pointer;
+  }
+  .k-menu-item[data-highlighted] {
+    background: var(--k-accent-soft);
+  }
+  .k-menu-item[data-tone='danger'] {
+    color: var(--k-danger);
+  }
+  .k-menu-item[data-tone='danger'][data-highlighted] {
+    background: var(--k-danger-soft);
+  }
+  .k-menu-item[data-disabled] {
+    color: var(--k-subtle);
+    background: transparent;
+    cursor: not-allowed;
+  }
+  .k-menu-item[data-state='checked'] {
+    color: var(--k-accent);
+    font-weight: var(--k-weight-bold);
+  }
+  /* A fixed 16px column for icons and check marks, empty on rows without one. */
+  .k-menu-lead,
+  .k-menu-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+  }
+  .k-menu-lead svg {
+    width: 16px;
+    height: 16px;
+  }
+  .k-menu-item:not([data-tone='danger']):not([data-state='checked']) .k-menu-lead {
+    color: var(--k-muted);
+  }
+  .k-menu-label {
+    flex: 1;
+    min-width: 0;
+  }
+  .k-menu-shortcut {
+    margin-inline-start: var(--k-space-4);
+    color: var(--k-muted);
+    font: var(--k-weight-regular) var(--k-text-mono-min) / var(--k-line-tight) var(--k-font-mono);
+  }
+  .k-menu-heading {
+    padding: 4px 8px;
+    color: var(--k-muted);
+    font-size: var(--k-text-xs);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+  }
+  .k-menu[data-lead] .k-menu-heading {
+    /* stylelint-disable-next-line kei/padding-symmetry -- アイコンの列（16px）と間（8px）の分だけ空けて、見出しを項目の文字と同じ位置から始める */
+    padding-inline-start: calc(8px + 16px + var(--k-space-2));
+  }
+  .k-menu-separator {
+    height: 1px;
+    margin: 4px 0;
+    background: var(--k-border);
   }
 
   /* Progress */
@@ -1061,6 +1319,35 @@
     gap: var(--k-space-2);
     padding: 16px 24px;
     border-top: 1px solid var(--k-border);
+  }
+  /* A confirmation is one short panel: the title, the text and the buttons share one padding,
+     and a narrower box keeps the line length short. */
+  .k-dialog--confirm {
+    width: min(440px, calc(100vw - 32px));
+  }
+  .k-dialog--confirm .k-dialog-body {
+    display: grid;
+    gap: var(--k-space-3);
+    padding: 24px;
+  }
+  .k-dialog--confirm .k-dialog-header {
+    flex-wrap: nowrap;
+    padding: 0;
+  }
+  .k-dialog--confirm .k-dialog-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+  }
+  .k-dialog--confirm .k-dialog-description {
+    color: var(--k-text);
+  }
+  .k-confirm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--k-space-2);
+    margin-top: var(--k-space-3);
   }
   @keyframes k-fade {
     from {
@@ -1315,6 +1602,21 @@
   .k-table tbody tr:last-child td {
     border-bottom: 0;
   }
+  /* Pages drawn by DataTable itself: the count and the buttons line up with the cells' padding. */
+  .k-table-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--k-space-3);
+    padding: var(--k-cell-padding);
+    border-top: 1px solid var(--k-border);
+  }
+  .k-table-count {
+    color: var(--k-muted);
+    font-size: var(--k-text-sm);
+    line-height: var(--k-line-tight);
+  }
   .k-table tbody tr:hover {
     background: color-mix(in srgb, var(--k-surface-sunken) 60%, transparent);
   }
@@ -1396,6 +1698,9 @@
     .k-dialog-footer {
       padding: 16px 20px;
     }
+    .k-dialog--confirm .k-dialog-body {
+      padding: 20px;
+    }
     .k-toast-viewport {
       right: 16px;
       bottom: 16px;
@@ -1409,7 +1714,8 @@
     .k-button,
     .k-select-trigger,
     .k-tab,
-    .k-select-item {
+    .k-select-item,
+    .k-menu-item {
       min-height: 44px;
     }
     .k-icon-button {
@@ -1492,7 +1798,9 @@
     .k-checkbox[data-state='indeterminate'],
     .k-switch,
     .k-tab::after,
-    .k-select-item[data-highlighted] {
+    .k-select-item[data-highlighted],
+    .k-menu-item[data-highlighted],
+    .k-menu-item[data-tone='danger'][data-highlighted] {
       forced-color-adjust: none;
     }
     /* Opting out also keeps the brand focus colour, so give focus a system colour back. */
@@ -1513,7 +1821,9 @@
       background: GrayText;
       color: Canvas;
     }
-    .k-select-item[data-highlighted] {
+    .k-select-item[data-highlighted],
+    .k-menu-item[data-highlighted],
+    .k-menu-item[data-tone='danger'][data-highlighted] {
       background: Highlight;
       color: HighlightText;
     }

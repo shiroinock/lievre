@@ -34,7 +34,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '先頭・末尾では移動できないボタンを無効にします。pageとonPageChangeで制御します。',
+          '先頭・末尾では移動できないボタンを無効にし、押したボタンが無効になったらフォーカスを反対のボタンへ移します。いまのページは「5ページ中2ページ目」と読み上げ、変わると知らせます。pageとonPageChangeで制御します。DataTableのページ送りには、これを使わずDataTableのpageSizeを使います。',
       },
     },
   },

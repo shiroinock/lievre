@@ -6,26 +6,25 @@ KEI に足りない部品を、ほかのデザインシステムと比べて洗�
 
 ## 1. KEI の今の部品
 
-`src/index.ts` が書き出している部品と、`src/stories` の Story から数えました。
+`src/index.ts` が書き出している部品と、`src/stories` の Story から数えました。第1段階のうち IconButton・Popover・DropdownMenu・ConfirmDialog・DescriptionList・VisuallyHidden・Spinner は作り終え、この表に入れています（比較の表は調べた時点のままです）。
 
-| まとまり             | 部品                                                                      |
-| -------------------- | ------------------------------------------------------------------------- |
-| 仕組み               | KeiProvider、useKeiTheme、PortalSurface、ToastProvider / useToast         |
-| 文字・配置           | Text、Heading、Link、ActionLink、Container、Stack、Grid、Divider          |
-| 操作・入力           | Button、TextField、Textarea、Checkbox、RadioGroup、Switch、Select（単一） |
-| 案内・フィードバック | Alert、Toast、Tooltip、Progress、Skeleton、EmptyState                     |
-| 表示                 | Badge、Card、Avatar、Kbd                                                  |
-| 移動                 | Tabs、Breadcrumb、Pagination                                              |
-| 重なり               | Dialog / DialogClose                                                      |
-| データ               | DataTable（並べ替え・行の選択・空と読み込み中）、Metric、Meter、Sparkline |
+| まとまり             | 部品                                                                                  |
+| -------------------- | ------------------------------------------------------------------------------------- |
+| 仕組み               | KeiProvider、useKeiTheme、PortalSurface、ToastProvider / useToast                     |
+| 文字・配置           | Text、Heading、Link、ActionLink、Container、Stack、Grid、Divider                      |
+| 操作・入力           | Button、IconButton、TextField、Textarea、Checkbox、RadioGroup、Switch、Select（単一） |
+| 案内・フィードバック | Alert、Toast、Tooltip、Progress、Skeleton、Spinner、EmptyState                        |
+| 表示                 | Badge、Card、Avatar、Kbd、DescriptionList、VisuallyHidden                             |
+| 移動                 | Tabs、Breadcrumb、Pagination                                                          |
+| 重なり               | Dialog / DialogClose、ConfirmDialog、Popover、DropdownMenu                            |
+| データ               | DataTable（並べ替え・行の選択・空と読み込み中）、Metric、Meter、Sparkline             |
 
 画面例（`src/patterns`、`src/App.tsx`）で部品にならずに手で組まれているもの：
 
 - 手順の表示（`Everyday.tsx` の `everyday-steps`）→ Stepper
-- 項目と値の一覧（`Operations.tsx` の `work-detail-grid`、`Everyday.tsx` の `everyday-summary`、`App.tsx` の `hero-facts`）→ DescriptionList
 - 操作の履歴（`Operations.tsx` の `activity-list`）→ Timeline
 - 表の上の検索と絞り込み（`Operations.tsx` の `queue-tools`）→ 表の操作バー
-- サイドバーとアイコンだけのボタン（`App.tsx` の `app-sidebar`、`k-icon-button`）→ AppShell・IconButton
+- サイドバー（`App.tsx` の `app-sidebar`）→ AppShell
 
 ## 2. ほかのシステムとの比較
 
@@ -359,4 +358,4 @@ Field で今の TextField・Select・RadioGroup を作り直すのは、配置�
 
 ## 7. 作らないもの
 
-カルーセル・画像スライダー・評価（星）・メガメニューなど、宣伝やサイトの画面向けの部品は、業務画面を対象にする KEI では作りません。
+カルーセル・画像スライダー・評価（星）・メガメニューなど、宣伝やサイトの画面向けの部品は、いまは作りません。KEI は用途を業務に絞ってはいませんが、これらは読む・探す・申し込む・管理するの画面で要る場面が少ないためです。

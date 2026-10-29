@@ -1,4 +1,13 @@
-import { useId, useMemo, useState, type ReactNode } from 'react';
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react';
 import {
   ArrowDown,
   ArrowDownRight,
@@ -8,7 +17,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { cx } from './system';
-import { EmptyState, Skeleton } from './primitives';
+import { EmptyState, Pagination, Skeleton, VisuallyHidden } from './primitives';
 
 export function Sparkline({
   values,
@@ -155,8 +164,8 @@ export type Column<T> = {
   width?: string;
 };
 export type TableSort = { key: string; direction: 'asc' | 'desc' } | null;
-export type DataTableProps<T> = {
-  /** 表示する行。並べ替えはここで渡した行の中だけで行うため、ページ送りでは全件を並べ替えてから区切った行を渡し、sorting / onSortingChange で状態を持ちます。 */
+type DataTableBaseProps<T> = {
+  /** 表示する行。dataMode が 'client'（既定）なら絞り込んだ全件を渡します。DataTable が並べ替えてから pageSize ごとに区切るので、自分で区切った行は渡しません。'server' なら、サーバーが並べ替えて区切った1ページ分を渡します。 */
   rows: T[];
   columns: Column<T>[];
   getRowId: (row: T) => string;
@@ -166,34 +175,94 @@ export type DataTableProps<T> = {
   selectedIds?: string[];
   onSelectionChange?: (ids: string[]) => void;
   onRowClick?: (row: T) => void;
+  /** 読み込み中の表示。dataMode="server" では、取り直している間は true にします。そのあいだの totalCount は古いことがあるので、範囲外のページを合わせるのは読み込みが終わってからです。 */
   loading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
-  /** 渡すと並べ替えの状態を外で持ちます（ページ送りと組み合わせるとき）。見出しを押すたびに昇順と降順を切り替え、解除はしません。 */
-  sorting?: TableSort;
-  onSortingChange?: (sort: TableSort) => void;
 };
-/** ネイティブtableの意味論を維持。ソート・選択・空/読込状態を備えます。 */
-export function DataTable<T>({
-  rows,
-  columns,
-  getRowId,
-  caption,
-  selectable = false,
-  selectedIds,
-  onSelectionChange,
-  onRowClick,
-  loading = false,
-  emptyTitle = '該当するデータがありません',
-  emptyDescription = '条件を変えてもう一度検索してください。',
-  sorting,
-  onSortingChange,
-}: DataTableProps<T>) {
+/** 並べ替えとページ分けを DataTable が手元で行う形（既定）。 */
+export type DataTableClientProps = {
+  /** 'client'（既定）は、rows の全件を手元で並べ替えてから区切ります。'server' は並べ替えもページ分けもサーバーに任せ、受け取った1ページ分の rows を並べ替えずにそのまま描きます。'server' では sorting・onSortingChange・pageSize・page・onPageChange・totalCount が必須です。 */
+  dataMode?: 'client';
+  /** 並べ替えの状態。'client' では渡すと外で持ち、'server' ではいまサーバーに頼んでいる並べ替えを渡します（見出しの矢印と aria-sort に使います）。見出しを押すたびに昇順と降順を切り替え、解除はしません。 */
+  sorting?: TableSort;
+  /** 見出しを押したときに呼びます。'server' ではこの並べ替えで取り直します。ページ送りがあって1ページ目でなければ、続けて onPageChange(1) も呼びます。 */
+  onSortingChange?: (sort: TableSort) => void;
+  /** 1ページの行数。渡すと表の下に件数とページ送り（Pagination）を描きます。'client' では全件を並べ替えてから区切ります。並べ替えを変えると1ページ目に戻ります。 */
+  pageSize?: number;
+  /** 表示するページ（1始まり）。'client' では渡さなければ DataTable が持ちます。行が減ってページが足りなくなると、最後のページ（0件なら1ページ目）に合わせて onPageChange を呼びます。絞り込みを変えたときに1ページ目へ戻すなら、外で持って 1 にします。 */
+  page?: number;
+  /** ページが変わるときに呼びます。ページ送りのほか、並べ替えを変えて1ページ目に戻るときも呼びます。'server' ではこのページを取り直します。 */
+  onPageChange?: (page: number) => void;
+  totalCount?: never;
+};
+/** 並べ替えとページ分けをサーバーに任せる形。rows はサーバーから受け取った1ページ分です。 */
+export type DataTableServerProps = {
+  dataMode: 'server';
+  sorting: TableSort;
+  onSortingChange: NonNullable<DataTableClientProps['onSortingChange']>;
+  pageSize: number;
+  page: number;
+  onPageChange: NonNullable<DataTableClientProps['onPageChange']>;
+  /** dataMode="server" のとき、サーバーにある全件の数（絞り込んだ後）。ページ数と件数の表示に使います。 */
+  totalCount: number;
+};
+export type DataTableProps<T> = DataTableBaseProps<T> &
+  (DataTableClientProps | DataTableServerProps);
+/** ネイティブtableの意味論を維持。ソート・選択・空/読込状態・ページ送りを備えます。ページ送りは pageSize を渡して DataTable に描かせ、Pagination を横に並べて自分で区切ることはしません。 */
+export function DataTable<T>(props: DataTableProps<T>) {
+  const {
+    rows,
+    columns,
+    getRowId,
+    caption,
+    selectable = false,
+    selectedIds,
+    onSelectionChange,
+    onRowClick,
+    loading = false,
+    emptyTitle = '該当するデータがありません',
+    emptyDescription = '条件を変えてもう一度検索してください。',
+    sorting,
+    onSortingChange,
+    pageSize,
+    page,
+    onPageChange,
+  } = props;
+  const server = props.dataMode === 'server';
   const [internalSort, setInternalSort] = useState<TableSort>(null);
   const sort = sorting === undefined ? internalSort : sorting;
+  const [internalPage, setInternalPage] = useState(1);
+  const size = pageSize === undefined ? undefined : Math.max(1, Math.floor(pageSize) || 1);
+  const total = props.dataMode === 'server' ? Math.max(0, props.totalCount) : rows.length;
+  const totalPages = size ? Math.max(1, Math.ceil(total / size)) : 1;
+  const requested = Math.max(1, page ?? internalPage);
+  const current = Math.min(totalPages, requested);
+  const setPage = (value: number) => {
+    setInternalPage(value);
+    onPageChange?.(value);
+  };
+  // A page past the end (fewer rows, or a server total that shrank) is moved to the last page
+  // and reported once, so the app fetches it and an inner page does not jump back later.
+  // The server's total is only trusted once it has finished loading.
+  const synced = useRef<string | null>(null);
+  const settled = !(server && loading);
+  useEffect(() => {
+    if (requested === current || !settled) {
+      synced.current = null;
+      return;
+    }
+    const key = `${requested}>${current}`;
+    if (synced.current === key) return;
+    synced.current = key;
+    setPage(current);
+    // setPage is a new function each render; what it reports is in the dependencies.
+  }, [requested, current, settled]);
   const setSort = (value: TableSort) => {
     setInternalSort(value);
     onSortingChange?.(value);
+    // A new order starts over from its first rows; staying on page 3 would show a random slice.
+    if (size && current !== 1) setPage(1);
   };
   const [internal, setInternal] = useState<string[]>([]);
   const selection = selectedIds ?? internal;
@@ -201,25 +270,30 @@ export function DataTable<T>({
     setInternal(ids);
     onSelectionChange?.(ids);
   };
-  const visibleIds = rows.map(getRowId);
-  const all = rows.length > 0 && visibleIds.every((id) => selection.includes(id));
-  const some = visibleIds.some((id) => selection.includes(id));
-  const sorted = useMemo(() => {
+  // Sort every row first, then cut the page: the order cannot be applied to a slice by mistake.
+  const shown = useMemo(() => {
+    if (server) return rows;
     const col = columns.find((c) => c.key === sort?.key);
-    if (!sort || !col?.sortValue) return rows;
-    const value = col.sortValue;
-    return [...rows].sort((a, b) => {
-      const av = value(a),
-        bv = value(b);
-      return (
-        (typeof av === 'number' && typeof bv === 'number'
-          ? av - bv
-          : String(av).localeCompare(String(bv), 'ja', { numeric: true })) *
-        (sort.direction === 'asc' ? 1 : -1)
-      );
-    });
-  }, [rows, columns, sort]);
-  return (
+    let sorted = rows;
+    if (sort && col?.sortValue) {
+      const value = col.sortValue;
+      sorted = [...rows].sort((a, b) => {
+        const av = value(a),
+          bv = value(b);
+        return (
+          (typeof av === 'number' && typeof bv === 'number'
+            ? av - bv
+            : String(av).localeCompare(String(bv), 'ja', { numeric: true })) *
+          (sort.direction === 'asc' ? 1 : -1)
+        );
+      });
+    }
+    return size ? sorted.slice((current - 1) * size, current * size) : sorted;
+  }, [server, rows, columns, sort, size, current]);
+  const visibleIds = shown.map(getRowId);
+  const all = shown.length > 0 && visibleIds.every((id) => selection.includes(id));
+  const some = visibleIds.some((id) => selection.includes(id));
+  const table = (
     <div
       className="k-table-wrap"
       role="region"
@@ -246,7 +320,7 @@ export function DataTable<T>({
                         : [...new Set([...selection, ...visibleIds])],
                     )
                   }
-                  disabled={loading || !rows.length}
+                  disabled={loading || !shown.length}
                 />
               </th>
             )}
@@ -294,7 +368,7 @@ export function DataTable<T>({
             ))}
             {onRowClick && (
               <th scope="col">
-                <span className="k-sr-only">操作</span>
+                <VisuallyHidden>操作</VisuallyHidden>
               </th>
             )}
           </tr>
@@ -320,8 +394,8 @@ export function DataTable<T>({
                 )}
               </tr>
             ))
-          ) : sorted.length ? (
-            sorted.map((row) => {
+          ) : shown.length ? (
+            shown.map((row) => {
               const id = getRowId(row);
               return (
                 <tr key={id} data-selected={selection.includes(id) || undefined}>
@@ -371,5 +445,69 @@ export function DataTable<T>({
         </tbody>
       </table>
     </div>
+  );
+  if (!size) return table;
+  const first = total ? (current - 1) * size + 1 : 0;
+  const last = Math.min(current * size, total);
+  return (
+    <div className="k-table-paged">
+      {table}
+      <div className="k-table-pager">
+        <span className="k-table-count k-tabular">
+          {total ? `${total}件中 ${first}〜${last}件目` : '0件'}
+        </span>
+        <Pagination page={current} totalPages={totalPages} onPageChange={setPage} />
+      </div>
+    </div>
+  );
+}
+
+export type DescriptionItem = {
+  /** 項目名。 */
+  label: string;
+  value: ReactNode;
+  /** 値が数値・ID・日時・コードのとき true。等幅で桁をそろえます。単位は value の中で `.k-mono` の外に置けないので、単位のある値は false のまま `<span className="k-mono">` で包みます。 */
+  mono?: boolean;
+  /** layout="stack" で段を組むとき、行の幅いっぱいに広げます（メモなど長い値）。 */
+  wide?: boolean;
+};
+/** 「項目名：値」の一覧。`<dl>` の意味を保ちます。layout="row" は項目名の列と値を横に並べ、幅が足りないと値を項目名の下に回します。 */
+export function DescriptionList({
+  items,
+  layout = 'row',
+  columns = 1,
+  labelWidth,
+  className,
+  style,
+  ...props
+}: HTMLAttributes<HTMLDListElement> & {
+  items: DescriptionItem[];
+  /** 'row' は詳細や確認の画面向けに項目名と値を横に並べ、'stack' は項目名の下に値を置きます。 */
+  layout?: 'row' | 'stack';
+  /** layout="stack" のときの段の数。幅が足りないと段を減らします。 */
+  columns?: 1 | 2 | 3;
+  /** layout="row" の項目名の列の幅。既定は '8em'。どの行も同じ幅になります。 */
+  labelWidth?: string;
+}) {
+  return (
+    <dl
+      {...props}
+      className={cx('k-dl', className)}
+      data-layout={layout}
+      style={
+        {
+          ...style,
+          '--dl-columns': columns,
+          ...(labelWidth && { '--dl-label-width': labelWidth }),
+        } as CSSProperties
+      }
+    >
+      {items.map((item, i) => (
+        <div key={i} className="k-dl-item" data-wide={item.wide || undefined}>
+          <dt className="k-dl-label">{item.label}</dt>
+          <dd className={cx('k-dl-value', item.mono && 'k-mono')}>{item.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

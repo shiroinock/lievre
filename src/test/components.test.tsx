@@ -16,16 +16,21 @@ import {
   Meter,
   Progress,
   Sparkline,
+  IconButton,
+  DescriptionList,
+  Spinner,
+  VisuallyHidden,
   type Column,
 } from '../index';
 import { OperationsExample, SettingsExample } from '../patterns/Operations';
-import type { ReactNode } from 'react';
+import { StrictMode, type ReactNode } from 'react';
+const wrap = (ui: ReactNode, theme: 'paper' | 'ink' = 'paper') => (
+  <KeiProvider theme={theme}>
+    <ToastProvider>{ui}</ToastProvider>
+  </KeiProvider>
+);
 function setup(ui: ReactNode, theme: 'paper' | 'ink' = 'paper') {
-  return render(
-    <KeiProvider theme={theme}>
-      <ToastProvider>{ui}</ToastProvider>
-    </KeiProvider>,
-  );
+  return render(wrap(ui, theme));
 }
 
 describe('Input and focus contracts', () => {
@@ -84,6 +89,37 @@ describe('Input and focus contracts', () => {
     await userEvent.keyboard('{Escape}');
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
+  });
+  it('names an icon-only button by its label, shows the same words as a tooltip and keeps focus while loading', async () => {
+    const { rerender } = setup(<IconButton label="行の操作" icon={<svg data-testid="icon" />} />);
+    const button = screen.getByRole('button', { name: '行の操作' });
+    expect(button).toHaveAttribute('type', 'button');
+    expect(screen.getByTestId('icon').parentElement).toHaveAttribute('aria-hidden', 'true');
+    await userEvent.tab();
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('行の操作');
+    rerender(
+      <KeiProvider>
+        <ToastProvider>
+          <IconButton label="行の操作" icon={<svg />} loading />
+        </ToastProvider>
+      </KeiProvider>,
+    );
+    expect(screen.getByRole('button', { name: '行の操作' })).toBe(button);
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute('aria-busy', 'true');
+  });
+  it('announces a spinner by its label and adds hidden words to a button name', () => {
+    setup(
+      <>
+        <Spinner label="一覧を読み込み中" />
+        <Button>
+          詳細<VisuallyHidden>（W-1024）</VisuallyHidden>
+        </Button>
+      </>,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('一覧を読み込み中');
+    expect(screen.getByText('一覧を読み込み中')).toHaveClass('k-sr-only');
+    expect(screen.getByRole('button')).toHaveAccessibleName(/詳細\s*（W-1024）/);
   });
   it('traps dialog focus and restores it to the trigger on Escape', async () => {
     setup(
@@ -161,6 +197,163 @@ describe('Tables and measures', () => {
       'preserveAspectRatio',
       'none',
     );
+  });
+  it('keeps a description list as dl, dt and dd, and sets figures in the monospaced face', async () => {
+    const { container } = setup(
+      <DescriptionList
+        items={[
+          { label: '申請番号', value: 'REQ-00481', mono: true },
+          { label: '申請者', value: '計 花子' },
+        ]}
+      />,
+    );
+    const list = container.querySelector('dl')!;
+    expect([...list.children].map((row) => [...row.children].map((c) => c.tagName))).toEqual([
+      ['DT', 'DD'],
+      ['DT', 'DD'],
+    ]);
+    expect(screen.getByText('REQ-00481')).toHaveClass('k-mono');
+    expect(screen.getByText('計 花子')).not.toHaveClass('k-mono');
+    const results = await axe.run(container);
+    expect(results.violations.map((v) => v.id)).toEqual([]);
+  });
+  const many = [30, 80, 10, 50, 95, 20, 60].map((value, i) => ({ id: `R${i + 1}`, value }));
+  it('sorts every row before cutting the page, and goes back to page 1 when the order changes', async () => {
+    const pageChange = vi.fn();
+    setup(
+      <DataTable
+        rows={many}
+        columns={columns}
+        getRowId={(r) => r.id}
+        caption="測定値"
+        pageSize={3}
+        onPageChange={pageChange}
+      />,
+    );
+    expect(screen.getByText('7件中 1〜3件目')).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: '次のページ' }));
+    expect(pageChange).toHaveBeenLastCalledWith(2);
+    expect(screen.getAllByRole('row')[1]).toHaveTextContent('R450');
+    await userEvent.click(screen.getByRole('button', { name: '値' }));
+    expect(pageChange).toHaveBeenLastCalledWith(1);
+    // The smallest of all seven, not of the three that were on page 2.
+    expect(screen.getAllByRole('row').map((r) => r.textContent)).toEqual([
+      'ID値',
+      'R310',
+      'R620',
+      'R130',
+    ]);
+    await userEvent.click(screen.getByRole('button', { name: '次のページ' }));
+    await userEvent.click(screen.getByRole('button', { name: '次のページ' }));
+    expect(screen.getAllByRole('row').map((r) => r.textContent)).toEqual(['ID値', 'R595']);
+    expect(screen.getByText('7件中 7〜7件目')).toBeVisible();
+  });
+  it('moves a page past the end to the last page and reports it once', () => {
+    const change = vi.fn();
+    const table = (count: number) => (
+      <StrictMode>
+        <DataTable
+          rows={many.slice(0, count)}
+          columns={columns}
+          getRowId={(r) => r.id}
+          caption="測定値"
+          pageSize={3}
+          page={3}
+          onPageChange={change}
+        />
+      </StrictMode>
+    );
+    const { rerender } = setup(table(7));
+    expect(change).not.toHaveBeenCalled();
+    rerender(wrap(table(2)));
+    expect(screen.getByRole('status')).toHaveTextContent('1ページ中 1ページ目');
+    expect(screen.getAllByRole('row')).toHaveLength(3);
+    // The app keeps page 3 here; the table does not ask again with the same page.
+    rerender(wrap(table(2)));
+    rerender(wrap(table(1)));
+    expect(change.mock.calls).toEqual([[1]]);
+    rerender(wrap(table(0)));
+    expect(change.mock.calls).toEqual([[1]]);
+  });
+  it('keeps the page it moved to when the rows come back', async () => {
+    const change = vi.fn();
+    const table = (count: number) => (
+      <DataTable
+        rows={many.slice(0, count)}
+        columns={columns}
+        getRowId={(r) => r.id}
+        caption="測定値"
+        pageSize={3}
+        onPageChange={change}
+      />
+    );
+    const { rerender } = setup(table(7));
+    await userEvent.click(screen.getByRole('button', { name: '次のページ' }));
+    await userEvent.click(screen.getByRole('button', { name: '次のページ' }));
+    expect(screen.getByRole('status')).toHaveTextContent('3ページ中 3ページ目');
+    rerender(wrap(table(4)));
+    expect(screen.getByRole('status')).toHaveTextContent('2ページ中 2ページ目');
+    expect(change).toHaveBeenLastCalledWith(2);
+    rerender(wrap(table(7)));
+    expect(screen.getByRole('status')).toHaveTextContent('3ページ中 2ページ目');
+    expect(change.mock.calls).toEqual([[2], [3], [2]]);
+  });
+  it('waits for the server to finish loading before moving a page past the end', () => {
+    const change = vi.fn();
+    const table = (loading: boolean, totalCount: number) => (
+      <DataTable
+        dataMode="server"
+        rows={[]}
+        columns={columns}
+        getRowId={(r) => r.id}
+        caption="測定値"
+        loading={loading}
+        sorting={null}
+        onSortingChange={() => {}}
+        pageSize={5}
+        page={5}
+        onPageChange={change}
+        totalCount={totalCount}
+      />
+    );
+    // While page 5 is loading, the total is still the one from before.
+    const { rerender } = setup(table(true, 12));
+    expect(change).not.toHaveBeenCalled();
+    rerender(wrap(table(false, 12)));
+    expect(change.mock.calls).toEqual([[3]]);
+    rerender(wrap(table(false, 12)));
+    expect(change.mock.calls).toEqual([[3]]);
+  });
+  it('leaves sorting and paging to the server in server mode', async () => {
+    const sortChange = vi.fn();
+    const pageChange = vi.fn();
+    // A page the server already sorted by value, descending: the table must not reorder it.
+    const pageRows = [
+      { id: 'X', value: 5 },
+      { id: 'Y', value: 9 },
+    ];
+    setup(
+      <DataTable
+        dataMode="server"
+        rows={pageRows}
+        columns={columns}
+        getRowId={(r) => r.id}
+        caption="測定値"
+        sorting={{ key: 'value', direction: 'asc' }}
+        onSortingChange={sortChange}
+        pageSize={2}
+        page={4}
+        onPageChange={pageChange}
+        totalCount={41}
+      />,
+    );
+    expect(screen.getAllByRole('row').map((r) => r.textContent)).toEqual(['ID値', 'X5', 'Y9']);
+    expect(screen.getByText('41件中 7〜8件目')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('21ページ中 4ページ目');
+    await userEvent.click(screen.getByRole('button', { name: '値' }));
+    expect(sortChange).toHaveBeenCalledWith({ key: 'value', direction: 'desc' });
+    expect(pageChange).toHaveBeenCalledWith(1);
+    expect(screen.getAllByRole('row').map((r) => r.textContent)).toEqual(['ID値', 'X5', 'Y9']);
   });
   it('renders an informative empty table instead of a blank panel', () => {
     setup(<DataTable rows={[]} columns={columns} getRowId={(r) => r.id} caption="測定値" />);
