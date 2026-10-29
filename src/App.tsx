@@ -263,7 +263,7 @@ export default function App() {
               <>
                 <section className="overview-hero">
                   <div className="hero-copy">
-                    <h1>業務の画面を、読みやすく組み立てる。</h1>
+                    <h1>日本語の画面を、読みやすく組み立てる。</h1>
                     <p>
                       KEI は、日本語の画面を基準に設計した React のコンポーネントと CSS
                       トークンです。操作の色はウルトラマリン一色。影を使わず、面の明るさと1pxの線で階層をつくります。
