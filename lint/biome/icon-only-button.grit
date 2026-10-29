@@ -1,0 +1,33 @@
+// kei/icon-only-button: a Button holding only an icon has no name. An icon is a component
+// imported from an icon library or named …Icon; `<FormattedMessage />` may be the text.
+// GritQL matches one icon child or the `icon` prop alone, and has no settings, so the icon
+// libraries are the fixed list below; the ESLint / Oxlint rule also checks several icons and
+// takes `settings.kei.iconSources`.
+language js(typescript, jsx);
+
+or {
+  JsxElement(opening_element = JsxOpeningElement(name = "Button", attributes = $attributes), elements = $children) as $button where {
+    $children <: or {
+      [JsxSelfClosingElement(name = $icon)],
+      [JsxText(), JsxSelfClosingElement(name = $icon), JsxText()]
+    },
+    $button <: within JsModule() as $icons,
+    or {
+      $icon <: r".*Icon",
+      $icons <: contains JsImport() as $import where {
+        $import <: contains JsModuleSource() as $source,
+        $source <: r"[\x22\x27](?:lucide-react|@radix-ui/react-icons|@heroicons/react|react-icons)(?:/.*)?[\x22\x27]",
+        $import <: contains $icon
+      }
+    }
+  },
+  JsxSelfClosingElement(name = "Button", attributes = $attributes) as $button where {
+    $attributes <: contains JsxAttribute(name = "icon"),
+    $attributes <: not contains JsxAttribute(name = "children")
+  }
+} where {
+  $attributes <: not contains JsxSpreadAttribute(),
+  $button <: within JsModule() as $module,
+  $module <: contains `import $_ from "@kei-design/react"`,
+  register_diagnostic(span = $button, message = "アイコンだけのボタンは IconButton を使い、label で読み上げ用の名前を付けてください（<IconButton label='行の操作' icon={<MoreHorizontal />} />）。label はツールチップにも出ます。")
+}

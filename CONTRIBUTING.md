@@ -44,6 +44,7 @@ const meta = {
 | 部品                               | checks                                                                         |
 | ---------------------------------- | ------------------------------------------------------------------------------ |
 | ボタン・タブ                       | `inset-x` `inset-y` `control-height` `{ padding: 'button' }` `fits` `{ icon }` |
+| アイコンだけのボタン               | `inset-x` `inset-y` `control-height` `square` `focus-room`                     |
 | 入力欄・選択の欄                   | `inset-y` `control-height` `{ padding: 'input' }`                              |
 | バッジ・キー・アバター             | `inset-x` `inset-y` `grid-height`                                              |
 | チェックボックス・ラジオ・スイッチ | 欄に `{ icon: '箱の selector', text: 'ラベルの selector' }`                    |

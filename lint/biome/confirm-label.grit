@@ -1,0 +1,13 @@
+// kei/confirm-label: 「OK」「はい」 does not say what happens.
+language js(typescript, jsx);
+
+or {
+  JsxOpeningElement(name = "ConfirmDialog", attributes = $attributes) as $dialog,
+  JsxSelfClosingElement(name = "ConfirmDialog", attributes = $attributes) as $dialog
+} where {
+  $attributes <: contains JsxAttribute(name = "confirmLabel", initializer = JsxAttributeInitializerClause(value = $label)) as $attribute,
+  $label <: r"[{]?[\x22\x27\x60]\s*(?:(?i)ok|yes|はい|いいえ|確認|確認する|実行|実行する|決定|了解|続ける|確定)\s*[\x22\x27\x60][}]?",
+  $dialog <: within JsModule() as $module,
+  $module <: contains `import $_ from "@kei-design/react"`,
+  register_diagnostic(span = $attribute, message = "confirmLabel が「OK」「はい」「実行」などで、押すと何が起きるか分かりません。何に何をするかを動詞で書いてください（confirmLabel='3件を削除'）。")
+}
