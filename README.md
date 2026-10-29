@@ -111,7 +111,7 @@ export function App() {
 
 `@kei-design/react` から読み込んだ部品だけを見ます。部品を自分のモジュールから出し直しているときは、ESLint と Oxlint の `settings` に `"kei": { "importSources": ["@kei-design/react", "@/ui"] }` と読み込み元を足します。
 
-`icon-only-button` がアイコンとみなすのは、アイコンの部品集（`lucide-react`・`@radix-ui/react-icons`・`@heroicons/react`・`react-icons`。`@heroicons/react/24/outline` のような副パスも含む）から読み込んだもの、名前が `Icon` で終わるもの、KEI が書き出すアイコン（名前が `Icon` で終わります）だけです。`<Button><FormattedMessage id="save" /></Button>` のように、ボタンの文字を出しているかもしれない部品は止めません。ほかの部品集を使うときは、ESLint と Oxlint の `settings` に `"kei": { "iconSources": ["my-icons"] }` と足します。
+`icon-only-button` がアイコンとみなすのは、アイコンの部品集（`lucide-react`・`@radix-ui/react-icons`・`@heroicons/react`・`react-icons`。`@heroicons/react/24/outline` のような副パスも含む）から読み込んだもの、名前が `Icon` で終わるもの、KEI が書き出すアイコン（今はまだなく、足すときは名前を `Icon` で終えます）だけです。`<Button><FormattedMessage id="save" /></Button>` のように、ボタンの文字を出しているかもしれない部品は止めません。ほかの部品集を使うときは、ESLint と Oxlint の `settings` に `"kei": { "iconSources": ["my-icons"] }` と足します。
 
 ### ESLint
 
