@@ -99,7 +99,6 @@ export function App() {
 | ルール                   | 止めるもの                                                                                     | Biome |
 | ------------------------ | ---------------------------------------------------------------------------------------------- | ----- |
 | `button-type-in-form`    | `<form>` の中の Button・IconButton に `type` がない（既定は `type="button"` で送信しない）     | あり  |
-| `table-sort-before-page` | DataTable の `rows` に `slice` した1ページ分を渡し、`sorting` がない                           | 一部  |
 | `metric-unit`            | Metric の `value` に単位がある（`"99.95%"`）。ESLint・Oxlint は `--fix` で `unit` に分けます   | あり  |
 | `metric-change`          | Metric の `trend="up"` / `"down"` に `change` がない（矢印と色だけでは向きが読み上げられない） | あり  |
 | `dialog-close`           | Dialog・ConfirmDialog・Popover に `open` だけを渡す。Dialog の `footer` の Button が何もしない | あり  |
@@ -107,10 +106,12 @@ export function App() {
 | `confirm-label`          | ConfirmDialog の `confirmLabel` が「OK」「はい」「実行」など                                   | あり  |
 | `danger-tone`            | 「削除」などの ConfirmDialog・メニューの項目に `tone` の danger がない                         | あり  |
 | `icon-button-label`      | IconButton の `label` が空か記号だけ                                                           | あり  |
-| `icon-only-button`       | Button の中身がアイコンだけ（IconButton を使う）                                               | 一部  |
+| `icon-only-button`       | Button の中身がアイコンだけ（IconButton を使う）。アイコンとみなすものは下に書きました         | 一部  |
 | `unit-outside-mono`      | `.k-mono` の中に単位（%・円）がある                                                            | あり  |
 
 `@kei-design/react` から読み込んだ部品だけを見ます。部品を自分のモジュールから出し直しているときは、ESLint と Oxlint の `settings` に `"kei": { "importSources": ["@kei-design/react", "@/ui"] }` と読み込み元を足します。
+
+`icon-only-button` がアイコンとみなすのは、アイコンの部品集（`lucide-react`・`@radix-ui/react-icons`・`@heroicons/react`・`react-icons`。`@heroicons/react/24/outline` のような副パスも含む）から読み込んだもの、名前が `Icon` で終わるもの、KEI が書き出すアイコン（名前が `Icon` で終わります）だけです。`<Button><FormattedMessage id="save" /></Button>` のように、ボタンの文字を出しているかもしれない部品は止めません。ほかの部品集を使うときは、ESLint と Oxlint の `settings` に `"kei": { "iconSources": ["my-icons"] }` と足します。
 
 ### ESLint
 
@@ -135,7 +136,6 @@ JS プラグインで同じファイルを読み込みます。Oxlint の JS プ
   "jsPlugins": ["@kei-design/react/lint"],
   "rules": {
     "kei/button-type-in-form": "error",
-    "kei/table-sort-before-page": "error",
     "kei/metric-unit": "error",
     "kei/metric-change": "error",
     "kei/dialog-close": "error",
@@ -157,7 +157,6 @@ JS プラグインで同じファイルを読み込みます。Oxlint の JS プ
 {
   "plugins": [
     "./node_modules/@kei-design/react/lint/biome/button-type-in-form.grit",
-    "./node_modules/@kei-design/react/lint/biome/table-sort-before-page.grit",
     "./node_modules/@kei-design/react/lint/biome/metric-unit.grit",
     "./node_modules/@kei-design/react/lint/biome/metric-change.grit",
     "./node_modules/@kei-design/react/lint/biome/dialog-close.grit",
@@ -177,8 +176,7 @@ Biome のプラグインの指摘には、ルールの名前が出ず `plugin` �
 
 どのルールも `.grit` を用意していますが、GritQL では次のことができないため、ESLint・Oxlint より見る範囲が狭くなります。
 
-- **変数をたどれない。** GritQL のプラグインは意味のモデル（どの名前がどの宣言を指すか）を使えません。そのため `table-sort-before-page` は、`rows={all.slice(…)}` とその場で書いたときだけ止めます。`const rows = all.slice(…)` や `useMemo` を通したものは ESLint・Oxlint だけが止めます。
-- **名前と読み込みを結べない。** `@kei-design/react` から何かを読み込んでいるファイルの中で、`Button` などの名前の要素を見ます。`import { Button as KButton }` の別名は見つけられず、同じファイルで別のライブラリの `Button` も使っていると、そちらも見ます。`settings` に当たる設定がないため、`importSources` も使えません。
+- **名前と読み込みを結べない。** `@kei-design/react` から何かを読み込んでいるファイルの中で、`Button` などの名前の要素を見ます。`import { Button as KButton }` の別名は見つけられず、同じファイルで別のライブラリの `Button` も使っていると、そちらも見ます。`settings` に当たる設定がないため、`importSources` と `iconSources` も使えません。`icon-only-button` がアイコンの部品集とみなすのは、上の決まった4つだけです。
 - **「子がすべてアイコン」を書けない。** 子の並びは決まった形でしか比べられないため、`icon-only-button` は、子がアイコン1つのときと `icon` だけのときに止めます。アイコンを2つ並べたものは ESLint・Oxlint だけが止めます。
 - **`metric-unit` の自動の直しはない。** GritQL の書き換えでは、値を数値と単位に分けて2つの属性にする処理を書けないため、指摘だけにしています。
 - **メッセージの中で `\"` を使えない。** Biome の GritQL は文字列の `\"` を正しく読まず、後ろの文字が化けます。そのためメッセージの例は `type='submit'` のように一重引用符で書き、ESLint・Oxlint の文もそろえています。

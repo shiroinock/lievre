@@ -1,7 +1,6 @@
 // Written by hand so that the plugin needs no build and no types from ESLint or Oxlint.
 type RuleName =
   | 'button-type-in-form'
-  | 'table-sort-before-page'
   | 'metric-unit'
   | 'metric-change'
   | 'dialog-close'

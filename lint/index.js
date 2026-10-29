@@ -36,6 +36,30 @@ const attribute = (opening, name) =>
 const hasSpread = (opening) => opening.attributes.some((a) => a.type === 'JSXSpreadAttribute');
 const missing = (opening, name) => !attribute(opening, name) && !hasSpread(opening);
 
+// Icon libraries, also matched by subpath ('@heroicons/react/24/outline', 'react-icons/fa').
+// Apps add their own with `settings.kei.iconSources`.
+const defaultIconSources = [
+  'lucide-react',
+  '@radix-ui/react-icons',
+  '@heroicons/react',
+  'react-icons',
+];
+
+// Local names of the components imported from an icon library.
+function iconImports(context) {
+  const sources = [...defaultIconSources, ...(context.settings?.kei?.iconSources ?? [])];
+  const names = new Set();
+  for (const statement of context.sourceCode.ast.body)
+    if (
+      statement.type === 'ImportDeclaration' &&
+      sources.some(
+        (s) => statement.source.value === s || statement.source.value.startsWith(`${s}/`),
+      )
+    )
+      for (const s of statement.specifiers) names.add(s.local.name);
+  return names;
+}
+
 // The string a prop is given when it is written in the code: `value="1"`, `value={'1'}`, `` value={`1`} ``.
 function staticString(attr) {
   let value = attr?.value;
@@ -93,19 +117,6 @@ const rules = {
           return;
         }
       }
-    }),
-  ),
-
-  'table-sort-before-page': rule(
-    'ページ送りの DataTable には、全件を並べ替えてから区切った行と sorting を渡す',
-    {
-      page: 'DataTable は渡された rows の中だけで並べ替えるので、区切った後の1ページ分では、そのページの中だけが並びます。全件を並べ替えてから slice し、sorting と onSortingChange で並べ替えの状態を持ってください（llms.txt「表の並べ替えとページ送り」）。',
-    },
-    onKei(['DataTable'], (context, node) => {
-      if (!missing(node, 'sorting')) return;
-      const rows = attribute(node, 'rows')?.value;
-      if (rows?.type !== 'JSXExpressionContainer') return;
-      if (isPaged(context, rows.expression, node, 0)) context.report({ node, messageId: 'page' });
     }),
   ),
 
@@ -265,25 +276,27 @@ const rules = {
   'icon-only-button': rule(
     'アイコンだけのボタンは IconButton にする',
     {
-      icon: "アイコンだけの Button は、読み上げで名前がなく、画面にも説明が出ません。<IconButton label='何をするか' icon={<Icon />} /> を使ってください。label が読み上げとツールチップの両方になります。",
+      icon: "アイコンだけのボタンは IconButton を使い、label で読み上げ用の名前を付けてください（<IconButton label='行の操作' icon={<MoreHorizontal />} />）。label はツールチップにも出ます。",
     },
     (context) => {
-      let kei;
+      let kei, icons;
       return {
         Program() {
           kei = keiImports(context);
+          icons = iconImports(context);
         },
         JSXElement(element) {
           const node = element.openingElement;
           if (kei(node.name) !== 'Button' || hasSpread(node) || attribute(node, 'children')) return;
           const shown = element.children.filter((c) => !(c.type === 'JSXText' && !c.value.trim()));
-          const isIcon = (c) =>
-            c.type === 'JSXElement' &&
-            c.children.length === 0 &&
-            ((c.openingElement.name.type === 'JSXIdentifier' &&
-              /^[A-Z]/.test(c.openingElement.name.name) &&
-              !kei(c.openingElement.name)) ||
-              c.openingElement.name.name === 'svg');
+          // Only what is surely an icon: `<FormattedMessage />` or `<SaveLabel />` may be the text.
+          const isIcon = (c) => {
+            const name = c.type === 'JSXElement' && c.openingElement.name;
+            return (
+              name?.type === 'JSXIdentifier' &&
+              (icons.has(name.name) || /Icon$/.test(name.name) || /Icon$/.test(kei(name) ?? ''))
+            );
+          };
           if (shown.every(isIcon) && (shown.length > 0 || attribute(node, 'icon')))
             context.report({ node, messageId: 'icon' });
         },
@@ -315,38 +328,6 @@ const rules = {
 
 const vagueLabel = /^(ok|yes|はい|いいえ|確認|確認する|実行|実行する|決定|了解|続ける|確定)$/i;
 const destructive = /削除|破棄|消去|解約|退会|初期化|取り消せません/;
-
-// Whether `rows` is a slice of the rows: `all.slice(…)`, or a variable or useMemo that holds one.
-function isPaged(context, expression, from, depth) {
-  if (!expression || depth > 3) return false;
-  if (expression.type === 'ChainExpression') expression = expression.expression;
-  if (expression.type === 'CallExpression') {
-    const callee = expression.callee;
-    // `all.slice()` with no arguments copies every row, which is not a page.
-    if (callee.type === 'MemberExpression' && callee.property.name === 'slice')
-      return expression.arguments.length > 0;
-    // useMemo(() => all.slice(…), […])
-    const fn = expression.arguments[0];
-    if (
-      (callee.name === 'useMemo' || callee.property?.name === 'useMemo') &&
-      fn?.type === 'ArrowFunctionExpression'
-    )
-      return fn.body.type === 'BlockStatement'
-        ? fn.body.body.some(
-            (s) => s.type === 'ReturnStatement' && isPaged(context, s.argument, from, depth + 1),
-          )
-        : isPaged(context, fn.body, from, depth + 1);
-    return false;
-  }
-  if (expression.type !== 'Identifier') return false;
-  for (let scope = context.sourceCode.getScope(from); scope; scope = scope.upper) {
-    const variable = scope.variables.find((v) => v.name === expression.name);
-    if (!variable) continue;
-    const def = variable.defs[0]?.node;
-    return def?.type === 'VariableDeclarator' && isPaged(context, def.init, from, depth + 1);
-  }
-  return false;
-}
 
 const plugin = {
   meta: { name: 'kei', version: '0.2.0' },

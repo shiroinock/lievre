@@ -15,13 +15,11 @@ type Case =
 type RuleName = keyof typeof kei.rules;
 
 const imports = `import {
-  Button, IconButton, Metric, DataTable, Pagination, Dialog, DialogClose, ConfirmDialog,
+  Button, IconButton, Metric, Dialog, DialogClose, ConfirmDialog,
   DropdownMenu, Popover,
 } from '@kei-design/react';
 import { Download, MoreHorizontal, Trash2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
 declare const all: { id: string }[];
-declare const page: number;
 declare const setOpen: (open: boolean) => void;
 declare const save: () => void;
 `;
@@ -44,30 +42,6 @@ const cases: Record<RuleName, { valid: Case[]; invalid: Case[] }> = {
       {
         code: `<form><Button onClick={save}>下書き</Button><Button>保存</Button></form>`,
         errors: 2,
-      },
-    ],
-  },
-  'table-sort-before-page': {
-    valid: [
-      `<DataTable caption="c" rows={all} columns={[]} getRowId={(r) => r.id} />`,
-      `<DataTable caption="c" rows={all.slice()} columns={[]} getRowId={(r) => r.id} />`,
-      `<DataTable caption="c" rows={all.slice(0, 10)} sorting={null} onSortingChange={() => {}} columns={[]} getRowId={(r) => r.id} />`,
-    ],
-    invalid: [
-      `<DataTable caption="c" rows={all.slice((page - 1) * 10, page * 10)} columns={[]} getRowId={(r) => r.id} />`,
-      {
-        code: `${imports}export const Case = () => {
-  const rows = all.slice(0, 10);
-  return <DataTable caption="c" rows={rows} columns={[]} getRowId={(r) => r.id} />;
-};`,
-        biome: false,
-      },
-      {
-        code: `${imports}export const Case = () => {
-  const rows = useMemo(() => all.slice(page * 10, page * 10 + 10), []);
-  return <DataTable caption="c" rows={rows} columns={[]} getRowId={(r) => r.id} />;
-};`,
-        biome: false,
       },
     ],
   },
@@ -146,9 +120,38 @@ const cases: Record<RuleName, { valid: Case[]; invalid: Case[] }> = {
       `<Button icon={<Download />}>書き出す</Button>`,
       `<Button><Download />書き出す</Button>`,
       `<IconButton label="書き出す" icon={<Download />} />`,
+      // Not surely an icon: these may render the button's text.
+      `import { Button } from '@kei-design/react';
+import { FormattedMessage } from 'react-intl';
+export const Case = () => <Button><FormattedMessage id="save" /></Button>;
+`,
+      `import { Button } from '@kei-design/react';
+declare const SaveLabel: () => null;
+export const Case = () => <Button><SaveLabel /></Button>;
+`,
+      `import { Button } from '@kei-design/react';
+import { Save } from 'my-icons';
+export const Case = () => <Button><Save /></Button>;
+`,
     ],
     invalid: [
       `<Button><Trash2 /></Button>`,
+      `import { Button } from '@kei-design/react';
+import { TrashIcon as Bin } from '@heroicons/react/24/outline';
+export const Case = () => <Button><Bin /></Button>;
+`,
+      `import { Button } from '@kei-design/react';
+declare const CloseIcon: () => null;
+export const Case = () => <Button><CloseIcon /></Button>;
+`,
+      {
+        code: `import { Button } from '@kei-design/react';
+import { Save } from 'my-icons';
+export const Case = () => <Button><Save /></Button>;
+`,
+        settings: { kei: { iconSources: ['my-icons'] } },
+        biome: false,
+      },
       `<Button icon={<Trash2 />} />`,
       `<Button>
   <Trash2 />
