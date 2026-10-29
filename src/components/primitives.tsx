@@ -1,6 +1,8 @@
 import {
   forwardRef,
   useId,
+  useLayoutEffect,
+  useRef,
   type ButtonHTMLAttributes,
   type HTMLAttributes,
   type InputHTMLAttributes,
@@ -64,6 +66,63 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {children}
     </button>
   );
+});
+
+export type IconButtonProps = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'children' | 'aria-label'
+> & {
+  /** 読み上げとツールチップに出す名前。何をするかを言葉で書きます（「閉じる」「行の操作」）。 */
+  label: string;
+  /** アイコン（lucide-react など）。大きさは size に合わせて部品が決め、aria-hidden も部品が付けます。 */
+  icon: ReactNode;
+  /** 色は Button と同じです。既定は枠のない 'ghost'。 */
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  /** 'md' は密度の操作の高さ（40 / 32px）、'sm' は 32px、'lg' は 48px の正方形。タッチの画面では 44px まで広げます。 */
+  size?: 'sm' | 'md' | 'lg';
+  /** false にするとツールチップを出しません。すぐ横に同じ言葉が書いてあるときだけ使います。 */
+  tooltip?: boolean;
+  /** 処理中の表示。押せなくなり、aria-busy が付きます。 */
+  loading?: boolean;
+};
+/** アイコンだけのボタン。label を読み上げとツールチップの両方に使うので、名前を付け忘れません。 */
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
+  {
+    label,
+    icon,
+    variant = 'ghost',
+    size = 'md',
+    tooltip = true,
+    loading = false,
+    disabled,
+    className,
+    type = 'button',
+    ...props
+  },
+  ref,
+) {
+  const button = (
+    <button
+      {...props}
+      ref={ref}
+      type={type}
+      aria-label={label}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      className={cx(
+        'k-icon-button',
+        `k-icon-button--${variant}`,
+        `k-icon-button--${size}`,
+        className,
+      )}
+    >
+      <span className="k-icon-button-icon" aria-hidden>
+        {loading ? <Loader2 className="k-spin" /> : icon}
+      </span>
+    </button>
+  );
+  // The tree stays the same while loading, so the button keeps its focus.
+  return tooltip ? <Tooltip content={label}>{button}</Tooltip> : button;
 });
 
 export type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
@@ -495,6 +554,33 @@ export function Skeleton({
 }) {
   return <span className="k-skeleton" role="status" aria-label={label} style={{ width, height }} />;
 }
+/** 画面には出さず、読み上げにだけ伝える文字。表の行の「詳細」ボタンに「（W-1024）」を足すときなどに使います。配置には影響しません。 */
+export function VisuallyHidden({
+  className,
+  ...props
+}: HTMLAttributes<HTMLSpanElement> & { children: ReactNode }) {
+  return <span {...props} className={cx('k-sr-only', className)} />;
+}
+/** 読み込み中の印。label を読み上げ（role="status"）、動きを減らす設定では回転を止めます。ボタンの中は Button の loading、表や一覧の形が分かるときは Skeleton を使います。 */
+export function Spinner({
+  label = '読み込み中',
+  showLabel = false,
+  size = 'sm',
+}: {
+  /** 読み上げる文。何を待っているかを書くと伝わります（「一覧を読み込み中」）。 */
+  label?: string;
+  /** true で label を画面にも出します。パネル全体の読み込みに使います。 */
+  showLabel?: boolean;
+  /** 'sm' は 16px、'md' は 24px。文字の大きさと行の高さは置いた場所から引き継ぎます。 */
+  size?: 'sm' | 'md';
+}) {
+  return (
+    <span className={cx('k-spinner', `k-spinner--${size}`)} role="status">
+      <Loader2 className="k-spin" aria-hidden />
+      {showLabel ? <span>{label}</span> : <VisuallyHidden>{label}</VisuallyHidden>}
+    </span>
+  );
+}
 export function EmptyState({
   title,
   description,
@@ -560,7 +646,7 @@ export function Breadcrumb({ items }: { items: { label: string; href?: string }[
   );
 }
 
-/** 前後のページ送り。DataTable と組み合わせるときは、全件を並べ替えてから区切った rows を渡します。 */
+/** 前後のページ送り。いまのページを「5ページ中2ページ目」と読み上げ、ページが変わると知らせます。端のページで押したボタンが無効になったら、フォーカスを反対のボタンへ移します。DataTable のページ送りには、これを横に置かずに DataTable の pageSize を使います。 */
 export function Pagination({
   page,
   totalPages,
@@ -573,23 +659,49 @@ export function Pagination({
 }) {
   const total = Math.max(1, Math.floor(totalPages));
   const current = Math.min(total, Math.max(1, page));
+  const prev = useRef<HTMLButtonElement>(null);
+  const next = useRef<HTMLButtonElement>(null);
+  const pressed = useRef<'prev' | 'next' | null>(null);
+  // A disabled button drops focus to the body. Hand it to the other button so keyboard and
+  // screen reader users stay in the pagination after reaching the first or last page.
+  useLayoutEffect(() => {
+    if (!pressed.current) return;
+    const [from, to] = pressed.current === 'next' ? [next, prev] : [prev, next];
+    pressed.current = null;
+    const active = document.activeElement;
+    if (from.current?.disabled && (active === from.current || active === document.body))
+      to.current?.focus();
+  }, [current, total]);
   return (
     <nav className="k-pagination" aria-label="ページ切り替え">
-      <span>
-        {current} / {total}
+      <span role="status">
+        <span aria-hidden>
+          {current} / {total}
+        </span>
+        <VisuallyHidden>
+          {total}ページ中 {current}ページ目
+        </VisuallyHidden>
       </span>
       <Button
+        ref={prev}
         size="sm"
         disabled={current === 1}
-        onClick={() => onPageChange(current - 1)}
+        onClick={() => {
+          pressed.current = 'prev';
+          onPageChange(current - 1);
+        }}
         aria-label="前のページ"
       >
         <ChevronLeft size={16} aria-hidden />
       </Button>
       <Button
+        ref={next}
         size="sm"
         disabled={current === total}
-        onClick={() => onPageChange(current + 1)}
+        onClick={() => {
+          pressed.current = 'next';
+          onPageChange(current + 1);
+        }}
         aria-label="次のページ"
       >
         <ChevronRight size={16} aria-hidden />

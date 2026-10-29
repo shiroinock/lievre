@@ -14,12 +14,18 @@
     },
     "./styles.css": "./lib/kei.css",
     "./tokens.json": "./tokens/tokens.json",
-    "./llms.txt": "./llms.txt"
+    "./llms.txt": "./llms.txt",
+    "./lint": {
+      "types": "./lint/index.d.ts",
+      "default": "./lint/index.js"
+    },
+    "./lint/biome/*": "./lint/biome/*"
   },
   "files": [
     "lib",
     "tokens",
     "llms.txt",
+    "lint",
     "README.md",
     "DESIGN.md"
   ],
@@ -53,6 +59,7 @@
     "radix-ui": "1.8.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.6.2",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/ibm-plex-sans-jp": "^5.3.1",
     "@storybook/addon-a11y": "10.6.3",
@@ -69,6 +76,7 @@
     "axe-core": "^4.11.0",
     "eslint": "^10.13.0",
     "jsdom": "^26.1.0",
+    "oxlint": "^1.89.0",
     "playwright": "^1.56.1",
     "prettier": "^3.3.3",
     "react": "^19.2.0",

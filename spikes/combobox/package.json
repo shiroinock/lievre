@@ -1,0 +1,23 @@
+{
+  "name": "kei-spike-combobox",
+  "private": true,
+  "type": "module",
+  "description": "Combobox の土台を比べる試作。本体には入れない。react・radix-ui・vite はリポジトリの直下のものを使う。",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5180 --strictPort",
+    "size": "node scripts/size.mjs",
+    "check": "node test/behavior.mjs"
+  },
+  "dependencies": {
+    "@ariakit/react": "0.4.42",
+    "@floating-ui/react-dom": "2.1.9",
+    "@internationalized/date": "3.12.4",
+    "downshift": "9.4.0",
+    "react-aria-components": "1.22.1"
+  },
+  "devDependencies": {
+    "@react-aria/optimize-locales-plugin": "2.1.0",
+    "axe-core": "4.11.0",
+    "playwright": "1.56.1"
+  }
+}

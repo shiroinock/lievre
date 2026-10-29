@@ -5,6 +5,7 @@ import { flushSync } from 'react-dom';
 import { KeiProvider, Sparkline } from '../../index';
 import '../../styles/fonts.css';
 import '../../styles/kei.css';
+import { inset } from '../../../scripts/measure-alignment.js';
 import { checkPart, undeclared } from './checks';
 import type { LayoutCheck } from './declare';
 
@@ -37,6 +38,17 @@ describe('配置の検査', () => {
     const [message] = messages(box('height: 40px; padding: 8px 0 0'), 'inset-y');
     expect(message).toMatch(/下に寄っています.*基準：上下の余白の差の半分が 0.1em（1.4px）以内/);
     expect(messages(box('height: 40px; padding: 0'), 'inset-y')).toEqual([]);
+  });
+
+  it('文字の輪郭は OS によらず同じに測る', async () => {
+    // Linux Chromium's measureText bounds bulge past the curves; macOS's do not. The ink is read
+    // from pixels instead, so the same label measures the same on CI and on a Mac.
+    await document.fonts.load('600 14px "IBM Plex Sans JP"', '3件を削除');
+    host.innerHTML = box("height: 40px; font: 600 14px / 20px 'IBM Plex Sans JP'", '3件を削除');
+    const { t, b } = inset(host.querySelector('.k-x')!)!;
+    // The outline's own extent, as macOS reports it; Linux's control boxes came out 0.2px taller.
+    expect(Math.abs(t - 11.05)).toBeLessThanOrEqual(0.1);
+    expect(Math.abs(b - 13.9)).toBeLessThanOrEqual(0.1);
   });
 
   it('操作の高さ', () => {
@@ -90,6 +102,24 @@ describe('配置の検査', () => {
     expect(messages(row(4), { icon: '.k-box' })).toEqual([]);
   });
 
+  it('読み上げ用に隠した文字は測らない', () => {
+    // Without a visible label there is no line to centre the icon on, so nothing is reported.
+    const spinner = (hidden: string) =>
+      `<span class="k-x" style="display: inline-flex; align-items: flex-start; line-height: 24px">
+        <span class="k-box" style="width: 16px; height: 16px"></span>
+        <span class="k-sr-only"${hidden}>読み込み中</span>
+      </span>`;
+    expect(messages(spinner(''), { icon: '.k-box' })).toEqual([]);
+    expect(
+      messages(
+        spinner(' style="position: static; clip: auto; width: auto; height: auto; margin: 0"'),
+        {
+          icon: '.k-box',
+        },
+      )[0],
+    ).toMatch(/文字「読み込み中」の1行目の行ボックスの中心より 4px 上にあります/);
+  });
+
   it('並んだ部品の高さ', () => {
     const row = (h: number) =>
       `<div class="k-x" style="display: flex; align-items: flex-end">
@@ -100,6 +130,43 @@ describe('配置の検査', () => {
       /input\.k-a 40px、button\.k-b「検索する」 41px/,
     );
     expect(messages(row(40), { sameHeight: '.k-a, .k-b' })).toEqual([]);
+  });
+
+  it('正方形', () => {
+    expect(messages(box('width: 40px; height: 32px; padding: 0'), 'square')[0]).toMatch(
+      /幅 40px・高さ 32px で、正方形になっていません/,
+    );
+    expect(messages(box('width: 32px; height: 32px; padding: 0'), 'square')).toEqual([]);
+  });
+
+  it('フォーカスの輪郭の余地', () => {
+    // The ring reaches 4px outside the box; a clipping parent with less padding cuts it.
+    const inside = (pad: number) =>
+      `<div style="overflow: hidden; padding: ${pad}px"><button class="k-x" style="display: block; width: 32px; height: 32px">×</button></div>`;
+    expect(messages(inside(2), 'focus-room')[0]).toMatch(
+      /はみ出しを切る親 div「×」 に左で 2px・上で 2px・下で 2px 切られます/,
+    );
+    expect(messages(inside(4), 'focus-room')).toEqual([]);
+    expect(
+      messages(
+        `<div style="padding: 0"><button class="k-x" style="width: 32px; height: 32px">×</button></div>`,
+        'focus-room',
+      ),
+    ).toEqual([]);
+  });
+
+  it('文字の端', () => {
+    const menu = (lead: string) =>
+      `<div class="k-x">
+        <div style="display: flex; gap: 8px"><span style="width: 16px">✓</span><span class="k-t">表示する</span></div>
+        <div style="display: flex; gap: 8px">${lead}<span class="k-t">隠す</span></div>
+      </div>`;
+    expect(messages(menu(''), { textEdge: 'start', of: '.k-t' })[0]).toMatch(
+      /文字の左端がそろっていません：span\.k-t「表示する」 を基準に、span\.k-t「隠す」 -24px/,
+    );
+    expect(
+      messages(menu('<span style="width: 16px"></span>'), { textEdge: 'start', of: '.k-t' }),
+    ).toEqual([]);
   });
 
   it('宣言のない操作の要素を見つける', () => {

@@ -6,7 +6,16 @@ export type Violation = { part: string; check: string; element: string; message:
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const px = (n: number) => `${r1(n)}px`;
-const visible = (el: Element) => el.getClientRects().length > 0;
+// Text kept only for screen readers (VisuallyHidden, .k-sr-only) sits in a box clipped to 1px:
+// it is not on the screen, so no check measures it.
+const clippedAway = (el: Element) => {
+  for (let a: Element | null = el; a && a !== document.body; a = a.parentElement) {
+    const r = a.getBoundingClientRect();
+    if (r.width <= 1 && r.height <= 1 && getComputedStyle(a).overflow !== 'visible') return true;
+  }
+  return false;
+};
+const visible = (el: Element) => el.getClientRects().length > 0 && !clippedAway(el);
 
 export function describe(el: Element) {
   const classes = [...el.classList].map((c) => `.${c}`).join('');
@@ -78,6 +87,36 @@ function checkOne(el: Element, check: LayoutCheck): string | null {
     const off = box.height % CRITERIA.grid;
     if (Math.min(off, CRITERIA.grid - off) <= CRITERIA.size) return null;
     return `高さが ${px(box.height)} です。基準：${CRITERIA.grid}px の倍数（近いのは ${Math.floor(box.height / 4) * 4}px か ${Math.ceil(box.height / 4) * 4}px）。`;
+  }
+
+  if (check === 'square') {
+    if (Math.abs(box.width - box.height) <= CRITERIA.size) return null;
+    return `幅 ${px(box.width)}・高さ ${px(box.height)} で、正方形になっていません。基準：幅と高さの差が ${CRITERIA.size}px 以内。padding ではなく width と height で大きさを決めてください。`;
+  }
+
+  if (check === 'focus-room') {
+    // The ring is drawn outside the box, so any ancestor that clips its overflow must leave room.
+    const ring = CRITERIA.focusRing;
+    for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+      const as = getComputedStyle(a);
+      if (as.overflowX === 'visible' && as.overflowY === 'visible') continue;
+      const r = a.getBoundingClientRect();
+      const inner = {
+        left: r.left + parseFloat(as.borderLeftWidth),
+        right: r.right - parseFloat(as.borderRightWidth),
+        top: r.top + parseFloat(as.borderTopWidth),
+        bottom: r.bottom - parseFloat(as.borderBottomWidth),
+      };
+      const cut = [
+        ['左', box.left - ring - inner.left],
+        ['右', inner.right - (box.right + ring)],
+        ['上', box.top - ring - inner.top],
+        ['下', inner.bottom - (box.bottom + ring)],
+      ].filter(([, room]) => (room as number) < -CRITERIA.size);
+      if (cut.length)
+        return `フォーカスの輪郭が、はみ出しを切る親 ${describe(a)} に${cut.map(([side, room]) => `${side}で ${px(-(room as number))}`).join('・')} 切られます。基準：要素の外に ${ring}px（輪郭 2px と隙間 2px）の余地がある。親の padding を空けるか、overflow を visible にしてください。`;
+    }
+    return null;
   }
 
   if (check === 'line-grid') {
@@ -210,6 +249,32 @@ function checkOne(el: Element, check: LayoutCheck): string | null {
       );
     }
     return problems.length ? problems.join(' ') : null;
+  }
+
+  if ('textEdge' in check) {
+    const start = check.textEdge === 'start';
+    const edges = [...el.querySelectorAll(check.of)]
+      .filter(visible)
+      .map((item) => {
+        const range = document.createRange();
+        range.selectNodeContents(item);
+        const rects = [...range.getClientRects()].filter((r) => r.width > 0);
+        if (!rects.length) return null;
+        return {
+          item,
+          x: start ? Math.min(...rects.map((r) => r.left)) : Math.max(...rects.map((r) => r.right)),
+        };
+      })
+      .filter((e): e is { item: Element; x: number } => !!e);
+    const xs = edges.map((e) => e.x);
+    if (edges.length < 2 || Math.max(...xs) - Math.min(...xs) <= CRITERIA.size) return null;
+    const list = edges
+      .map(
+        ({ item, x }, n) =>
+          `${describe(item)} ${n === 0 ? 'を基準に' : `${x > xs[0] ? '+' : ''}${r1(x - xs[0])}px`}`,
+      )
+      .join('、');
+    return `文字の${start ? '左端' : '右端'}がそろっていません：${list}。基準：差が ${CRITERIA.size}px 以内。アイコンの列は中身がなくても同じ幅を取ってください。`;
   }
 
   const items = [...el.querySelectorAll(check.sameHeight)].filter(visible);
