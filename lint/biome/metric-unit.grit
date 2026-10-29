@@ -1,0 +1,11 @@
+// kei/metric-unit: `value="99.95%"` should be `value="99.95" unit="%"`.
+language js(typescript, jsx);
+
+JsxSelfClosingElement(name = "Metric", attributes = $attributes) as $metric where {
+  $attributes <: contains JsxAttribute(name = "value", initializer = JsxAttributeInitializerClause(value = $value)) as $attribute,
+  // The value as written: "99.95%", {'99.95%'} or {`99.95%`}.
+  $value <: r"[{]?[\x22\x27\x60]\s*(?:[+\-−±]?\d[\d,]*(?:\.\d+)?\s*[^\d\s\x22\x27\x60][^\d\x22\x27\x60]*|[¥￥$€£]\s*[+\-−]?\d[\d,]*(?:\.\d+)?)\s*[\x22\x27\x60][}]?",
+  $metric <: within JsModule() as $module,
+  $module <: contains `import $_ from "@kei-design/react"`,
+  register_diagnostic(span = $attribute, message = "Metric の value には数値だけを渡し、単位は unit に分けてください（value='99.95' unit='%'）。数値は等幅、単位は本文の書体で並べます。")
+}

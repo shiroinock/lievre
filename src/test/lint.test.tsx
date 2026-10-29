@@ -134,12 +134,13 @@ describe('the sources pass their own lint', () => {
     expect(results.flatMap((r) => r.warnings.map((w) => `${r.source}: ${w.text}`))).toEqual([]);
   });
 
+  // Linting every source takes a few seconds while the other test files run.
   it('eslint', async () => {
     const results = await new ESLint().lintFiles(['src']);
     expect(results.flatMap((r) => r.messages.map((m) => `${r.filePath}: ${m.message}`))).toEqual(
       [],
     );
-  });
+  }, 30_000);
 });
 
 // Layout gate (docs/quality-gate.md): the static rules.
