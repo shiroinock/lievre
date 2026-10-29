@@ -9,6 +9,7 @@ type RuleName =
   | 'danger-tone'
   | 'icon-button-label'
   | 'icon-only-button'
+  | 'table-pagination'
   | 'unit-outside-mono';
 
 type Rule = {

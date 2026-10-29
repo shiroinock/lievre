@@ -1,0 +1,15 @@
+// kei/table-pagination: a sortable DataTable paged by a Pagination beside it, not by DataTable.
+// GritQL cannot follow `columns={columns}`, so any `sortValue` in the file makes the table sortable.
+language js(typescript, jsx);
+
+or {
+  JsxOpeningElement(name = "DataTable", attributes = $attributes) as $table,
+  JsxSelfClosingElement(name = "DataTable", attributes = $attributes) as $table
+} where {
+  $attributes <: not contains or { JsxAttribute(name = "pageSize"), JsxAttribute(name = "dataMode"), JsxSpreadAttribute() },
+  $table <: within JsModule() as $module,
+  $module <: contains `import $_ from "@kei-design/react"`,
+  $module <: contains or { JsxOpeningElement(name = "Pagination"), JsxSelfClosingElement(name = "Pagination") },
+  $module <: contains or { JsPropertyObjectMember(name = "sortValue"), JsMethodObjectMember(name = "sortValue") },
+  register_diagnostic(span = $table, message = "並べ替えのある DataTable の外で Pagination を使うと、区切った後の行の中だけで並べ替わります。全件を rows に渡して pageSize を付け、ページ送りは DataTable に描かせてください（pageSize={10} page={page} onPageChange={setPage}）。サーバーで並べ替えて区切るなら dataMode='server' と totalCount を渡してください。")
+}

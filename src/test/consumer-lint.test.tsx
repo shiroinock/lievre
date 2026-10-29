@@ -16,12 +16,14 @@ type RuleName = keyof typeof kei.rules;
 
 const imports = `import {
   Button, IconButton, Metric, Dialog, DialogClose, ConfirmDialog,
-  DropdownMenu, Popover,
+  DropdownMenu, Popover, DataTable, Pagination,
 } from '@kei-design/react';
 import { Download, MoreHorizontal, Trash2 } from 'lucide-react';
 declare const all: { id: string }[];
 declare const setOpen: (open: boolean) => void;
 declare const save: () => void;
+declare const page: number;
+declare const setPage: (page: number) => void;
 `;
 // A JSX expression becomes `export const Case = () => (…)`; a file is used as written.
 const file = (code: string) =>
@@ -157,6 +159,93 @@ export const Case = () => <Button><Save /></Button>;
   <Trash2 />
 </Button>`,
       { code: `<Button><Download /><Trash2 /></Button>`, biome: false },
+    ],
+  },
+  'table-pagination': {
+    valid: [
+      // DataTable sorts every row, then cuts the page.
+      `<DataTable rows={all} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" pageSize={10} page={page} onPageChange={setPage} />`,
+      `<><DataTable dataMode="server" rows={all} totalCount={120} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" sorting={null} onSortingChange={save} pageSize={10} page={page} onPageChange={setPage} /><Pagination page={page} totalPages={12} onPageChange={setPage} /></>`,
+      // Nothing to sort: the rows keep the order they were cut in.
+      `<><DataTable rows={all.slice(0, 10)} columns={[{ key: 'id', header: 'ID', render: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" /><Pagination page={page} totalPages={3} onPageChange={setPage} /></>`,
+      // Sorted, but not paged.
+      `<DataTable rows={all.slice(0, 5)} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="最新の5件" />`,
+      `<><DataTable {...{ pageSize: 10 }} rows={all} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" /><Pagination page={page} totalPages={3} onPageChange={setPage} /></>`,
+      {
+        // A Pagination from another library is not KEI's. Biome cannot tie a name to its import.
+        code: `import { DataTable } from '@kei-design/react';
+import { Pagination } from 'other-ui';
+declare const all: { id: string }[];
+export const Case = () => (
+  <>
+    <DataTable rows={all} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" />
+    <Pagination />
+  </>
+);
+`,
+        biome: false,
+      },
+      {
+        // ESLint follows each table's columns; Biome only sees that the file has a sortValue.
+        code: `import { DataTable, Pagination, type Column } from '@kei-design/react';
+type Row = { id: string };
+declare const all: Row[];
+declare const page: number;
+declare const setPage: (page: number) => void;
+const plain: Column<Row>[] = [{ key: 'id', header: 'ID', render: (r) => r.id }];
+const sortable: Column<Row>[] = [{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }];
+export const Case = () => (
+  <>
+    <DataTable rows={all} columns={sortable} getRowId={(r) => r.id} caption="並べ替える" pageSize={10} />
+    <DataTable rows={all.slice((page - 1) * 10, page * 10)} columns={plain} getRowId={(r) => r.id} caption="並べ替えない" />
+    <Pagination page={page} totalPages={3} onPageChange={setPage} />
+  </>
+);
+`,
+        biome: false,
+      },
+    ],
+    invalid: [
+      `<><DataTable rows={all.slice((page - 1) * 10, page * 10)} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" /><Pagination page={page} totalPages={3} onPageChange={setPage} /></>`,
+      // How the rows are made is not looked at: a helper is the same as slice.
+      `import { useMemo, useState } from 'react';
+import { DataTable, Pagination, type Column } from '@kei-design/react';
+type Row = { id: string; amount: number };
+declare const all: Row[];
+declare function pageOf<T>(rows: T[], page: number): T[];
+export function Invoices() {
+  const [page, setPage] = useState(1);
+  const columns = useMemo<Column<Row>[]>(
+    () => [
+      { key: 'id', header: 'ID', render: (r) => r.id },
+      { key: 'amount', header: '金額', render: (r) => r.amount, sortValue: (r) => r.amount },
+    ],
+    [],
+  );
+  return (
+    <section>
+      <DataTable rows={pageOf(all, page)} columns={columns} getRowId={(r) => r.id} caption="請求書" />
+      <footer>
+        <Pagination page={page} totalPages={Math.ceil(all.length / 10)} onPageChange={setPage} />
+      </footer>
+    </section>
+  );
+}
+`,
+      {
+        code: `import * as K from '@kei-design/react';
+declare const all: { id: string }[];
+declare const page: number;
+declare const setPage: (page: number) => void;
+export const Case = () => (
+  <>
+    <K.DataTable rows={all} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" />
+    <K.Pagination page={page} totalPages={3} onPageChange={setPage} />
+  </>
+);
+`,
+        biome: false,
+      },
     ],
   },
   'unit-outside-mono': {

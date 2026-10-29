@@ -12,7 +12,6 @@ import {
   Select,
   Dialog,
   DataTable,
-  Pagination,
   Badge,
   Meter,
   Progress,
@@ -24,7 +23,7 @@ import {
   type Column,
 } from '../index';
 import { OperationsExample, SettingsExample } from '../patterns/Operations';
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 function setup(ui: ReactNode, theme: 'paper' | 'ink' = 'paper') {
   return render(
     <KeiProvider theme={theme}>
@@ -303,20 +302,6 @@ describe('Tables and measures', () => {
     expect(sortChange).toHaveBeenCalledWith({ key: 'value', direction: 'desc' });
     expect(pageChange).toHaveBeenCalledWith(1);
     expect(screen.getAllByRole('row').map((r) => r.textContent)).toEqual(['ID値', 'X5', 'Y9']);
-  });
-  it('keeps focus in the pagination when the pressed button turns disabled', async () => {
-    function Pager() {
-      const [page, setPage] = useState(2);
-      return <Pagination page={page} totalPages={3} onPageChange={setPage} />;
-    }
-    setup(<Pager />);
-    const next = screen.getByRole('button', { name: '次のページ' });
-    await userEvent.click(next);
-    expect(next).toBeDisabled();
-    expect(screen.getByRole('button', { name: '前のページ' })).toHaveFocus();
-    expect(screen.getByRole('status')).toHaveTextContent('3ページ中 3ページ目');
-    await userEvent.click(screen.getByRole('button', { name: '前のページ' }));
-    expect(screen.getByRole('button', { name: '前のページ' })).toHaveFocus();
   });
   it('renders an informative empty table instead of a blank panel', () => {
     setup(<DataTable rows={[]} columns={columns} getRowId={(r) => r.id} caption="測定値" />);

@@ -70,6 +70,40 @@ function staticString(attr) {
   return null;
 }
 
+// Whether a subtree has a `sortValue` key: `{ key: 'name', sortValue: (r) => r.name }`.
+function hasSortValue(node) {
+  if (!node || typeof node !== 'object') return false;
+  if (Array.isArray(node)) return node.some(hasSortValue);
+  if (
+    node.type === 'Property' &&
+    !node.computed &&
+    (node.key.name ?? node.key.value) === 'sortValue'
+  )
+    return true;
+  for (const key in node)
+    if (key !== 'parent' && key !== 'loc' && key !== 'range' && hasSortValue(node[key]))
+      return true;
+  return false;
+}
+
+// Whether a DataTable has a column with `sortValue`. `columns={columns}` is followed to its
+// declaration in this file; columns that come from elsewhere fall back to the whole file.
+function sortable(context, node, program) {
+  const columns = attribute(node, 'columns')?.value?.expression;
+  if (columns?.type === 'Identifier') {
+    let scope = context.sourceCode.getScope(node);
+    for (; scope; scope = scope.upper) {
+      const variable = scope.set.get(columns.name);
+      if (!variable) continue;
+      const declarator = variable.defs.find((d) => d.node.type === 'VariableDeclarator')?.node;
+      if (declarator) return hasSortValue(declarator.init);
+      break;
+    }
+    return hasSortValue(program);
+  }
+  return hasSortValue(columns ?? program);
+}
+
 function* ancestors(node) {
   for (let n = node.parent; n; n = n.parent) yield n;
 }
@@ -299,6 +333,36 @@ const rules = {
           };
           if (shown.every(isIcon) && (shown.length > 0 || attribute(node, 'icon')))
             context.report({ node, messageId: 'icon' });
+        },
+      };
+    },
+  ),
+
+  // The order of a paged table belongs to DataTable: it sorts every row, then cuts the page.
+  // How the rows are made (slice, filter, a helper) is not looked at, only the components used.
+  'table-pagination': rule(
+    '並べ替えのある DataTable のページ送りは DataTable に任せる',
+    {
+      page: "並べ替えのある DataTable の外で Pagination を使うと、区切った後の行の中だけで並べ替わります。全件を rows に渡して pageSize を付け、ページ送りは DataTable に描かせてください（pageSize={10} page={page} onPageChange={setPage}）。サーバーで並べ替えて区切るなら dataMode='server' と totalCount を渡してください。",
+    },
+    (context) => {
+      let kei;
+      const tables = [];
+      let paged = false;
+      return {
+        Program() {
+          kei = keiImports(context);
+        },
+        JSXOpeningElement(node) {
+          const name = kei(node.name);
+          if (name === 'Pagination') paged = true;
+          if (name === 'DataTable' && missing(node, 'pageSize') && missing(node, 'dataMode'))
+            tables.push(node);
+        },
+        'Program:exit'(program) {
+          if (!paged) return;
+          for (const node of tables)
+            if (sortable(context, node, program)) context.report({ node, messageId: 'page' });
         },
       };
     },
