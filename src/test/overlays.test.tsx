@@ -68,6 +68,7 @@ const OVERLAYS: Overlay[] = [
         title="削除しますか？"
         description="元に戻せません。"
         confirmLabel="削除"
+        tone="danger"
         onConfirm={() => {}}
       />
     ),

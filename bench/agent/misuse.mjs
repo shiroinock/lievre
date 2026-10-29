@@ -53,11 +53,32 @@ const typeMessages = (file) =>
     .getPreEmitDiagnostics(program, program.getSourceFile(file))
     .map((d) => ts.flattenDiagnosticMessageText(d.messageText, '\n'));
 
-// KEI's lint rules live in this repository and are not shipped, so only code inside it is checked.
-const eslint = new ESLint({ cwd: root });
+// The lint rules shipped to apps (`@kei-design/react/lint`), configured as an app would. A
+// checkout from before they were shipped only has the rules for code inside the repository.
+const shippedLint = existsSync(join(root, 'lint/index.js'));
+const eslint = shippedLint
+  ? new ESLint({
+      cwd: app,
+      overrideConfigFile: true,
+      overrideConfig: [
+        {
+          files: ['**/*.tsx'],
+          languageOptions: {
+            parser: (
+              await import(
+                pathToFileURL(join(root, 'node_modules/typescript-eslint/dist/index.js')).href
+              )
+            ).default.parser,
+          },
+          ...(await import(pathToFileURL(join(root, 'lint/index.js')).href)).default.configs
+            .recommended,
+        },
+      ],
+    })
+  : new ESLint({ cwd: root });
 const lintMessages = async (c) => {
   const [result] = await eslint.lintText(c.code, {
-    filePath: join(root, `src/__bench__/${c.id}.tsx`),
+    filePath: shippedLint ? join(app, `${c.id}.tsx`) : join(root, `src/__bench__/${c.id}.tsx`),
   });
   return result.messages.map((m) => m.message);
 };
@@ -147,7 +168,7 @@ for (const [i, c] of cases.entries()) {
     task: c.task,
     mistake: c.mistake,
     caught: caught ?? null,
-    shipped: caught !== 'lint',
+    shipped: caught !== 'lint' || shippedLint,
     actionable,
     score,
     message,
@@ -157,7 +178,7 @@ rmSync(app, { recursive: true, force: true });
 
 const layerName = {
   type: '型',
-  lint: 'lint（リポジトリ内のみ）',
+  lint: shippedLint ? 'lint' : 'lint（リポジトリ内のみ）',
   runtime: '実行時',
   null: '検出なし',
 };
