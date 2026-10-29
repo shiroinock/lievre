@@ -104,6 +104,11 @@ function sortable(context, node, program) {
   return hasSortValue(columns ?? program);
 }
 
+const isFunction = (node) =>
+  node.type === 'FunctionDeclaration' ||
+  node.type === 'FunctionExpression' ||
+  node.type === 'ArrowFunctionExpression';
+
 function* ancestors(node) {
   for (let n = node.parent; n; n = n.parent) yield n;
 }
@@ -339,7 +344,10 @@ const rules = {
   ),
 
   // The order of a paged table belongs to DataTable: it sorts every row, then cuts the page.
-  // How the rows are made (slice, filter, a helper) is not looked at, only the components used.
+  // How the rows are made (slice, filter, a helper) is not looked at, only the components used,
+  // and only within one component: the nearest function around the DataTable. A Pagination
+  // moved out to a footer component in the same file is missed, rather than stopping a table
+  // that another component in the file pages cards beside.
   'table-pagination': rule(
     '並べ替えのある DataTable のページ送りは DataTable に任せる',
     {
@@ -348,21 +356,27 @@ const rules = {
     (context) => {
       let kei;
       const tables = [];
-      let paged = false;
+      // Every function (and the program) that has a Pagination somewhere inside it.
+      const paged = new Set();
       return {
         Program() {
           kei = keiImports(context);
         },
         JSXOpeningElement(node) {
           const name = kei(node.name);
-          if (name === 'Pagination') paged = true;
+          if (name === 'Pagination') {
+            for (const n of ancestors(node))
+              if (isFunction(n) || n.type === 'Program') paged.add(n);
+          }
           if (name === 'DataTable' && missing(node, 'pageSize') && missing(node, 'dataMode'))
             tables.push(node);
         },
         'Program:exit'(program) {
-          if (!paged) return;
-          for (const node of tables)
-            if (sortable(context, node, program)) context.report({ node, messageId: 'page' });
+          for (const node of tables) {
+            const owner = [...ancestors(node)].find((n) => isFunction(n) || n.type === 'Program');
+            if (paged.has(owner) && sortable(context, node, program))
+              context.report({ node, messageId: 'page' });
+          }
         },
       };
     },

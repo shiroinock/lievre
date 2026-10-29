@@ -1,6 +1,8 @@
 import {
+  useEffect,
   useId,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
   type HTMLAttributes,
@@ -173,6 +175,7 @@ type DataTableBaseProps<T> = {
   selectedIds?: string[];
   onSelectionChange?: (ids: string[]) => void;
   onRowClick?: (row: T) => void;
+  /** 読み込み中の表示。dataMode="server" では、取り直している間は true にします。そのあいだの totalCount は古いことがあるので、範囲外のページを合わせるのは読み込みが終わってからです。 */
   loading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
@@ -187,7 +190,7 @@ export type DataTableClientProps = {
   onSortingChange?: (sort: TableSort) => void;
   /** 1ページの行数。渡すと表の下に件数とページ送り（Pagination）を描きます。'client' では全件を並べ替えてから区切ります。並べ替えを変えると1ページ目に戻ります。 */
   pageSize?: number;
-  /** 表示するページ（1始まり）。'client' では渡さなければ DataTable が持ちます。行が減ってページが足りなくなると最後のページを出します。絞り込みを変えたときに1ページ目へ戻すなら、外で持って 1 にします。 */
+  /** 表示するページ（1始まり）。'client' では渡さなければ DataTable が持ちます。行が減ってページが足りなくなると、最後のページ（0件なら1ページ目）に合わせて onPageChange を呼びます。絞り込みを変えたときに1ページ目へ戻すなら、外で持って 1 にします。 */
   page?: number;
   /** ページが変わるときに呼びます。ページ送りのほか、並べ替えを変えて1ページ目に戻るときも呼びます。'server' ではこのページを取り直します。 */
   onPageChange?: (page: number) => void;
@@ -233,11 +236,28 @@ export function DataTable<T>(props: DataTableProps<T>) {
   const size = pageSize === undefined ? undefined : Math.max(1, Math.floor(pageSize) || 1);
   const total = props.dataMode === 'server' ? Math.max(0, props.totalCount) : rows.length;
   const totalPages = size ? Math.max(1, Math.ceil(total / size)) : 1;
-  const current = Math.min(totalPages, Math.max(1, page ?? internalPage));
+  const requested = Math.max(1, page ?? internalPage);
+  const current = Math.min(totalPages, requested);
   const setPage = (value: number) => {
     setInternalPage(value);
     onPageChange?.(value);
   };
+  // A page past the end (fewer rows, or a server total that shrank) is moved to the last page
+  // and reported once, so the app fetches it and an inner page does not jump back later.
+  // The server's total is only trusted once it has finished loading.
+  const synced = useRef<string | null>(null);
+  const settled = !(server && loading);
+  useEffect(() => {
+    if (requested === current || !settled) {
+      synced.current = null;
+      return;
+    }
+    const key = `${requested}>${current}`;
+    if (synced.current === key) return;
+    synced.current = key;
+    setPage(current);
+    // setPage is a new function each render; what it reports is in the dependencies.
+  }, [requested, current, settled]);
   const setSort = (value: TableSort) => {
     setInternalSort(value);
     onSortingChange?.(value);

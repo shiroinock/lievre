@@ -96,25 +96,25 @@ export function App() {
 
 型では止まらない部品の誤用を、使う側のアプリの lint で止めます。ルールは `@kei-design/react/lint` に入っていて、ほかのパッケージは要りません。ESLint と Oxlint は同じプラグイン（`lint/index.js`）をそのまま読み込み、Biome は GritQL のファイル（`lint/biome/*.grit`）を読み込みます。メッセージには直し方を日本語で書いています。
 
-| ルール                   | 止めるもの                                                                                                                             | Biome |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `button-type-in-form`    | `<form>` の中の Button・IconButton に `type` がない（既定は `type="button"` で送信しない）                                             | あり  |
-| `metric-unit`            | Metric の `value` に単位がある（`"99.95%"`）。ESLint・Oxlint は `--fix` で `unit` に分けます                                           | あり  |
-| `metric-change`          | Metric の `trend="up"` / `"down"` に `change` がない（矢印と色だけでは向きが読み上げられない）                                         | あり  |
-| `dialog-close`           | Dialog・ConfirmDialog・Popover に `open` だけを渡す。Dialog の `footer` の Button が何もしない                                         | あり  |
-| `confirm-dialog-trigger` | ConfirmDialog に `trigger` も `open` もない                                                                                            | あり  |
-| `confirm-label`          | ConfirmDialog の `confirmLabel` が「OK」「はい」「実行」など                                                                           | あり  |
-| `danger-tone`            | 「削除」などの ConfirmDialog・メニューの項目に `tone` の danger がない                                                                 | あり  |
-| `icon-button-label`      | IconButton の `label` が空か記号だけ                                                                                                   | あり  |
-| `icon-only-button`       | Button の中身がアイコンだけ（IconButton を使う）。アイコンとみなすものは下に書きました                                                 | 一部  |
-| `unit-outside-mono`      | `.k-mono` の中に単位（%・円）がある                                                                                                    | あり  |
-| `table-pagination`       | 並べ替えのある DataTable（`sortValue` のある列がある）と Pagination を同じファイルで使い、DataTable に `pageSize` も `dataMode` もない | 一部  |
+| ルール                   | 止めるもの                                                                                                                                                 | Biome |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `button-type-in-form`    | `<form>` の中の Button・IconButton に `type` がない（既定は `type="button"` で送信しない）                                                                 | あり  |
+| `metric-unit`            | Metric の `value` に単位がある（`"99.95%"`）。ESLint・Oxlint は `--fix` で `unit` に分けます                                                               | あり  |
+| `metric-change`          | Metric の `trend="up"` / `"down"` に `change` がない（矢印と色だけでは向きが読み上げられない）                                                             | あり  |
+| `dialog-close`           | Dialog・ConfirmDialog・Popover に `open` だけを渡す。Dialog の `footer` の Button が何もしない                                                             | あり  |
+| `confirm-dialog-trigger` | ConfirmDialog に `trigger` も `open` もない                                                                                                                | あり  |
+| `confirm-label`          | ConfirmDialog の `confirmLabel` が「OK」「はい」「実行」など                                                                                               | あり  |
+| `danger-tone`            | 「削除」などの ConfirmDialog・メニューの項目に `tone` の danger がない                                                                                     | あり  |
+| `icon-button-label`      | IconButton の `label` が空か記号だけ                                                                                                                       | あり  |
+| `icon-only-button`       | Button の中身がアイコンだけ（IconButton を使う）。アイコンとみなすものは下に書きました                                                                     | 一部  |
+| `unit-outside-mono`      | `.k-mono` の中に単位（%・円）がある                                                                                                                        | あり  |
+| `table-pagination`       | 並べ替えのある DataTable（`sortValue` のある列がある）と Pagination を同じ部品（いちばん近い関数）の中で使い、DataTable に `pageSize` も `dataMode` もない | 一部  |
 
 `@kei-design/react` から読み込んだ部品だけを見ます。部品を自分のモジュールから出し直しているときは、ESLint と Oxlint の `settings` に `"kei": { "importSources": ["@kei-design/react", "@/ui"] }` と読み込み元を足します。
 
 `icon-only-button` がアイコンとみなすのは、アイコンの部品集（`lucide-react`・`@radix-ui/react-icons`・`@heroicons/react`・`react-icons`。`@heroicons/react/24/outline` のような副パスも含む）から読み込んだもの、名前が `Icon` で終わるもの、KEI が書き出すアイコン（今はまだなく、足すときは名前を `Icon` で終えます）だけです。`<Button><FormattedMessage id="save" /></Button>` のように、ボタンの文字を出しているかもしれない部品は止めません。ほかの部品集を使うときは、ESLint と Oxlint の `settings` に `"kei": { "iconSources": ["my-icons"] }` と足します。
 
-`table-pagination` は、DataTable の外に置いた Pagination でページを送る表を止めます。行の作り方（`slice`・`filter`・自作の関数）は見ません。ページ送りは `pageSize` で DataTable に任せると、全件を並べ替えてから区切ります。サーバーで並べ替えて区切るときは `dataMode="server"` を渡します。並べ替えがあるかは、`columns={columns}` をこのファイルの宣言まで追って `sortValue` を探し、別のファイルから読み込んだ列なら、このファイルに `sortValue` があるかで決めます。
+`table-pagination` は、DataTable の外に置いた Pagination でページを送る表を止めます。行の作り方（`slice`・`filter`・自作の関数）は見ません。ページ送りは `pageSize` で DataTable に任せると、全件を並べ替えてから区切ります。サーバーで並べ替えて区切るときは `dataMode="server"` を渡します。並べ替えがあるかは、`columns={columns}` をこのファイルの宣言まで追って `sortValue` を探し、別のファイルから読み込んだ列なら、このファイルに `sortValue` があるかで決めます。見るのは、DataTable を囲むいちばん近い関数（部品）の中に Pagination があるときだけです。同じファイルの別の部品（カードの一覧など）が Pagination を使っていても止めません。そのかわり、Pagination を同じファイルの小さなフッターの部品に分けた書き方は見逃します。的外れな指摘で正しい表を止めるより、見逃しのほうがましと考えてこの範囲にしています。
 
 ### ESLint
 
@@ -196,5 +196,5 @@ Biome のプラグインの指摘には、ルールの名前が出ず `plugin` �
 - 入力には必ず `label` を付け、ダイアログには説明を付けます。
 - 状態は色だけでなく、文字でも伝えます。
 - 数値・時刻・ID・コードには `.k-mono`、文中の数値には `.k-tabular` を使います。
-- DataTable のページ送りは `pageSize` で DataTable に任せます（全件を並べ替えてから区切ります）。サーバーで並べ替えて区切るときは `dataMode="server"` と `totalCount` を渡します。
+- DataTable のページ送りは `pageSize` で DataTable に任せます（全件を並べ替えてから区切ります）。サーバーで並べ替えて区切るときは `dataMode="server"` と `totalCount` を渡します。ページが足りなくなると、最後のページに合わせて `onPageChange` を呼びます。`DataTableProps<T>` は `dataMode` で形の分かれる型なので、`Omit<DataTableProps<T>, …>` で包むと、`dataMode="server"` のときに要る props を型が見分けなくなります。包むときは、`Omit<DataTableProps<T> & DataTableClientProps, 'caption'> | Omit<DataTableProps<T> & DataTableServerProps, 'caption'>` のように形ごとに分けて書きます。
 - フォーカスリングは消さず、動きを減らす設定に従います。

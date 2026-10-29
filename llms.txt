@@ -346,14 +346,14 @@ import '@kei-design/react/styles.css';
 - `selectedIds?: string[]`
 - `onSelectionChange?: ((ids: string[]) => void)`
 - `onRowClick?: ((row: T) => void)`
-- `loading?: boolean`
+- `loading?: boolean` — 読み込み中の表示。dataMode="server" では、取り直している間は true にします。そのあいだの totalCount は古いことがあるので、範囲外のページを合わせるのは読み込みが終わってからです。
 - `emptyTitle?: string`
 - `emptyDescription?: string`
 - `dataMode?: 'client' | 'server'` — 'client'（既定）は、rows の全件を手元で並べ替えてから区切ります。'server' は並べ替えもページ分けもサーバーに任せ、受け取った1ページ分の rows を並べ替えずにそのまま描きます。'server' では sorting・onSortingChange・pageSize・page・onPageChange・totalCount が必須です。
 - `sorting?: TableSort` — 並べ替えの状態。'client' では渡すと外で持ち、'server' ではいまサーバーに頼んでいる並べ替えを渡します（見出しの矢印と aria-sort に使います）。見出しを押すたびに昇順と降順を切り替え、解除はしません。
 - `onSortingChange?: ((sort: TableSort) => void)` — 見出しを押したときに呼びます。'server' ではこの並べ替えで取り直します。ページ送りがあって1ページ目でなければ、続けて onPageChange(1) も呼びます。
 - `pageSize?: number` — 1ページの行数。渡すと表の下に件数とページ送り（Pagination）を描きます。'client' では全件を並べ替えてから区切ります。並べ替えを変えると1ページ目に戻ります。
-- `page?: number` — 表示するページ（1始まり）。'client' では渡さなければ DataTable が持ちます。行が減ってページが足りなくなると最後のページを出します。絞り込みを変えたときに1ページ目へ戻すなら、外で持って 1 にします。
+- `page?: number` — 表示するページ（1始まり）。'client' では渡さなければ DataTable が持ちます。行が減ってページが足りなくなると、最後のページ（0件なら1ページ目）に合わせて onPageChange を呼びます。絞り込みを変えたときに1ページ目へ戻すなら、外で持って 1 にします。
 - `onPageChange?: ((page: number) => void)` — ページが変わるときに呼びます。ページ送りのほか、並べ替えを変えて1ページ目に戻るときも呼びます。'server' ではこのページを取り直します。
 - `totalCount?: number` — dataMode="server" のとき、サーバーにある全件の数（絞り込んだ後）。ページ数と件数の表示に使います。
 

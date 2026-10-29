@@ -23,13 +23,14 @@ import {
   type Column,
 } from '../index';
 import { OperationsExample, SettingsExample } from '../patterns/Operations';
-import type { ReactNode } from 'react';
+import { StrictMode, type ReactNode } from 'react';
+const wrap = (ui: ReactNode, theme: 'paper' | 'ink' = 'paper') => (
+  <KeiProvider theme={theme}>
+    <ToastProvider>{ui}</ToastProvider>
+  </KeiProvider>
+);
 function setup(ui: ReactNode, theme: 'paper' | 'ink' = 'paper') {
-  return render(
-    <KeiProvider theme={theme}>
-      <ToastProvider>{ui}</ToastProvider>
-    </KeiProvider>,
-  );
+  return render(wrap(ui, theme));
 }
 
 describe('Input and focus contracts', () => {
@@ -247,30 +248,81 @@ describe('Tables and measures', () => {
     expect(screen.getAllByRole('row').map((r) => r.textContent)).toEqual(['ID値', 'R595']);
     expect(screen.getByText('7件中 7〜7件目')).toBeVisible();
   });
-  it('shows the last page that still exists when the rows shrink', () => {
-    const { rerender } = setup(
-      <DataTable
-        rows={many}
-        columns={columns}
-        getRowId={(r) => r.id}
-        caption="測定値"
-        pageSize={3}
-        page={3}
-      />,
+  it('moves a page past the end to the last page and reports it once', () => {
+    const change = vi.fn();
+    const table = (count: number) => (
+      <StrictMode>
+        <DataTable
+          rows={many.slice(0, count)}
+          columns={columns}
+          getRowId={(r) => r.id}
+          caption="測定値"
+          pageSize={3}
+          page={3}
+          onPageChange={change}
+        />
+      </StrictMode>
     );
-    expect(screen.getByRole('status')).toHaveTextContent('3ページ中 3ページ目');
-    rerender(
-      <DataTable
-        rows={many.slice(0, 2)}
-        columns={columns}
-        getRowId={(r) => r.id}
-        caption="測定値"
-        pageSize={3}
-        page={3}
-      />,
-    );
+    const { rerender } = setup(table(7));
+    expect(change).not.toHaveBeenCalled();
+    rerender(wrap(table(2)));
     expect(screen.getByRole('status')).toHaveTextContent('1ページ中 1ページ目');
     expect(screen.getAllByRole('row')).toHaveLength(3);
+    // The app keeps page 3 here; the table does not ask again with the same page.
+    rerender(wrap(table(2)));
+    rerender(wrap(table(1)));
+    expect(change.mock.calls).toEqual([[1]]);
+    rerender(wrap(table(0)));
+    expect(change.mock.calls).toEqual([[1]]);
+  });
+  it('keeps the page it moved to when the rows come back', async () => {
+    const change = vi.fn();
+    const table = (count: number) => (
+      <DataTable
+        rows={many.slice(0, count)}
+        columns={columns}
+        getRowId={(r) => r.id}
+        caption="測定値"
+        pageSize={3}
+        onPageChange={change}
+      />
+    );
+    const { rerender } = setup(table(7));
+    await userEvent.click(screen.getByRole('button', { name: '次のページ' }));
+    await userEvent.click(screen.getByRole('button', { name: '次のページ' }));
+    expect(screen.getByRole('status')).toHaveTextContent('3ページ中 3ページ目');
+    rerender(wrap(table(4)));
+    expect(screen.getByRole('status')).toHaveTextContent('2ページ中 2ページ目');
+    expect(change).toHaveBeenLastCalledWith(2);
+    rerender(wrap(table(7)));
+    expect(screen.getByRole('status')).toHaveTextContent('3ページ中 2ページ目');
+    expect(change.mock.calls).toEqual([[2], [3], [2]]);
+  });
+  it('waits for the server to finish loading before moving a page past the end', () => {
+    const change = vi.fn();
+    const table = (loading: boolean, totalCount: number) => (
+      <DataTable
+        dataMode="server"
+        rows={[]}
+        columns={columns}
+        getRowId={(r) => r.id}
+        caption="測定値"
+        loading={loading}
+        sorting={null}
+        onSortingChange={() => {}}
+        pageSize={5}
+        page={5}
+        onPageChange={change}
+        totalCount={totalCount}
+      />
+    );
+    // While page 5 is loading, the total is still the one from before.
+    const { rerender } = setup(table(true, 12));
+    expect(change).not.toHaveBeenCalled();
+    rerender(wrap(table(false, 12)));
+    expect(change.mock.calls).toEqual([[3]]);
+    rerender(wrap(table(false, 12)));
+    expect(change.mock.calls).toEqual([[3]]);
   });
   it('leaves sorting and paging to the server in server mode', async () => {
     const sortChange = vi.fn();

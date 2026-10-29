@@ -163,6 +163,63 @@ export const Case = () => <Button><Save /></Button>;
   },
   'table-pagination': {
     valid: [
+      {
+        // From the review: a small table and a card list paged by Pagination are two components.
+        code: `import { DataTable, Pagination, type Column } from '@kei-design/react';
+import { useState } from 'react';
+type Row = { id: string; amount: number };
+declare const all: Row[];
+const columns: Column<Row>[] = [
+  { key: 'amount', header: '金額', render: (r) => r.amount, sortValue: (r) => r.amount },
+];
+export function Latest() {
+  return <DataTable rows={all.slice(0, 5)} columns={columns} getRowId={(r) => r.id} caption="最新の5件" />;
+}
+export const Cards = () => {
+  const [page, setPage] = useState(1);
+  return (
+    <ul>
+      {all.slice((page - 1) * 10, page * 10).map((r) => <li key={r.id}>{r.id}</li>)}
+      <Pagination page={page} totalPages={3} onPageChange={setPage} />
+    </ul>
+  );
+};
+`,
+      },
+      {
+        // The nearest function around the DataTable is the inner component, not the outer one.
+        code: `import { DataTable, Pagination } from '@kei-design/react';
+declare const all: { id: string }[];
+declare const page: number;
+declare const setPage: (page: number) => void;
+export function Outer() {
+  const Inner = () => (
+    <DataTable rows={all.slice(0, 5)} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="最新の5件" />
+  );
+  return (
+    <>
+      <Inner />
+      <Pagination page={page} totalPages={3} onPageChange={setPage} />
+    </>
+  );
+}
+`,
+      },
+      {
+        // Accepted miss: a Pagination moved out to a footer component is in another function.
+        code: `import { DataTable, Pagination } from '@kei-design/react';
+declare const all: { id: string }[];
+declare const page: number;
+declare const setPage: (page: number) => void;
+const Footer = () => <Pagination page={page} totalPages={3} onPageChange={setPage} />;
+export const Case = () => (
+  <>
+    <DataTable rows={all.slice((page - 1) * 10, page * 10)} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" />
+    <Footer />
+  </>
+);
+`,
+      },
       // DataTable sorts every row, then cuts the page.
       `<DataTable rows={all} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" pageSize={10} page={page} onPageChange={setPage} />`,
       `<><DataTable dataMode="server" rows={all} totalCount={120} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" sorting={null} onSortingChange={save} pageSize={10} page={page} onPageChange={setPage} /><Pagination page={page} totalPages={12} onPageChange={setPage} /></>`,
@@ -206,6 +263,16 @@ export const Case = () => (
       },
     ],
     invalid: [
+      // Outside any function, the whole file is the component.
+      `import { DataTable, Pagination } from '@kei-design/react';
+declare const all: { id: string }[];
+export const page = (
+  <>
+    <DataTable rows={all.slice(0, 10)} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" />
+    <Pagination page={1} totalPages={3} onPageChange={() => {}} />
+  </>
+);
+`,
       `<><DataTable rows={all.slice((page - 1) * 10, page * 10)} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" /><Pagination page={page} totalPages={3} onPageChange={setPage} /></>`,
       // How the rows are made is not looked at: a helper is the same as slice.
       `import { useMemo, useState } from 'react';
