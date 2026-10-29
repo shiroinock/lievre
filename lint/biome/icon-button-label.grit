@@ -1,0 +1,13 @@
+// kei/icon-button-label: an empty label leaves the button without a name.
+language js(typescript, jsx);
+
+or {
+  JsxOpeningElement(name = "IconButton", attributes = $attributes) as $button,
+  JsxSelfClosingElement(name = "IconButton", attributes = $attributes) as $button
+} where {
+  $attributes <: contains JsxAttribute(name = "label", initializer = JsxAttributeInitializerClause(value = $label)) as $attribute,
+  $label <: r"[{]?[\x22\x27\x60][\s\p{P}\p{S}]*[\x22\x27\x60][}]?",
+  $button <: within JsModule() as $module,
+  $module <: contains `import $_ from "@kei-design/react"`,
+  register_diagnostic(span = $attribute, message = "IconButton の label が空か記号だけで、読み上げで何のボタンか分かりません。何をするかを言葉で書いてください（label='行の操作'）。")
+}

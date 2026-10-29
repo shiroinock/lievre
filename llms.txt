@@ -1,6 +1,6 @@
 # KEI（@kei-design/react）
 
-> 日本語の業務画面向けの React 部品と CSS トークン。この文書だけで部品を使えるように、使い方の約束と全部品の API をまとめています。後半の「部品」以降は `npm run llms` で型から生成しています。
+> 日本語の画面のための React 部品と CSS トークン（作者個人の実験的なデザインシステム。WCAG 2.x AA は守る）。この文書だけで部品を使えるように、使い方の約束と全部品の API をまとめています。後半の「部品」以降は `npm run llms` で型から生成しています。
 
 ## 始め方
 
@@ -26,30 +26,59 @@ import '@kei-design/react/styles.css';
 - 状態は色だけでなく文字でも伝えます。Badge には必ず文字を入れます。Metric の `trend` は矢印と色だけなので、向きは `change` に言葉で書きます（「前週比 +0.02 ポイント上昇」）。
 - 数値・時刻・ID・コードは `<span className="k-mono">`、文中の数値は `.k-tabular`。単位（%・円）は `.k-mono` の外に置きます：`<span><span className="k-mono">{n}</span>円</span>`。Metric は `value="99.95" unit="%"` と分けます。
 - Dialog には `title` と `description` が必須です。閉じるだけのボタンは `<DialogClose asChild><Button>キャンセル</Button></DialogClose>` で包みます。処理してから閉じるときは `open` / `onOpenChange` で開閉を持ちます。フォーカスの閉じ込めと復帰は部品が行います。
+- アイコンだけのボタンは `<IconButton label="行の操作" icon={<MoreHorizontal />} />`。`label` が読み上げの名前とツールチップの両方になるので、`aria-label` は書きません。`Button` に svg だけを入れません。
+- 押して開く操作できる中身（絞り込み・表示の設定）は `Popover`、説明の短い文だけなら `Tooltip`。Popover の中の「適用」で閉じるときは `open` / `onOpenChange` で開閉を持ちます。
+- 操作の一覧は `DropdownMenu` に `items` の配列で渡します（子要素では渡しません）。区切りは `{ type: 'separator' }`、入り切りは `type: 'checkbox'`、1つを選ぶ組は `type: 'radio'`。削除などは `tone: 'danger'` にし、label にも「削除」と書きます。
+- 削除・送信の確認は Dialog で組まず `ConfirmDialog` を使います。`confirmLabel` には何が起きるかを動詞で書きます（「3件を削除」。「OK」「はい」にしない）。取り消せない操作は `tone="danger"`。`onConfirm` が Promise を返すと終わるまで閉じず、reject すると開いたままです。メニューの項目から開くときは `trigger` を省き、`open` / `onOpenChange` で持ちます。
+- 「項目名：値」の一覧は `<dl>` を手で組まず `DescriptionList` に `items` で渡します。数値・ID・日時は `mono: true`。詳細や確認の画面は既定の `layout="row"`、項目を段に並べるときは `layout="stack" columns={2}`。
+- 読み上げにだけ伝える文字は `<VisuallyHidden>`（`.k-sr-only` を手で書かない）。パネル全体の読み込みは `<Spinner label="一覧を読み込み中" showLabel />`、ボタンの中は `Button` の `loading`、形の分かる一覧は `Skeleton`。
 - ラベルは日本語で書き、英大文字や記号で飾りません。
 
 ## 表の並べ替えとページ送り
 
-DataTable は渡された `rows` の中だけで並べ替えます。ページ送りでは全件を自分で並べ替えてから区切り、並べ替えの状態を `sorting` / `onSortingChange` で持ちます。
+ページ送りは DataTable に任せます。手元にある全件を `rows` に渡して `pageSize` を付けると、DataTable が全件を並べ替えてから区切り、表の下に件数と前後のページ送りを描きます。並べ替えを変えると1ページ目に戻ります。自分で `slice` した行を渡したり、`Pagination` を横に並べたりはしません。
 
 ```tsx
-const [sort, setSort] = useState<TableSort>(null);
-const [page, setPage] = useState(1);
-const sorted = useMemo(() => {
-  const col = columns.find((c) => c.key === sort?.key);
-  if (!sort || !col?.sortValue) return all;
-  const v = col.sortValue;
-  return [...all].sort((a, b) => (v(a) < v(b) ? -1 : v(a) > v(b) ? 1 : 0) * (sort.direction === 'asc' ? 1 : -1));
-}, [all, sort]);
-<DataTable caption="請求書" rows={sorted.slice((page - 1) * 10, page * 10)} columns={columns}
-  getRowId={(r) => r.id} sorting={sort} onSortingChange={(s) => { setSort(s); setPage(1); }} />
-<Pagination page={page} totalPages={Math.ceil(all.length / 10)} onPageChange={setPage} />
+// const [page, setPage] = useState(1);
+<DataTable
+  caption="請求書"
+  rows={filtered}
+  columns={columns}
+  getRowId={(r) => r.id}
+  pageSize={10}
+  page={page}
+  onPageChange={setPage}
+/>
+```
+
+`page` を渡さなければ DataTable が持ちます。絞り込みを変えたときに1ページ目へ戻すなら、上のように外で持って `setPage(1)` します。
+
+サーバーが並べ替えて区切った1ページ分を受け取るときは `dataMode="server"` にします。手元では並べ替えず、`totalCount` からページ数を出します。この形では `sorting` / `onSortingChange` / `page` / `onPageChange` / `pageSize` / `totalCount` が型で必須です。
+
+```tsx
+<DataTable
+  dataMode="server"
+  caption="請求書"
+  rows={data.items}
+  totalCount={data.total}
+  columns={columns}
+  getRowId={(r) => r.id}
+  loading={isFetching}
+  sorting={sort}
+  onSortingChange={setSort}
+  pageSize={10}
+  page={page}
+  onPageChange={setPage}
+/>
 ```
 
 ## 確かめ方
 
 - 型（`tsc --noEmit`）が誤った props の大半を止めます。
-- 次は型では止まりません：KeiProvider の包み忘れ、フォームの Button の `type="submit"` 忘れ、ページ送りで区切った後の並べ替え、Metric の `value` に単位を含めること。書いた後にこの4点を見直してください。
+- 型で止まらない誤用は、`@kei-design/react/lint` の lint ルールが止めます（フォームの Button の `type` 忘れ、Metric の `value` の単位、閉じられない Dialog、アイコンだけの Button、DataTable の外に置いたページ送りなど11個）。メッセージに直し方が書いてあるので、そのとおりに直します。ESLint と Oxlint は同じプラグイン、Biome は GritQL のファイルで、設定は README の「lint」にあります。
+  - ESLint：`import kei from '@kei-design/react/lint'` を読み込み、flat config に `{ files: ['**/*.tsx'], languageOptions: { parser: tseslint.parser }, ...kei.configs.recommended }` を足します。
+  - Oxlint：`.oxlintrc.json` に `"jsPlugins": ["@kei-design/react/lint"]` と、`"rules"` に `"kei/button-type-in-form": "error"` などを書きます。
+- lint でも見えないもの：KeiProvider の包み忘れ（ファイルをまたぐため）。書いた後に見直してください。
 
 ## 部品
 
@@ -171,6 +200,21 @@ const sorted = useMemo(() => {
 - `height?: string | number` — 既定 16
 - `label?: string` — 既定 '読み込み中'
 
+### VisuallyHidden
+
+画面には出さず、読み上げにだけ伝える文字。表の行の「詳細」ボタンに「（W-1024）」を足すときなどに使います。配置には影響しません。
+
+- `children: ReactNode`
+- ほかに HTMLAttributes<HTMLSpanElement> の属性を受け取ります。
+
+### Spinner
+
+読み込み中の印。label を読み上げ（role="status"）、動きを減らす設定では回転を止めます。ボタンの中は Button の loading、表や一覧の形が分かるときは Skeleton を使います。
+
+- `label?: string` — 既定 '読み込み中'。読み上げる文。何を待っているかを書くと伝わります（「一覧を読み込み中」）。
+- `showLabel?: boolean` — 既定 false。true で label を画面にも出します。パネル全体の読み込みに使います。
+- `size?: 'sm' | 'md'` — 既定 'sm'。'sm' は 16px、'md' は 24px。文字の大きさと行の高さは置いた場所から引き継ぎます。
+
 ### EmptyState
 
 - `title: string`
@@ -198,7 +242,7 @@ const sorted = useMemo(() => {
 
 ### Pagination
 
-前後のページ送り。DataTable と組み合わせるときは、全件を並べ替えてから区切った rows を渡します。
+前後のページ送り。いまのページを「5ページ中2ページ目」と読み上げ、ページが変わると知らせます。端のページで押したボタンが無効になったら、フォーカスを反対のボタンへ移します。DataTable のページ送りには、これを横に置かずに DataTable の pageSize を使います。
 
 - `page: number` — 1 始まり。
 - `totalPages: number`
@@ -213,6 +257,17 @@ const sorted = useMemo(() => {
 - `loading?: boolean` — 既定 false。処理中の表示。押せなくなり、aria-busy が付きます。
 - `icon?: ReactNode`
 - ほかに ButtonHTMLAttributes<HTMLButtonElement> の属性を受け取ります。
+
+### IconButton
+
+アイコンだけのボタン。label を読み上げとツールチップの両方に使うので、名前を付け忘れません。
+
+- `label: string` — 読み上げとツールチップに出す名前。何をするかを言葉で書きます（「閉じる」「行の操作」）。
+- `icon: ReactNode` — アイコン（lucide-react など）。大きさは size に合わせて部品が決め、aria-hidden も部品が付けます。
+- `variant?: 'danger' | 'primary' | 'secondary' | 'ghost'` — 既定 'ghost'。色は Button と同じです。既定は枠のない 'ghost'。
+- `size?: 'sm' | 'md' | 'lg'` — 既定 'md'。'md' は密度の操作の高さ（40 / 32px）、'sm' は 32px、'lg' は 48px の正方形。タッチの画面では 44px まで広げます。
+- `tooltip?: boolean` — 既定 true。false にするとツールチップを出しません。すぐ横に同じ言葉が書いてあるときだけ使います。
+- `loading?: boolean` — 既定 false。処理中の表示。押せなくなり、aria-busy が付きます。
 
 ### TextField
 
@@ -234,6 +289,21 @@ const sorted = useMemo(() => {
 - `description: string` — 何が起きるかの説明。aria-describedby で結びます。
 - `children: ReactNode` — 本文。フォームや詳細を置きます。
 - `footer?: ReactNode` — 操作。閉じるだけのボタンは `<DialogClose asChild><Button>…</Button></DialogClose>` で包みます。
+- `open?: boolean`
+- `onOpenChange?: ((open: boolean) => void)`
+
+### ConfirmDialog
+
+取り消せない操作の前の確認。初めのフォーカスは取り消し側に置き、Escape・外側を押す・閉じるボタンはどれも取り消しになります。
+
+- `trigger?: ReactNode` — 開くボタン。メニューの項目などから開くときは省き、open と onOpenChange で開閉を持ちます。
+- `title: string` — 確かめる問い。「3件の作業を削除しますか？」のように、何に何をするかを書きます。
+- `description: string` — 実行すると何が起きるか、取り消せるか。aria-describedby で結びます。
+- `children?: ReactNode` — 補足。対象の一覧など。
+- `confirmLabel: string` — 実行のボタンの文字。何が起きるかを動詞で書きます（「3件を削除」）。「OK」「はい」にはしません。
+- `cancelLabel?: string` — 既定 'キャンセル'
+- `tone?: 'danger' | 'default'` — 既定 'default'。'danger' は削除など取り消せない操作。実行のボタンを赤にします。
+- `onConfirm: () => void | Promise<unknown>` — 実行したときに呼びます。Promise を返すと、終わるまで実行のボタンを処理中にして閉じさせず、終わったら閉じます。失敗（reject）したら開いたままにして、もう一度押せるようにします。部品は失敗の理由を出さないので、onConfirm の中で Toast などで知らせます。
 - `open?: boolean`
 - `onOpenChange?: ((open: boolean) => void)`
 
@@ -268,21 +338,36 @@ const sorted = useMemo(() => {
 
 ### DataTable
 
-ネイティブtableの意味論を維持。ソート・選択・空/読込状態を備えます。
+ネイティブtableの意味論を維持。ソート・選択・空/読込状態・ページ送りを備えます。ページ送りは pageSize を渡して DataTable に描かせ、Pagination を横に並べて自分で区切ることはしません。
 
-- `rows: T[]` — 表示する行。並べ替えはここで渡した行の中だけで行うため、ページ送りでは全件を並べ替えてから区切った行を渡し、sorting / onSortingChange で状態を持ちます。
+- `rows: T[]` — 表示する行。dataMode が 'client'（既定）なら絞り込んだ全件を渡します。DataTable が並べ替えてから pageSize ごとに区切るので、自分で区切った行は渡しません。'server' なら、サーバーが並べ替えて区切った1ページ分を渡します。
 - `columns: Column<T>[]`
 - `getRowId: (row: T) => string`
 - `caption: string` — 表の名前。画面には出さず、読み上げに使います。
-- `selectable?: boolean` — 既定 false
+- `selectable?: boolean`
 - `selectedIds?: string[]`
 - `onSelectionChange?: ((ids: string[]) => void)`
 - `onRowClick?: ((row: T) => void)`
-- `loading?: boolean` — 既定 false
-- `emptyTitle?: string` — 既定 '該当するデータがありません'
-- `emptyDescription?: string` — 既定 '条件を変えてもう一度検索してください。'
-- `sorting?: TableSort` — 渡すと並べ替えの状態を外で持ちます（ページ送りと組み合わせるとき）。見出しを押すたびに昇順と降順を切り替え、解除はしません。
-- `onSortingChange?: ((sort: TableSort) => void)`
+- `loading?: boolean` — 読み込み中の表示。dataMode="server" では、取り直している間は true にします。そのあいだの totalCount は古いことがあるので、範囲外のページを合わせるのは読み込みが終わってからです。
+- `emptyTitle?: string`
+- `emptyDescription?: string`
+- `dataMode?: 'client' | 'server'` — 'client'（既定）は、rows の全件を手元で並べ替えてから区切ります。'server' は並べ替えもページ分けもサーバーに任せ、受け取った1ページ分の rows を並べ替えずにそのまま描きます。'server' では sorting・onSortingChange・pageSize・page・onPageChange・totalCount が必須です。
+- `sorting?: TableSort` — 並べ替えの状態。'client' では渡すと外で持ち、'server' ではいまサーバーに頼んでいる並べ替えを渡します（見出しの矢印と aria-sort に使います）。見出しを押すたびに昇順と降順を切り替え、解除はしません。
+- `onSortingChange?: ((sort: TableSort) => void)` — 見出しを押したときに呼びます。'server' ではこの並べ替えで取り直します。ページ送りがあって1ページ目でなければ、続けて onPageChange(1) も呼びます。
+- `pageSize?: number` — 1ページの行数。渡すと表の下に件数とページ送り（Pagination）を描きます。'client' では全件を並べ替えてから区切ります。並べ替えを変えると1ページ目に戻ります。
+- `page?: number` — 表示するページ（1始まり）。'client' では渡さなければ DataTable が持ちます。行が減ってページが足りなくなると、最後のページ（0件なら1ページ目）に合わせて onPageChange を呼びます。絞り込みを変えたときに1ページ目へ戻すなら、外で持って 1 にします。
+- `onPageChange?: ((page: number) => void)` — ページが変わるときに呼びます。ページ送りのほか、並べ替えを変えて1ページ目に戻るときも呼びます。'server' ではこのページを取り直します。
+- `totalCount?: number` — dataMode="server" のとき、サーバーにある全件の数（絞り込んだ後）。ページ数と件数の表示に使います。
+
+### DescriptionList
+
+「項目名：値」の一覧。`<dl>` の意味を保ちます。layout="row" は項目名の列と値を横に並べ、幅が足りないと値を項目名の下に回します。
+
+- `items: DescriptionItem[]`
+- `layout?: 'row' | 'stack'` — 既定 'row'。'row' は詳細や確認の画面向けに項目名と値を横に並べ、'stack' は項目名の下に値を置きます。
+- `columns?: 1 | 2 | 3` — 既定 1。layout="stack" のときの段の数。幅が足りないと段を減らします。
+- `labelWidth?: string` — layout="row" の項目名の列の幅。既定は '8em'。どの行も同じ幅になります。
+- ほかに HTMLAttributes<HTMLDListElement> の属性を受け取ります。
 
 ### Text
 
@@ -290,7 +375,7 @@ const sorted = useMemo(() => {
 
 - `as?: 'div' | 'p' | 'span'` — 既定 'p'
 - `size?: 'body' | 'small' | 'lead'` — 既定 'body'
-- `tone?: 'muted' | 'default'` — 既定 'default'
+- `tone?: 'default' | 'muted'` — 既定 'default'
 - ほかに HTMLAttributes<HTMLElement> の属性を受け取ります。
 
 ### Link
@@ -343,6 +428,26 @@ const sorted = useMemo(() => {
 - `size?: 'title' | 'section' | 'display'` — 既定 'section'
 - ほかに HTMLAttributes<HTMLHeadingElement> の属性を受け取ります。
 
+### Popover
+
+押すと開く、操作できる中身のパネル。Escape と外側を押すと閉じ、フォーカスを開いた元に戻します。影を使わず、1px の線と面で浮かせます。
+
+- `trigger: ReactNode` — 開くボタン。Button か IconButton を渡します。閉じるとフォーカスはここに戻ります。
+- `title: string` — パネルの見出し。画面に出し、aria-labelledby でパネルと結びます。
+- `children: ReactNode` — 中身。絞り込みの条件や設定など、操作できるものを置きます。説明だけなら Tooltip を使います。
+- `side?: 'top' | 'right' | 'bottom' | 'left'` — 既定 'bottom'。開く向き。画面の端で入らないときは反対側に回ります。
+- `align?: 'center' | 'start' | 'end'` — 既定 'start'。開いた元の部品とのそろえ方。
+- `open?: boolean` — 中の「適用」などで閉じるときは、open と onOpenChange で開閉を持ちます。
+- `onOpenChange?: ((open: boolean) => void)`
+
+### DropdownMenu
+
+押すと開く操作の一覧。矢印キー・Home / End・文字での選択・Escape に対応し、閉じるとフォーカスを開いた元に戻します。
+
+- `trigger: ReactNode` — 開くボタン。Button か IconButton を渡します。メニューの名前はこのボタンの名前になります。
+- `items: MenuItem[]` — 項目。並べた順に出します。区切りは `{ type: 'separator' }`。
+- `align?: 'start' | 'end'` — 既定 'start'。開いた元の部品とのそろえ方。表の行の端に置くときは 'end'。
+
 ## フック
 
 ### useKeiTheme
@@ -383,6 +488,12 @@ live は wearSeed から SVG のフィルタを作り、文字も歪ませる。
   - `align?: 'left' | 'right'`
   - `width?: string`
 - `type TableSort = { key: string; direction: 'asc' | 'desc' } | null;`
+- `type DescriptionItem`
+  - `label: string` — 項目名。
+  - `value: ReactNode`
+  - `mono?: boolean` — 値が数値・ID・日時・コードのとき true。等幅で桁をそろえます。単位は value の中で `.k-mono` の外に置けないので、単位のある値は false のまま `<span className="k-mono">` で包みます。
+  - `wide?: boolean` — layout="stack" で段を組むとき、行の幅いっぱいに広げます（メモなど長い値）。
 - `type Space = 0 | 1 | 2 | 3 | 4 | 6 | 8 | 12;`
 - `type RadioOption = { value: string; label: string; description?: string; disabled?: boolean; };`
+- `type MenuItem = | { type?: 'item'; label: string; onSelect: () => void; icon?: ReactNode; shortcut?: string; tone?: 'danger'; disabled?: boolean; } | { type: 'checkbox'; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; disabled?: boolean; } | { type: 'radio'; label: string; value: string; onValueChange: (value: string) => void; options: { value: string; label: string; disabled?: boolean }[]; } | { type: 'separator' };`
 - `cx`: `(...values: (string | false | null | undefined)[]) => string`

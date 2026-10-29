@@ -26,6 +26,8 @@ import {
   type Theme,
   type Density,
   type Wear,
+  IconButton,
+  DescriptionList,
 } from './index';
 import { ComponentGallery } from './docs/ComponentGallery';
 import { ColorFoundation, Foundations, ReferenceDirection, principles } from './docs/Foundations';
@@ -188,13 +190,14 @@ export default function App() {
               <strong>KEI</strong>
               <small>デザインシステム</small>
             </div>
-            <button
-              className="sidebar-close k-icon-button"
-              aria-label="メニューを閉じる"
+            <IconButton
+              className="sidebar-close"
+              size="sm"
+              label="メニューを閉じる"
+              icon={<X />}
+              tooltip={false}
               onClick={() => setNavOpen(false)}
-            >
-              <X size={18} />
-            </button>
+            />
           </div>
           <nav aria-label="メインナビゲーション" className="main-nav">
             {pages.map((p) => (
@@ -258,16 +261,17 @@ export default function App() {
         )}
         <div className="app-main">
           <header className="app-topbar">
-            <button
+            <IconButton
               ref={menuRef}
               aria-controls="app-navigation"
-              className="mobile-menu k-icon-button"
+              className="mobile-menu"
+              size="sm"
+              label="メニューを開く"
+              icon={<Menu />}
+              tooltip={false}
               onClick={() => setNavOpen(true)}
-              aria-label="メニューを開く"
               aria-expanded={navOpen}
-            >
-              <Menu size={18} />
-            </button>
+            />
             <span className="topbar-title">{active.label}</span>
           </header>
           <main id="main" className="app-content" tabIndex={-1}>
@@ -275,7 +279,7 @@ export default function App() {
               <>
                 <section className="overview-hero">
                   <div className="hero-copy">
-                    <h1>業務の画面を、読みやすく組み立てる。</h1>
+                    <h1>日本語の画面を、読みやすく組み立てる。</h1>
                     <p>
                       KEI は、日本語の画面を基準に設計した React のコンポーネントと CSS
                       トークンです。操作の色はウルトラマリン一色。影を使わず、面の明るさと1pxの線で階層をつくります。
@@ -292,20 +296,16 @@ export default function App() {
                         デザインの基礎
                       </Button>
                     </div>
-                    <dl className="hero-facts">
-                      <div>
-                        <dt>本文</dt>
-                        <dd>16px／操作画面は14px</dd>
-                      </div>
-                      <div>
-                        <dt>テーマ</dt>
-                        <dd>Paper と Ink</dd>
-                      </div>
-                      <div>
-                        <dt>コントラスト</dt>
-                        <dd>すべての組み合わせをテストで検査</dd>
-                      </div>
-                    </dl>
+                    <DescriptionList
+                      className="hero-facts"
+                      layout="stack"
+                      columns={3}
+                      items={[
+                        { label: '本文', value: '16px／操作画面は14px' },
+                        { label: 'テーマ', value: 'Paper と Ink' },
+                        { label: 'コントラスト', value: 'すべての組み合わせをテストで検査' },
+                      ]}
+                    />
                   </div>
                   <InstrumentPanel />
                 </section>

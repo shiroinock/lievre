@@ -1,0 +1,10 @@
+// kei/unit-outside-mono: units are words, not data: <span><span className="k-mono">{n}</span>%</span>.
+language js(typescript, jsx);
+
+JsxElement(opening_element = JsxOpeningElement(attributes = $attributes), elements = $children) where {
+  $attributes <: contains JsxAttribute(name = "className", initializer = JsxAttributeInitializerClause(value = $class)),
+  $class <: r"[\x22\x27](?:.*\s)?k-mono(?:\s.*)?[\x22\x27]",
+  $children <: some JsxText() as $text,
+  $text <: r"(?s).*[%％円].*",
+  register_diagnostic(span = $text, message = "単位（%・円）は .k-mono の外に出して本文の書体にしてください：<span><span className='k-mono'>{n}</span>%</span>")
+}
