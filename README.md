@@ -96,5 +96,5 @@ export function App() {
 - 入力には必ず `label` を付け、ダイアログには説明を付けます。
 - 状態は色だけでなく、文字でも伝えます。
 - 数値・時刻・ID・コードには `.k-mono`、文中の数値には `.k-tabular` を使います。
-- ページ付きの DataTable では、全件を先に並べ替えてから区切ります（`sorting` / `onSortingChange`）。
+- DataTable のページ送りは `pageSize` で DataTable に任せます（全件を並べ替えてから区切ります）。サーバーで並べ替えて区切るときは `dataMode="server"` と `totalCount` を渡します。
 - フォーカスリングは消さず、動きを減らす設定に従います。

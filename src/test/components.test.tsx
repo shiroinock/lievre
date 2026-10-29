@@ -12,6 +12,7 @@ import {
   Select,
   Dialog,
   DataTable,
+  Pagination,
   Badge,
   Meter,
   Progress,
@@ -23,7 +24,7 @@ import {
   type Column,
 } from '../index';
 import { OperationsExample, SettingsExample } from '../patterns/Operations';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 function setup(ui: ReactNode, theme: 'paper' | 'ink' = 'paper') {
   return render(
     <KeiProvider theme={theme}>
@@ -215,6 +216,107 @@ describe('Tables and measures', () => {
     expect(screen.getByText('計 花子')).not.toHaveClass('k-mono');
     const results = await axe.run(container);
     expect(results.violations.map((v) => v.id)).toEqual([]);
+  });
+  const many = [30, 80, 10, 50, 95, 20, 60].map((value, i) => ({ id: `R${i + 1}`, value }));
+  it('sorts every row before cutting the page, and goes back to page 1 when the order changes', async () => {
+    const pageChange = vi.fn();
+    setup(
+      <DataTable
+        rows={many}
+        columns={columns}
+        getRowId={(r) => r.id}
+        caption="測定値"
+        pageSize={3}
+        onPageChange={pageChange}
+      />,
+    );
+    expect(screen.getByText('7件中 1〜3件目')).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: '次のページ' }));
+    expect(pageChange).toHaveBeenLastCalledWith(2);
+    expect(screen.getAllByRole('row')[1]).toHaveTextContent('R450');
+    await userEvent.click(screen.getByRole('button', { name: '値' }));
+    expect(pageChange).toHaveBeenLastCalledWith(1);
+    // The smallest of all seven, not of the three that were on page 2.
+    expect(screen.getAllByRole('row').map((r) => r.textContent)).toEqual([
+      'ID値',
+      'R310',
+      'R620',
+      'R130',
+    ]);
+    await userEvent.click(screen.getByRole('button', { name: '次のページ' }));
+    await userEvent.click(screen.getByRole('button', { name: '次のページ' }));
+    expect(screen.getAllByRole('row').map((r) => r.textContent)).toEqual(['ID値', 'R595']);
+    expect(screen.getByText('7件中 7〜7件目')).toBeVisible();
+  });
+  it('shows the last page that still exists when the rows shrink', () => {
+    const { rerender } = setup(
+      <DataTable
+        rows={many}
+        columns={columns}
+        getRowId={(r) => r.id}
+        caption="測定値"
+        pageSize={3}
+        page={3}
+      />,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('3ページ中 3ページ目');
+    rerender(
+      <DataTable
+        rows={many.slice(0, 2)}
+        columns={columns}
+        getRowId={(r) => r.id}
+        caption="測定値"
+        pageSize={3}
+        page={3}
+      />,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('1ページ中 1ページ目');
+    expect(screen.getAllByRole('row')).toHaveLength(3);
+  });
+  it('leaves sorting and paging to the server in server mode', async () => {
+    const sortChange = vi.fn();
+    const pageChange = vi.fn();
+    // A page the server already sorted by value, descending: the table must not reorder it.
+    const pageRows = [
+      { id: 'X', value: 5 },
+      { id: 'Y', value: 9 },
+    ];
+    setup(
+      <DataTable
+        dataMode="server"
+        rows={pageRows}
+        columns={columns}
+        getRowId={(r) => r.id}
+        caption="測定値"
+        sorting={{ key: 'value', direction: 'asc' }}
+        onSortingChange={sortChange}
+        pageSize={2}
+        page={4}
+        onPageChange={pageChange}
+        totalCount={41}
+      />,
+    );
+    expect(screen.getAllByRole('row').map((r) => r.textContent)).toEqual(['ID値', 'X5', 'Y9']);
+    expect(screen.getByText('41件中 7〜8件目')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('21ページ中 4ページ目');
+    await userEvent.click(screen.getByRole('button', { name: '値' }));
+    expect(sortChange).toHaveBeenCalledWith({ key: 'value', direction: 'desc' });
+    expect(pageChange).toHaveBeenCalledWith(1);
+    expect(screen.getAllByRole('row').map((r) => r.textContent)).toEqual(['ID値', 'X5', 'Y9']);
+  });
+  it('keeps focus in the pagination when the pressed button turns disabled', async () => {
+    function Pager() {
+      const [page, setPage] = useState(2);
+      return <Pagination page={page} totalPages={3} onPageChange={setPage} />;
+    }
+    setup(<Pager />);
+    const next = screen.getByRole('button', { name: '次のページ' });
+    await userEvent.click(next);
+    expect(next).toBeDisabled();
+    expect(screen.getByRole('button', { name: '前のページ' })).toHaveFocus();
+    expect(screen.getByRole('status')).toHaveTextContent('3ページ中 3ページ目');
+    await userEvent.click(screen.getByRole('button', { name: '前のページ' }));
+    expect(screen.getByRole('button', { name: '前のページ' })).toHaveFocus();
   });
   it('renders an informative empty table instead of a blank panel', () => {
     setup(<DataTable rows={[]} columns={columns} getRowId={(r) => r.id} caption="測定値" />);

@@ -1584,6 +1584,21 @@
   .k-table tbody tr:last-child td {
     border-bottom: 0;
   }
+  /* Pages drawn by DataTable itself: the count and the buttons line up with the cells' padding. */
+  .k-table-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--k-space-3);
+    padding: var(--k-cell-padding);
+    border-top: 1px solid var(--k-border);
+  }
+  .k-table-count {
+    color: var(--k-muted);
+    font-size: var(--k-text-sm);
+    line-height: var(--k-line-tight);
+  }
   .k-table tbody tr:hover {
     background: color-mix(in srgb, var(--k-surface-sunken) 60%, transparent);
   }

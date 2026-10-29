@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { LayoutGate } from '../test/layout/declare';
-import { DataTable, Badge, type Column } from '../index';
+import { useState } from 'react';
+import { DataTable, Badge, type Column, type TableSort } from '../index';
 import { expect, userEvent, within } from 'storybook/test';
 type Row = { id: string; name: string; value: number; status: string };
 const rows: Row[] = [
@@ -54,6 +55,11 @@ const meta = {
           checks: ['inset-y', 'line-grid'],
         },
         {
+          name: 'ページ送りの帯',
+          selector: '.k-table-pager',
+          checks: ['inset-x', 'inset-y', 'fits', { icon: '.k-pagination', text: '.k-table-count' }],
+        },
+        {
           name: '並べ替えのボタン',
           selector: '.k-table-sort',
           checks: ['grid-height', { icon: 'svg' }],
@@ -63,7 +69,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'ネイティブtableの意味論を維持。sortValueのある列はソート可能。選択とソートは内部管理・外部制御の両方に対応。ページング時は全件を先にソートし、sorting/onSortingChangeを渡します。',
+          'ネイティブtableの意味論を維持。sortValueのある列はソート可能。選択とソートは内部管理・外部制御の両方に対応。pageSizeを渡すと、全件を並べ替えてから区切り、表の下に件数とページ送りを描きます。並べ替えとページ分けをサーバーに任せるときは dataMode="server" と totalCount を渡します。',
       },
     },
   },
@@ -96,3 +102,53 @@ export const SortAndSelect: Story = {
     for (const checkbox of c.getAllByRole('checkbox')) await expect(checkbox).toBeChecked();
   },
 };
+
+const many: Row[] = Array.from({ length: 12 }, (_, i) => ({
+  id: `KEI-${String(i + 1).padStart(2, '0')}`,
+  name: `機材${i + 1}`,
+  // 1ページ目に最小も最大も来ない並びにして、区切ってから並べ替えると結果が変わるようにする。
+  value: [40, 55, 61, 47, 3, 72, 58, 99, 44, 50, 66, 52][i],
+  status: i % 4 === 0 ? '要確認' : '稼働中',
+}));
+/** 全件を渡し、pageSize で区切ります。並べ替えは全件にかかり、変えると1ページ目に戻ります。 */
+export const Paginated: Story = {
+  args: { rows: many, pageSize: 5 },
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await expect(c.getByText('12件中 1〜5件目')).toBeVisible();
+    await userEvent.click(c.getByRole('button', { name: '次のページ' }));
+    await expect(c.getByRole('status')).toHaveTextContent('3ページ中 2ページ目');
+    await userEvent.click(c.getByRole('button', { name: '使用率' }));
+    await expect(c.getByRole('status')).toHaveTextContent('3ページ中 1ページ目');
+    await expect(c.getAllByRole('row')[1]).toHaveTextContent('機材5');
+  },
+};
+/** サーバーが並べ替えて区切った1ページ分を受け取る形。手元では並べ替えず、総件数からページ数を出します。 */
+export const ServerSide: Story = {
+  render: (args) => <ServerDemo {...args} />,
+};
+function ServerDemo(args: React.ComponentProps<typeof DataTable<Row>>) {
+  const [sorting, setSorting] = useState<TableSort>(null);
+  const [page, setPage] = useState(1);
+  // サーバーの代わり。本来は sorting と page を付けて取り直します。
+  const sorted = sorting
+    ? [...many].sort(
+        (a, b) =>
+          (sorting.key === 'value' ? a.value - b.value : a.name.localeCompare(b.name, 'ja')) *
+          (sorting.direction === 'asc' ? 1 : -1),
+      )
+    : many;
+  return (
+    <DataTable
+      {...args}
+      dataMode="server"
+      rows={sorted.slice((page - 1) * 5, page * 5)}
+      totalCount={many.length}
+      pageSize={5}
+      page={page}
+      onPageChange={setPage}
+      sorting={sorting}
+      onSortingChange={setSorting}
+    />
+  );
+}
