@@ -13,8 +13,11 @@
 | accent | surface | 4.5 | 8.76 | 10.60 | ansi256(20) #0000d7 / ansi256(231) #ffffff |
 | onAccent | accent | 4.5 | 9.06 | 10.60 | ansi256(231) #ffffff / ansi256(20) #0000d7 |
 | success | surface | 4.5 | 6.24 | 7.49 | ansi256(23) #005f5f / ansi256(231) #ffffff |
-| warning | surface | 4.5 | 6.44 | 5.73 | ansi256(94) #875f00 / ansi256(231) #ffffff |
+| warning | surface | 4.5 | 6.44 | 6.72 | ansi256(58) #5f5f00 / ansi256(231) #ffffff |
 | danger | surface | 4.5 | 6.32 | 7.44 | ansi256(124) #af0000 / ansi256(231) #ffffff |
+| success | selected | 4.5 | 4.62 | 5.37 | ansi256(23) #005f5f / ansi256(189) #d7d7ff |
+| warning | selected | 4.5 | 4.77 | 4.82 | ansi256(58) #5f5f00 / ansi256(189) #d7d7ff |
+| danger | selected | 4.5 | 4.68 | 5.33 | ansi256(124) #af0000 / ansi256(189) #d7d7ff |
 | focus | surface | 3 | 8.76 | 10.60 | ansi256(20) #0000d7 / ansi256(231) #ffffff |
 | focus | bg | 3 | 8.24 | 9.14 | ansi256(20) #0000d7 / ansi256(255) #eeeeee |
 | accent | selected | 3 | 6.49 | 7.60 | ansi256(20) #0000d7 / ansi256(189) #d7d7ff |
@@ -33,6 +36,9 @@
 | success | surface | 4.5 | 10.33 | 10.04 | ansi256(115) #87d7af / ansi256(234) #1c1c1c |
 | warning | surface | 4.5 | 10.75 | 11.33 | ansi256(186) #d7d787 / ansi256(234) #1c1c1c |
 | danger | surface | 4.5 | 8.90 | 9.74 | ansi256(217) #ffafaf / ansi256(234) #1c1c1c |
+| success | selected | 4.5 | 6.11 | 7.64 | ansi256(115) #87d7af / ansi256(19) #0000af |
+| warning | selected | 4.5 | 6.36 | 8.62 | ansi256(186) #d7d787 / ansi256(19) #0000af |
+| danger | selected | 4.5 | 5.27 | 7.41 | ansi256(217) #ffafaf / ansi256(19) #0000af |
 | focus | surface | 3 | 8.79 | 8.44 | ansi256(147) #afafff / ansi256(234) #1c1c1c |
 | focus | bg | 3 | 9.47 | 9.28 | ansi256(147) #afafff / ansi256(233) #121212 |
 | accent | selected | 3 | 5.20 | 6.42 | ansi256(147) #afafff / ansi256(19) #0000af |

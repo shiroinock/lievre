@@ -152,6 +152,10 @@ export const PAIRS: [fg: keyof Palette, bg: keyof Palette, min: number][] = [
   ['success', 'surface', 4.5],
   ['warning', 'surface', 4.5],
   ['danger', 'surface', 4.5],
+  // The status word also sits on the selected table row.
+  ['success', 'selected', 4.5],
+  ['warning', 'selected', 4.5],
+  ['danger', 'selected', 4.5],
   ['focus', 'surface', 3],
   ['focus', 'bg', 3],
   ['accent', 'selected', 3],

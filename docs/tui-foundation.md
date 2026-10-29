@@ -133,17 +133,17 @@ references/ docs/            リポジトリ全体のもの
 
 ### 改名（KEI → lievre）
 
-| 対象                | いま                                                                                                         | 改名後（案）                                                         | 数（`git grep` で数えた）              |
-| ------------------- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------- | -------------------------------------- |
-| パッケージ          | `@kei-design/react`                                                                                          | `@lievre/tokens`・`@lievre/react`・`@lievre/tui`                     | 52か所                                 |
-| 部品の入口          | `KeiProvider`                                                                                                | `LievreProvider`                                                     | 70か所                                 |
-| 根のクラス          | `.kei`、`.kei-portal`                                                                                        | `.lievre`、`.lievre-portal`                                          |                                        |
-| 部品のクラスの頭    | `.k-`                                                                                                        | `.lv-`                                                               | `src` に543か所                        |
-| トークンの頭        | `--k-`                                                                                                       | `--lv-`                                                              | `src` に759か所                        |
-| カスケードの層      | `kei.tokens`・`kei.base`・`kei.components`・`kei.utilities`                                                  | `lievre.tokens` など                                                 | 約30か所                               |
-| lint のルールの名前 | `kei/spacing-grid` など、`settings.kei`                                                                      | `lievre/spacing-grid`、`settings.lievre`                             | stylelint 8、ESLint・Oxlint・Biome     |
-| 書体の名前          | `KEI Mono`（`fonts.css`）、`KEI Worn Sans`・`KEI Worn Mono`（`claude/kei-wear-age` の枝）、試作の `KEI Term` | `Lievre Mono`、`Lievre Worn Sans`・`Lievre Worn Mono`、`Lievre Term` | `KEI Mono` 22か所                      |
-| 文書とデモ          | README・DESIGN・AGENTS・CONTRIBUTING・`docs/`・`llms.txt`・デモの画面と Storybook の題                       | lievre                                                               | `kei`・`KEI`・`Kei` を含むファイルは72 |
+| 対象                | いま                                                                                      | 改名後（案）                                          | 数（`git grep` で数えた）              |
+| ------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------- |
+| パッケージ          | `@kei-design/react`                                                                       | `@lievre/tokens`・`@lievre/react`・`@lievre/tui`      | 52か所                                 |
+| 部品の入口          | `KeiProvider`                                                                             | `LievreProvider`                                      | 70か所                                 |
+| 根のクラス          | `.kei`、`.kei-portal`                                                                     | `.lievre`、`.lievre-portal`                           |                                        |
+| 部品のクラスの頭    | `.k-`                                                                                     | `.lv-`                                                | `src` に543か所                        |
+| トークンの頭        | `--k-`                                                                                    | `--lv-`                                               | `src` に759か所                        |
+| カスケードの層      | `kei.tokens`・`kei.base`・`kei.components`・`kei.utilities`                               | `lievre.tokens` など                                  | 約30か所                               |
+| lint のルールの名前 | `kei/spacing-grid` など、`settings.kei`                                                   | `lievre/spacing-grid`、`settings.lievre`              | stylelint 8、ESLint・Oxlint・Biome     |
+| 書体の名前          | `KEI Mono`（`fonts.css`）、`KEI Worn Sans`・`KEI Worn Mono`（`claude/kei-wear-age` の枝） | `Lievre Mono`、`Lievre Worn Sans`・`Lievre Worn Mono` | `KEI Mono` 22か所                      |
+| 文書とデモ          | README・DESIGN・AGENTS・CONTRIBUTING・`docs/`・`llms.txt`・デモの画面と Storybook の題    | lievre                                                | `kei`・`KEI`・`Kei` を含むファイルは72 |
 
 **クラスとトークンの頭は `.lv-` と `--lv-` を推します。**
 
@@ -175,7 +175,7 @@ references/ docs/            リポジトリ全体のもの
 | **Ink**         | 8.0.0（2026-10-03）       | React。Flexbox（Yoga）で配置               | **推奨。** Node.js 22 で動き、このリポジトリの React 19.3.1 をそのまま使える。スクリーンリーダー向けの出力、Tab でのフォーカス、`renderToString` が揃っている                              |
 | OpenTUI         | 0.8.0（2026-10-29）       | React か Solid。中核は Zig                 | 次の候補。速さと、テストの道具（文字と色の区間を取り出せる）は Ink より上。ただし、Bun か Node.js 26.4 以上の実験の旗が要り、1.0 の前で変更が速く、スクリーンリーダーと Tab での巡回がない |
 | terminal-kit    | 3.1.4（2026-07-19）       | 命令的な API。React では書けない           | 保守は続いているが、KEI の部品の書き方と離れる                                                                                                                                             |
-| blessed         | 0.1.81（2015-09-03）      | 命令的な API。react-blessed（0.7.2、2022） | 保守が止まっている                                                                                                                                                                         |
+| blessed         | 0.1.81（2015-09-03）      | 命令的な API。react-blessed（0.7.2、2021） | 保守が止まっている                                                                                                                                                                         |
 | @unblessed/core | 1.0.0-alpha.23（2025-12） | blessed の後継を目指すもの                 | alpha のまま、約10か月公開がない                                                                                                                                                           |
 
 OpenTUI は、作業用のフォルダに Bun 1.4.4 と `@opentui/core` 0.7.0 を入れて、`createTestRenderer` で KEI のカードに近い形を描きました。日本語は2セルで揃いました。`●` と `×`（幅が曖昧な字）は1セルで、Ink と同じ扱いでした。このリポジトリには入れていません。
@@ -261,7 +261,7 @@ OpenTUI に移るときに書き直すのは `src/ink` だけで、色と字の�
 
 chalk は `FORCE_COLOR` を優先するので、KEI が段階を決めたあとで `chalk.level` を上書きします。
 
-256色に落とした結果は、Paper と Ink の両方で、13の組み合わせがすべて基準を満たしました（`spikes/tui/out/contrast.md`）。Ink の面（`#11143A`）は、近い色がない紺なので、灰色の `#1C1C1C` になります。色みが変わる点は、トークンの側で256色向けの値を指定できるようにするかを、あとで決めます。
+256色に落とした結果は、Paper と Ink の両方で、16の組み合わせがすべて基準を満たしました（`spikes/tui/out/contrast.md`）。表の選んだ行には状態の言葉も載るので、状態の色と選んだ行の組も検査します。Paper の黄（`warning`）は、この組を満たすために、茶に近い `#875F00` ではなくオリーブの `#5F5F00` に落ちます。Ink の面（`#11143A`）は、近い色がない紺なので、灰色の `#1C1C1C` になります。色みが変わる点は、トークンの側で256色向けの値を指定できるようにするかを、あとで決めます。
 
 ### 明るい背景と暗い背景
 
