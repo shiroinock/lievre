@@ -11,8 +11,9 @@ import { readFileSync } from 'node:fs';
 export type Level = 'truecolor' | '256' | '16' | 'none';
 export type ThemeName = 'paper' | 'ink';
 
+// After the move to workspaces this becomes `import tokens from '@lievre/tokens/tokens.json'`.
 const tokens = JSON.parse(
-  readFileSync(new URL('../../../tokens/tokens.json', import.meta.url), 'utf8'),
+  readFileSync(new URL('../../../../tokens/tokens.json', import.meta.url), 'utf8'),
 ) as Record<ThemeName, Record<string, { $value: string }>>;
 
 /** Token value for a theme; Ink only overrides colors, so the rest comes from Paper. */

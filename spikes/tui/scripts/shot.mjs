@@ -1,7 +1,7 @@
 // Plays out/*.ans in xterm.js (the terminal emulator inside VS Code) in Chromium and saves
 // out/*.png. Run scripts/capture.tsx first.
 //   node scripts/shot.mjs
-// The KEI Term screens are shot twice: with the font installed, and without it (the fallback).
+// The Lievre Term screens are shot twice: with the font installed, and without it (the fallback).
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { chromium } from 'playwright';
 
@@ -44,7 +44,7 @@ const font = (path) => new URL(path, root).href;
 const html = `<!doctype html><meta charset="utf-8">
 <link rel="stylesheet" href="${new URL('node_modules/@xterm/xterm/css/xterm.css', here).href}">
 <style>
-  @font-face { font-family: 'KEI Term'; src: url('${new URL('font/KEITerm-Regular.ttf', here).href}'); }
+  @font-face { font-family: 'Lievre Term'; src: url('${new URL('font/LievreTerm-Regular.ttf', here).href}'); }
   @font-face { font-family: 'IBM Plex Mono'; src: url('${font('node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2')}'); }
   @font-face { font-family: 'IBM Plex Mono'; font-weight: 700; src: url('${font('node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2')}'); }
   body { margin: 0; }
@@ -56,7 +56,7 @@ const html = `<!doctype html><meta charset="utf-8">
 
 const files = readdirSync(out).filter((f) => f.endsWith('.ans'));
 const jobs = files.map((f) => ({ file: f, png: f.replace('.ans', '.png'), installed: true }));
-for (const f of files.filter((f) => f.includes('kei-term'))) {
+for (const f of files.filter((f) => f.includes('lievre-term'))) {
   jobs.push({ file: f, png: f.replace('.ans', '-no-font.png'), installed: false });
 }
 
@@ -70,12 +70,12 @@ for (const job of jobs) {
   const data = readFileSync(new URL(job.file, out), 'utf8');
   // Japanese falls back to the system's Hiragino, as in a real terminal on macOS.
   const family = job.installed
-    ? "'KEI Term', 'Hiragino Sans', monospace"
+    ? "'Lievre Term', 'Hiragino Sans', monospace"
     : "'IBM Plex Mono', 'Hiragino Sans', monospace";
   await page.evaluate(
     async ({ data, theme, family }) => {
       await Promise.all([
-        document.fonts.load("16px 'KEI Term'"),
+        document.fonts.load("16px 'Lievre Term'"),
         document.fonts.load("16px 'IBM Plex Mono'"),
         document.fonts.load("bold 16px 'IBM Plex Mono'"),
       ]);

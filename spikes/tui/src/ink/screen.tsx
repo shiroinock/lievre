@@ -1,8 +1,8 @@
 // The sample screen: a card with a figure and two buttons, and a table of jobs.
 import { Box, Text } from 'ink';
-import { Button, Card, Kei, Status, Table, type Column, type State } from './components.js';
-import type { Glyphs } from './glyphs.js';
-import type { Palette } from './palette.js';
+import { Button, Card, Lievre, Status, Table, type Column, type State } from './components.js';
+import type { Glyphs } from '../core/glyphs.js';
+import type { Palette } from '../core/palette.js';
 
 type Job = { name: string; count: number; seconds: number; state: State };
 
@@ -43,7 +43,7 @@ export function Screen({
   caption?: string;
 }) {
   return (
-    <Kei.Provider value={{ p, g }}>
+    <Lievre.Provider value={{ p, g }}>
       <Box flexDirection="column" width={56} gap={1}>
         {/* Outside KEI's surfaces the text keeps the terminal's own colors. */}
         {caption && <Text bold>{caption}</Text>}
@@ -65,7 +65,7 @@ export function Screen({
           <Table columns={COLUMNS} rows={JOBS} selected={focus === 'table' ? row : undefined} />
         </Card>
       </Box>
-    </Kei.Provider>
+    </Lievre.Provider>
   );
 }
 

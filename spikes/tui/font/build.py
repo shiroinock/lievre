@@ -1,4 +1,4 @@
-"""Builds the trial "KEI Term" font: IBM Plex Mono (Latin) with ten KEI glyphs in the private use area.
+"""Builds the trial "Lievre Term" font: IBM Plex Mono (Latin) with ten KEI glyphs in the private use area.
 
 The added glyphs fill one terminal cell each (600 units wide, from the descender -275 to the
 ascender 1025) so lines meet the next cell:
@@ -9,10 +9,10 @@ ascender 1025) so lines meet the next cell:
   U+E508–E509  focus ring: a thin bracket with a gap before the cap, like outline-offset
 
 U+E500–U+E53F lies in a gap that Nerd Fonts 3.5.1 leaves free (its glyphs stop at U+E3E3 and
-start again at U+E5FA), so KEI Term can sit next to a Nerd Font in a fallback list.
+start again at U+E5FA), so Lievre Term can sit next to a Nerd Font in a fallback list.
 
 IBM Plex is licensed under the SIL OFL 1.1 with the Reserved Font Name "Plex", so the result is
-named "KEI Term" and carries the OFL (OFL.txt next to this file).
+named "Lievre Term" and carries the OFL (OFL.txt next to this file).
 
 Usage: python3 -I spikes/tui/font/build.py   (requires fontTools and brotli)
        python3 -I spikes/tui/font/build.py check
@@ -28,7 +28,7 @@ from fontTools.ttLib import TTFont
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 SOURCE = ROOT / 'node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2'
-OUT = HERE / 'KEITerm-Regular.ttf'
+OUT = HERE / 'LievreTerm-Regular.ttf'
 
 W, TOP, BOTTOM = 600, 1025, -275
 MID_X, MID_Y = W / 2, (TOP + BOTTOM) / 2
@@ -37,16 +37,16 @@ STROKE, RADIUS = 50, 200
 BLEED = 12
 
 CODEPOINTS = {
-    0xE500: 'kei.frame.topLeft',
-    0xE501: 'kei.frame.topRight',
-    0xE502: 'kei.frame.bottomLeft',
-    0xE503: 'kei.frame.bottomRight',
-    0xE504: 'kei.frame.horizontal',
-    0xE505: 'kei.frame.vertical',
-    0xE506: 'kei.button.capLeft',
-    0xE507: 'kei.button.capRight',
-    0xE508: 'kei.focus.left',
-    0xE509: 'kei.focus.right',
+    0xE500: 'lievre.frame.topLeft',
+    0xE501: 'lievre.frame.topRight',
+    0xE502: 'lievre.frame.bottomLeft',
+    0xE503: 'lievre.frame.bottomRight',
+    0xE504: 'lievre.frame.horizontal',
+    0xE505: 'lievre.frame.vertical',
+    0xE506: 'lievre.button.capLeft',
+    0xE507: 'lievre.button.capRight',
+    0xE508: 'lievre.focus.left',
+    0xE509: 'lievre.focus.right',
 }
 
 
@@ -178,16 +178,16 @@ def bracket(pen, left):
 def glyph(name, font):
     pen = TTGlyphPen(font.getGlyphSet())
     h = STROKE / 2
-    if name == 'kei.frame.horizontal':
+    if name == 'lievre.frame.horizontal':
         rect(pen, -BLEED, MID_Y - h, W + BLEED, MID_Y + h)
-    elif name == 'kei.frame.vertical':
+    elif name == 'lievre.frame.vertical':
         rect(pen, MID_X - h, BOTTOM - BLEED, MID_X + h, TOP + BLEED)
-    elif name.startswith('kei.frame.'):
+    elif name.startswith('lievre.frame.'):
         which = name.split('.')[-1]
         sx = 1 if 'Left' in which else -1
         sy = 1 if which.startswith('top') else -1
         corner(pen, sx, sy)
-    elif name.startswith('kei.button.'):
+    elif name.startswith('lievre.button.'):
         rounded_half(pen, name.endswith('Left'))
     else:
         bracket(pen, name.endswith('left'))
@@ -210,13 +210,13 @@ def build():
             table.cmap.update({cp: name for cp, name in CODEPOINTS.items()})
     font['maxp'].numGlyphs = len(order)
     names = {
-        1: 'KEI Term',
+        1: 'Lievre Term',
         2: 'Regular',
-        3: 'KEI Term Regular trial',
-        4: 'KEI Term Regular',
+        3: 'Lievre Term Regular trial',
+        4: 'Lievre Term Regular',
         5: 'Version 0.0.1 (trial; from IBM Plex Mono 2.3)',
-        6: 'KEITerm-Regular',
-        16: 'KEI Term',
+        6: 'LievreTerm-Regular',
+        16: 'Lievre Term',
         17: 'Regular',
     }
     name_table = font['name']
@@ -226,7 +226,7 @@ def build():
         name_table.setName(value, nid, 1, 0, 0)
     # The OFL notice stays, and a line says what changed.
     name_table.setName(
-        'Copyright 2017 IBM Corp. Modified 2026 for KEI (added private use glyphs).', 0, 3, 1, 0x409
+        'Copyright 2017 IBM Corp. Modified 2026 for lievre (added private use glyphs).', 0, 3, 1, 0x409
     )
     font.save(OUT)
     print(f'wrote {OUT.relative_to(ROOT)} ({OUT.stat().st_size} bytes)')

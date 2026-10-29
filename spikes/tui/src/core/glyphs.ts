@@ -1,14 +1,14 @@
 // The characters KEI draws with. A terminal app cannot ask which font the terminal uses, so the
-// set is chosen by the user: KEI_GLYPHS=unicode (default) | kei-term | ascii.
+// set is chosen by the user: LIEVRE_GLYPHS=unicode (default) | lievre-term | ascii.
 //
 // Box drawing (U+2500–) and most block elements are East Asian Width "Ambiguous": a terminal set
 // to draw ambiguous characters double-wide (common with Japanese fonts) gives them 2 cells, and
-// every frame drawn with them falls apart. KEI_AMBIGUOUS=wide therefore switches to ASCII,
-// whose width never changes. The private use area is Ambiguous too, so KEI Term has the same
+// every frame drawn with them falls apart. LIEVRE_AMBIGUOUS=wide therefore switches to ASCII,
+// whose width never changes. The private use area is Ambiguous too, so Lievre Term has the same
 // limit.
 import type { BoxStyle } from 'cli-boxes';
 
-export type GlyphSet = 'unicode' | 'kei-term' | 'ascii';
+export type GlyphSet = 'unicode' | 'lievre-term' | 'ascii';
 
 export type Glyphs = {
   set: GlyphSet;
@@ -30,7 +30,7 @@ export type Glyphs = {
   stop: string;
 };
 
-/** KEI Term private use code points, U+E500–U+E53F (outside Nerd Fonts 3.5.1). See font/build.py. */
+/** Lievre Term private use code points, U+E500–U+E53F (outside Nerd Fonts 3.5.1). See font/build.py. */
 export const PUA = {
   topLeft: '',
   topRight: '',
@@ -68,9 +68,9 @@ const unicode: Glyphs = {
   stop: '✕',
 };
 
-const keiTerm: Glyphs = {
+const termFont: Glyphs = {
   ...unicode,
-  set: 'kei-term',
+  set: 'lievre-term',
   frame: {
     topLeft: PUA.topLeft,
     top: PUA.horizontal,
@@ -111,8 +111,8 @@ const ascii: Glyphs = {
 };
 
 export function glyphs(env = process.env): Glyphs {
-  if (env.KEI_AMBIGUOUS === 'wide') return ascii;
-  if (env.KEI_GLYPHS === 'kei-term') return keiTerm;
-  if (env.KEI_GLYPHS === 'ascii' || env.TERM === 'dumb') return ascii;
+  if (env.LIEVRE_AMBIGUOUS === 'wide') return ascii;
+  if (env.LIEVRE_GLYPHS === 'lievre-term') return termFont;
+  if (env.LIEVRE_GLYPHS === 'ascii' || env.TERM === 'dumb') return ascii;
   return unicode;
 }

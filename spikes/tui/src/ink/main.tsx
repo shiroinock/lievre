@@ -1,19 +1,19 @@
 // Interactive sample: Tab / Shift+Tab move the focus, ↑↓ move the selected row, q quits.
 //   npx tsx src/main.tsx
-// KEI_THEME=paper|ink, KEI_GLYPHS=unicode|kei-term|ascii, KEI_AMBIGUOUS=wide, NO_COLOR, FORCE_COLOR.
+// LIEVRE_THEME=paper|ink, LIEVRE_GLYPHS=unicode|lievre-term|ascii, LIEVRE_AMBIGUOUS=wide, NO_COLOR, FORCE_COLOR.
 import chalk from 'chalk';
 import { render, useApp, useInput, useStdin } from 'ink';
 import { useState } from 'react';
-import { glyphs } from './glyphs.js';
-import { detectLevel, palette, rgb, type ThemeName } from './palette.js';
+import { glyphs } from '../core/glyphs.js';
+import { detectLevel, palette, rgb, type ThemeName } from '../core/palette.js';
 import { ROWS, Screen, type Focus } from './screen.js';
 
 /**
- * Light or dark: KEI_THEME first, then the terminal's background from an OSC 11 query
+ * Light or dark: LIEVRE_THEME first, then the terminal's background from an OSC 11 query
  * (answered by xterm, iTerm2, kitty, WezTerm, Ghostty, Windows Terminal, …), then COLORFGBG.
  */
 async function detectTheme(): Promise<ThemeName> {
-  const named = process.env.KEI_THEME;
+  const named = process.env.LIEVRE_THEME;
   if (named === 'paper' || named === 'ink') return named;
   const bg = await queryBackground();
   if (bg) {

@@ -3,14 +3,14 @@
 import { Box, Text } from 'ink';
 import { createContext, useContext, type ReactNode } from 'react';
 import stringWidth from 'string-width';
-import type { Glyphs } from './glyphs.js';
-import type { Palette } from './palette.js';
+import type { Glyphs } from '../core/glyphs.js';
+import type { Palette } from '../core/palette.js';
 
-export const Kei = createContext<{ p: Palette; g: Glyphs }>(null!);
-const useKei = () => useContext(Kei);
+export const Lievre = createContext<{ p: Palette; g: Glyphs }>(null!);
+const useLievre = () => useContext(Lievre);
 
 export function Card({ title, children }: { title?: string; children: ReactNode }) {
-  const { p, g } = useKei();
+  const { p, g } = useLievre();
   return (
     <Box
       flexDirection="column"
@@ -41,22 +41,22 @@ export function Button({
   variant?: 'primary' | 'secondary';
   focused?: boolean;
 }) {
-  const { p, g } = useKei();
+  const { p, g } = useLievre();
   const primary = variant === 'primary';
   // Without known colors the primary button is reverse video: the terminal's own text and
   // background swapped, so its contrast is the user's own text contrast.
   const fill = p.paints ? (primary ? p.accent : p.sunken) : undefined;
   const ink = p.paints ? (primary ? p.onAccent : p.text) : undefined;
   const inverse = !p.paints && primary;
-  // Filled caps (KEI Term) take the button's color as their foreground; spaces take it as background.
+  // Filled caps (Lievre Term) take the button's color as their foreground; spaces take it as background.
   const cap = (char: string) =>
-    g.set === 'kei-term' && p.paints ? (
+    g.set === 'lievre-term' && p.paints ? (
       <Text color={fill} backgroundColor={p.surface}>
         {char}
       </Text>
     ) : (
       <Text backgroundColor={fill} inverse={inverse}>
-        {char === ' ' || g.set !== 'kei-term' ? ' ' : char}
+        {char === ' ' || g.set !== 'lievre-term' ? ' ' : char}
       </Text>
     );
   const ring = (char: string) => (
@@ -106,7 +106,7 @@ export function Table<Row>({
   rows: Row[];
   selected?: number;
 }) {
-  const { p, g } = useKei();
+  const { p, g } = useLievre();
   const total = 1 + columns.reduce((sum, c) => sum + c.width + 2, 0);
   return (
     // No aria-label here: in Ink's screen reader output a label replaces the content, rows and all.
@@ -152,7 +152,7 @@ const WORDS: Record<State, string> = { ok: '正常', warn: '注意', stop: '停�
 
 /** The mark and the word together: color repeats the meaning, never carries it alone. */
 export function Status({ state, width }: { state: State; width: number }) {
-  const { p, g } = useKei();
+  const { p, g } = useLievre();
   const color = { ok: p.success, warn: p.warning, stop: p.danger }[state];
   const mark = { ok: g.ok, warn: g.warn, stop: g.stop }[state];
   return (

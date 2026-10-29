@@ -1,10 +1,10 @@
 {
-  "name": "kei-spike-tui",
+  "name": "@lievre/tui",
   "private": true,
   "type": "module",
-  "description": "KEI のデザイン言語を端末に広げる試作。本体には入れない。react はリポジトリの直下のものを使う。",
+  "description": "lievre（いまの KEI）の端末向けパッケージの試作。仮の名前で、公開しない。モノレポに移すまではリポジトリの直下の react と tokens/tokens.json を使う。",
   "scripts": {
-    "start": "tsx src/main.tsx",
+    "start": "tsx src/ink/main.tsx",
     "capture": "tsx scripts/capture.tsx",
     "shot": "node scripts/shot.mjs",
     "font": "python3 -I font/build.py",

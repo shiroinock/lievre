@@ -4,9 +4,16 @@
 import chalk from 'chalk';
 import { renderToString } from 'ink';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { glyphs, type GlyphSet } from '../src/glyphs.js';
-import { PAIRS, contrast, palette, resolved, type Level, type ThemeName } from '../src/palette.js';
-import { Screen } from '../src/screen.js';
+import { glyphs, type GlyphSet } from '../src/core/glyphs.js';
+import {
+  PAIRS,
+  contrast,
+  palette,
+  resolved,
+  type Level,
+  type ThemeName,
+} from '../src/core/palette.js';
+import { Screen } from '../src/ink/screen.js';
 
 const out = new URL('../out/', import.meta.url);
 mkdirSync(out, { recursive: true });
@@ -21,7 +28,7 @@ const LEVEL_NAMES: Record<Level, string> = {
 const THEME_NAMES: Record<ThemeName, string> = { paper: 'Paper', ink: 'Ink' };
 const GLYPH_NAMES: Record<GlyphSet, string> = {
   unicode: '標準の文字',
-  'kei-term': 'KEI Term',
+  'lievre-term': 'Lievre Term',
   ascii: 'ASCII',
 };
 
@@ -33,8 +40,8 @@ const shots: [Level, ThemeName, GlyphSet][] = [
   ['16', 'paper', 'unicode'],
   ['16', 'ink', 'unicode'],
   ['none', 'paper', 'unicode'],
-  ['truecolor', 'paper', 'kei-term'],
-  ['truecolor', 'ink', 'kei-term'],
+  ['truecolor', 'paper', 'lievre-term'],
+  ['truecolor', 'ink', 'lievre-term'],
   ['16', 'paper', 'ascii'],
 ];
 
@@ -44,7 +51,7 @@ for (const [level, theme, set] of shots) {
   const text = renderToString(
     <Screen
       p={palette(level, theme)}
-      g={glyphs({ KEI_GLYPHS: set })}
+      g={glyphs({ LIEVRE_GLYPHS: set })}
       focus="save"
       row={1}
       caption={caption}
@@ -53,7 +60,7 @@ for (const [level, theme, set] of shots) {
   );
   // Selected row and focus on the table too, in a second frame.
   const table = renderToString(
-    <Screen p={palette(level, theme)} g={glyphs({ KEI_GLYPHS: set })} focus="table" row={2} />,
+    <Screen p={palette(level, theme)} g={glyphs({ LIEVRE_GLYPHS: set })} focus="table" row={2} />,
     { columns: 60 },
   );
   writeFileSync(new URL(`${level}-${theme}-${set}.ans`, out), `${text}\n\n${table}\n`);
