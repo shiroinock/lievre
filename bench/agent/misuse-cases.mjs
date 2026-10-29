@@ -65,8 +65,9 @@ export const Case = () => <Button variant="primary">保存する</Button>;`,
   {
     id: 'table-page-before-sort',
     task: 'T2',
-    mistake: '区切った1ページ分の rows を DataTable に渡し、並べ替えを DataTable 任せにする',
-    fix: ['sorting', 'onSortingChange'],
+    mistake:
+      '区切った1ページ分の rows を DataTable に渡し、Pagination を横に置く（並べ替えは1ページの中だけになる）',
+    fix: ['pageSize'],
     code: `import { DataTable, Pagination } from '@kei-design/react';
 import { useState } from 'react';
 type Row = { id: string; amount: number };

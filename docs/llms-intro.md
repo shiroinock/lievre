@@ -36,26 +36,46 @@ import '@kei-design/react/styles.css';
 
 ## 表の並べ替えとページ送り
 
-DataTable は渡された `rows` の中だけで並べ替えます。ページ送りでは全件を自分で並べ替えてから区切り、並べ替えの状態を `sorting` / `onSortingChange` で持ちます。
+ページ送りは DataTable に任せます。手元にある全件を `rows` に渡して `pageSize` を付けると、DataTable が全件を並べ替えてから区切り、表の下に件数と前後のページ送りを描きます。並べ替えを変えると1ページ目に戻ります。自分で `slice` した行を渡したり、`Pagination` を横に並べたりはしません。
 
 ```tsx
-const [sort, setSort] = useState<TableSort>(null);
-const [page, setPage] = useState(1);
-const sorted = useMemo(() => {
-  const col = columns.find((c) => c.key === sort?.key);
-  if (!sort || !col?.sortValue) return all;
-  const v = col.sortValue;
-  return [...all].sort((a, b) => (v(a) < v(b) ? -1 : v(a) > v(b) ? 1 : 0) * (sort.direction === 'asc' ? 1 : -1));
-}, [all, sort]);
-<DataTable caption="請求書" rows={sorted.slice((page - 1) * 10, page * 10)} columns={columns}
-  getRowId={(r) => r.id} sorting={sort} onSortingChange={(s) => { setSort(s); setPage(1); }} />
-<Pagination page={page} totalPages={Math.ceil(all.length / 10)} onPageChange={setPage} />
+// const [page, setPage] = useState(1);
+<DataTable
+  caption="請求書"
+  rows={filtered}
+  columns={columns}
+  getRowId={(r) => r.id}
+  pageSize={10}
+  page={page}
+  onPageChange={setPage}
+/>
+```
+
+`page` を渡さなければ DataTable が持ちます。絞り込みを変えたときに1ページ目へ戻すなら、上のように外で持って `setPage(1)` します。
+
+サーバーが並べ替えて区切った1ページ分を受け取るときは `dataMode="server"` にします。手元では並べ替えず、`totalCount` からページ数を出します。この形では `sorting` / `onSortingChange` / `page` / `onPageChange` / `pageSize` / `totalCount` が型で必須です。
+
+```tsx
+<DataTable
+  dataMode="server"
+  caption="請求書"
+  rows={data.items}
+  totalCount={data.total}
+  columns={columns}
+  getRowId={(r) => r.id}
+  loading={isFetching}
+  sorting={sort}
+  onSortingChange={setSort}
+  pageSize={10}
+  page={page}
+  onPageChange={setPage}
+/>
 ```
 
 ## 確かめ方
 
 - 型（`tsc --noEmit`）が誤った props の大半を止めます。
-- 型で止まらない誤用は、`@kei-design/react/lint` の lint ルールが止めます（フォームの Button の `type` 忘れ、Metric の `value` の単位、閉じられない Dialog、アイコンだけの Button など10個）。メッセージに直し方が書いてあるので、そのとおりに直します。ESLint と Oxlint は同じプラグイン、Biome は GritQL のファイルで、設定は README の「lint」にあります。
+- 型で止まらない誤用は、`@kei-design/react/lint` の lint ルールが止めます（フォームの Button の `type` 忘れ、Metric の `value` の単位、閉じられない Dialog、アイコンだけの Button、DataTable の外に置いたページ送りなど11個）。メッセージに直し方が書いてあるので、そのとおりに直します。ESLint と Oxlint は同じプラグイン、Biome は GritQL のファイルで、設定は README の「lint」にあります。
   - ESLint：`import kei from '@kei-design/react/lint'` を読み込み、flat config に `{ files: ['**/*.tsx'], languageOptions: { parser: tseslint.parser }, ...kei.configs.recommended }` を足します。
   - Oxlint：`.oxlintrc.json` に `"jsPlugins": ["@kei-design/react/lint"]` と、`"rules"` に `"kei/button-type-in-form": "error"` などを書きます。
-- lint でも見えないもの：KeiProvider の包み忘れ（ファイルをまたぐため）と、ページ送りで区切った後の並べ替え（上の「表の並べ替えとページ送り」）。書いた後に見直してください。
+- lint でも見えないもの：KeiProvider の包み忘れ（ファイルをまたぐため）。書いた後に見直してください。

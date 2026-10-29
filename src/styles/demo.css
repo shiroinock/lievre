@@ -843,16 +843,6 @@ body:has(.kei-app) {
   font-size: var(--k-text-sm);
   font-weight: var(--k-weight-bold);
 }
-.queue-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 20px;
-  border-top: 1px solid var(--k-border);
-  font-size: var(--k-text-sm);
-}
 .work-name {
   display: grid;
 }

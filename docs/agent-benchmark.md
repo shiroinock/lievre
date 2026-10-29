@@ -180,7 +180,7 @@ shadcn/ui、Radix Themes、MUI（v9）、Chakra UI（v3）、Mantine（v9）、G
 - `metric-unit`：Metric の `value` の文字列が `%` や `円` で終わる。「単位は unit に分けてください：value="99.95" unit="%"」。
 - `dialog-close`：Dialog の `footer` にある Button が `onClick` を持たず、DialogClose にも包まれていない。
 
-→ `lint/` に入れ、ESLint・Oxlint・Biome で使えるようにしました（README の「lint」）。誤用ベンチは 40 → 48 / 63 点です。`table-sort-before-page` は、`slice` のような汎用のメソッドを見張る形では流し込み方が増えるたびに直すことになるため外しました。DataTable にページ分けを持たせて、誤った順番を書けない作りにする方針です（別の PR）。`dialog-cancel-not-close` は、例が `open` だけを渡しているため、先に「onOpenChange を渡す」の指摘が出て、DialogClose の言葉までは届きません。
+→ `lint/` に入れ、ESLint・Oxlint・Biome で使えるようにしました（README の「lint」）。誤用ベンチは 40 → 48 / 63 点です。`table-sort-before-page` は、`slice` のような汎用のメソッドを見張る形では流し込み方が増えるたびに直すことになるため外しました。代わりに DataTable にページ分け（`pageSize`）とサーバー任せの形（`dataMode="server"`）を持たせ、誤った順番を書けない作りにしました。lint は、並べ替えのある DataTable と Pagination を同じ部品（いちばん近い関数）の中で使い、DataTable のページ分けを使っていない組み合わせだけを見る `table-pagination` にし、誤用ベンチは 51 / 63 点です。`dialog-cancel-not-close` は、例が `open` だけを渡しているため、先に「onOpenChange を渡す」の指摘が出て、DialogClose の言葉までは届きません。
 
 ### 2. 開発時の警告
 

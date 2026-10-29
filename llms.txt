@@ -36,29 +36,49 @@ import '@kei-design/react/styles.css';
 
 ## 表の並べ替えとページ送り
 
-DataTable は渡された `rows` の中だけで並べ替えます。ページ送りでは全件を自分で並べ替えてから区切り、並べ替えの状態を `sorting` / `onSortingChange` で持ちます。
+ページ送りは DataTable に任せます。手元にある全件を `rows` に渡して `pageSize` を付けると、DataTable が全件を並べ替えてから区切り、表の下に件数と前後のページ送りを描きます。並べ替えを変えると1ページ目に戻ります。自分で `slice` した行を渡したり、`Pagination` を横に並べたりはしません。
 
 ```tsx
-const [sort, setSort] = useState<TableSort>(null);
-const [page, setPage] = useState(1);
-const sorted = useMemo(() => {
-  const col = columns.find((c) => c.key === sort?.key);
-  if (!sort || !col?.sortValue) return all;
-  const v = col.sortValue;
-  return [...all].sort((a, b) => (v(a) < v(b) ? -1 : v(a) > v(b) ? 1 : 0) * (sort.direction === 'asc' ? 1 : -1));
-}, [all, sort]);
-<DataTable caption="請求書" rows={sorted.slice((page - 1) * 10, page * 10)} columns={columns}
-  getRowId={(r) => r.id} sorting={sort} onSortingChange={(s) => { setSort(s); setPage(1); }} />
-<Pagination page={page} totalPages={Math.ceil(all.length / 10)} onPageChange={setPage} />
+// const [page, setPage] = useState(1);
+<DataTable
+  caption="請求書"
+  rows={filtered}
+  columns={columns}
+  getRowId={(r) => r.id}
+  pageSize={10}
+  page={page}
+  onPageChange={setPage}
+/>
+```
+
+`page` を渡さなければ DataTable が持ちます。絞り込みを変えたときに1ページ目へ戻すなら、上のように外で持って `setPage(1)` します。
+
+サーバーが並べ替えて区切った1ページ分を受け取るときは `dataMode="server"` にします。手元では並べ替えず、`totalCount` からページ数を出します。この形では `sorting` / `onSortingChange` / `page` / `onPageChange` / `pageSize` / `totalCount` が型で必須です。
+
+```tsx
+<DataTable
+  dataMode="server"
+  caption="請求書"
+  rows={data.items}
+  totalCount={data.total}
+  columns={columns}
+  getRowId={(r) => r.id}
+  loading={isFetching}
+  sorting={sort}
+  onSortingChange={setSort}
+  pageSize={10}
+  page={page}
+  onPageChange={setPage}
+/>
 ```
 
 ## 確かめ方
 
 - 型（`tsc --noEmit`）が誤った props の大半を止めます。
-- 型で止まらない誤用は、`@kei-design/react/lint` の lint ルールが止めます（フォームの Button の `type` 忘れ、Metric の `value` の単位、閉じられない Dialog、アイコンだけの Button など10個）。メッセージに直し方が書いてあるので、そのとおりに直します。ESLint と Oxlint は同じプラグイン、Biome は GritQL のファイルで、設定は README の「lint」にあります。
+- 型で止まらない誤用は、`@kei-design/react/lint` の lint ルールが止めます（フォームの Button の `type` 忘れ、Metric の `value` の単位、閉じられない Dialog、アイコンだけの Button、DataTable の外に置いたページ送りなど11個）。メッセージに直し方が書いてあるので、そのとおりに直します。ESLint と Oxlint は同じプラグイン、Biome は GritQL のファイルで、設定は README の「lint」にあります。
   - ESLint：`import kei from '@kei-design/react/lint'` を読み込み、flat config に `{ files: ['**/*.tsx'], languageOptions: { parser: tseslint.parser }, ...kei.configs.recommended }` を足します。
   - Oxlint：`.oxlintrc.json` に `"jsPlugins": ["@kei-design/react/lint"]` と、`"rules"` に `"kei/button-type-in-form": "error"` などを書きます。
-- lint でも見えないもの：KeiProvider の包み忘れ（ファイルをまたぐため）と、ページ送りで区切った後の並べ替え（上の「表の並べ替えとページ送り」）。書いた後に見直してください。
+- lint でも見えないもの：KeiProvider の包み忘れ（ファイルをまたぐため）。書いた後に見直してください。
 
 ## 部品
 
@@ -220,7 +240,7 @@ const sorted = useMemo(() => {
 
 ### Pagination
 
-前後のページ送り。DataTable と組み合わせるときは、全件を並べ替えてから区切った rows を渡します。
+前後のページ送り。いまのページを「5ページ中2ページ目」と読み上げ、ページが変わると知らせます。端のページで押したボタンが無効になったら、フォーカスを反対のボタンへ移します。DataTable のページ送りには、これを横に置かずに DataTable の pageSize を使います。
 
 - `page: number` — 1 始まり。
 - `totalPages: number`
@@ -316,21 +336,26 @@ const sorted = useMemo(() => {
 
 ### DataTable
 
-ネイティブtableの意味論を維持。ソート・選択・空/読込状態を備えます。
+ネイティブtableの意味論を維持。ソート・選択・空/読込状態・ページ送りを備えます。ページ送りは pageSize を渡して DataTable に描かせ、Pagination を横に並べて自分で区切ることはしません。
 
-- `rows: T[]` — 表示する行。並べ替えはここで渡した行の中だけで行うため、ページ送りでは全件を並べ替えてから区切った行を渡し、sorting / onSortingChange で状態を持ちます。
+- `rows: T[]` — 表示する行。dataMode が 'client'（既定）なら絞り込んだ全件を渡します。DataTable が並べ替えてから pageSize ごとに区切るので、自分で区切った行は渡しません。'server' なら、サーバーが並べ替えて区切った1ページ分を渡します。
 - `columns: Column<T>[]`
 - `getRowId: (row: T) => string`
 - `caption: string` — 表の名前。画面には出さず、読み上げに使います。
-- `selectable?: boolean` — 既定 false
+- `selectable?: boolean`
 - `selectedIds?: string[]`
 - `onSelectionChange?: ((ids: string[]) => void)`
 - `onRowClick?: ((row: T) => void)`
-- `loading?: boolean` — 既定 false
-- `emptyTitle?: string` — 既定 '該当するデータがありません'
-- `emptyDescription?: string` — 既定 '条件を変えてもう一度検索してください。'
-- `sorting?: TableSort` — 渡すと並べ替えの状態を外で持ちます（ページ送りと組み合わせるとき）。見出しを押すたびに昇順と降順を切り替え、解除はしません。
-- `onSortingChange?: ((sort: TableSort) => void)`
+- `loading?: boolean` — 読み込み中の表示。dataMode="server" では、取り直している間は true にします。そのあいだの totalCount は古いことがあるので、範囲外のページを合わせるのは読み込みが終わってからです。
+- `emptyTitle?: string`
+- `emptyDescription?: string`
+- `dataMode?: 'client' | 'server'` — 'client'（既定）は、rows の全件を手元で並べ替えてから区切ります。'server' は並べ替えもページ分けもサーバーに任せ、受け取った1ページ分の rows を並べ替えずにそのまま描きます。'server' では sorting・onSortingChange・pageSize・page・onPageChange・totalCount が必須です。
+- `sorting?: TableSort` — 並べ替えの状態。'client' では渡すと外で持ち、'server' ではいまサーバーに頼んでいる並べ替えを渡します（見出しの矢印と aria-sort に使います）。見出しを押すたびに昇順と降順を切り替え、解除はしません。
+- `onSortingChange?: ((sort: TableSort) => void)` — 見出しを押したときに呼びます。'server' ではこの並べ替えで取り直します。ページ送りがあって1ページ目でなければ、続けて onPageChange(1) も呼びます。
+- `pageSize?: number` — 1ページの行数。渡すと表の下に件数とページ送り（Pagination）を描きます。'client' では全件を並べ替えてから区切ります。並べ替えを変えると1ページ目に戻ります。
+- `page?: number` — 表示するページ（1始まり）。'client' では渡さなければ DataTable が持ちます。行が減ってページが足りなくなると、最後のページ（0件なら1ページ目）に合わせて onPageChange を呼びます。絞り込みを変えたときに1ページ目へ戻すなら、外で持って 1 にします。
+- `onPageChange?: ((page: number) => void)` — ページが変わるときに呼びます。ページ送りのほか、並べ替えを変えて1ページ目に戻るときも呼びます。'server' ではこのページを取り直します。
+- `totalCount?: number` — dataMode="server" のとき、サーバーにある全件の数（絞り込んだ後）。ページ数と件数の表示に使います。
 
 ### DescriptionList
 

@@ -1,6 +1,8 @@
 import {
   forwardRef,
   useId,
+  useLayoutEffect,
+  useRef,
   type ButtonHTMLAttributes,
   type HTMLAttributes,
   type InputHTMLAttributes,
@@ -644,7 +646,7 @@ export function Breadcrumb({ items }: { items: { label: string; href?: string }[
   );
 }
 
-/** 前後のページ送り。DataTable と組み合わせるときは、全件を並べ替えてから区切った rows を渡します。 */
+/** 前後のページ送り。いまのページを「5ページ中2ページ目」と読み上げ、ページが変わると知らせます。端のページで押したボタンが無効になったら、フォーカスを反対のボタンへ移します。DataTable のページ送りには、これを横に置かずに DataTable の pageSize を使います。 */
 export function Pagination({
   page,
   totalPages,
@@ -657,23 +659,49 @@ export function Pagination({
 }) {
   const total = Math.max(1, Math.floor(totalPages));
   const current = Math.min(total, Math.max(1, page));
+  const prev = useRef<HTMLButtonElement>(null);
+  const next = useRef<HTMLButtonElement>(null);
+  const pressed = useRef<'prev' | 'next' | null>(null);
+  // A disabled button drops focus to the body. Hand it to the other button so keyboard and
+  // screen reader users stay in the pagination after reaching the first or last page.
+  useLayoutEffect(() => {
+    if (!pressed.current) return;
+    const [from, to] = pressed.current === 'next' ? [next, prev] : [prev, next];
+    pressed.current = null;
+    const active = document.activeElement;
+    if (from.current?.disabled && (active === from.current || active === document.body))
+      to.current?.focus();
+  }, [current, total]);
   return (
     <nav className="k-pagination" aria-label="ページ切り替え">
-      <span>
-        {current} / {total}
+      <span role="status">
+        <span aria-hidden>
+          {current} / {total}
+        </span>
+        <VisuallyHidden>
+          {total}ページ中 {current}ページ目
+        </VisuallyHidden>
       </span>
       <Button
+        ref={prev}
         size="sm"
         disabled={current === 1}
-        onClick={() => onPageChange(current - 1)}
+        onClick={() => {
+          pressed.current = 'prev';
+          onPageChange(current - 1);
+        }}
         aria-label="前のページ"
       >
         <ChevronLeft size={16} aria-hidden />
       </Button>
       <Button
+        ref={next}
         size="sm"
         disabled={current === total}
-        onClick={() => onPageChange(current + 1)}
+        onClick={() => {
+          pressed.current = 'next';
+          onPageChange(current + 1);
+        }}
         aria-label="次のページ"
       >
         <ChevronRight size={16} aria-hidden />
