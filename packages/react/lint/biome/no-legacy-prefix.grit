@@ -3,7 +3,7 @@ language js(typescript, jsx);
 
 or {
   JsxAttribute(name = "className", initializer = JsxAttributeInitializerClause(value = $class)) as $attribute where {
-    $class <: r"[{]?[\x22\x27\x60](?:.*\s)?k-[a-z][\w-]*(?:\s.*)?[\x22\x27\x60][}]?",
+    $class <: r"[{]?[\x22\x27\x60](?:.*\s)?k-[a-z$][^\s\x22\x27\x60]*(?:\s.*)?[\x22\x27\x60][}]?",
     register_diagnostic(span = $attribute, message = "改名の前のクラス（k- で始まるもの）は効きません。頭を lv- に変えてください（className='lv-mono'）。まとめて直すには npx lievre-migrate を使ってください。")
   },
   JsStringLiteralExpression() as $string where {

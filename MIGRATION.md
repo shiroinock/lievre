@@ -28,9 +28,11 @@ npm にはまだどちらの名前も公開していないので、移る必要�
 2. **書き換える。** まず何が変わるかを見てから、書き換えます。
 
    ```sh
-   npx lievre-migrate --dry-run src
-   npx lievre-migrate src
+   npx lievre-migrate --dry-run src eslint.config.js
+   npx lievre-migrate src eslint.config.js
    ```
+
+   渡した場所だけを書き換えます。lint の設定は `src` の外にあることが多いので、`eslint.config.js`・`.oxlintrc.json`・`biome.json` のうち使っているものも渡してください。
 
    `lievre-migrate` は `@lievre/react` に入っています。読み込み、`KeiProvider`、文字列の中のクラスと CSS 変数、層の名前、書体の名前、ESLint・Oxlint・Biome の設定を書き換えます。クラスと CSS 変数は、lievre に同じ名前（頭だけ違うもの）があるときだけ書き換えるので、アプリが自分で付けた `k-` で始まるクラスは残ります。
 

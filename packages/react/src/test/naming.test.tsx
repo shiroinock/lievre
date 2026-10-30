@@ -33,7 +33,7 @@ const OLD_NAMES: [RegExp, string][] = [
     /(?<![A-Za-z])(?:kei|KEI)(?![a-z])|Kei(?![a-z])/,
     'kei・KEI・Kei は lievre（見出しとロゴは Lièvre）に',
   ],
-  [/(?<![\w$@/-])k-[a-z]/, 'クラスの頭 k- は lv- に'],
+  [/(?<![\w$@/-])k-[a-z$]/, 'クラスの頭 k- は lv- に'],
   [/\.k-/, 'クラスの頭 .k- は .lv- に'],
   [/--k-[a-z]/, 'CSS 変数の頭 --k- は --lv- に'],
 ];
@@ -71,6 +71,17 @@ describe('the rename to lievre', () => {
         });
     }
     expect(found).toEqual([]);
+  });
+
+  it('leaves no old name in a file name', () => {
+    const allowed = ABOUT_OLD_NAMES.map(([p]) => p);
+    const found = files.filter(
+      (file) =>
+        !allowed.some((p) => p.test(file)) &&
+        !OUTSIDE_DATA.some((p) => p.test(file)) &&
+        OLD_NAMES.some(([pattern]) => pattern.test(file)),
+    );
+    expect(found, 'ファイルの名前の kei を lievre に変えてください').toEqual([]);
   });
 
   it('keeps 計器 out of the documents and the screens', () => {

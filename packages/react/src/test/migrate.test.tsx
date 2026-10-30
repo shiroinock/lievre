@@ -53,6 +53,38 @@ export default [{ files: ['**/*.tsx'], ...kei.configs.recommended }];`;
 export default [{ files: ['**/*.tsx'], ...kei.configs.recommended }];`);
   });
 
+  it('names the plugin lievre, so the rules find it', () => {
+    const config = `import kei from '@kei-design/react/lint';
+export default [{ plugins: { react, kei }, rules: { 'kei/metric-unit': 'error' } }];
+export const other = [{ plugins: { kei: plugin } }];`;
+    expect(migrate(config, names)).toBe(`import kei from '@lievre/react/lint';
+export default [{ plugins: { react, lievre: kei }, rules: { 'lievre/metric-unit': 'error' } }];
+export const other = [{ plugins: { lievre: plugin } }];`);
+  });
+
+  it('rewrites the rule names in the comments that turn rules off', () => {
+    const before = `// eslint-disable-next-line kei/metric-unit, other/rule
+/* stylelint-disable kei/spacing-grid -- 理由 */
+// 説明の中の kei/metric-unit`;
+    expect(migrate(before, names)).toBe(`// eslint-disable-next-line lievre/metric-unit, other/rule
+/* stylelint-disable lievre/spacing-grid -- 理由 */
+// 説明の中の kei/metric-unit`);
+  });
+
+  it('rewrites the root class and an unquoted font name', () => {
+    expect(migrate(`<div className="kei tag" /><div class='a kei' />`, names)).toBe(
+      `<div className="lievre tag" /><div class='a lievre' />`,
+    );
+    expect(migrate(`font-family: KEI Mono, monospace;`, names)).toBe(
+      `font-family: Lievre Mono, monospace;`,
+    );
+  });
+
+  it("leaves the app's own object that has a kei key", () => {
+    const own = `const people = { kei: { name: '慶' } };`;
+    expect(migrate(own, names)).toBe(own);
+  });
+
   it("leaves the app's own names that only look like lievre's", () => {
     const own = `<div className="k-hero desk-top" style={{ color: 'var(--k-brand)' }} />`;
     expect(migrate(own, names)).toBe(own);

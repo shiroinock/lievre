@@ -427,6 +427,14 @@ const rules = {
               .some((c) => legacyClass.test(c))
           )
             context.report({ node, messageId: 'class' });
+          // A class built from parts: `k-${name}`.
+          const built = node.value?.expression;
+          if (
+            built?.type === 'TemplateLiteral' &&
+            built.expressions.length > 0 &&
+            legacyClassStart.test(built.quasis.map((q) => q.value.raw).join('\0'))
+          )
+            context.report({ node, messageId: 'class' });
         },
         Literal(node) {
           if (typeof node.value === 'string') check(node, node.value);
@@ -440,6 +448,7 @@ const rules = {
 };
 
 const legacyClass = /^k-[a-z]/;
+const legacyClassStart = /(?:^|\s)k-/;
 const legacyVariable = /--k-[a-z]/;
 
 const vagueLabel = /^(ok|yes|はい|いいえ|確認|確認する|実行|実行する|決定|了解|続ける|確定)$/i;
