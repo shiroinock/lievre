@@ -1,15 +1,97 @@
 {
-  "salt": "kei",
-  "surfaceMax": 0.1,
-  "kasureFloor": 0.72,
-  "tile": 256,
+  "config": {
+    "preset": "custom",
+    "salt": "kei",
+    "outline": {
+      "rough": 3.5,
+      "roughScale": 20,
+      "swell": 5,
+      "swellScale": 250,
+      "step": 15
+    },
+    "kasure": {
+      "density": 9,
+      "threshold": 0.7,
+      "floor": 0.7
+    },
+    "stain": {
+      "strength": 0.04
+    },
+    "yake": {
+      "strength": 0.2,
+      "reach": 160,
+      "mottle": 0.7,
+      "corner": 0.4,
+      "surfaces": 0.3
+    },
+    "sure": {
+      "density": 0.5,
+      "strength": 0.35,
+      "fold": 0.6
+    },
+    "age": {
+      "fade": 0.8,
+      "mottle": 0.35,
+      "rules": 0.6,
+      "chips": 0.6
+    },
+    "tones": {
+      "paper": {
+        "yake": "#f2dca6",
+        "amount": 1,
+        "sure": "#ffffff"
+      },
+      "ink": {
+        "yake": "#2a2f4a",
+        "amount": 0.6,
+        "sure": "#262b5c"
+      }
+    },
+    "kinds": {
+      "small": {
+        "distort": false,
+        "kasure": 0.3
+      },
+      "text": {
+        "distort": true,
+        "kasure": 0.7
+      },
+      "heading": {
+        "distort": true,
+        "kasure": 1
+      },
+      "figure": {
+        "distort": true,
+        "kasure": 1
+      },
+      "data": {
+        "distort": false,
+        "kasure": 0
+      }
+    }
+  },
   "pixels": {
     "surface": "24cbd0f38917608c",
-    "kasure": "44cd81c3b365194e"
+    "kasure": "2366133b09102344",
+    "yake": "023e5f76f94559b9",
+    "sure": "89342154ecf77cc3",
+    "mottle": "31002734a21815fc"
   },
   "bytes": {
+    "yake-paper.png": 6718,
+    "sure-paper.png": 3043,
     "surface-paper.png": 16771,
+    "yake-ink.png": 6718,
+    "sure-ink.png": 3043,
     "surface-ink.png": 16771,
-    "kasure.png": 8769
+    "kasure.png": 4872,
+    "age-mottle-paper-light.png": 3133,
+    "age-mottle-paper-heavy.png": 3133,
+    "age-mottle-ink-light.png": 3133,
+    "age-mottle-ink-heavy.png": 3133,
+    "age-chip-tl.png": 195,
+    "age-chip-tr.png": 200,
+    "age-chip-br.png": 200,
+    "age-chip-bl.png": 202
   }
 }

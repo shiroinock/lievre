@@ -1,0 +1,71 @@
+{
+  "preset": "custom",
+  "salt": "kei",
+  "outline": {
+    "rough": 3.5,
+    "roughScale": 20,
+    "swell": 5,
+    "swellScale": 250,
+    "step": 15
+  },
+  "kasure": {
+    "density": 9,
+    "threshold": 0.7,
+    "floor": 0.7
+  },
+  "stain": {
+    "strength": 0.04
+  },
+  "yake": {
+    "strength": 0.2,
+    "reach": 160,
+    "mottle": 0.7,
+    "corner": 0.4,
+    "surfaces": 0.3
+  },
+  "sure": {
+    "density": 0.5,
+    "strength": 0.35,
+    "fold": 0.6
+  },
+  "tones": {
+    "paper": {
+      "yake": "#f2dca6",
+      "amount": 1,
+      "sure": "#ffffff"
+    },
+    "ink": {
+      "yake": "#2a2f4a",
+      "amount": 0.6,
+      "sure": "#262b5c"
+    }
+  },
+  "age": {
+    "fade": 0.8,
+    "mottle": 0.35,
+    "rules": 0.6,
+    "chips": 0.6
+  },
+  "kinds": {
+    "small": {
+      "distort": false,
+      "kasure": 0.3
+    },
+    "text": {
+      "distort": true,
+      "kasure": 0.7
+    },
+    "heading": {
+      "distort": true,
+      "kasure": 1
+    },
+    "figure": {
+      "distort": true,
+      "kasure": 1
+    },
+    "data": {
+      "distort": false,
+      "kasure": 0
+    }
+  }
+}

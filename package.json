@@ -34,7 +34,7 @@
     "storybook": "storybook dev -p 6006 --host 127.0.0.1 --no-open --disable-telemetry",
     "build:storybook": "storybook build -o dist/storybook --disable-telemetry",
     "build:demo": "vite build",
-    "build:lib": "vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json",
+    "build:lib": "vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json && cp src/wear/age.d.mts src/wear/presets.d.mts lib/wear/",
     "build": "npm run typecheck && npm run lint && npm run wear && npm run build:lib && npm run build:demo && npm run build:storybook",
     "typecheck": "tsc --noEmit",
     "lint": "stylelint \"src/**/*.css\" && eslint .",
@@ -45,6 +45,8 @@
     "tokens": "node scripts/build-tokens.mjs",
     "wear": "node scripts/build-wear.mjs",
     "wear:font": "node scripts/build-wear-font.mjs",
+    "wear:setup": "node scripts/wear/setup.mjs",
+    "wear:tune": "vite --open /tune.html",
     "llms": "node scripts/build-llms.mjs",
     "bench:agent": "npm run build:lib && node bench/agent/misuse.mjs && node bench/agent/context.mjs"
   },

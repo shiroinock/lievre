@@ -1,27 +1,35 @@
 /*
  * KEI wear — prototype. <KeiProvider wear="off | baked | live" wearSeed="…">
  *
- * baked: textures and offsets written at build time from a salt (npm run wear → wear/baked.css).
- *        Plain background and mask images; nothing is computed in the browser.
- * live:  the provider writes SVG textures and filters seeded by wearSeed, and text is distorted
- *        by feDisplacementMap. Heavier: see the measurements in the pull request.
+ * Values come from wear.config.json (tune them with npm run wear:tune).
+ * baked: textures and offsets written at build time (npm run wear → wear/baked.css), and worn
+ *        faces from npm run wear:font. Plain background and mask images in the browser.
+ * live:  the provider builds the same textures and offsets in the browser from wearSeed, and
+ *        distorts text with feDisplacementMap instead of worn faces. Heavier.
  *
- * Both modes read the same custom properties below, so they wear the same parts in the same way.
+ * Both modes read the same custom properties, so they wear the same parts in the same way.
+ * wear/rules.css places the dry brush, the tile offsets and the live filters for each text kind.
  * Never worn: focus outlines, controls (anything focusable), and status colours or symbols.
  * Nothing here changes the size or position of a box.
+ *
+ * Age (<KeiProvider age="none | light | heavy">) is a separate axis in wear/age.css: faded inks,
+ * slipped fills, mottled faces, broken rules and chipped corners, handed to the parts listed in
+ * src/wear/age.mjs (AGE_PLACES). It works with any wear setting, off included.
  */
 @import './wear/baked.css';
+@import './wear/rules.css';
+@import './wear/age.css';
 
 @layer kei.components {
   /* Wear is decoration: none of it applies when the reader asks for plainer or stronger
      rendering. The provider lowers the setting too; this covers pages without JavaScript. */
   @media (not (prefers-contrast: more)) and (not (forced-colors: active)) {
-    /* Baked glyphs: the same outlines displaced by the build salt, for kana, kanji and Latin
-       alike. The faces come from `npm run wear:font`; until then these names fall through. */
+    /* Worn faces for the distorted kinds (wear/baked.css picks them). The faces come from
+       `npm run wear:font`; until then these names fall through to the plain ones. */
     .kei[data-wear='baked'] {
-      --k-font-sans: 'KEI Worn Sans', 'IBM Plex Sans JP', system-ui, -apple-system, 'Hiragino Sans',
+      --k-wear-sans: 'KEI Worn Sans', 'IBM Plex Sans JP', system-ui, -apple-system, 'Hiragino Sans',
         'Yu Gothic UI', sans-serif;
-      --k-font-mono: 'KEI Worn Mono', 'KEI Mono', 'PlemolJP', 'IBM Plex Mono', 'KEI Worn Sans',
+      --k-wear-mono: 'KEI Worn Mono', 'KEI Mono', 'PlemolJP', 'IBM Plex Mono', 'KEI Worn Sans',
         'IBM Plex Sans JP', ui-monospace, 'SF Mono', Menlo, monospace;
     }
 
@@ -33,20 +41,44 @@
       background-size: 256px 256px;
     }
 
-    /* Dry brush on text: a mask that never drops below the floor in params.mjs. Muted text is
-       left whole, as are elements that hold a link or control, so focus rings stay intact. */
-    .kei[data-wear='baked']
-      :is(
-        .k-heading,
-        .k-card-title,
-        .k-text:not(.k-muted),
-        .k-label,
-        .k-metric-value,
-        .k-meter-reading strong
-      ):not(:has(a, button, input, select, textarea, [tabindex])) {
-      mask-image: var(--k-wear-kasure);
-      mask-size: 256px 256px;
-      mask-clip: no-clip;
+    /* The sheet: yake browns the page in from the edges of the viewport, and sure rubs the colour
+       off in scuffs near the edges and along one fold. Both sit behind the content (z-index -1
+       in the root's own stacking context), so they age the paper and never the ink: text,
+       focus outlines, controls and status colours are drawn over them unchanged. Fixed to the
+       viewport, they are composited once and not repainted while the page scrolls. The frame
+       is cut into nine (border-image), so the corners keep their size on any screen; when the
+       screen is narrower than two reaches, the browser shrinks all four edges alike. */
+    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal) {
+      isolation: isolate;
+    }
+    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::before,
+    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::before {
+      border-style: solid;
+      border-width: 0;
+      /* border-image (the slice is SHEET_SLICE) comes from wear/rules.css. */
+    }
+    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::after {
+      background-image: var(--k-wear-sure);
+      background-size: 256px 256px;
+      mask: var(--k-wear-sure-mask);
+    }
+    /* A root inside another root (a specimen on the tuning page) is a sheet of its own box.
+       Position that root (relative) so the sheet stays inside it. */
+    .kei .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::before,
+    .kei .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::after {
+      position: absolute;
+    }
+    /* Cards and metrics are sheets laid on the page: they brown along their own edges, more
+       weakly (yake.surfaces). */
+    .kei:is([data-wear='baked'], [data-wear='live']) :is(.k-card, .k-metric) {
+      box-shadow: var(--k-wear-rim);
     }
 
     /* Worn rules: decorative dividers and chart grids break up. Control outlines and table rules
@@ -57,66 +89,6 @@
     }
     .kei:is([data-wear='baked'], [data-wear='live']) .k-chart-grid {
       stroke-dasharray: var(--k-wear-dash);
-    }
-
-    /* Live: the provider defines one filter per kind and variant (distortion and dry brush). */
-    .kei[data-wear='live']
-      :is(.k-heading, .k-card-title):not(:has(a, button, input, select, textarea, [tabindex])) {
-      filter: var(--k-wear-heading-0);
-    }
-    .kei[data-wear='live']
-      :is(.k-heading, .k-card-title):nth-of-type(4n + 2):not(
-        :has(a, button, input, select, textarea, [tabindex])
-      ) {
-      filter: var(--k-wear-heading-1);
-    }
-    .kei[data-wear='live']
-      :is(.k-heading, .k-card-title):nth-of-type(4n + 3):not(
-        :has(a, button, input, select, textarea, [tabindex])
-      ) {
-      filter: var(--k-wear-heading-2);
-    }
-    .kei[data-wear='live']
-      :is(.k-heading, .k-card-title):nth-of-type(4n + 4):not(
-        :has(a, button, input, select, textarea, [tabindex])
-      ) {
-      filter: var(--k-wear-heading-3);
-    }
-    .kei[data-wear='live']
-      :is(.k-text:not(.k-muted), .k-label):not(
-        :has(a, button, input, select, textarea, [tabindex])
-      ) {
-      filter: var(--k-wear-text-0);
-    }
-    .kei[data-wear='live']
-      :is(.k-text:not(.k-muted), .k-label):nth-of-type(4n + 2):not(
-        :has(a, button, input, select, textarea, [tabindex])
-      ) {
-      filter: var(--k-wear-text-1);
-    }
-    .kei[data-wear='live']
-      :is(.k-text:not(.k-muted), .k-label):nth-of-type(4n + 3):not(
-        :has(a, button, input, select, textarea, [tabindex])
-      ) {
-      filter: var(--k-wear-text-2);
-    }
-    .kei[data-wear='live']
-      :is(.k-text:not(.k-muted), .k-label):nth-of-type(4n + 4):not(
-        :has(a, button, input, select, textarea, [tabindex])
-      ) {
-      filter: var(--k-wear-text-3);
-    }
-    .kei[data-wear='live'] :is(.k-metric-value, .k-meter-reading strong) {
-      filter: var(--k-wear-figure-0);
-    }
-    .kei[data-wear='live'] :is(.k-metric-value, .k-meter-reading strong):nth-of-type(4n + 2) {
-      filter: var(--k-wear-figure-1);
-    }
-    .kei[data-wear='live'] :is(.k-metric-value, .k-meter-reading strong):nth-of-type(4n + 3) {
-      filter: var(--k-wear-figure-2);
-    }
-    .kei[data-wear='live'] :is(.k-metric-value, .k-meter-reading strong):nth-of-type(4n + 4) {
-      filter: var(--k-wear-figure-3);
     }
   }
 }

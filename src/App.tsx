@@ -25,6 +25,7 @@ import {
   ToastProvider,
   type Theme,
   type Density,
+  type Age,
   type Wear,
   IconButton,
   DescriptionList,
@@ -109,6 +110,7 @@ export default function App() {
   const [theme, setTheme] = useState<Theme>('paper');
   const [density, setDensity] = useState<Density>('comfortable');
   const [wear, setWear] = useState<Wear>('off');
+  const [age, setAge] = useState<Age>('none');
   useEffect(() => {
     if (wear === 'baked') wornFonts.forEach((load) => load());
   }, [wear]);
@@ -169,7 +171,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   return (
-    <KeiProvider theme={theme} density={density} wear={wear} className="kei-app">
+    <KeiProvider theme={theme} density={density} wear={wear} age={age} className="kei-app">
       <ToastProvider>
         <a href="#main" className="skip-link">
           本文へスキップ
@@ -247,6 +249,14 @@ export default function App() {
                 <option value="off">なし</option>
                 <option value="baked">焼き込み</option>
                 <option value="live">実行時</option>
+              </select>
+            </div>
+            <div className="density-control">
+              <label htmlFor="age">経年（試作）</label>
+              <select id="age" value={age} onChange={(e) => setAge(e.target.value as Age)}>
+                <option value="none">なし</option>
+                <option value="light">弱</option>
+                <option value="heavy">強</option>
               </select>
             </div>
             <p className="sidebar-version">v{version}</p>

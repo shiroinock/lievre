@@ -1,88 +1,139 @@
-// Live wear: SVG textures and filters written in the browser from wearSeed.
-// feTurbulence takes the seed directly, so the same seed draws the same grain and distortion.
+// Live wear: the same textures and offsets as the baked build, made in the browser from
+// wearSeed, plus SVG filters that distort text where the baked build swaps in worn faces.
 import type { CSSProperties } from 'react';
 import tokens from '../../tokens/tokens.json';
 import { seedFor } from './seed.mjs';
-import { printMarks } from './marks.mjs';
-import { DISPLACEMENT, KASURE_FLOOR, SURFACE_MAX, TEXT_KINDS, TILE, VARIANTS } from './params.mjs';
+import { liveEdge, sheetThemeVars, sheetVars, textures, wearVars } from './textures.mjs';
+import { TEXT_KINDS, VARIANTS } from './params.mjs';
+import type { WearConfig, WearKind } from './presets.mjs';
+import { ageTextures, ageVars, type Age } from './age.mjs';
 
-type Kind = keyof typeof TEXT_KINDS;
-const kinds = Object.keys(TEXT_KINDS) as Kind[];
+const kinds = Object.keys(TEXT_KINDS) as WearKind[];
 // feTurbulence seeds are read as numbers; keep them small enough to stay exact.
 const turbulenceSeed = (salt: string, kind: string, id: string | number) =>
   seedFor(salt, kind, id) % 100000;
 
-function textColour(theme: string) {
-  const scope = (tokens as unknown as Record<string, Record<string, { $value: string }>>)[theme];
-  return scope?.text?.$value ?? tokens.paper.text.$value;
+function toUrl(bytes: Uint8Array) {
+  if (typeof URL.createObjectURL === 'function')
+    return URL.createObjectURL(new Blob([bytes as BlobPart], { type: 'image/png' }));
+  let binary = '';
+  for (const b of bytes) binary += String.fromCharCode(b);
+  return `data:image/png;base64,${btoa(binary)}`;
 }
 
-/** Grain and stains as an SVG image in the theme's text colour, at most SURFACE_MAX opaque. */
-function surfaceImage(salt: string, theme: string) {
-  const grain = turbulenceSeed(salt, 'texture', 'grain');
-  const stain = turbulenceSeed(salt, 'texture', 'stain');
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${TILE}' height='${TILE}'><filter id='s' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='1' seed='${grain}' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 6 0 0 0 -4.6' result='g'/><feTurbulence type='fractalNoise' baseFrequency='.016' numOctaves='2' seed='${stain}' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 0 0 0 -1.7'/><feComponentTransfer><feFuncA type='linear' slope='.7'/></feComponentTransfer><feComposite in2='g' operator='arithmetic' k2='1' k3='1'/><feComponentTransfer result='a'><feFuncA type='linear' slope='${SURFACE_MAX}'/></feComponentTransfer><feFlood flood-color='${textColour(theme)}'/><feComposite in2='a' operator='in'/></filter><rect width='100%' height='100%' filter='url(%23s)'/></svg>`;
-  return `url("data:image/svg+xml,${svg.replace(/#/g, '%23').replace(/</g, '%3C').replace(/>/g, '%3E')}")`;
+// Textures depend on the salt, the kasure, stain, yake and sure values and the theme's colours;
+// tuning rebuilds them often, so keep the last few and release the rest.
+type Urls = { surface: string; kasure: string; yake: string; sure: string };
+const cache = new Map<string, Urls>();
+function textureUrls(config: WearConfig, theme: string) {
+  const key = JSON.stringify([
+    config.salt,
+    config.kasure,
+    config.stain,
+    config.yake,
+    config.sure,
+    config.tones,
+    theme,
+  ]);
+  let hit = cache.get(key);
+  if (!hit) {
+    const { files } = textures(config, tokens);
+    hit = {
+      surface: toUrl(files[`surface-${theme}.png`] ?? files['surface-paper.png']),
+      kasure: toUrl(files['kasure.png']),
+      yake: toUrl(files[`yake-${theme}.png`] ?? files['yake-paper.png']),
+      sure: toUrl(files[`sure-${theme}.png`] ?? files['sure-paper.png']),
+    };
+    cache.set(key, hit);
+    for (const [old, urls] of cache)
+      if (cache.size > 8 && old !== key) {
+        cache.delete(old);
+        if (urls.surface.startsWith('blob:')) Object.values(urls).forEach(URL.revokeObjectURL);
+      }
+  }
+  return hit;
 }
 
 /** Custom properties a live provider (and its portals) needs. */
-export function liveWearStyle(prefix: string, salt: string, theme: string): CSSProperties {
-  const { rule, dash } = printMarks(salt);
+export function liveWearStyle(prefix: string, config: WearConfig, theme: string): CSSProperties {
+  const urls = textureUrls(config, theme);
   const style: Record<string, string> = {
-    '--k-wear-surface': surfaceImage(salt, theme),
-    '--k-wear-rule': rule,
-    '--k-wear-dash': dash,
+    ...wearVars(config, `url(${urls.kasure})`),
+    '--k-wear-surface': `url(${urls.surface})`,
+    ...sheetVars(config),
+    ...sheetThemeVars(
+      config,
+      theme,
+      { yake: `url(${urls.yake})`, sure: `url(${urls.sure})` },
+      tokens,
+    ),
   };
   for (const kind of kinds)
-    for (let n = 0; n < VARIANTS; n++)
-      style[`--k-wear-${kind}-${n}`] = `url(#${prefix}-${kind}-${n})`;
+    if (config.kinds[kind].distort)
+      for (let n = 0; n < VARIANTS; n++)
+        style[`--k-wear-${kind}-${n}`] = `url(#${prefix}-${kind}-${n})`;
   return style as CSSProperties;
 }
 
-/** One distortion-and-dry-brush filter per text kind and variant. */
-export function LiveWearFilters({ prefix, salt }: { prefix: string; salt: string }) {
+// Age images depend on the whole config (the fade stops on the worn paper too) and the theme.
+const ageCache = new Map<string, Record<string, string>>();
+/** Age's custom properties with this config, for a provider given its own config (the tuning page). */
+export function liveAgeStyle(config: WearConfig, theme: string, level: Age): CSSProperties {
+  const key = JSON.stringify([config, theme]);
+  let urls = ageCache.get(key);
+  if (!urls) {
+    urls = Object.fromEntries(
+      Object.entries(ageTextures(config, tokens, [theme]).files).map(([name, bytes]) => [
+        name,
+        toUrl(bytes),
+      ]),
+    );
+    ageCache.set(key, urls);
+    for (const [old, list] of ageCache)
+      if (ageCache.size > 8 && old !== key) {
+        ageCache.delete(old);
+        Object.values(list).forEach((u) => u.startsWith('blob:') && URL.revokeObjectURL(u));
+      }
+  }
+  const found = urls;
+  return ageVars(config, tokens, theme, level, (name) => `url(${found[name]})`) as CSSProperties;
+}
+
+/** One edge-wear filter per worn kind and variant. */
+export function LiveWearFilters({ prefix, config }: { prefix: string; config: WearConfig }) {
   return (
     <svg aria-hidden width="0" height="0" style={{ position: 'absolute', width: 0, height: 0 }}>
-      {kinds.flatMap((kind) =>
-        Array.from({ length: VARIANTS }, (_, n) => (
-          <filter
-            key={`${kind}-${n}`}
-            id={`${prefix}-${kind}-${n}`}
-            x="-4%"
-            y="-12%"
-            width="108%"
-            height="124%"
-            colorInterpolationFilters="sRGB"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.045"
-              numOctaves={2}
-              seed={turbulenceSeed(salt, kind, n)}
-              result="warp"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="warp"
-              scale={DISPLACEMENT[kind]}
-              xChannelSelector="R"
-              yChannelSelector="G"
-              result="moved"
-            />
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.03 0.5"
-              numOctaves={1}
-              seed={turbulenceSeed(salt, `${kind}-kasure`, n)}
-            />
-            <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -4 0 0 0 3.2" />
-            <feComponentTransfer>
-              <feFuncA type="linear" slope={1 - KASURE_FLOOR} intercept={KASURE_FLOOR} />
-            </feComponentTransfer>
-            <feComposite in="moved" operator="in" />
-          </filter>
-        )),
-      )}
+      {kinds
+        .filter((kind) => config.kinds[kind].distort)
+        .flatMap((kind) => {
+          const { baseFrequency, scale } = liveEdge(config, kind);
+          return Array.from({ length: VARIANTS }, (_, n) => (
+            <filter
+              key={`${kind}-${n}`}
+              id={`${prefix}-${kind}-${n}`}
+              x="-4%"
+              y="-12%"
+              width="108%"
+              height="124%"
+              colorInterpolationFilters="sRGB"
+            >
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency={baseFrequency}
+                numOctaves={2}
+                seed={turbulenceSeed(config.salt, kind, n)}
+                result="warp"
+              />
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="warp"
+                scale={scale}
+                xChannelSelector="R"
+                yChannelSelector="G"
+              />
+            </filter>
+          ));
+        })}
     </svg>
   );
 }

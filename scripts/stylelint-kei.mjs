@@ -128,10 +128,26 @@ const spacingGrid = rule('spacing-grid', '', (root, fail) => {
 // Content sits on the theme's surfaces; re-pointing them (e.g. to ultramarine) leaves no colour for "pressable".
 const surfaceTokens = rule(
   'surface-tokens',
-  '面のトークン（--k-bg / --k-surface*）は kei.tokens のテーマでだけ定義してください。中身の地を別の色にするなら、KeiProvider の theme を入れ子にします。ウルトラマリンの面はアプリの枠（サイドバー）だけです。',
+  '面のトークン（--k-bg / --k-surface* / --k-frame* / --k-on-frame*）は kei.tokens のテーマでだけ定義してください。中身の地を別の色にするなら、KeiProvider の theme を入れ子にします。アプリの枠（サイドバー）は --k-frame を使います（Paper ではウルトラマリン）。',
   (root, fail) => {
-    root.walkDecls(/^--k-(bg|surface[\w-]*)$/, (decl) => {
+    root.walkDecls(/^--k-(bg|surface[\w-]*|frame[\w-]*|on-frame[\w-]*)$/, (decl) => {
       if (!inside(decl, (a) => a.name === 'layer' && a.params.trim() === 'kei.tokens')) fail(decl);
+    });
+  },
+);
+
+// Every colour a part draws comes through a token, so a theme (and age, which fades the tokens)
+// reaches it. A literal colour outside the themes stays fresh beside faded parts.
+const COLOUR =
+  /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(|\b(?:white|black|red|green|blue|navy|gray|grey|silver|orange|yellow|purple|pink|brown)\b/i;
+const colourTokens = rule(
+  'colour-tokens',
+  '色は kei.tokens のトークン（var(--k-…)）を通して使ってください。値を直接書くと、テーマや経年の褪色が届きません。透明度だけを使うマスクの #000 は例外です。',
+  (root, fail) => {
+    root.walkDecls((decl) => {
+      if (/^(-webkit-)?mask/.test(decl.prop)) return;
+      if (inside(decl, (a) => a.name === 'layer' && a.params.trim() === 'kei.tokens')) return;
+      if (COLOUR.test(decl.value.replace(/(['"]).*?\1/g, ''))) fail(decl);
     });
   },
 );
@@ -143,6 +159,7 @@ export default [
   forcedColorsState,
   spacingGrid,
   surfaceTokens,
+  colourTokens,
 ];
 
 // ------------------------------------------------------------- layout gate
