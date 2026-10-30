@@ -10,3 +10,7 @@ coverage/
 .env
 .env.*
 !.env.example
+# Worn fonts from `npm run wear:font` (modified IBM Plex, regenerated per salt)
+wear-fonts/
+# Python for the worn fonts, from `npm run wear:setup`
+.venv-wear/
