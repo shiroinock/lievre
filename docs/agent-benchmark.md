@@ -213,13 +213,13 @@ node bench/agent/context.mjs --external               # 他のシステムの文
 node bench/agent/misuse.mjs --json out.json           # 結果を JSON で残す
 ```
 
-改善前と比べるときは、別のチェックアウトを `--root` で渡します（`packages/react` で実行します。ワークスペースに移したあとのチェックアウトなら、`--root` には `packages/react` を渡します）。
+改善前と比べるときは、別のチェックアウトの `packages/react` を `--root` で渡します（`packages/react` で実行します。ワークスペースに移す前のチェックアウトなら、`--root` にはチェックアウトの直下を渡します）。
 
 ```sh
-git worktree add ../lievre-main main
-cd ../lievre-main && npm ci && npm run build:lib && cd -
-node bench/agent/misuse.mjs --root ../lievre-main
-node bench/agent/context.mjs --root ../lievre-main
+git worktree add ../../../lievre-main main
+cd ../../../lievre-main && npm ci && npm run build:lib -w packages/react && cd -
+node bench/agent/misuse.mjs --root ../../../lievre-main/packages/react
+node bench/agent/context.mjs --root ../../../lievre-main/packages/react
 ```
 
 エージェントの実測は手作業です。
