@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { Popover as PopoverPrimitive } from 'radix-ui';
-import { PortalSurface } from '../../../src/components/system';
+import { PortalSurface } from '../../../packages/react/src/components/system';
 
 export type ComboboxOption = {
   value: string;
