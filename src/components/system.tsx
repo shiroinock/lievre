@@ -61,20 +61,25 @@ function useMedia(query: string) {
     () => false,
   );
 }
+/** More contrast or forced colours. Both hooks run on every render, whichever matches. */
+function usePlain() {
+  const more = useMedia('(prefers-contrast: more)');
+  const forced = useMedia('(forced-colors: active)');
+  return more || forced;
+}
 /**
  * The wear actually drawn: off when the reader asks for more contrast or forced colours,
  * and baked instead of live when they ask for less motion.
  */
 export function useEffectiveWear(wear: Wear): Wear {
-  const plain = useMedia('(prefers-contrast: more)') || useMedia('(forced-colors: active)');
+  const plain = usePlain();
   const still = useMedia('(prefers-reduced-motion: reduce)');
   if (plain) return 'off';
   return wear === 'live' && still ? 'baked' : wear;
 }
 /** The age actually drawn: none when the reader asks for more contrast or forced colours. */
 export function useEffectiveAge(age: Age): Age {
-  const plain = useMedia('(prefers-contrast: more)') || useMedia('(forced-colors: active)');
-  return plain ? 'none' : age;
+  return usePlain() ? 'none' : age;
 }
 /** すべての部品の配色と表示密度のスコープ。アプリのルートを包んで使います。部品のスタイルは `.kei`（この部品が出す div）の内側でだけ効きます。 */
 export function KeiProvider({

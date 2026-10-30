@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import tokens from '../../tokens/tokens.json';
 import { buildWear, readConfig } from '../../scripts/build-wear.mjs';
@@ -190,6 +190,26 @@ describe('Wear: what it may touch', () => {
   });
 });
 
+describe('Wear: published types', () => {
+  // tsc copies no .d.mts into lib, so build:lib copies the ones the published types name.
+  it('ships every .d.mts that lib/*.d.ts imports types from', () => {
+    const script = JSON.parse(readFileSync('package.json', 'utf8')).scripts['build:lib'];
+    const typeImports = (file: string) =>
+      [...readFileSync(file, 'utf8').matchAll(/import (type )?\{([^}]*)\} from '([^']+\.mjs)'/g)]
+        .filter(([, all, names]) => all || /\btype\b/.test(names))
+        .map(([, , , from]) => from.replace(/^.*\//, '').replace(/\.mjs$/, ''));
+    const wanted = new Set(
+      ['src/components/system.tsx', 'src/wear/live.tsx'].flatMap((file) => typeImports(file)),
+    );
+    for (const name of [...wanted])
+      typeImports(`src/wear/${name}.d.mts`).forEach((n) => wanted.add(n));
+    for (const name of wanted)
+      expect(script, `build:lib に src/wear/${name}.d.mts を lib/wear/ へ写す cp を足す`).toContain(
+        `src/wear/${name}.d.mts`,
+      );
+  });
+});
+
 describe('Wear: provider', () => {
   afterEach(() => vi.unstubAllGlobals());
   const media = (matches: string[]) =>
@@ -212,6 +232,35 @@ describe('Wear: provider', () => {
     media(['(prefers-reduced-motion: reduce)']);
     render(<KeiProvider data-testid="scope" wear="live" />);
     expect(screen.getByTestId('scope')).toHaveAttribute('data-wear', 'baked');
+  });
+
+  it('follows the reader changing the setting while the page is open', () => {
+    const on = new Set<string>();
+    const listeners = new Set<() => void>();
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      get matches() {
+        return on.has(query);
+      },
+      addEventListener: (_: string, listener: () => void) => listeners.add(listener),
+      removeEventListener: (_: string, listener: () => void) => listeners.delete(listener),
+    }));
+    const flip = (query: string) =>
+      act(() => {
+        if (!on.delete(query)) on.add(query);
+        listeners.forEach((listener) => listener());
+      });
+    render(<KeiProvider data-testid="scope" wear="live" age="heavy" />);
+    const scope = screen.getByTestId('scope');
+    // Every query keeps its hook whichever matches first, so the provider never throws.
+    flip('(prefers-contrast: more)');
+    expect(scope).toHaveAttribute('data-wear', 'off');
+    expect(scope).toHaveAttribute('data-age', 'none');
+    flip('(forced-colors: active)');
+    flip('(prefers-contrast: more)');
+    expect(scope).toHaveAttribute('data-wear', 'off');
+    flip('(forced-colors: active)');
+    expect(scope).toHaveAttribute('data-wear', 'live');
+    expect(scope).toHaveAttribute('data-age', 'heavy');
   });
 
   it('writes seeded live filters and carries them into portals', async () => {
