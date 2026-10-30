@@ -1,0 +1,195 @@
+/* Layout of the wear tuning page (npm run wear:tune). Not part of the library. */
+body {
+  margin: 0;
+}
+.tune {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  min-height: 100vh;
+}
+.tune-controls {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--k-space-3, 12px);
+  height: 100vh;
+  padding: 20px;
+  overflow-y: auto;
+  border-right: 1px solid var(--k-border);
+  box-sizing: border-box;
+}
+.tune-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.tune-presets legend {
+  margin-bottom: 8px;
+}
+.tune-slider {
+  display: grid;
+  gap: 4px;
+}
+.tune-slider input[type='range'] {
+  width: 100%;
+  accent-color: var(--k-accent);
+}
+.tune-slider small {
+  color: var(--k-muted);
+  font-size: var(--k-text-xs);
+}
+.tune-slider output {
+  float: right;
+  font-family: var(--k-font-mono);
+}
+.tune-kinds {
+  border-collapse: collapse;
+  font-size: var(--k-text-sm);
+}
+.tune-kinds caption {
+  text-align: left;
+}
+.tune-kinds :is(th, td) {
+  padding: 4px;
+  text-align: left;
+  white-space: nowrap;
+}
+.tune-kinds input[type='range'] {
+  width: 80px;
+  accent-color: var(--k-accent);
+}
+.tune-save {
+  display: grid;
+  gap: 8px;
+}
+.tune-status pre {
+  max-height: 160px;
+  overflow: auto;
+  font-size: var(--k-text-xs);
+  white-space: pre-wrap;
+}
+.tune-main {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  min-width: 0;
+  padding: 20px 24px 48px;
+}
+.tune-gauges {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.tune-gauges caption {
+  text-align: left;
+  caption-side: top;
+  padding-bottom: 8px;
+}
+.tune-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+.tune-column {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+}
+.tune-specimen {
+  /* Each specimen is a sheet of its own: the wear's yake and sure stay inside it. */
+  position: relative;
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--k-border);
+  overflow: hidden;
+}
+.tune-tones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.tune-tones legend {
+  margin-bottom: 8px;
+}
+.tune-tones label:not(.tune-slider) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tune-tones .tune-slider {
+  grid-column: 1 / -1;
+}
+.tune-sheet-section {
+  display: grid;
+  gap: 12px;
+}
+.tune-sheet {
+  position: relative;
+  min-height: 560px;
+  border: 1px solid var(--k-border);
+  overflow: hidden;
+}
+.tune-sheet-layout {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  min-height: 560px;
+}
+.tune-sheet-side {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 12px;
+}
+.tune-sheet-body {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 24px 0 24px 24px;
+}
+.tune-sheet-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding-right: 12px;
+}
+.tune-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tune-buttons > * {
+  white-space: nowrap;
+}
+.tune-fonts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.tune-grid {
+  display: grid;
+  gap: 4px;
+  font-size: 32px;
+  line-height: 1.4;
+  background: repeating-linear-gradient(90deg, var(--k-border) 0 1px, transparent 1px 16px);
+}
+@media (width < 900px) {
+  .tune {
+    grid-template-columns: 1fr;
+  }
+  .tune-controls {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--k-border);
+  }
+}

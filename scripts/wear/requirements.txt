@@ -1,0 +1,3 @@
+# Python modules for scripts/wear/font.py. `npm run wear:setup` installs them into .venv-wear/.
+fonttools==4.55.3
+brotli==1.1.0

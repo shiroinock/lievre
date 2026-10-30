@@ -39,11 +39,11 @@ KEI（計）は、日本語の画面を読みやすく組み立てるための�
 - **Paper**：青みのある明るい作業面。
 - **Ink**：深い紺の面。アクセントは明るいウルトラマリンに置き換える。
 
-- **試作中**：紙の粒と擦れた罫線を加える `wear="worn"`。採用は未定で、候補と根拠は [references/weathered-candidates.md](references/weathered-candidates.md) にあります（試作した Sepia と Rust のテーマは採用しませんでした）。
+- **試作中**：紙の粒・汚れ・文字のカスレと歪み・擦れた罫線を加える `wear="off | baked | live"`（[references/wear-prototype.md](references/wear-prototype.md)）。採用は未定で、候補と根拠は [references/weathered-candidates.md](references/weathered-candidates.md) にあります。試作した Sepia と Rust のテーマは採用しませんでした。
 
 トークンの名前と意味は共通で、値だけが入れ替わります。ダイアログやメニューなどのポータルにもテーマが引き継がれます。
 
-ウルトラマリンを面に使ってよいのは、アプリの枠（サイドバーなどのナビゲーション）だけです。Inkでは `#191953` まで落とし、本文や小さなアクセントより目立たないようにします。計器・カード・コード例など、読む中身の地はテーマの面（`--k-surface` / `--k-surface-sunken`）にします。中身の地をウルトラマリンにすると、その上で「押せる・選んでいる」を示す色がなくなるためです。面のトークン（`--k-bg` / `--k-surface*`）を `kei.tokens` の外で付け替えると、stylelint の `kei/surface-tokens` が止めます。一部の地だけを変えたいときは、`KeiProvider` の theme を入れ子にします。
+アプリの枠（サイドバーなどのナビゲーション）は、テーマの枠の色（`--k-frame` と、その上の文字・線・選択中の色 `--k-on-frame` / `--k-frame-muted` / `--k-frame-line` / `--k-frame-selected` / `--k-on-frame-selected`）にします。Paper ではウルトラマリン、Ink では `#191953` まで落とし、本文や小さなアクセントより目立たないようにします。ウルトラマリンを面に使ってよいのは、この枠だけです。計器・カード・コード例など、読む中身の地はテーマの面（`--k-surface` / `--k-surface-sunken`）にします。中身の地をウルトラマリンにすると、その上で「押せる・選んでいる」を示す色がなくなるためです。面と枠のトークン（`--k-bg` / `--k-surface*` / `--k-frame*` / `--k-on-frame*`）を `kei.tokens` の外で付け替えると、stylelint の `kei/surface-tokens` が止めます。枠の文字は4.5:1、枠の上の選択中の項目とフォーカスの輪郭は3:1以上を、テーマごとにテストで検査しています。一部の地だけを変えたいときは、`KeiProvider` の theme を入れ子にします。
 
 ## 文字の設定と密度
 

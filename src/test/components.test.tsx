@@ -90,9 +90,9 @@ describe('Input and focus contracts', () => {
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
     expect(trigger).toHaveFocus();
   });
-  it('carries theme and the prototype wear into portals', async () => {
+  it('carries prototype theme and wear into portals', async () => {
     render(
-      <KeiProvider theme="ink" wear="worn">
+      <KeiProvider theme="ink" wear="baked">
         <Dialog trigger={<Button>開く</Button>} title="表示設定" description="表示を調整">
           <Button>保存</Button>
         </Dialog>
@@ -101,7 +101,7 @@ describe('Input and focus contracts', () => {
     await userEvent.click(screen.getByRole('button', { name: '開く' }));
     const scope = screen.getByRole('dialog', { name: '表示設定' }).closest('.kei');
     expect(scope).toHaveAttribute('data-theme', 'ink');
-    expect(scope).toHaveAttribute('data-wear', 'worn');
+    expect(scope).toHaveAttribute('data-wear', 'baked');
   });
   it('names an icon-only button by its label, shows the same words as a tooltip and keeps focus while loading', async () => {
     const { rerender } = setup(<IconButton label="行の操作" icon={<svg data-testid="icon" />} />);

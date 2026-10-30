@@ -1,0 +1,36 @@
+export type WearKind = 'small' | 'text' | 'heading' | 'figure' | 'data';
+export interface WearKindSettings {
+  distort: boolean;
+  kasure: number;
+}
+export type WearTheme = 'paper' | 'ink';
+export interface WearTone {
+  yake: string;
+  amount: number;
+  sure: string;
+}
+export interface WearConfig {
+  preset: string;
+  salt: string;
+  outline: { rough: number; roughScale: number; swell: number; swellScale: number; step: number };
+  kasure: { density: number; threshold: number; floor: number };
+  stain: { strength: number };
+  yake: { strength: number; reach: number; mottle: number; corner: number; surfaces: number };
+  sure: { density: number; strength: number; fold: number };
+  age: { fade: number; mottle: number; rules: number; chips: number };
+  tones: Record<WearTheme, WearTone>;
+  kinds: Record<WearKind, WearKindSettings>;
+}
+export const TEXT_KINDS: Record<
+  WearKind,
+  { selectors: string[]; font: 'sans' | 'mono'; size: number }
+>;
+export const PRESETS: Record<'subtle' | 'standard' | 'strong', Omit<WearConfig, 'preset'>>;
+export const PRESET_NAMES: Record<keyof typeof PRESETS, string>;
+export function normaliseConfig(config?: unknown): WearConfig;
+export const TILE: number;
+export const SHEET: number;
+export const SHEET_SLICE: number;
+export const VARIANTS: number;
+export const OUTLINE_CAPS: { edge: number; swell: number; total: number };
+export const THIN: { sans: number; mono: number };

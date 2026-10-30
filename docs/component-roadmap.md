@@ -199,7 +199,7 @@ KEI の △：IconButton は `k-icon-button` の CSS だけがあり部品とし
 
 - **理由**：管理画面の枠は利用者が毎回自分で組むことになり、ずれやすい。`App.tsx` にすでに手組みがある。
 - **参考**：Primer の NavList / PageLayout、Carbon の UI Shell、SmartHR UI の AppHeader / SideNav。
-- **KEI での注意**：ブランドの色面（ウルトラマリン）をサイドバーに使う決まりを部品で守る。今いる場所は `aria-current="page"` と面の色の両方で示す。
+- **KEI での注意**：サイドバーはテーマの枠の色（`--k-frame`、Paper ではウルトラマリン）を使う決まりを部品で守る。今いる場所は `aria-current="page"` と面の色の両方で示す。
 - **品質基準で見る点**：ナビの項目のアイコンと文字の縦の中心、アイコン列の幅が揃って文字の開始位置が揃うこと。折りたたんだときのアイコンの左右中央。
 
 #### SegmentedControl（切り替え）
