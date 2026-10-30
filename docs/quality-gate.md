@@ -2,10 +2,10 @@
 
 部品を追加・変更するときに満たす、配置の基準です。どれも数値で測れる形にしてあり、CI で検査します。
 
-- **実際の描画で測るもの**：`npm run test:layout`（`src/test/layout`）。Vitest のブラウザモードと Playwright の Chromium で、すべての Story を描画して測ります。
-- **CSS から静的に分かるもの**：`npm run lint`（`scripts/stylelint-kei.mjs`）。
+- **実際の描画で測るもの**：`npm run test:layout`（`packages/react/src/test/layout`）。Vitest のブラウザモードと Playwright の Chromium で、すべての Story を描画して測ります。
+- **CSS から静的に分かるもの**：`npm run lint`（`packages/react/scripts/stylelint-kei.mjs`）。
 
-基準の値は `src/test/layout/declare.ts` の `CRITERIA` が正です。この文書と食い違ったら、どちらかを直してください。
+基準の値は `packages/react/src/test/layout/declare.ts` の `CRITERIA` が正です。この文書と食い違ったら、どちらかを直してください。
 
 ## 基準
 
@@ -37,7 +37,7 @@
 
 ### 部品を組み合わせた画面も測る
 
-部品の Story だけでなく、デモ（`src/App.tsx`、`Patterns/Application`）と画面例（`src/patterns`、`Patterns/Everyday`・`Patterns/Workspace`）も測ります。狭い枠に入れた Meter のはみ出しや、カードいっぱいに伸ばした折れ線など、部品を組み合わせたときにだけ起きるずれがあるためです。測る部品は `src/test/layout/screen-parts.ts` の `SCREEN_PARTS` にまとめ、宣言には `screen: '理由'` を付けます。画面では、操作の要素がすべて宣言に入っているかは見ません（それぞれの部品の Story で見ます）。
+部品の Story だけでなく、デモ（`packages/react/src/App.tsx`、`Patterns/Application`）と画面例（`packages/react/src/patterns`、`Patterns/Everyday`・`Patterns/Workspace`）も測ります。狭い枠に入れた Meter のはみ出しや、カードいっぱいに伸ばした折れ線など、部品を組み合わせたときにだけ起きるずれがあるためです。測る部品は `packages/react/src/test/layout/screen-parts.ts` の `SCREEN_PARTS` にまとめ、宣言には `screen: '理由'` を付けます。画面では、操作の要素がすべて宣言に入っているかは見ません（それぞれの部品の Story で見ます）。
 
 ### 行の箱を 4px に乗せる
 
@@ -83,8 +83,8 @@ padding: 0 12px 0 36px;
 
 `npm run test:layout` は、配置そのものに加えて次のことも検査します。
 
-1. `src/stories` のすべての Story ファイルが、meta の `parameters.layoutGate` に「測る部品」か「測らない理由」を書いている。
-2. `src/index.ts` から公開している部品（大文字で始まるもの）ごとに、`meta.component` にその部品を指定し、部品を測る Story がある。入れ物だけのもの（`KeiProvider` など）は `src/test/layout/baseline.ts` の `NOT_A_PART` に理由付きで書く。
+1. `packages/react/src/stories` のすべての Story ファイルが、meta の `parameters.layoutGate` に「測る部品」か「測らない理由」を書いている。
+2. `packages/react/src/index.ts` から公開している部品（大文字で始まるもの）ごとに、`meta.component` にその部品を指定し、部品を測る Story がある。入れ物だけのもの（`KeiProvider` など）は `packages/react/src/test/layout/baseline.ts` の `NOT_A_PART` に理由付きで書く。
 3. 描画したボタン・入力・タブなどの操作の要素が、どれかの部品の宣言に入っている。
 4. 宣言した部品が、どれかの Story で実際に描画されている（selector の書き間違いを防ぐ）。
 
@@ -92,8 +92,8 @@ padding: 0 12px 0 36px;
 
 検査を入れた時点で基準を満たしていなかった箇所は、理由を付けて一覧にしています。一覧にある間は CI が通り、消すとその箇所に基準が効きます。
 
-- 描画で測るもの：`src/test/layout/baseline.ts` の `BASELINE`
-- `kei/height-grid`：`scripts/stylelint-baseline.mjs`
+- 描画で測るもの：`packages/react/src/test/layout/baseline.ts` の `BASELINE`
+- `kei/height-grid`：`packages/react/scripts/stylelint-baseline.mjs`
 
 例外は Story の title・部品の名前・検査の名前で照合し、`example`（Story の名前）と `element`（メッセージに出る要素の一部、`「整える」` など）でさらに絞れます。画面の例外は、ずれる要素か Story に絞ってください。部品ごとに外すと、同じ画面で新しく起きたずれも見逃します。
 

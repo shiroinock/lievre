@@ -2,21 +2,17 @@
 
 KEI のデザイン言語を端末に広げるための試作です。改名の予定に合わせて、仮に `@lievre/tui` という名前にしています（`private` で、公開しません）。比較と推奨は [docs/tui-foundation.md](../../docs/tui-foundation.md) にあります。
 
-**本体（`src/`・`package.json`）には入れません。** 依存は、このフォルダの `package.json` にだけ入れています。モノレポに移したときの `packages/tui` を想定した形にしていますが、移す作業はしていません。トークンは、いまはリポジトリの `tokens/tokens.json` をパスで読んでいます。
+**部品（`src/core` と `src/ink`）は [packages/tui](../../packages/tui/README.md) に移しました。** ここに残したのは、操作できる見本、画面の書き出し、試しの書体です。どれも `packages/tui/src` をパスで読みます。
 
 カード・ボタン（フォーカスの状態を含む）・表（数値の桁揃えと状態の表示）を、Ink 8 で描きます。
 
 ## 中身
 
-色と字の組を決める中核（`src/core`）は Ink に依りません。描画の道具を OpenTUI などに替えるときは、`src/ink` だけを書き直します。
+色と字の組を決める中核（`packages/tui/src/core`）は Ink に依りません。描画の道具を OpenTUI などに替えるときは、`packages/tui/src/ink` だけを書き直します。
 
 | ファイル                      | 内容                                                                                                                                   |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/core/palette.ts`         | `tokens/tokens.json` から端末の色を作る。色の段階の判定（`NO_COLOR`・`FORCE_COLOR`）、256色への落とし方、コントラストの計算            |
-| `src/core/glyphs.ts`          | 字の組（標準の文字・Lievre Term・ASCII）と、Lievre Term の私用の領域の割り当て                                                         |
-| `src/ink/components.tsx`      | Card・Button・Table・Status                                                                                                            |
-| `src/ink/screen.tsx`          | 見本の画面                                                                                                                             |
-| `src/ink/main.tsx`            | 操作できる見本。Tab と Shift+Tab でフォーカスを動かし、表では ↑↓ で行を選び、q で終わる。OSC 11 で背景の明るさを問い合わせる           |
+| `scripts/main.tsx`            | 操作できる見本。Tab と Shift+Tab でフォーカスを動かし、表では ↑↓ で行を選び、q で終わる。OSC 11 で背景の明るさを問い合わせる           |
 | `scripts/capture.tsx`         | 色の段階・テーマ・字の組ごとに `out/*.ans`（ANSI の色付きのテキスト）と `out/contrast.md` を書く                                       |
 | `scripts/shot.mjs`            | `out/*.ans` を xterm.js（WebGL の描画）で描き、`out/*.png` を撮る。Lievre Term の画面は、書体を入れた場合と入れていない場合の2枚を撮る |
 | `font/build.py`               | 試しの書体「Lievre Term」を作り、検査する（送り幅が1セルか、名前に「Plex」が入っていないか）                                           |
@@ -24,7 +20,7 @@ KEI のデザイン言語を端末に広げるための試作です。改名の�
 
 ## 動かし方
 
-リポジトリの直下で `npm install` してあることが前提です（react と playwright はそちらを使います）。
+リポジトリの直下で `npm install` してあることが前提です（react・ink・playwright はそちらを使います）。
 
 ```sh
 cd spikes/tui

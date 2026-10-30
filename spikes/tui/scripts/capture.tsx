@@ -4,7 +4,7 @@
 import chalk from 'chalk';
 import { renderToString } from 'ink';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { glyphs, type GlyphSet } from '../src/core/glyphs.js';
+import { glyphs, type GlyphSet } from '../../../packages/tui/src/core/glyphs.js';
 import {
   PAIRS,
   contrast,
@@ -12,8 +12,8 @@ import {
   resolved,
   type Level,
   type ThemeName,
-} from '../src/core/palette.js';
-import { Screen } from '../src/ink/screen.js';
+} from '../../../packages/tui/src/core/palette.js';
+import { Screen } from '../../../packages/tui/src/ink/screen.js';
 
 const out = new URL('../out/', import.meta.url);
 mkdirSync(out, { recursive: true });

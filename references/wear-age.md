@@ -15,7 +15,7 @@
 
 - `age` は入れ子にでき、指定がなければ外側の値を受け継ぎます。ポータル（Dialog など）にも `data-age` が渡ります。
 - 既定は `none`。強いコントラストを求める設定（`prefers-contrast: more`）と強制カラーモード（`forced-colors: active`）では、指定にかかわらず `none` になります。生成する CSS も、同じ条件のメディアクエリの内側にあります。
-- 強さは [wear.config.json](../wear.config.json) の `age` に保存し、調整画面（`npm run wear:tune`）の「経年を見比べる」で、Button・Card・DataTable を経年なし・弱・強で並べて確かめます。弱は強の半分です。
+- 強さは [wear.config.json](../packages/react/wear.config.json) の `age` に保存し、調整画面（`npm run wear:tune`）の「経年を見比べる」で、Button・Card・DataTable を経年なし・弱・強で並べて確かめます。弱は強の半分です。
 
 ## 4つの素材
 
@@ -34,7 +34,7 @@
 
 ### 場所による強さ
 
-[age.mjs の AGE_PLACES](../src/wear/age.mjs) に、場所ごとの倍率を置いています。カードは罫線のかすれも角の欠けも 1 倍、表の罫線は 0.5 倍（13〜14px の行が読みにくくならないよう）、ボタンの角は 0.35 倍、入力欄には何もかけません。褪色だけはトークンなので、見出しも Meter もサイドバーも含めて全体に同じだけ効きます。トークンを通らない色が部品やデモに残ると、そこだけ褪せずに浮くので、stylelint の `kei/colour-tokens` が `kei.tokens` の外の色の値（`#…`・`rgb()`・`oklch()`・色の名前）を止め、TSX のインラインの色はテストが止めます（透明度だけを使うマスクの `#000` と、トークンから計算して作る `src/styles/wear/` は例外）。
+[age.mjs の AGE_PLACES](../packages/react/src/wear/age.mjs) に、場所ごとの倍率を置いています。カードは罫線のかすれも角の欠けも 1 倍、表の罫線は 0.5 倍（13〜14px の行が読みにくくならないよう）、ボタンの角は 0.35 倍、入力欄には何もかけません。褪色だけはトークンなので、見出しも Meter もサイドバーも含めて全体に同じだけ効きます。トークンを通らない色が部品やデモに残ると、そこだけ褪せずに浮くので、stylelint の `kei/colour-tokens` が `kei.tokens` の外の色の値（`#…`・`rgb()`・`oklch()`・色の名前）を止め、TSX のインラインの色はテストが止めます（透明度だけを使うマスクの `#000` と、トークンから計算して作る `src/styles/wear/` は例外）。
 
 ### 境目を出さない
 
@@ -46,7 +46,7 @@
 
 ### 罫線のかすれ
 
-最初の試作は、線を一定の長さの区間ごとに切っていました。1px の線では、それが「ただの破線」に見えました。今は次のようにしています（[age.mjs の ruleStops](../src/wear/age.mjs)）。
+最初の試作は、線を一定の長さの区間ごとに切っていました。1px の線では、それが「ただの破線」に見えました。今は次のようにしています（[age.mjs の ruleStops](../packages/react/src/wear/age.mjs)）。
 
 - **濃さのむらが主**：2つの大きさの滑らかなノイズで、線の濃さを長さに沿って変えます（強・標準のカードで 1〜0.55、表で 1〜0.69 程度）。区間の境目もグラデーションでつなぐので、段は付きません。
 - **途切れは稀**：区間ごとに `rules × 0.08` の確率で、1〜3px だけ切れます。720px の繰り返しの中で 0〜3 か所ほどです。
@@ -56,7 +56,7 @@
 
 ### 試作の範囲
 
-今回は Button（primary / secondary / ghost / 無効）、Card、DataTable（選択した行、ホバー、並べ替えの見出し）で試しました。CSS は [src/styles/wear/age.css](../src/styles/wear/age.css) に生成し、[kei-wear.css](../src/styles/kei-wear.css) から読み込みます。kei.css の Button・Card・表の規則には手を入れていません。
+今回は Button（primary / secondary / ghost / 無効）、Card、DataTable（選択した行、ホバー、並べ替えの見出し）で試しました。CSS は [src/styles/wear/age.css](../packages/react/src/styles/wear/age.css) に生成し、[kei-wear.css](../packages/react/src/styles/kei-wear.css) から読み込みます。kei.css の Button・Card・表の規則には手を入れていません。
 
 ## 状態は経年の外に置く
 
@@ -85,7 +85,7 @@
 - **むらは、割る手前で頭打ち**：塗りに紙の色が最も多く透けた点でも、上の文字が 4.5:1 を保つ濃さで止めます（標準の値で 0.16〜0.33）。
 - **フォーカスは褪せない**：褪せる前の `accent` のまま、全ての面の上で 3:1 以上です。
 - **操作の輪郭は 3:1 を保つ**：secondary の輪郭（`border-strong`）は線として半分だけ褪せ、面に対して 3:1 以上を保ちます（質感の焼き込みが輪郭を濃くしているときは、そちらが勝ちます）。primary の塗りは褪せても背景に対して 4.5:1 以上あるので、ボタンの形は 3:1 以上で見えます。
-- **保存の検査**：調整画面の保存は、`ageContrast`（上の組のどれか、文字 4.5:1、輪郭とフォーカス 3:1）を割る値と、スライダーの範囲の外の値を受け付けません（[tune-server.mjs](../scripts/wear/tune-server.mjs) の `validate`）。
+- **保存の検査**：調整画面の保存は、`ageContrast`（上の組のどれか、文字 4.5:1、輪郭とフォーカス 3:1）を割る値と、スライダーの範囲の外の値を受け付けません（[tune-server.mjs](../packages/react/scripts/wear/tune-server.mjs) の `validate`）。
 
 標準の値・強の、褪色したあとの accent：Paper `#2424d8` → `#364a90`、Ink `#a9b1ff` → `#b4b5d5`。
 
@@ -110,11 +110,11 @@
 
 - `src/styles/wear/age.css`：強さごとの形（むらの位置・欠け・かすれ）の変数、テーマと強さごとの褪色した色、規則（57KB。罫線の周期を 720px に延ばし、全ての色のトークンを出すので増えました）。
 - `age-mottle-{theme}-{light|heavy}.png`：128px 四方を 256px に広げて使う（8枚、各3KB）。`age-chip-{tl,tr,br,bl}.png`：32px 四方（4枚、各0.2KB）。
-- 調整画面は、自分の値を渡した KeiProvider で、同じ変数と画像をその場で作って当てます（[live.tsx の liveAgeStyle](../src/wear/live.tsx)）。
+- 調整画面は、自分の値を渡した KeiProvider で、同じ変数と画像をその場で作って当てます（[live.tsx の liveAgeStyle](../packages/react/src/wear/live.tsx)）。
 
 ## テスト
 
-[src/test/age.test.tsx](../src/test/age.test.tsx) と [age-validate.test.tsx](../src/test/age-validate.test.tsx)：
+[src/test/age.test.tsx](../packages/react/src/test/age.test.tsx) と [age-validate.test.tsx](../packages/react/src/test/age-validate.test.tsx)：
 
 - 全てのプリセットと、全てのスライダーを最大にした値で、褪色した全ての組が 4.5:1、フォーカスが 3:1 以上。
 - 褪色は求めた量を超えず、色のあるトークンの彩度を増やさない。青は紫を通らず灰青へ褪せる。kei.css の色のトークンは `overlay` と `focus` を除いて全て褪色の対象に入っている。

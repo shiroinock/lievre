@@ -1,92 +1,31 @@
 {
-  "name": "@kei-design/react",
-  "version": "0.2.0",
-  "description": "KEI — Japanese-first instrument-inspired design system",
-  "type": "module",
+  "name": "kei-design-system",
   "private": true,
-  "sideEffects": [
-    "**/*.css"
-  ],
-  "exports": {
-    ".": {
-      "types": "./lib/index.d.ts",
-      "import": "./lib/kei.js"
-    },
-    "./styles.css": "./lib/kei.css",
-    "./tokens.json": "./tokens/tokens.json",
-    "./llms.txt": "./llms.txt",
-    "./lint": {
-      "types": "./lint/index.d.ts",
-      "default": "./lint/index.js"
-    },
-    "./lint/biome/*": "./lint/biome/*"
-  },
-  "files": [
-    "lib",
-    "tokens",
-    "llms.txt",
-    "lint",
-    "README.md",
-    "DESIGN.md"
+  "type": "module",
+  "workspaces": [
+    "packages/tokens",
+    "packages/react",
+    "packages/tui"
   ],
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
-    "storybook": "storybook dev -p 6006 --host 127.0.0.1 --no-open --disable-telemetry",
-    "build:storybook": "storybook build -o dist/storybook --disable-telemetry",
-    "build:demo": "vite build",
-    "build:lib": "vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json && cp src/wear/age.d.mts src/wear/presets.d.mts lib/wear/",
-    "build": "npm run typecheck && npm run lint && npm run wear && npm run build:lib && npm run build:demo && npm run build:storybook",
-    "typecheck": "tsc --noEmit",
-    "lint": "stylelint \"src/**/*.css\" && eslint .",
-    "test": "vitest run",
-    "test:layout": "vitest run -c vitest.layout.config.ts",
-    "preview": "vite preview --host 127.0.0.1",
+    "dev": "npm run dev -w packages/react",
+    "storybook": "npm run storybook -w packages/react",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:layout": "npm run test:layout -w packages/react",
+    "build": "npm run build --workspaces --if-present",
     "format": "prettier --write .",
-    "tokens": "node scripts/build-tokens.mjs",
-    "wear": "node scripts/build-wear.mjs",
-    "wear:font": "node scripts/build-wear-font.mjs",
-    "wear:setup": "node scripts/wear/setup.mjs",
-    "wear:tune": "vite --open /tune.html",
-    "llms": "node scripts/build-llms.mjs",
-    "bench:agent": "npm run build:lib && node bench/agent/misuse.mjs && node bench/agent/context.mjs"
-  },
-  "peerDependencies": {
-    "react": "^18.3.0 || ^19.0.0",
-    "react-dom": "^18.3.0 || ^19.0.0"
-  },
-  "dependencies": {
-    "lucide-react": "^0.468.0",
-    "radix-ui": "1.8.1"
+    "tokens": "npm run tokens -w packages/tokens",
+    "llms": "npm run llms -w packages/react",
+    "wear": "npm run wear -w packages/react",
+    "wear:font": "npm run wear:font -w packages/react",
+    "wear:setup": "npm run wear:setup -w packages/react",
+    "wear:tune": "npm run wear:tune -w packages/react",
+    "bench:agent": "npm run bench:agent -w packages/react"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.6.2",
-    "@fontsource/ibm-plex-mono": "^5.3.0",
-    "@fontsource/ibm-plex-sans-jp": "^5.3.1",
-    "@storybook/addon-a11y": "10.6.3",
-    "@storybook/addon-docs": "10.6.3",
-    "@storybook/react-vite": "10.6.3",
-    "@testing-library/jest-dom": "^6.9.0",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/node": "^22.0.0",
-    "@types/react": "^19.2.0",
-    "@types/react-dom": "^19.2.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "@vitest/browser-playwright": "^4.1.12",
-    "axe-core": "^4.11.0",
-    "eslint": "^10.13.0",
-    "jsdom": "^26.1.0",
-    "oxlint": "^1.89.0",
-    "playwright": "^1.56.1",
-    "prettier": "^3.3.3",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "storybook": "10.6.3",
-    "stylelint": "^17.16.0",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.72.0",
-    "vite": "^7.0.0",
-    "vitest": "^4.0.0"
+    "prettier": "^3.3.3"
   },
   "engines": {
     "node": ">=22.12.0"

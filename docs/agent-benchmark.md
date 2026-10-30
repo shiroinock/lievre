@@ -35,7 +35,7 @@ shadcn/ui、Radix Themes、MUI（v9）、Chakra UI（v3）、Mantine（v9）、G
 
 ### 課題
 
-[bench/agent/tasks.md](../bench/agent/tasks.md) の5件です。どのシステムでも同じ文で解けるよう、部品の名前ではなく画面の要件で書いています。
+[bench/agent/tasks.md](../packages/react/bench/agent/tasks.md) の5件です。どのシステムでも同じ文で解けるよう、部品の名前ではなく画面の要件で書いています。
 
 | 課題 | 内容                                                               | 主な部品                         |
 | ---- | ------------------------------------------------------------------ | -------------------------------- |
@@ -47,13 +47,13 @@ shadcn/ui、Radix Themes、MUI（v9）、Chakra UI（v3）、Mantine（v9）、G
 
 ### 測るもの
 
-1. **読む量**（[bench/agent/context.mjs](../bench/agent/context.mjs)）：課題を解くのに開く文書の大きさを、トークンの見積もり（英数字4文字か日本語1文字で1トークン）で数えます。KEI はパッケージに入る README と、使う部品を宣言している d.ts を丸ごと、または `llms.txt` だけ。他のシステムは、使う部品の Markdown 版の文書を `--external` で取得して数えます。
-2. **誤用の検出**（[bench/agent/misuse.mjs](../bench/agent/misuse.mjs)、事例は [misuse-cases.mjs](../bench/agent/misuse-cases.mjs)）：エージェントがしがちな誤り21件を、利用側のアプリと同じ見え方（ビルド済みの `lib/` を通して）で型検査し、ESLint にかけ、jsdom で描画します。採点は1件3点です。
+1. **読む量**（[bench/agent/context.mjs](../packages/react/bench/agent/context.mjs)）：課題を解くのに開く文書の大きさを、トークンの見積もり（英数字4文字か日本語1文字で1トークン）で数えます。KEI はパッケージに入る README と、使う部品を宣言している d.ts を丸ごと、または `llms.txt` だけ。他のシステムは、使う部品の Markdown 版の文書を `--external` で取得して数えます。
+2. **誤用の検出**（[bench/agent/misuse.mjs](../packages/react/bench/agent/misuse.mjs)、事例は [misuse-cases.mjs](../packages/react/bench/agent/misuse-cases.mjs)）：エージェントがしがちな誤り21件を、利用側のアプリと同じ見え方（ビルド済みの `lib/` を通して）で型検査し、ESLint にかけ、jsdom で描画します。採点は1件3点です。
    - 型か lint で止まる：2点。編集のたびにエディタ（LSP）や検査で分かります。
    - 実行時に止まる（例外・`console.error`・`console.warn`）：1点。
    - どこでも止まらない：0点。
    - 最初のメッセージに直し方の言葉（`onCheckedChange`・`danger` など、事例ごとに決めたもの）が含まれる：1点を足す。
-3. **エージェントの実測**（KEI のみ）：課題ごとに利用側のアプリを scratch に作り、パッケージ（`npm pack` したもの）だけを入れて、サブエージェントに [agent-prompt.md](../bench/agent/agent-prompt.md) の指示で解かせます。記録するのは、サブエージェントの合計トークン、道具の呼び出し回数、型検査の回数、読んだファイルです。合計トークンにはシステムの指示も入っているため、何も調べずに1行書くだけの対照（T0）の値を引いて比べます。
+3. **エージェントの実測**（KEI のみ）：課題ごとに利用側のアプリを scratch に作り、パッケージ（`npm pack` したもの）だけを入れて、サブエージェントに [agent-prompt.md](../packages/react/bench/agent/agent-prompt.md) の指示で解かせます。記録するのは、サブエージェントの合計トークン、道具の呼び出し回数、型検査の回数、読んだファイルです。合計トークンにはシステムの指示も入っているため、何も調べずに1行書くだけの対照（T0）の値を引いて比べます。
 
 ### 採点表（16点満点）
 
@@ -173,14 +173,14 @@ shadcn/ui、Radix Themes、MUI（v9）、Chakra UI（v3）、Mantine（v9）、G
 
 ### 1. 利用者向けの ESLint プラグイン
 
-今の独自ルール（`kei/unit-outside-mono`）は `eslint.config.mjs` の中にあり、パッケージを使う側には届きません。ルールをプラグインとして切り出してパッケージに入れ、次のルールを足します。メッセージには直し方を書きます（いまのルールと同じ方針）。
+今の独自ルール（`kei/unit-outside-mono`）は `packages/react/eslint.config.mjs` の中にあり、パッケージを使う側には届きません。ルールをプラグインとして切り出してパッケージに入れ、次のルールを足します。メッセージには直し方を書きます（いまのルールと同じ方針）。
 
 - `button-type-in-form`：`<form>` の中の Button に `type` がない。「フォームの送信には type="submit" を付けてください（Button の既定は type="button"）」。
 - `table-sort-before-page`：DataTable の `rows` に `.slice(` の結果を渡しているのに `sorting` がない。「全件を並べ替えてから区切り、sorting / onSortingChange で状態を持ってください」。
 - `metric-unit`：Metric の `value` の文字列が `%` や `円` で終わる。「単位は unit に分けてください：value="99.95" unit="%"」。
 - `dialog-close`：Dialog の `footer` にある Button が `onClick` を持たず、DialogClose にも包まれていない。
 
-→ `lint/` に入れ、ESLint・Oxlint・Biome で使えるようにしました（README の「lint」）。誤用ベンチは 40 → 48 / 63 点です。`table-sort-before-page` は、`slice` のような汎用のメソッドを見張る形では流し込み方が増えるたびに直すことになるため外しました。代わりに DataTable にページ分け（`pageSize`）とサーバー任せの形（`dataMode="server"`）を持たせ、誤った順番を書けない作りにしました。lint は、並べ替えのある DataTable と Pagination を同じ部品（いちばん近い関数）の中で使い、DataTable のページ分けを使っていない組み合わせだけを見る `table-pagination` にし、誤用ベンチは 51 / 63 点です。`dialog-cancel-not-close` は、例が `open` だけを渡しているため、先に「onOpenChange を渡す」の指摘が出て、DialogClose の言葉までは届きません。
+→ `packages/react/lint/` に入れ、ESLint・Oxlint・Biome で使えるようにしました（README の「lint」）。誤用ベンチは 40 → 48 / 63 点です。`table-sort-before-page` は、`slice` のような汎用のメソッドを見張る形では流し込み方が増えるたびに直すことになるため外しました。代わりに DataTable にページ分け（`pageSize`）とサーバー任せの形（`dataMode="server"`）を持たせ、誤った順番を書けない作りにしました。lint は、並べ替えのある DataTable と Pagination を同じ部品（いちばん近い関数）の中で使い、DataTable のページ分けを使っていない組み合わせだけを見る `table-pagination` にし、誤用ベンチは 51 / 63 点です。`dialog-cancel-not-close` は、例が `open` だけを渡しているため、先に「onOpenChange を渡す」の指摘が出て、DialogClose の言葉までは届きません。
 
 ### 2. 開発時の警告
 
@@ -208,11 +208,12 @@ shadcn/ui、Radix Themes、MUI（v9）、Chakra UI（v3）、Mantine（v9）、G
 ```sh
 npm ci
 npm run bench:agent                                   # 誤用の検出と、KEI の読む量
+cd packages/react
 node bench/agent/context.mjs --external               # 他のシステムの文書も取得して数える
 node bench/agent/misuse.mjs --json out.json           # 結果を JSON で残す
 ```
 
-改善前と比べるときは、別のチェックアウトを `--root` で渡します。
+改善前と比べるときは、別のチェックアウトを `--root` で渡します（`packages/react` で実行します。ワークスペースに移したあとのチェックアウトなら、`--root` には `packages/react` を渡します）。
 
 ```sh
 git worktree add ../kei-main main
@@ -223,12 +224,12 @@ node bench/agent/context.mjs --root ../kei-main
 
 エージェントの実測は手作業です。
 
-1. `npm run build:lib && npm pack` でパッケージを作る。
+1. リポジトリの直下で `npm run build:lib -w packages/react && npm pack -w packages/react` を実行し、パッケージを作る。
 2. 課題ごとに空の利用側アプリを作り、パッケージ・react・react-dom・typescript を入れる（`npm run typecheck` が `tsc --noEmit` を呼べること）。`src/App.tsx` は KeiProvider と ToastProvider で包むだけ。
-3. [agent-prompt.md](../bench/agent/agent-prompt.md) に課題の節を入れてサブエージェントに渡す。同じモデルで、対照の T0（何も調べずに1行書く）も1回解かせる。
-4. 合計トークン・道具の呼び出し・時間・読んだファイルを [results/agent-runs.json](../bench/agent/results/agent-runs.json) の形で残し、解答が型検査を通り、課題の確認項目を満たすかを見る。
+3. [agent-prompt.md](../packages/react/bench/agent/agent-prompt.md) に課題の節を入れてサブエージェントに渡す。同じモデルで、対照の T0（何も調べずに1行書く）も1回解かせる。
+4. 合計トークン・道具の呼び出し・時間・読んだファイルを [results/agent-runs.json](../packages/react/bench/agent/results/agent-runs.json) の形で残し、解答が型検査を通り、課題の確認項目を満たすかを見る。
 
-今回の結果の JSON は [bench/agent/results](../bench/agent/results) にあります。
+今回の結果の JSON は [bench/agent/results](../packages/react/bench/agent/results) にあります。
 
 ## 限界
 

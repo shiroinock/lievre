@@ -1,6 +1,6 @@
 # KEI を端末（TUI）に広げる道
 
-KEI のデザイン言語を、端末の画面にも広げるための比較です。KEI は lievre に改名する予定なので、試作は仮に `@lievre/tui` という名前で [spikes/tui](../spikes/tui/README.md) に置きました。本体（`src/`・ルートの `package.json`）には入れていません。
+KEI のデザイン言語を、端末の画面にも広げるための比較です。KEI は lievre に改名する予定です。試作は [spikes/tui](../spikes/tui/README.md) に置き、その部品を土台に、ワークスペースのパッケージ [packages/tui](../packages/tui/README.md)（いまは `@kei-design/tui`）を作りました。
 
 ## TUI の道具の今（2026年10月30日に確かめた）
 
@@ -48,7 +48,7 @@ KEI の場合は、次の2点で TypeScript がいちばん合います。
 ## 推奨
 
 1. **言語**：TypeScript で揃える。
-2. **描画の道具**：いまは Ink 8。色と字の組を決める中核（`spikes/tui/src/core`）は Ink に依らない形で書き、描画の層（`src/ink`）だけを差し替えられるようにする。OpenTUI が 1.0 になり、Node.js で実験の旗なしに動き、スクリーンリーダーに配慮するようになったら、もう一度比べる。
+2. **描画の道具**：いまは Ink 8。色と字の組を決める中核（`packages/tui/src/core`）は Ink に依らない形で書き、描画の層（`src/ink`）だけを差し替えられるようにする。OpenTUI が 1.0 になり、Node.js で実験の旗なしに動き、スクリーンリーダーに配慮するようになったら、もう一度比べる。
 3. **パッケージ**：このリポジトリを npm のワークスペースにし、`@lievre/tokens`・`@lievre/react`・`@lievre/tui` に分ける。改名も同じ時期に行う。ただし、移すことと改名は別の PR にする（下の「移す手順」）。
 4. **書体**：標準の罫線を基本にする。私用の領域の書体「Lievre Term」は、利用者が選んだときだけ使い、Unicode にない形（ボタンの丸い端とフォーカスの輪）に限る。
 5. **色**：
