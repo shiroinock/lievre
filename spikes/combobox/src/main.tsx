@@ -1,13 +1,13 @@
 import { StrictMode, useState, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { I18nProvider } from 'react-aria-components';
-import '../../../src/styles/fonts.css';
-import '../../../src/styles/kei.css';
+import '../../../packages/react/src/styles/fonts.css';
+import '../../../packages/react/src/styles/kei.css';
 import './spike.css';
 import './datepicker.css';
-import { KeiProvider, type Theme } from '../../../src/components/system';
-import { Button, Select } from '../../../src/components/primitives';
-import { Dialog } from '../../../src/components/dialog';
+import { KeiProvider, type Theme } from '../../../packages/react/src/components/system';
+import { Button, Select } from '../../../packages/react/src/components/primitives';
+import { Dialog } from '../../../packages/react/src/components/dialog';
 import { AriaCombobox } from './AriaCombobox';
 import { AriakitCombobox } from './AriakitCombobox';
 import { AriaDatePicker } from './AriaDatePicker';

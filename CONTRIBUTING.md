@@ -4,9 +4,9 @@
 
 ## 1. 部品と Story
 
-1. `src/components` に部品を書き、`src/index.ts` から公開します。クラス名は `.k-` で始めます。
-2. スタイルは `src/styles/kei.css` の `@layer kei.components` に書きます。高さ・余白・間隔はトークン（`--k-space-*`、`--k-control-height`）か 4px の倍数にします。
-3. `src/stories/部品名.stories.tsx` を作り、`meta.component` に部品を指定します。状態ごとに Story を分けます。開いた状態（ダイアログ・メニュー・ツールチップ）も、開いたまま終わる Story を1つ作ります。
+1. `packages/react/src/components` に部品を書き、`packages/react/src/index.ts` から公開します。クラス名は `.k-` で始めます。
+2. スタイルは `packages/react/src/styles/kei.css` の `@layer kei.components` に書きます。高さ・余白・間隔はトークン（`--k-space-*`、`--k-control-height`）か 4px の倍数にします。トークンそのものは `packages/tokens/tokens.css` にあります。
+3. `packages/react/src/stories/部品名.stories.tsx` を作り、`meta.component` に部品を指定します。状態ごとに Story を分けます。開いた状態（ダイアログ・メニュー・ツールチップ）も、開いたまま終わる Story を1つ作ります。
 
 ## 2. 配置の宣言
 
@@ -60,6 +60,8 @@ const meta = {
 
 ## 3. テスト
 
+コマンドはリポジトリの直下で実行します。
+
 ```sh
 npm run typecheck
 npm run lint
@@ -67,11 +69,11 @@ npm test             # jsdom：部品のふるまい・axe・Story の play
 npm run test:layout  # ブラウザ：配置の基準（初回は npx playwright install chromium）
 ```
 
-部品の props や説明（`/** */`）を書いたら `npm run llms`、`kei.css` のトークンを変えたら `npm run tokens` で書き出します。書き出し忘れは `npm test` が止めます。
+部品の props や説明（`/** */`）を書いたら `npm run llms`、`tokens.css` のトークンを変えたら `npm run tokens` で書き出します。書き出し忘れは `npm test` が止めます。
 
 `npm run test:layout` が失敗したら、メッセージの「基準」に合わせて CSS を直します。メッセージには Story、配色・密度・文字の組み合わせ、部品の名前、要素、ずれの大きさが出ます。
 
-すぐに直せない理由があるときだけ、`src/test/layout/baseline.ts` に理由付きで例外を足します。画面の例外は `example`（Story の名前）か `element`（要素の一部）で、ずれる箇所だけに絞ります。直したら例外を消してください（消し忘れると検査が知らせます）。
+すぐに直せない理由があるときだけ、`packages/react/src/test/layout/baseline.ts` に理由付きで例外を足します。画面の例外は `example`（Story の名前）か `element`（要素の一部）で、ずれる箇所だけに絞ります。直したら例外を消してください（消し忘れると検査が知らせます）。
 
 ## プルリクエスト
 

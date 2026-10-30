@@ -6,7 +6,7 @@ KEI に足りない部品を、ほかのデザインシステムと比べて洗�
 
 ## 1. KEI の今の部品
 
-`src/index.ts` が書き出している部品と、`src/stories` の Story から数えました。第1段階のうち IconButton・Popover・DropdownMenu・ConfirmDialog・DescriptionList・VisuallyHidden・Spinner は作り終え、この表に入れています（比較の表は調べた時点のままです）。
+`packages/react/src/index.ts` が書き出している部品と、`packages/react/src/stories` の Story から数えました。第1段階のうち IconButton・Popover・DropdownMenu・ConfirmDialog・DescriptionList・VisuallyHidden・Spinner は作り終え、この表に入れています（比較の表は調べた時点のままです）。
 
 | まとまり             | 部品                                                                                  |
 | -------------------- | ------------------------------------------------------------------------------------- |
@@ -19,7 +19,7 @@ KEI に足りない部品を、ほかのデザインシステムと比べて洗�
 | 重なり               | Dialog / DialogClose、ConfirmDialog、Popover、DropdownMenu                            |
 | データ               | DataTable（並べ替え・行の選択・空と読み込み中）、Metric、Meter、Sparkline             |
 
-画面例（`src/patterns`、`src/App.tsx`）で部品にならずに手で組まれているもの：
+画面例（`packages/react/src/patterns`、`packages/react/src/App.tsx`）で部品にならずに手で組まれているもの：
 
 - 手順の表示（`Everyday.tsx` の `everyday-steps`）→ Stepper
 - 操作の履歴（`Operations.tsx` の `activity-list`）→ Timeline

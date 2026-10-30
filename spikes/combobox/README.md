@@ -1,6 +1,6 @@
 # Combobox の土台の試作
 
-部品の第2段階（Combobox・DatePicker）の土台を選ぶための試作です。結論と理由は [docs/combobox-foundation.md](../../docs/combobox-foundation.md) にあります。**本体（`src/`・`package.json`）には入れません。** 依存はこのフォルダの `package.json` だけに入れています。
+部品の第2段階（Combobox・DatePicker）の土台を選ぶための試作です。結論と理由は [docs/combobox-foundation.md](../../docs/combobox-foundation.md) にあります。**本体（`packages/`）には入れません。** 依存はこのフォルダの `package.json` だけに入れています。
 
 ## 中身
 

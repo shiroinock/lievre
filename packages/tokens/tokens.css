@@ -1,0 +1,151 @@
+/*
+ * KEI tokens 0.2
+ * The source of truth for every --k-* token. @kei-design/react reads this file into
+ * styles.css; `npm run tokens` writes tokens.json from it.
+ */
+@layer kei.tokens {
+  .kei {
+    /* Palette — paper */
+    --k-bg: #f3f4f8;
+    --k-surface: #fbfbfd;
+    --k-surface-raised: #ffffff;
+    --k-surface-sunken: #e8eaf2;
+    --k-text: #121640;
+    --k-muted: #4a5070;
+    --k-subtle: #5a6182;
+    --k-border: #d5d8e4;
+    --k-border-strong: #7c83a4;
+    --k-accent: #2424d8;
+    --k-accent-hover: #1b1ba6;
+    --k-accent-soft: #e7e8fd;
+    --k-on-accent: #ffffff;
+    /* Distinct from hover (sunken) and the work surface, not just a tint of them. */
+    --k-selected: #d5d8fb;
+    /* The app frame (sidebar): the one solid surface outside content. Paper prints it in ultramarine. */
+    --k-frame: #2424d8;
+    --k-frame-hover: #3535e4;
+    --k-frame-inset: #1b1ba6;
+    --k-frame-line: #5b5bea;
+    --k-on-frame: #ffffff;
+    --k-frame-muted: #d6d8ff;
+    --k-frame-selected: #ffffff;
+    --k-on-frame-selected: #1b1ba6;
+    --k-success: #0b6b58;
+    --k-success-soft: #ddf1eb;
+    --k-warning: #7e5400;
+    --k-warning-soft: #f6ebcf;
+    --k-danger: #b3261e;
+    --k-danger-soft: #fbe5e2;
+    --k-on-danger: #ffffff;
+    --k-info: #2a4aa6;
+    --k-info-soft: #e5ebfb;
+    --k-skeleton: #dcdfe9;
+    --k-overlay: #0b0d2666;
+    --k-focus: var(--k-accent);
+
+    /* Type */
+    --k-font-sans: 'IBM Plex Sans JP', system-ui, -apple-system, 'Hiragino Sans', 'Yu Gothic UI',
+      sans-serif;
+    --k-font-mono: 'KEI Mono', 'PlemolJP', 'IBM Plex Mono', 'IBM Plex Sans JP', ui-monospace,
+      'SF Mono', Menlo, monospace;
+    --k-text-xs: 0.75rem;
+    /* Smallest size for monospace text: KEI Mono draws Latin at 5/6 size, so 0.9rem reads as 12px. */
+    --k-text-mono-min: 0.9rem;
+    --k-text-sm: 0.8125rem;
+    --k-text-md: 0.875rem;
+    --k-text-base: 1rem;
+    --k-text-lg: 1.125rem;
+    --k-text-xl: 1.375rem;
+    --k-text-2xl: 1.75rem;
+    --k-text-3xl: 2.25rem;
+    --k-weight-regular: 400;
+    --k-weight-medium: 500;
+    --k-weight-bold: 600;
+    --k-leading-tight: 1.4;
+    --k-leading-body: 1.75;
+    /* Line heights snapped to the 4px grid at the size of the element that uses them. */
+    --k-line-tight: round(1.45em, 4px);
+    --k-line-body: round(1.7em, 4px);
+    --k-tracking-heading: 0.04em;
+    --k-body: var(--k-text-base);
+
+    /* Space and shape */
+    --k-space-1: 4px;
+    --k-space-2: 8px;
+    --k-space-3: 12px;
+    --k-space-4: 16px;
+    --k-space-6: 24px;
+    --k-space-8: 32px;
+    --k-space-12: 48px;
+    --k-radius-sm: 3px;
+    --k-radius-md: 5px;
+    --k-radius-lg: 8px;
+    --k-radius-full: 999px;
+
+    /* Density */
+    --k-control-height: 40px;
+    /* Side padding: buttons 0.4 × height, inputs 0.3 × height, rounded to 4px. */
+    --k-control-padding: 0 16px;
+    --k-input-padding: 8px 12px;
+    --k-panel-padding: 20px;
+    --k-stack-gap: 20px;
+    --k-cell-padding: 12px 16px;
+
+    /* Motion */
+    --k-motion: 140ms;
+    --k-ease: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .kei[data-theme='ink'] {
+    --k-bg: #0b0d26;
+    --k-surface: #11143a;
+    --k-surface-raised: #191d4a;
+    --k-surface-sunken: #070920;
+    --k-text: #eceefe;
+    --k-muted: #b4b9dc;
+    --k-subtle: #a2a8d0;
+    --k-border: #2b3068;
+    --k-border-strong: #6f77b2;
+    --k-accent: #a9b1ff;
+    --k-accent-hover: #c9cdff;
+    --k-accent-soft: #23286c;
+    --k-selected: #2e358c;
+    /* Ink calms the frame to a deep blue, below the text and small accents. */
+    --k-frame: #191953;
+    --k-frame-hover: #26266e;
+    --k-frame-inset: #10103e;
+    --k-frame-line: #3a3a80;
+    --k-on-frame: #ffffff;
+    --k-frame-muted: #c9cbf2;
+    --k-frame-selected: #dce0ff;
+    --k-on-frame-selected: #191953;
+    --k-on-accent: #0f1148;
+    --k-success: #7dd6bf;
+    --k-success-soft: #11352e;
+    --k-warning: #eec46a;
+    --k-warning-soft: #3a3018;
+    --k-danger: #ff9e91;
+    --k-danger-soft: #46211e;
+    --k-on-danger: #2a0d0a;
+    --k-info: #a0b9ff;
+    --k-info-soft: #1b2a5d;
+    --k-skeleton: #262b5e;
+    --k-overlay: #03041399;
+  }
+
+  /* Density changes control height and padding, never the size of reading text. */
+  .kei[data-density='compact'] {
+    --k-control-height: 32px;
+    --k-control-padding: 0 12px;
+    --k-input-padding: 4px 8px;
+    --k-panel-padding: 16px;
+    --k-stack-gap: 16px;
+    --k-cell-padding: 8px 12px;
+  }
+
+  .kei[data-typography='interface'] {
+    --k-body: var(--k-text-md);
+    /* 14px × 24 / 14 = 24px, so inherited body lines stay on the grid. */
+    --k-leading-body: calc(24 / 14);
+  }
+}

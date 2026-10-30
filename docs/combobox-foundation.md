@@ -30,7 +30,7 @@ React Aria は DatePicker と和暦まで持つ点が有力でしたが、自前
 
 ## 2. 依存の大きさ
 
-今の KEI のライブラリ（`src/library.ts`、react を外に出し、本番のビルド）に足したときの増分です。`npm run size`（`spikes/combobox/scripts/size.mjs`）で測りました。radix-ui の中身と同じパッケージ（floating-ui など）は、実際のライブラリと同じく1つにまとめています。
+今の KEI のライブラリ（`packages/react/src/library.ts`、react を外に出し、本番のビルド）に足したときの増分です。`npm run size`（`spikes/combobox/scripts/size.mjs`）で測りました。radix-ui の中身と同じパッケージ（floating-ui など）は、実際のライブラリと同じく1つにまとめています。
 
 | 足すもの                                           | gzip の増分 | 新しく入るパッケージ                                                                     |
 | -------------------------------------------------- | ----------: | ---------------------------------------------------------------------------------------- |
@@ -186,7 +186,7 @@ DatePicker・DateRangePicker・Calendar を持ち、`@internationalized/date` �
 - **IME の守り**：`useImeGuard` を、Combobox のほか、SearchField・DatePicker の年月日の欄にも使う。
 - **枠の約束**：入力欄にフォーカスを残す部品の枠は、Radix の Popover に次を付ける。開閉でフォーカスを動かさない（`onOpenAutoFocus`・`onCloseAutoFocus` を止める）、入力欄と一覧の中は「外側」にしない、変換中の Esc では閉じない。
 - **見た目**：一覧は Select と同じ値（`.k-select-content`・`.k-select-item`）。z-index は Dialog の上（試作では 110）にする。今の候補の印は、試作では土台ごとに属性の名前が違った（`data-focused`・`data-active-item`・`data-highlighted`）ので、KEI の部品では `data-highlighted` に揃える。
-- **共通の操作の検査**：`test/behavior.mjs` の操作（矢印・Home / End・Enter・Esc・Tab・外側を押す・ポインターで選ぶ・Dialog の中・IME の2つの順・テーマ）を、`src/test` の検査として、開閉する部品（Select・Combobox・DatePicker・DropdownMenu・Popover）に共通に流す。土台の違う部品でも同じ検査を通すことが、約束の「検査で確かめる」になる。
+- **共通の操作の検査**：`test/behavior.mjs` の操作（矢印・Home / End・Enter・Esc・Tab・外側を押す・ポインターで選ぶ・Dialog の中・IME の2つの順・テーマ）を、`packages/react/src/test` の検査として、開閉する部品（Select・Combobox・DatePicker・DropdownMenu・Popover）に共通に流す。土台の違う部品でも同じ検査を通すことが、約束の「検査で確かめる」になる。
 
 ## 9. 残っている確認
 

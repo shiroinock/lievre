@@ -1,17 +1,14 @@
 {
-  "name": "@lievre/tui",
+  "name": "kei-tui-spike",
   "private": true,
   "type": "module",
-  "description": "lievre（いまの KEI）の端末向けパッケージの試作。仮の名前で、公開しない。モノレポに移すまではリポジトリの直下の react と tokens/tokens.json を使う。",
+  "description": "KEI の端末向けの試作の残り（操作できる見本、画面の書き出し、試しの書体）。部品は packages/tui に移した。公開しない。",
   "scripts": {
-    "start": "tsx src/ink/main.tsx",
+    "start": "tsx scripts/main.tsx",
     "capture": "tsx scripts/capture.tsx",
     "shot": "node scripts/shot.mjs",
     "font": "python3 -I font/build.py",
     "typecheck": "tsc -p tsconfig.json"
-  },
-  "dependencies": {
-    "ink": "8.0.0"
   },
   "devDependencies": {
     "@types/node": "22.20.5",

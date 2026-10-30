@@ -1,4 +1,4 @@
-export * from '../../../src/library';
+export * from '../../../packages/react/src/library';
 export {
   Button,
   ComboBox,

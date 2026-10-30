@@ -1,0 +1,40 @@
+{
+  "name": "@kei-design/tui",
+  "version": "0.2.0",
+  "description": "KEI の端末（TUI）向けの部品。Ink 8 で描く",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    }
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "react": ">=19.3.0"
+  },
+  "dependencies": {
+    "@kei-design/tokens": "0.2.0",
+    "cli-boxes": "^4.0.1",
+    "ink": "8.0.0",
+    "string-width": "^8.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.3.0",
+    "react": "^19.3.0",
+    "typescript": "~5.9.3",
+    "vitest": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

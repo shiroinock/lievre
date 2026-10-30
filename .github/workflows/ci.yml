@@ -32,11 +32,12 @@ jobs:
       - name: lint（stylelint・ESLint）
         run: npm run lint
 
-      - name: テスト（jsdom）
+      # Every workspace: tokens (node --test), react (jsdom), tui (renderToString and contrast).
+      - name: テスト（tokens・react・tui）
         run: npm test
 
       # The browser is keyed on the installed Playwright version, so it is only downloaded again
-      # when package-lock.json moves Playwright.
+      # when package-lock.json moves Playwright. npm installs it once, at the repository root.
       - name: Playwright の版を調べる
         id: playwright
         run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
@@ -59,5 +60,12 @@ jobs:
       - name: 配置の検査（ブラウザ）
         run: npm run test:layout
 
-      - name: build
-        run: npm run build:lib && npm run build:demo && npm run build:storybook
+      - name: build（react の lib・デモ・Storybook、tui の lib）
+        run: >-
+          npm run build:lib -w packages/react &&
+          npm run build:demo -w packages/react &&
+          npm run build:storybook -w packages/react &&
+          npm run build -w packages/tui
+
+      - name: npm pack の中身
+        run: npm run check:pack -w packages/react

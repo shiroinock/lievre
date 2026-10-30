@@ -1,0 +1,25 @@
+{
+  "name": "@kei-design/tokens",
+  "version": "0.2.0",
+  "description": "KEI のデザイントークン（CSS と Design Tokens 形式の JSON）",
+  "type": "module",
+  "private": true,
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    "./tokens.css": "./tokens.css",
+    "./tokens.json": "./tokens.json"
+  },
+  "files": [
+    "tokens.css",
+    "tokens.json"
+  ],
+  "scripts": {
+    "tokens": "node scripts/build-tokens.mjs",
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

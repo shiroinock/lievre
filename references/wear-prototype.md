@@ -1,6 +1,6 @@
 # 試作：シードで固定できる質感（off / baked / live）
 
-カスレ・縁の荒れ・汚れ・紙のヤケとスレで物質感を足しつつ、性能を優先して切れるようにする試作です。採用は未定です。見比べる場所は Storybook の「Foundations / 試作 配色と擦れ」と、demo アプリのサイドバーの「質感（試作）」です。強さは、手元の調整画面（`npm run wear:tune`）で決めて [wear.config.json](../wear.config.json) に保存します（[下の「強さの調整」](#強さの調整)）。刷ってからの時間（褪色・インクのむら・罫線のかすれ・角の欠け）は、別の軸として [wear-age.md](wear-age.md) にまとめています。
+カスレ・縁の荒れ・汚れ・紙のヤケとスレで物質感を足しつつ、性能を優先して切れるようにする試作です。採用は未定です。見比べる場所は Storybook の「Foundations / 試作 配色と擦れ」と、demo アプリのサイドバーの「質感（試作）」です。強さは、手元の調整画面（`npm run wear:tune`）で決めて [wear.config.json](../packages/react/wear.config.json) に保存します（[下の「強さの調整」](#強さの調整)）。刷ってからの時間（褪色・インクのむら・罫線のかすれ・角の欠け）は、別の軸として [wear-age.md](wear-age.md) にまとめています。
 
 ## 使い方
 
@@ -24,14 +24,14 @@
 
 ## シード
 
-- `hash(ソルト + 部品の種類 + 位置)` で部品ごとの値を決めます（FNV-1a、[src/wear/seed.mjs](../src/wear/seed.mjs)）。続けて値を取り出すときは mulberry32 を使います。同じソルトなら毎回同じ見た目になります。
+- `hash(ソルト + 部品の種類 + 位置)` で部品ごとの値を決めます（FNV-1a、[src/wear/seed.mjs](../packages/react/src/wear/seed.mjs)）。続けて値を取り出すときは mulberry32 を使います。同じソルトなら毎回同じ見た目になります。
 - 部品の種類は `root`（作業面）、`card` と、文字の種類 `small`（12–13px）、`text`（本文）、`heading`、`figure`（Metric・Meter の数値）、`data`（表のセル）です。位置は `:nth-of-type(4n+1〜4)` の4種類で、同じ種類の部品が並んでも模様の位置がずれます。
 - ソルトは `wear.config.json` の `salt` で決まります。live の `wearSeed` の既定もこの値なので、何も指定しなければ live と baked は同じ模様になります。
-- フォントの変形（[scripts/wear/font.py](../scripts/wear/font.py)）でも同じハッシュとノイズを Python で使います。JavaScript と同じ値を返すことを確かめています（負の座標も含む）。
+- フォントの変形（[scripts/wear/font.py](../packages/react/scripts/wear/font.py)）でも同じハッシュとノイズを Python で使います。JavaScript と同じ値を返すことを確かめています（負の座標も含む）。
 
 ## baked
 
-- `npm run wear`：[scripts/build-wear.mjs](../scripts/build-wear.mjs) が、[src/styles/wear/](../src/styles/wear/) に次のものを書き出します。依存するのは Node の zlib だけです。`npm run build` に組み込みました。
+- `npm run wear`：[scripts/build-wear.mjs](../packages/react/scripts/build-wear.mjs) が、[src/styles/wear/](../packages/react/src/styles/wear/) に次のものを書き出します。依存するのは Node の zlib だけです。`npm run build` に組み込みました。
   - 粒と汚れ：256px 四方のタイルを、テーマごとに4枚（各16KB）。文字色を、最も濃い点でも `stain.strength`（標準 0.08）まで重ねます。
   - 紙のヤケ：端と角を9つに分けて使う 512px 四方の枠の画像を、テーマごとに4枚（各6KB）。スレ：256px 四方のタイルを、テーマごとに4枚（各3KB）。[下の「紙のヤケとスレ」](#紙のヤケとスレ)。
   - 文字のカスレ：マスク画像1枚（5KB）。最も薄い点でも `kasure.floor`（標準 0.8）を残します。文字の種類ごとの深さは、マスクの上に平らな層を重ねて浅くします（深さ f のとき、最も薄い点は 1 − (1 − floor) × f）。
@@ -40,7 +40,7 @@
   - `wear.json`：設定と、画素のハッシュ。テストで、`wear.config.json` から生成し直した結果と一致するかを調べます。
 - WebP ではなく PNG（16階調のパレット）にしました。WebP を書き出すには外部の部品が必要で、PNG でも十分に小さいためです。
 - `npm run wear:font`：Plex Sans JP（400 / 500 / 600）と、KEI Mono の元になっている Plex Mono の英数字（latin、400 / 500 / 600）の、全ての字形を変形します。
-  - 字の形（骨格）は動かさず、縁だけを荒らします（[scripts/wear/font.py](../scripts/wear/font.py)）。
+  - 字の形（骨格）は動かさず、縁だけを荒らします（[scripts/wear/font.py](../packages/react/scripts/wear/font.py)）。
     1. 輪郭の曲線と直線を、`outline.step`（標準 12/1000em）ほどの長さの短い区間に分けます。
     2. 縁の荒れ：分けた点を、輪郭の法線の向きにだけ動かします。ノイズの波長は `outline.roughScale`（標準 26/1000em）と短く、量は `outline.rough`（標準 7/1000em）です。
     3. 太さのむら：波長の長い（`outline.swellScale`、標準 220/1000em）ノイズで、法線の向きに少しふくらませたり細らせたりします。量は `outline.swell`（標準 4/1000em）です。
@@ -67,7 +67,7 @@
 - **紙は画面（ビューポート）**：ルートの `::before` と `::after` を `position: fixed` で画面に貼ります。スクロールしても描き直しません。`background-attachment: fixed` は使っていません。入れ子のルート（調整画面の見本）は、そのルートの箱を1枚の紙にします（`position: absolute`。そのルートに `position: relative` を付けてください）。
 - **カードは紙の上に置いた紙**：カードと Metric は、自分の縁に沿って弱く焼けます（`yake.surfaces`、標準 0.3）。内側の影（`box-shadow: inset`）なので、カードの大きさによらず同じ幅で付き、場所を取りません。0 にすると焼きません。
 - **文字の下にだけ付ける**：2つの層は `z-index: -1` で、ルートの中身の後ろに置きます（ルートに `isolation: isolate`）。紙だけが古くなり、文字、フォーカスの枠、操作部、状態の色は、その上にそのまま描かれます。サイドバーのように自分の背景を持つ面は、ヤケの上に重なります。
-- **ヤケ**（[textures.mjs の yakeField](../src/wear/textures.mjs)）
+- **ヤケ**（[textures.mjs の yakeField](../packages/react/src/wear/textures.mjs)）
   - 端から内側へ、`yake.reach`（標準 160px）まで、端に近いほど濃くします。
   - 低い周波数のノイズで、届く深さを最大 6割まで縮め、濃さも場所によって変えます（`yake.mottle`）。端からの距離だけで決めた、機械的な帯にならないようにするためです。
   - 二方向の端が重なる角は、足し合わせて濃くなり、さらに `yake.corner` を足します。最も濃い角で、テーマの色味を `yake.strength`（標準 0.35）の不透明度で重ねます。
@@ -86,7 +86,7 @@
 
 ## live
 
-- 粒と汚れ、カスレ、模様の位置は、baked と同じ関数（[src/wear/textures.mjs](../src/wear/textures.mjs)）でブラウザの中で作ります。画像は圧縮せずに PNG にし、blob URL で渡します。画素は baked と同じです（テストで確かめています）。
+- 粒と汚れ、カスレ、模様の位置は、baked と同じ関数（[src/wear/textures.mjs](../packages/react/src/wear/textures.mjs)）でブラウザの中で作ります。画像は圧縮せずに PNG にし、blob URL で渡します。画素は baked と同じです（テストで確かめています）。
 - 縁の荒れは、荒らす文字の種類と位置ごとに SVG フィルタを作ります（標準では3種類×4で12個）。`feTurbulence`（seed 属性）と `feDisplacementMap` を使います（`liveEdge`）。細かさは `outline.roughScale` から、大きさは縁の荒れと太さのむらを合わせた量から、文字の種類ごとの代表の大きさで換算します。
 - これは近似です。フィルタは画素を横と縦にずらすので、縁の法線の向きだけに動かすことはできず、字の内側も少し揺れます。太さのむらも表せません。調整の画面にも、この違いを書いています。
 - フィルタは、本文や見出しなど文字の要素だけにかけます。部品の箱にはかけません。
@@ -100,14 +100,14 @@ npm run wear:setup   # .venv-wear/ を作り、fontTools と brotli を入れる
 npm run wear:tune
 ```
 
-- `npm run wear:setup` は、リポジトリの中に `.venv-wear/`（git の管理外）を作り、[scripts/wear/requirements.txt](../scripts/wear/requirements.txt) の版（fontTools 4.55.3、brotli 1.1.0）を PyPI から入れます。uv があれば uv を、なければ `python3 -m venv` と pip を使います。何度実行しても同じ結果になります。
-- 焼き込みに使う Python は、`KEI_WEAR_PYTHON`、`.venv-wear/bin/python3`、`python3` の順に選びます（[scripts/wear/python.mjs](../scripts/wear/python.mjs)）。`npm run wear:font` と、調整画面の「保存して焼き込む」「その場の焼き込み」で共通です。
+- `npm run wear:setup` は、リポジトリの中に `.venv-wear/`（git の管理外）を作り、[scripts/wear/requirements.txt](../packages/react/scripts/wear/requirements.txt) の版（fontTools 4.55.3、brotli 1.1.0）を PyPI から入れます。uv があれば uv を、なければ `python3 -m venv` と pip を使います。何度実行しても同じ結果になります。
+- 焼き込みに使う Python は、`KEI_WEAR_PYTHON`、`.venv-wear/bin/python3`、`python3` の順に選びます（[scripts/wear/python.mjs](../packages/react/scripts/wear/python.mjs)）。`npm run wear:font` と、調整画面の「保存して焼き込む」「その場の焼き込み」で共通です。
 - 必要なモジュールがないときは、ターミナルにも調整画面にも「npm run wear:setup を実行してください」と出します。
 
 
 - スライダーで変えられる値：縁の荒れの量と細かさ、太さのむらの量と広さ、輪郭を分ける長さ、カスレの密度・しきい値・最も薄い点、汚れの濃さ、ヤケの強さ・届く深さ・むら・角の強さ・カードの縁のヤケ、スレの密度・強さ・折り目のスレ、ソルト。選んでいるテーマの色味（ヤケの色、スレの色、そのテーマでの強さ）も変えられます。文字の種類ごとに、縁を荒らすかどうかと、カスレの深さも変えられます。
 - 変えた値は「実行時（live）」の列にすぐ反映します。隣に「質感なし」「焼き込み（保存した値）」と「焼き込みの試し（今の値）」を並べます。「焼き込みの試し」は、開発サーバーが見本の文字に使う区切りだけを今の値で焼いて（約2秒）返すもので、保存しなくても焼き込みの見た目を確かめられます。見本は、12 / 14 / 16px の本文と見出し、KEI Mono の数値・ID・時刻、表、ボタン、入力欄、Metric、Meter です。テーマは4つから選べます。
-- 読みやすさの目安を数値で出します（[src/wear/gauges.mjs](../src/wear/gauges.mjs)）。
+- 読みやすさの目安を数値で出します（[src/wear/gauges.mjs](../packages/react/src/wear/gauges.mjs)）。
   - 縁の動き（px、上限で切った後の値）と、いちばん細い画（60/1000em）に対する割合。目安は20%まで、30%を超えると「超過」です。14px 未満の文字の縁を荒らすと「注意」にします。
   - カスレで5%以上薄くなる画素の割合。目安は15%まで、30%を超えると「超過」です。
   - 汚れ・ヤケ・スレが最も濃い点の上の、全ての文字色と、最も薄いカスレの文字のコントラスト。3つの層を、それぞれ最も濃い点で重ねたものでも測ります（実際には同じ場所でそろうことはまれです）。いちばん低くなった層も表示します。4.5:1 未満なら「超過」で、保存もしません。
@@ -116,7 +116,7 @@ npm run wear:tune
 ![調整画面の広い見本（Sepia、標準。Sepia はあとで不採用）](images/wear-sheet/tune-wide-sheet.jpg)
 - 小さい文字ほど控えめにする仕組みとして、文字の種類（`small` / `text` / `heading` / `figure` / `data`）ごとに、縁を荒らすかとカスレの深さを分けました。CSS では計算後の文字の大きさで要素を選べないので、型の段階（`k-text--small` など）で分けています。縁の動きは em 単位なので、px では小さい文字ほど少なく動きます。
 - 「保存して焼き込む」で、開発サーバーが `wear.config.json` を書き、`src/styles/wear/` を生成し直し、フォントの焼き込み（`npm run wear:font`）を始めます。この窓口は `vite` の開発サーバーにしかなく、同じ機械からの、同じオリジンのページからの要求だけを受け付けます。コントラストが 4.5:1 に届かない値は保存しません。
-- プリセットは3つです（[src/wear/presets.mjs](../src/wear/presets.mjs)）。
+- プリセットは3つです（[src/wear/presets.mjs](../packages/react/src/wear/presets.mjs)）。
 
 | プリセット | 縁（荒れ / 細かさ / むら / 広さ / 区間） | カスレ（密度 / しきい値 / 最も薄い点） | 汚れ | ヤケ（強さ / 深さ / むら / 角 / カード） | スレ（密度 / 強さ / 折り目） | 荒らす種類 | 目安 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -170,7 +170,7 @@ npm run wear:tune
 - フォーカスの枠、入力やボタンなどの操作部、状態の色や記号には、質感をかけません。リンクや操作部を含む要素にも、マスクやフィルタをかけません。テストで、`kei-wear.css` がそれらのセレクタを含まないことを調べています。
 - 補助文字（`k-muted`）には、カスレをかけません。最も濃い点のコントラストに余裕がないためです。
 - 部品の大きさや位置は変えません。`kei-wear.css` が使ってよいプロパティをテストで限っています。紙の層のために、`isolation`、`z-index`、`pointer-events`、幅 0 の `border`（`border-image` だけを描く）、内側の `box-shadow` を加えました。どれも箱の大きさを変えません。Chrome でも、demo の2画面（565要素）で、off・baked・live の間で箱が1つも動かないことを確かめました（回転し続ける読み込み中のアイコン2つは除く）。
-- コントラストは、最も濃い点で検査しています（[src/test/contrast.test.tsx](../src/test/contrast.test.tsx)）。
+- コントラストは、最も濃い点で検査しています（[src/test/contrast.test.tsx](../packages/react/src/test/contrast.test.tsx)）。
   - 汚れが最も濃い点、その上にヤケが最も濃い点、さらにスレが最も濃い点を重ねた3つの背景で、全ての文字色（本文・補助・状態の色・リンク）が4.5:1以上、フォーカスの枠と操作の輪郭が3:1以上になること。
   - その上でカスレが最も薄い点の文字でも、4.5:1以上になること。
   - 当初の下限 0.62 では Paper と（当時あった）Sepia が届かなかったので、0.72 に上げました。

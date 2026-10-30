@@ -1,0 +1,1714 @@
+/*
+ * KEI 0.2
+ * Wrap the app in .kei (KeiProvider). Every rule lives in a cascade layer,
+ * so unlayered app styles override KEI without !important.
+ */
+@layer kei.tokens, kei.base, kei.components, kei.utilities;
+
+/* The tokens layer lives in @kei-design/tokens; the build inlines it into styles.css. */
+@import '@kei-design/tokens/tokens.css';
+
+/* -------------------------------------------------------------------- base */
+
+@layer kei.base {
+  /* Plain .k-mono text never drops below --k-text-mono-min, so the narrowed Latin stays readable. */
+  .k-mono {
+    font-size: max(1em, var(--k-text-mono-min));
+  }
+  .kei {
+    color: var(--k-text);
+    background: var(--k-bg);
+    font: var(--k-weight-regular) var(--k-body) / var(--k-leading-body) var(--k-font-sans);
+    color-scheme: light;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .kei[data-theme='ink'] {
+    color-scheme: dark;
+  }
+  .kei-portal {
+    background: transparent;
+  }
+  .kei *,
+  .kei *::before,
+  .kei *::after {
+    box-sizing: border-box;
+  }
+  .kei :where(button, input, textarea, select) {
+    font: inherit;
+    color: inherit;
+  }
+  .kei :where(button) {
+    cursor: pointer;
+  }
+  .kei :where(button, input, textarea, select):disabled {
+    cursor: not-allowed;
+  }
+  .kei :where(a) {
+    color: inherit;
+    text-underline-offset: 0.2em;
+  }
+  .kei :where(svg) {
+    flex-shrink: 0;
+  }
+  .kei :where(button) svg {
+    pointer-events: none;
+  }
+  .kei :where(button, input, textarea, select, a, [tabindex]):focus-visible {
+    outline: 2px solid var(--k-focus);
+    outline-offset: 2px;
+  }
+  .kei ::selection {
+    background: var(--k-accent-soft);
+  }
+}
+
+/* -------------------------------------------------------------- components */
+
+@layer kei.components {
+  /* Typography */
+  .k-text {
+    margin: 0;
+    line-height: var(--k-line-body);
+    overflow-wrap: anywhere;
+  }
+  .k-text--body {
+    font-size: var(--k-body);
+  }
+  .k-text--small {
+    font-size: var(--k-text-xs);
+  }
+  .k-text--lead {
+    font-size: var(--k-text-lg);
+    max-width: 38em;
+  }
+
+  .k-heading {
+    margin: 0;
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+    letter-spacing: var(--k-tracking-heading);
+    font-feature-settings: 'palt';
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+  .k-heading--section {
+    font-size: var(--k-text-xl);
+  }
+  .k-heading--title {
+    font-size: clamp(var(--k-text-2xl), 3vw, var(--k-text-3xl));
+  }
+  .k-heading--display {
+    font-size: clamp(var(--k-text-3xl), 5vw, 3.25rem);
+    line-height: round(1.3em, 4px);
+  }
+
+  /* A short label above a title. Sans and sentence case; mono is reserved for data. */
+  .k-eyebrow {
+    font-size: var(--k-text-xs);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-body);
+    letter-spacing: 0.04em;
+    color: var(--k-muted);
+  }
+
+  .k-link {
+    color: var(--k-accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+  }
+  .k-link:hover {
+    color: var(--k-accent-hover);
+  }
+
+  /* Layout */
+  .k-container {
+    width: 100%;
+    min-width: 0;
+    margin-inline: auto;
+  }
+  .k-container--reading {
+    max-width: 42rem;
+  }
+  .k-container--wide {
+    max-width: 72rem;
+  }
+  .k-container--full {
+    max-width: none;
+  }
+  .k-stack,
+  .k-grid,
+  .k-stack > *,
+  .k-grid > * {
+    min-width: 0;
+  }
+
+  /* Button */
+  .k-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--k-space-2);
+    min-width: 24px;
+    min-height: var(--k-control-height);
+    padding: var(--k-control-padding);
+    border: 1px solid transparent;
+    border-radius: var(--k-radius-md);
+    font-size: var(--k-text-md);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+    text-decoration: none;
+    white-space: normal;
+    transition:
+      background-color var(--k-motion) var(--k-ease),
+      border-color var(--k-motion) var(--k-ease),
+      color var(--k-motion) var(--k-ease);
+  }
+  .k-button--primary {
+    background: var(--k-accent);
+    color: var(--k-on-accent);
+  }
+  .k-button--primary:where(:hover, :active):not(:disabled) {
+    background: var(--k-accent-hover);
+  }
+  .k-button--secondary {
+    background: var(--k-surface-raised);
+    border-color: var(--k-border-strong);
+    color: var(--k-text);
+  }
+  .k-button--secondary:hover:not(:disabled) {
+    background: var(--k-surface-sunken);
+  }
+  .k-button--secondary:active:not(:disabled) {
+    background: var(--k-accent-soft);
+    border-color: var(--k-accent);
+  }
+  .k-button--ghost {
+    background: transparent;
+    color: var(--k-muted);
+  }
+  .k-button--ghost:hover:not(:disabled) {
+    background: var(--k-surface-sunken);
+    color: var(--k-text);
+  }
+  .k-button--ghost:active:not(:disabled) {
+    background: var(--k-accent-soft);
+  }
+  .k-button--danger {
+    background: var(--k-danger);
+    color: var(--k-on-danger);
+  }
+  .k-button--danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--k-danger) 86%, var(--k-text));
+  }
+  .k-button--sm {
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: var(--k-text-sm);
+  }
+  .k-button--lg {
+    min-height: 48px;
+    padding: 0 20px;
+    font-size: var(--k-text-base);
+  }
+  .k-button:disabled {
+    background: var(--k-surface-sunken);
+    border-color: var(--k-border);
+    color: var(--k-muted);
+  }
+
+  /* A square: width = height = the control height of its size. The border is transparent
+     unless the variant draws one, so every variant has the same box. */
+  .k-icon-button {
+    --icon-button-size: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--icon-button-size);
+    height: var(--icon-button-size);
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--k-radius-md);
+    background: transparent;
+    color: var(--k-muted);
+    transition:
+      background-color var(--k-motion) var(--k-ease),
+      border-color var(--k-motion) var(--k-ease),
+      color var(--k-motion) var(--k-ease);
+  }
+  .k-icon-button:hover:not(:disabled) {
+    background: var(--k-surface-sunken);
+    color: var(--k-text);
+  }
+  .k-icon-button--md {
+    --icon-button-size: var(--k-control-height);
+  }
+  .k-icon-button--lg {
+    --icon-button-size: 48px;
+  }
+  .k-icon-button-icon {
+    display: flex;
+  }
+  .k-icon-button-icon > svg {
+    width: 16px;
+    height: 16px;
+  }
+  .k-icon-button--lg .k-icon-button-icon > svg {
+    width: 20px;
+    height: 20px;
+  }
+  .k-icon-button--secondary {
+    background: var(--k-surface-raised);
+    border-color: var(--k-border-strong);
+    color: var(--k-text);
+  }
+  .k-icon-button--secondary:active:not(:disabled) {
+    background: var(--k-accent-soft);
+    border-color: var(--k-accent);
+  }
+  .k-icon-button--ghost:active:not(:disabled) {
+    background: var(--k-accent-soft);
+  }
+  .k-icon-button--primary {
+    background: var(--k-accent);
+    color: var(--k-on-accent);
+  }
+  .k-icon-button--primary:where(:hover, :active):not(:disabled) {
+    background: var(--k-accent-hover);
+    color: var(--k-on-accent);
+  }
+  .k-icon-button--danger {
+    background: var(--k-danger);
+    color: var(--k-on-danger);
+  }
+  .k-icon-button--danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--k-danger) 86%, var(--k-text));
+    color: var(--k-on-danger);
+  }
+  .k-icon-button:disabled {
+    color: var(--k-muted);
+    cursor: not-allowed;
+  }
+  .k-icon-button:where(
+      .k-icon-button--primary,
+      .k-icon-button--secondary,
+      .k-icon-button--danger
+    ):disabled {
+    background: var(--k-surface-sunken);
+    border-color: var(--k-border);
+  }
+
+  .k-spin {
+    animation: k-spin 0.9s linear infinite;
+  }
+  /* Spinner: it takes the size and line height of where it sits, and the icon is one line box
+     tall, so it stays on the centre of the text's first line, beside a label or in a sentence. */
+  .k-spinner {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--k-space-2);
+    color: var(--k-muted);
+    vertical-align: top;
+  }
+  .k-spinner > svg {
+    width: 16px;
+    height: 1lh;
+  }
+  .k-spinner--md > svg {
+    width: 24px;
+  }
+  @keyframes k-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Tone — shared by Badge and Alert */
+  .k-tone-neutral {
+    --tone: var(--k-muted);
+    --tone-bg: var(--k-surface-sunken);
+  }
+  .k-tone-success {
+    --tone: var(--k-success);
+    --tone-bg: var(--k-success-soft);
+  }
+  .k-tone-warning {
+    --tone: var(--k-warning);
+    --tone-bg: var(--k-warning-soft);
+  }
+  .k-tone-danger {
+    --tone: var(--k-danger);
+    --tone-bg: var(--k-danger-soft);
+  }
+  .k-tone-info {
+    --tone: var(--k-info);
+    --tone-bg: var(--k-info-soft);
+  }
+
+  /* Sized to its content, so a flex or grid parent neither stretches nor shifts it. */
+  .k-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    height: fit-content;
+    padding: 0 8px;
+    border-radius: var(--k-radius-sm);
+    background: var(--tone-bg);
+    color: var(--tone);
+    font-size: var(--k-text-xs);
+    font-weight: var(--k-weight-bold);
+    line-height: 20px;
+    white-space: nowrap;
+  }
+  .k-status-dot {
+    width: 6px;
+    /* stylelint-disable-next-line kei/height-grid -- 状態の点。12px の文字に合わせた 6px の丸 */
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* Field */
+  .k-field {
+    display: grid;
+    gap: var(--k-space-2);
+    min-width: 0;
+  }
+  .k-label {
+    font-size: var(--k-text-sm);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+  }
+  .k-required {
+    color: var(--k-danger);
+  }
+  .k-field-hint {
+    margin: 0;
+    font-size: var(--k-text-xs);
+    line-height: var(--k-line-body);
+    color: var(--k-muted);
+  }
+  .k-field-error {
+    color: var(--k-danger);
+  }
+
+  .k-input,
+  .k-select-trigger {
+    width: 100%;
+    min-height: var(--k-control-height);
+    padding: var(--k-input-padding);
+    border: 1px solid var(--k-border-strong);
+    border-radius: var(--k-radius-md);
+    background: var(--k-surface-raised);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-tight);
+    transition: border-color var(--k-motion) var(--k-ease);
+  }
+  .k-input::placeholder {
+    color: var(--k-subtle);
+  }
+  .k-input:hover:not(:disabled),
+  .k-select-trigger:hover:not(:disabled) {
+    border-color: var(--k-text);
+  }
+  .k-input:focus-visible,
+  .k-select-trigger:focus-visible {
+    border-color: var(--k-accent);
+    outline-offset: 0;
+  }
+  .k-input[aria-invalid='true'],
+  .k-select-trigger[aria-invalid='true'] {
+    border-color: var(--k-danger);
+  }
+  .k-input:disabled,
+  .k-select-trigger:disabled {
+    background: var(--k-surface-sunken);
+    border-color: var(--k-border);
+    color: var(--k-muted);
+  }
+  .k-control--lg {
+    min-height: 48px;
+    padding: 8px 16px;
+    font-size: var(--k-text-base);
+  }
+  .k-textarea {
+    min-height: 104px;
+    line-height: var(--k-line-body);
+    resize: vertical;
+  }
+
+  /* Select */
+  .k-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--k-space-4);
+    text-align: left;
+  }
+  .k-select-trigger[data-placeholder] {
+    color: var(--k-subtle);
+  }
+  /* Radix wraps the icons in spans; as flex boxes they sit on the centre line, not a baseline. */
+  .k-select-icon,
+  .k-select-indicator {
+    display: flex;
+  }
+  .k-select-icon {
+    color: var(--k-muted);
+  }
+  /* Floating layers share one z-index above dialogs (101) and below toasts (120), so the one
+     opened last, appended last to the body, sits on top: a select inside a popover or dialog. */
+  .k-select-content {
+    z-index: 110;
+    min-width: var(--radix-select-trigger-width);
+    max-height: var(--radix-select-content-available-height);
+    padding: 4px;
+    border: 1px solid var(--k-border-strong);
+    border-radius: var(--k-radius-md);
+    background: var(--k-surface-raised);
+  }
+  .k-select-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--k-space-6);
+    min-height: var(--k-control-height);
+    /* 4px list padding + 8px = the trigger's 12px, so the text lines up with the trigger. */
+    padding: 4px 8px;
+    border-radius: var(--k-radius-sm);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-tight);
+    outline: 0;
+    cursor: pointer;
+  }
+  .k-select-item[data-highlighted] {
+    background: var(--k-accent-soft);
+  }
+  .k-select-item[data-state='checked'] {
+    color: var(--k-accent);
+    font-weight: var(--k-weight-bold);
+  }
+  .k-select-item[data-disabled] {
+    color: var(--k-subtle);
+    background: transparent;
+    cursor: not-allowed;
+  }
+
+  /* Checkbox, Switch, Radio — "on" is always the accent, never a status color. */
+  /* Controls beside text sit on the centre of its first line: (1lh − size) / 2 from the top. */
+  .k-check-field {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-body);
+  }
+  .k-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: calc((1lh - 20px) / 2);
+    padding: 0;
+    border: 1px solid var(--k-border-strong);
+    border-radius: var(--k-radius-sm);
+    background: var(--k-surface-raised);
+    color: var(--k-on-accent);
+  }
+  .k-checkbox > span {
+    display: flex;
+  }
+  .k-checkbox:hover:not(:disabled) {
+    border-color: var(--k-text);
+  }
+  .k-checkbox[data-state='checked'],
+  .k-checkbox[data-state='indeterminate'] {
+    background: var(--k-accent);
+    border-color: var(--k-accent);
+  }
+  .k-checkbox[aria-invalid='true'] {
+    border-color: var(--k-danger);
+  }
+  .k-check-label {
+    cursor: pointer;
+  }
+  .k-check-field:has(button:disabled) label,
+  .k-switch-field:has(button:disabled) label {
+    color: var(--k-muted);
+    cursor: not-allowed;
+  }
+
+  .k-switch-field {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    line-height: var(--k-line-body);
+  }
+  .k-switch {
+    flex-shrink: 0;
+    width: 40px;
+    height: 24px;
+    margin-top: calc((1lh - 24px) / 2);
+    /* stylelint-disable-next-line kei/spacing-grid -- 24 − 2 × (1px border + 2px) = an 18px thumb */
+    padding: 2px;
+    border: 1px solid var(--k-border-strong);
+    border-radius: var(--k-radius-full);
+    background: var(--k-surface-sunken);
+    transition: background-color var(--k-motion) var(--k-ease);
+  }
+  .k-switch[data-state='checked'] {
+    background: var(--k-accent);
+    border-color: var(--k-accent);
+  }
+  .k-switch-thumb {
+    display: block;
+    width: 18px;
+    /* stylelint-disable-next-line kei/height-grid -- 高さ 24px から罫線 1px と padding 2px を上下で引いた 18px */
+    height: 18px;
+    border-radius: 50%;
+    background: var(--k-border-strong);
+    transition: transform var(--k-motion) var(--k-ease);
+  }
+  .k-switch[data-state='checked'] .k-switch-thumb {
+    background: var(--k-on-accent);
+    transform: translateX(16px);
+  }
+  .k-switch:disabled {
+    background: var(--k-surface-sunken);
+    border-color: var(--k-border);
+  }
+
+  .k-radio-group {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .k-radio-group legend {
+    margin-bottom: var(--k-space-3);
+  }
+  .k-radio-option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--k-space-3);
+    font-size: var(--k-body);
+    line-height: var(--k-line-body);
+    cursor: pointer;
+  }
+  .k-radio-option input {
+    appearance: none;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin: calc((1lh - 20px) / 2) 0 0;
+    border: 1px solid var(--k-border-strong);
+    border-radius: 50%;
+    background: var(--k-surface-raised);
+    transition: border-width var(--k-motion) var(--k-ease);
+  }
+  .k-radio-option input:checked {
+    border: 6px solid var(--k-accent);
+  }
+  .k-radio-option small {
+    display: block;
+    font-size: var(--k-text-xs);
+    line-height: var(--k-line-body);
+    color: var(--k-muted);
+  }
+  .k-radio-option:has(input:disabled) {
+    color: var(--k-muted);
+    cursor: not-allowed;
+  }
+
+  /* Card */
+  .k-card {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--k-border);
+    border-radius: var(--k-radius-lg);
+    background: var(--k-surface);
+  }
+  /* The action sits on the centre of the heading block, with or without an eyebrow. */
+  .k-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--k-space-4);
+    padding: var(--k-panel-padding) var(--k-panel-padding) 0;
+  }
+  .k-card-title {
+    margin: 0;
+    font-size: var(--k-text-base);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+    letter-spacing: 0.02em;
+  }
+  .k-card-body {
+    padding: var(--k-panel-padding);
+  }
+  /* A panel's padding alone sets its inner space: the margins of its first and last
+     children (a <p>'s default 1em, say) would make one side deeper than the other. */
+  :is(.k-card-body, .k-dialog-body, .k-tab-content, .k-alert-description, .k-popover-body)
+    > :where(:first-child) {
+    margin-top: 0;
+  }
+  :is(.k-card-body, .k-dialog-body, .k-tab-content, .k-alert-description, .k-popover-body)
+    > :where(:last-child) {
+    margin-bottom: 0;
+  }
+
+  /* Alert */
+  .k-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--k-space-2);
+    padding: var(--k-space-4);
+    border: 1px solid color-mix(in srgb, var(--tone) 28%, transparent);
+    border-radius: var(--k-radius-md);
+    background: var(--tone-bg);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-body);
+  }
+  /* One line tall: the icon is drawn centred on the first line of text. */
+  .k-alert > svg {
+    height: 1lh;
+    color: var(--tone);
+  }
+  .k-alert strong {
+    color: var(--tone);
+    font-weight: var(--k-weight-bold);
+  }
+  .k-alert-description {
+    color: var(--k-text);
+  }
+
+  /* Tabs */
+  .k-tabs-list {
+    display: flex;
+    gap: var(--k-space-6);
+    /* overflow-x: auto also clips vertically, so the baseline is painted inside the
+       box (not as a border) and the active indicator sits on top of it. */
+    overflow: auto hidden;
+    background: linear-gradient(var(--k-border), var(--k-border)) bottom / 100% 1px no-repeat;
+  }
+  .k-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--k-space-2);
+    min-height: 40px;
+    padding: 8px 4px;
+    border: 0;
+    background: transparent;
+    color: var(--k-muted);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-tight);
+    white-space: nowrap;
+  }
+  .k-tab:hover:not(:disabled) {
+    color: var(--k-text);
+  }
+  .k-tab::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: transparent;
+  }
+  .k-tab[data-state='active'] {
+    color: var(--k-text);
+    font-weight: var(--k-weight-bold);
+  }
+  .k-tab[data-state='active']::after {
+    background: var(--k-accent);
+  }
+  .k-tab:disabled {
+    color: var(--k-subtle);
+    cursor: not-allowed;
+  }
+  .k-tab:focus-visible {
+    outline-offset: -2px;
+  }
+  .k-tab-count {
+    min-width: 16px;
+    padding: 0 4px;
+    border-radius: var(--k-radius-full);
+    background: var(--k-surface-sunken);
+    font-size: var(--k-text-mono-min);
+    font-family: var(--k-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--k-weight-medium);
+    line-height: 16px;
+    text-align: center;
+  }
+  .k-tab-content {
+    padding: var(--k-space-6) 0 0;
+    outline-offset: 4px;
+  }
+
+  /* Tooltip */
+  .k-tooltip {
+    z-index: 110;
+    max-width: 260px;
+    padding: 4px 8px;
+    border-radius: var(--k-radius-sm);
+    background: var(--k-text);
+    color: var(--k-bg);
+    font-size: var(--k-text-xs);
+    line-height: var(--k-line-body);
+  }
+  .k-tooltip-arrow {
+    fill: var(--k-text);
+  }
+
+  /* DescriptionList: row puts every label in one fixed column and lets the value wrap below
+     it when the row is too narrow; stack sets label over value in up to N columns. */
+  .k-dl {
+    --dl-label-width: 8em;
+    display: grid;
+    gap: var(--k-space-3) var(--k-space-6);
+    margin: 0;
+  }
+  .kei[data-density='compact'] .k-dl {
+    row-gap: var(--k-space-2);
+  }
+  .k-dl-item {
+    min-width: 0;
+  }
+  .k-dl-label {
+    color: var(--k-muted);
+    font-size: var(--k-text-sm);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+  }
+  .k-dl-value {
+    min-width: 0;
+    margin: 0;
+    line-height: var(--k-line-body);
+    overflow-wrap: anywhere;
+  }
+  /* Baselines line up even when a monospaced value sits beside a Japanese label. */
+  .k-dl[data-layout='row'] .k-dl-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--k-space-4);
+  }
+  .k-dl[data-layout='row'] .k-dl-label {
+    flex: 0 0 var(--dl-label-width);
+  }
+  .k-dl[data-layout='row'] .k-dl-value {
+    flex: 1 1 16rem;
+  }
+  .k-dl[data-layout='stack'] {
+    /* At most --dl-columns columns, fewer once a column would drop below 12rem. */
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(
+        max(12rem, calc((100% - (var(--dl-columns) - 1) * var(--k-space-6)) / var(--dl-columns))),
+        1fr
+      )
+    );
+  }
+  .k-dl[data-layout='stack'] .k-dl-label {
+    margin-bottom: var(--k-space-1);
+  }
+  .k-dl-item[data-wide] {
+    grid-column: 1 / -1;
+  }
+
+  /* Popover and menu float on a 1px line and the raised surface, never a shadow. */
+  .k-popover,
+  .k-menu {
+    z-index: 110;
+    border: 1px solid var(--k-border-strong);
+    border-radius: var(--k-radius-md);
+    background: var(--k-surface-raised);
+    color: var(--k-text);
+    animation: k-fade 120ms ease-out;
+  }
+  /* The same padding as a panel; the width keeps a form readable and shrinks at the edge. */
+  .k-popover {
+    width: 320px;
+    max-width: var(--radix-popover-content-available-width);
+    max-height: var(--radix-popover-content-available-height);
+    overflow: auto;
+    padding: var(--k-panel-padding);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-body);
+  }
+  .k-popover:focus-visible {
+    outline-offset: -2px;
+  }
+  .k-popover-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--k-space-2);
+  }
+  .k-popover-title {
+    margin: 0 0 var(--k-space-3);
+    font-size: var(--k-text-base);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+  }
+
+  /* Menu: 4px around the list and 4px above and below a separator, like the select list. */
+  .k-menu {
+    min-width: max(180px, var(--radix-dropdown-menu-trigger-width));
+    max-width: var(--radix-dropdown-menu-content-available-width);
+    max-height: var(--radix-dropdown-menu-content-available-height);
+    overflow: auto;
+    padding: 4px;
+  }
+  .k-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--k-space-2);
+    min-height: var(--k-control-height);
+    /* 4px list padding + 8px = the 12px a select or input leaves before its text. */
+    padding: 4px 8px;
+    border-radius: var(--k-radius-sm);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-tight);
+    outline: 0;
+    cursor: pointer;
+  }
+  .k-menu-item[data-highlighted] {
+    background: var(--k-accent-soft);
+  }
+  .k-menu-item[data-tone='danger'] {
+    color: var(--k-danger);
+  }
+  .k-menu-item[data-tone='danger'][data-highlighted] {
+    background: var(--k-danger-soft);
+  }
+  .k-menu-item[data-disabled] {
+    color: var(--k-subtle);
+    background: transparent;
+    cursor: not-allowed;
+  }
+  .k-menu-item[data-state='checked'] {
+    color: var(--k-accent);
+    font-weight: var(--k-weight-bold);
+  }
+  /* A fixed 16px column for icons and check marks, empty on rows without one. */
+  .k-menu-lead,
+  .k-menu-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+  }
+  .k-menu-lead svg {
+    width: 16px;
+    height: 16px;
+  }
+  .k-menu-item:not([data-tone='danger']):not([data-state='checked']) .k-menu-lead {
+    color: var(--k-muted);
+  }
+  .k-menu-label {
+    flex: 1;
+    min-width: 0;
+  }
+  .k-menu-shortcut {
+    margin-inline-start: var(--k-space-4);
+    color: var(--k-muted);
+    font: var(--k-weight-regular) var(--k-text-mono-min) / var(--k-line-tight) var(--k-font-mono);
+  }
+  .k-menu-heading {
+    padding: 4px 8px;
+    color: var(--k-muted);
+    font-size: var(--k-text-xs);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+  }
+  .k-menu[data-lead] .k-menu-heading {
+    /* stylelint-disable-next-line kei/padding-symmetry -- アイコンの列（16px）と間（8px）の分だけ空けて、見出しを項目の文字と同じ位置から始める */
+    padding-inline-start: calc(8px + 16px + var(--k-space-2));
+  }
+  .k-menu-separator {
+    height: 1px;
+    margin: 4px 0;
+    background: var(--k-border);
+  }
+
+  /* Progress */
+  /* The value mixes KEI Mono (14.4px) with a sans %; baseline keeps it level with the label. */
+  .k-progress-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--k-space-3);
+    margin-bottom: var(--k-space-2);
+    font-size: var(--k-text-sm);
+    line-height: var(--k-line-tight);
+  }
+  /* Only the value is muted; without showValue the label is the last child. */
+  .k-progress-label > :last-child:not(:first-child) {
+    color: var(--k-muted);
+  }
+  .k-progress {
+    position: relative;
+    /* stylelint-disable-next-line kei/height-grid -- 進み具合の棒。罫線を含めて 6px */
+    height: 6px;
+    overflow: hidden;
+    border-radius: var(--k-radius-full);
+    background: var(--k-surface-sunken);
+    box-shadow: inset 0 0 0 1px var(--k-border);
+  }
+  .k-progress-indicator {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--k-accent);
+    transition: transform 0.4s var(--k-ease);
+  }
+
+  /* Skeleton */
+  .k-skeleton {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: middle;
+    border-radius: var(--k-radius-sm);
+    background: var(--k-skeleton);
+    animation: k-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes k-pulse {
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Empty state */
+  .k-empty {
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--k-muted);
+  }
+  .k-empty-icon {
+    display: inline-flex;
+    margin-bottom: var(--k-space-3);
+  }
+  .k-empty h3 {
+    margin: 0 0 var(--k-space-1);
+    color: var(--k-text);
+    font-size: var(--k-text-base);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+  }
+  .k-empty p {
+    max-width: 22rem;
+    margin: 0 auto var(--k-space-4);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-body);
+  }
+  .k-empty > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* Divider */
+  .k-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--k-space-3);
+    margin: 20px 0;
+    color: var(--k-muted);
+    font-size: var(--k-text-xs);
+  }
+  .k-divider::before,
+  .k-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--k-border);
+  }
+  .k-divider:not(:has(span))::after {
+    display: none;
+  }
+
+  /* Kbd */
+  .k-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 4px;
+    border: 1px solid var(--k-border);
+    border-radius: var(--k-radius-sm);
+    background: var(--k-surface-raised);
+    color: var(--k-muted);
+    font: var(--k-text-mono-min) / 1 var(--k-font-mono);
+  }
+
+  /* Avatar */
+  .k-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--k-accent-soft);
+    color: var(--k-accent);
+    font-size: var(--k-text-xs);
+    font-weight: var(--k-weight-bold);
+  }
+  .k-avatar--sm {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Breadcrumb */
+  .k-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--k-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--k-text-sm);
+    color: var(--k-muted);
+  }
+  .k-breadcrumb li {
+    display: flex;
+    gap: var(--k-space-2);
+  }
+  .k-breadcrumb li > span[aria-hidden] {
+    color: var(--k-subtle);
+  }
+  .k-breadcrumb a:hover {
+    color: var(--k-text);
+  }
+  .k-breadcrumb [aria-current] {
+    color: var(--k-text);
+  }
+
+  /* Pagination */
+  .k-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--k-space-2);
+    font-size: var(--k-text-sm);
+  }
+  /* A whole-pixel line: at the inherited 1.714 × 14.4px the browser rounds the half-leading
+     and the figures drift 0.8px off the buttons' centre. */
+  .k-pagination > span {
+    margin-right: var(--k-space-2);
+    color: var(--k-muted);
+    font-size: var(--k-text-mono-min);
+    font-family: var(--k-font-mono);
+    line-height: var(--k-line-tight);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Dialog */
+  .k-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: var(--k-overlay);
+    animation: k-fade 120ms ease-out;
+  }
+  .k-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 101;
+    width: min(520px, calc(100vw - 32px));
+    max-height: calc(100dvh - 40px);
+    overflow: auto;
+    border: 1px solid var(--k-border-strong);
+    border-radius: var(--k-radius-lg);
+    background: var(--k-surface-raised);
+    transform: translate(-50%, -50%);
+    animation: k-rise 160ms var(--k-ease);
+  }
+  .k-dialog-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--k-space-3);
+    padding: 24px 24px 0;
+  }
+  .k-dialog-header > div {
+    flex: 1;
+    min-width: 0;
+  }
+  .k-dialog-title {
+    margin: 0 0 var(--k-space-1);
+    font-size: var(--k-text-xl);
+    font-weight: var(--k-weight-bold);
+    line-height: var(--k-line-tight);
+    letter-spacing: var(--k-tracking-heading);
+    font-feature-settings: 'palt';
+  }
+  .k-dialog-description {
+    margin: 0;
+    color: var(--k-muted);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-body);
+  }
+  /* The close button's icon, not its 32px hit area, lines up with the 24px padding. */
+  .k-dialog-header > .k-icon-button {
+    margin-right: -8px;
+  }
+  .k-dialog-body {
+    padding: 24px;
+  }
+  /* An action band, not a panel: 16px above and below, and the body's 24px at the sides. */
+  .k-dialog-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--k-space-2);
+    padding: 16px 24px;
+    border-top: 1px solid var(--k-border);
+  }
+  /* A confirmation is one short panel: the title, the text and the buttons share one padding,
+     and a narrower box keeps the line length short. */
+  .k-dialog--confirm {
+    width: min(440px, calc(100vw - 32px));
+  }
+  .k-dialog--confirm .k-dialog-body {
+    display: grid;
+    gap: var(--k-space-3);
+    padding: 24px;
+  }
+  .k-dialog--confirm .k-dialog-header {
+    flex-wrap: nowrap;
+    padding: 0;
+  }
+  .k-dialog--confirm .k-dialog-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+  }
+  .k-dialog--confirm .k-dialog-description {
+    color: var(--k-text);
+  }
+  .k-confirm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--k-space-2);
+    margin-top: var(--k-space-3);
+  }
+  @keyframes k-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes k-rise {
+    from {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% + 6px));
+    }
+  }
+
+  /* Toast */
+  .k-toast-viewport {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 120;
+    display: flex;
+    flex-direction: column;
+    gap: var(--k-space-2);
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    outline: none;
+  }
+  .k-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--k-space-2);
+    padding: var(--k-space-4);
+    border: 1px solid var(--k-border-strong);
+    border-radius: var(--k-radius-lg);
+    background: var(--k-surface-raised);
+    color: var(--k-text);
+    font-size: var(--k-text-md);
+    line-height: var(--k-line-body);
+    animation: k-fade 160ms ease-out;
+  }
+  .k-toast > svg {
+    height: 1lh;
+    color: var(--k-success);
+  }
+  /* The 32px close button takes one line of height and its icon meets the 16px padding. */
+  .k-toast > .k-icon-button {
+    margin: -4px -8px -4px 0;
+  }
+  .k-toast[data-tone='error'] > svg {
+    color: var(--k-danger);
+  }
+  .k-toast > div {
+    flex: 1;
+  }
+  .k-toast-title {
+    font-size: var(--k-text-md);
+    font-weight: var(--k-weight-bold);
+  }
+  .k-toast-description {
+    color: var(--k-muted);
+    font-size: var(--k-text-sm);
+  }
+  .k-toast[data-swipe='move'] {
+    transform: translateX(var(--radix-toast-swipe-move-x));
+  }
+
+  /* Metric */
+  .k-metric {
+    position: relative;
+    min-width: 0;
+    padding: var(--k-panel-padding);
+    border: 1px solid var(--k-border);
+    border-radius: var(--k-radius-lg);
+    background: var(--k-surface);
+  }
+  .k-metric-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--k-space-2);
+    color: var(--k-muted);
+    font-size: var(--k-text-sm);
+    line-height: var(--k-line-tight);
+  }
+  .k-metric-code {
+    color: var(--k-subtle);
+    font: var(--k-text-mono-min) / var(--k-line-tight) var(--k-font-mono);
+  }
+  .k-metric-value {
+    margin: 8px 0 4px;
+    font-size: var(--k-text-3xl);
+    font-family: var(--k-font-mono);
+    font-weight: var(--k-weight-regular);
+    font-variant-numeric: tabular-nums;
+    line-height: round(1.2em, 4px);
+    letter-spacing: -0.01em;
+  }
+  /* Units are words, not data: the sans face keeps % the same size as 件 or 秒.
+     line-height: 1 keeps the smaller sans box inside the figure's line. */
+  .k-metric-value > span {
+    margin-left: 4px;
+    line-height: 1;
+    color: var(--k-muted);
+    font-family: var(--k-font-sans);
+    font-size: var(--k-text-md);
+    font-weight: var(--k-weight-regular);
+    letter-spacing: 0;
+  }
+  .k-metric-change {
+    display: flex;
+    align-items: center;
+    gap: var(--k-space-1);
+    color: var(--k-muted);
+    font-size: var(--k-text-sm);
+    line-height: var(--k-line-tight);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Sparkline */
+  .k-sparkline {
+    display: block;
+    width: 100%;
+    height: 40px;
+    margin-top: var(--k-space-3);
+    color: var(--k-accent);
+  }
+  .k-sparkline--success {
+    color: var(--k-success);
+  }
+  .k-sparkline--muted {
+    color: var(--k-muted);
+  }
+  .k-chart-grid {
+    fill: none;
+    stroke: var(--k-border);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* Meter — a dial for one value against a fixed range. */
+  .k-meter {
+    position: relative;
+    width: 200px;
+    min-height: 192px;
+    text-align: center;
+  }
+  .k-meter-face {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    /* Centred even when the meter is narrower than the face (auto margins would align it left). */
+    margin-inline: calc((100% - 180px) / 2);
+  }
+  .k-meter-ticks {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: repeating-conic-gradient(
+      from -135deg,
+      var(--k-border-strong) 0deg 1deg,
+      transparent 1deg 9deg
+    );
+    mask: radial-gradient(circle, transparent 62%, #000 63% 68%, transparent 69%);
+    /* Hide the 90° below the hand's −135°…135° sweep, keeping the end ticks whole. */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 48%, 0 100%);
+  }
+  .k-meter-hand {
+    position: absolute;
+    top: 27px;
+    left: calc(50% - 1px);
+    width: 2px;
+    /* stylelint-disable-next-line kei/height-grid -- 針の長さ。目盛りの内側の半径（180px の 35%）に合わせた 63px */
+    height: 63px;
+    background: var(--k-accent);
+    transform-origin: 50% 100%;
+    transition: transform 0.5s var(--k-ease);
+  }
+  .k-meter-hub {
+    position: absolute;
+    top: 85px;
+    left: calc(50% - 5px);
+    width: 10px;
+    /* stylelint-disable-next-line kei/height-grid -- 針の軸。罫線 2px を含めて 10px の丸 */
+    height: 10px;
+    border: 2px solid var(--k-surface);
+    border-radius: 50%;
+    background: var(--k-accent);
+  }
+  .k-meter-reading {
+    position: absolute;
+    top: 116px;
+    display: grid;
+    gap: 0;
+    width: 100%;
+  }
+  .k-meter-reading strong {
+    font-size: var(--k-text-2xl);
+    font-family: var(--k-font-mono);
+    font-weight: var(--k-weight-regular);
+    font-variant-numeric: tabular-nums;
+    line-height: round(1.2em, 4px);
+  }
+  .k-meter-reading small {
+    margin-left: 4px;
+    line-height: 1;
+    color: var(--k-muted);
+    font-family: var(--k-font-sans);
+    font-size: var(--k-text-md);
+    font-weight: var(--k-weight-regular);
+  }
+  .k-meter-reading > span {
+    color: var(--k-muted);
+    font-size: var(--k-text-xs);
+  }
+
+  /* Table */
+  .k-table-wrap {
+    max-width: 100%;
+    min-width: 0;
+    overflow: auto;
+  }
+  /* Separate borders: each cell keeps its whole 1px rule, where collapse would split it into
+     half-pixel row heights and cells whose box no longer matches their border width. */
+  .k-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--k-text-md);
+    white-space: nowrap;
+  }
+  .k-table th {
+    padding: var(--k-cell-padding);
+    line-height: var(--k-line-tight);
+    border-bottom: 1px solid var(--k-border-strong);
+    color: var(--k-muted);
+    font-size: var(--k-text-sm);
+    font-weight: var(--k-weight-bold);
+    text-align: left;
+  }
+  .k-table td {
+    padding: var(--k-cell-padding);
+    border-bottom: 1px solid var(--k-border);
+    line-height: var(--k-line-body);
+    vertical-align: middle;
+  }
+  /* A badge alone in a cell sits on the middle of the line, not on its baseline (1.5px low). */
+  .k-table td > .k-badge {
+    vertical-align: middle;
+  }
+  .k-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  /* Pages drawn by DataTable itself: the count and the buttons line up with the cells' padding. */
+  .k-table-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--k-space-3);
+    padding: var(--k-cell-padding);
+    border-top: 1px solid var(--k-border);
+  }
+  .k-table-count {
+    color: var(--k-muted);
+    font-size: var(--k-text-sm);
+    line-height: var(--k-line-tight);
+  }
+  .k-table tbody tr:hover {
+    background: color-mix(in srgb, var(--k-surface-sunken) 60%, transparent);
+  }
+  .k-table tbody tr[data-selected],
+  .k-table tbody tr[data-selected]:hover {
+    background: var(--k-selected);
+  }
+  /* A selected row also carries the accent edge used by the active tab, so it never relies on the fill alone. */
+  .k-table tbody tr[data-selected] > :first-child {
+    background-image: linear-gradient(var(--k-accent), var(--k-accent));
+    background-repeat: no-repeat;
+    background-size: 4px 100%;
+  }
+  /* The same 20px as the Checkbox component. */
+  .k-table input[type='checkbox'] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    vertical-align: middle;
+    accent-color: var(--k-accent);
+    cursor: pointer;
+  }
+  .k-table-select {
+    width: 40px;
+  }
+  .k-table-sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 24px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  .k-table-sort:hover {
+    color: var(--k-text);
+  }
+  .k-table-detail {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--k-space-1);
+    min-width: 24px;
+    min-height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--k-accent);
+    font-size: var(--k-text-sm);
+    font-weight: var(--k-weight-bold);
+  }
+  .k-table-detail:hover {
+    text-decoration: underline;
+  }
+  /* A borderless button gives its side padding back to the cell, so its content starts on
+     the same line as the column heading. */
+  .k-table td > .k-button--ghost.k-button--sm:first-child {
+    margin-inline-start: -12px;
+  }
+
+  @media (max-width: 600px) {
+    .k-card-header {
+      padding: 16px 16px 0;
+    }
+    .k-card-body,
+    .k-metric {
+      padding: 16px;
+    }
+    .k-metric-value {
+      font-size: var(--k-text-2xl);
+    }
+    .k-dialog-header {
+      padding: 20px 20px 0;
+    }
+    .k-dialog-body {
+      padding: 20px;
+    }
+    .k-dialog-footer {
+      padding: 16px 20px;
+    }
+    .k-dialog--confirm .k-dialog-body {
+      padding: 20px;
+    }
+    .k-toast-viewport {
+      right: 16px;
+      bottom: 16px;
+    }
+    .k-table th {
+      padding-inline: 12px;
+    }
+  }
+
+  @media (pointer: coarse) {
+    .k-button,
+    .k-select-trigger,
+    .k-tab,
+    .k-select-item,
+    .k-menu-item {
+      min-height: 44px;
+    }
+    .k-icon-button {
+      min-width: 44px;
+      min-height: 44px;
+    }
+    /* The 44px close buttons keep their 16px icon on the padding line and centred on the
+       title's line (32px in a dialog, 24px in a toast). */
+    .k-dialog-header > .k-icon-button {
+      margin: calc((32px - 44px) / 2) calc((16px - 44px) / 2) calc((32px - 44px) / 2) 0;
+    }
+    .k-toast > .k-icon-button {
+      margin: calc((24px - 44px) / 2) calc((16px - 44px) / 2) calc((24px - 44px) / 2) 0;
+    }
+  }
+}
+
+/* --------------------------------------------------------------- utilities */
+
+@layer kei.utilities {
+  /* For data: figures, times, IDs and code. Japanese units fall back to the sans face.
+     The size floor lives in kei.base so a component's own font-size still wins. */
+  .k-mono {
+    font-family: var(--k-font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  /* For figures inside running text: keeps the sans face, equalises digits. */
+  .k-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .k-muted {
+    color: var(--k-muted);
+  }
+  .k-text-success {
+    color: var(--k-success);
+  }
+  .k-text-danger {
+    color: var(--k-danger);
+  }
+  .k-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kei *,
+    .kei *::before,
+    .kei *::after {
+      animation: none !important;
+      transition: none !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .k-button,
+    .k-badge,
+    .k-input,
+    .k-card,
+    .k-checkbox,
+    .k-switch,
+    .k-tab {
+      border: 1px solid ButtonText;
+    }
+    .k-progress-indicator,
+    .k-status-dot,
+    .k-meter-hand {
+      background: Highlight;
+    }
+    /* Shapes drawn only with a background vanish once the browser forces colours,
+       so paint them with system colours instead. */
+    .k-checkbox[data-state='checked'],
+    .k-checkbox[data-state='indeterminate'],
+    .k-switch,
+    .k-tab::after,
+    .k-select-item[data-highlighted],
+    .k-menu-item[data-highlighted],
+    .k-menu-item[data-tone='danger'][data-highlighted] {
+      forced-color-adjust: none;
+    }
+    /* Opting out also keeps the brand focus colour, so give focus a system colour back. */
+    .kei :focus-visible {
+      outline-color: Highlight;
+    }
+    .k-checkbox[data-state='checked'],
+    .k-checkbox[data-state='indeterminate'] {
+      background: Highlight;
+      border-color: Highlight;
+      color: HighlightText;
+    }
+    .k-checkbox:disabled {
+      border-color: GrayText;
+    }
+    .k-checkbox:disabled[data-state='checked'],
+    .k-checkbox:disabled[data-state='indeterminate'] {
+      background: GrayText;
+      color: Canvas;
+    }
+    .k-select-item[data-highlighted],
+    .k-menu-item[data-highlighted],
+    .k-menu-item[data-tone='danger'][data-highlighted] {
+      background: Highlight;
+      color: HighlightText;
+    }
+    /* Rows keep forced colours for their contents; the selection becomes an outline. */
+    .k-table tbody tr[data-selected],
+    .k-table tbody tr[data-selected]:hover {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+    .k-switch {
+      background: Canvas;
+    }
+    .k-switch-thumb {
+      background: ButtonText;
+    }
+    .k-switch[data-state='checked'] {
+      background: Highlight;
+      border-color: Highlight;
+    }
+    .k-switch[data-state='checked'] .k-switch-thumb {
+      background: HighlightText;
+    }
+    .k-switch:disabled {
+      background: Canvas;
+      border-color: GrayText;
+    }
+    .k-switch:disabled .k-switch-thumb {
+      background: GrayText;
+    }
+    .k-tab[data-state='active']::after {
+      background: Highlight;
+    }
+  }
+}
