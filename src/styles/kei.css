@@ -25,6 +25,15 @@
     --k-on-accent: #ffffff;
     /* Distinct from hover (sunken) and the work surface, not just a tint of them. */
     --k-selected: #d5d8fb;
+    /* The app frame (sidebar): the one solid surface outside content. Paper prints it in ultramarine. */
+    --k-frame: #2424d8;
+    --k-frame-hover: #3535e4;
+    --k-frame-inset: #1b1ba6;
+    --k-frame-line: #5b5bea;
+    --k-on-frame: #ffffff;
+    --k-frame-muted: #d6d8ff;
+    --k-frame-selected: #ffffff;
+    --k-on-frame-selected: #1b1ba6;
     --k-success: #0b6b58;
     --k-success-soft: #ddf1eb;
     --k-warning: #7e5400;
@@ -105,6 +114,15 @@
     --k-accent-hover: #c9cdff;
     --k-accent-soft: #23286c;
     --k-selected: #2e358c;
+    /* Ink calms the frame to a deep blue, below the text and small accents. */
+    --k-frame: #191953;
+    --k-frame-hover: #26266e;
+    --k-frame-inset: #10103e;
+    --k-frame-line: #3a3a80;
+    --k-on-frame: #ffffff;
+    --k-frame-muted: #c9cbf2;
+    --k-frame-selected: #dce0ff;
+    --k-on-frame-selected: #191953;
     --k-on-accent: #0f1148;
     --k-success: #7dd6bf;
     --k-success-soft: #11352e;

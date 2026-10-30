@@ -17,6 +17,7 @@ export interface WearConfig {
   stain: { strength: number };
   yake: { strength: number; reach: number; mottle: number; corner: number; surfaces: number };
   sure: { density: number; strength: number; fold: number };
+  age: { fade: number; mottle: number; rules: number; chips: number };
   tones: Record<WearTheme, WearTone>;
   kinds: Record<WearKind, WearKindSettings>;
 }

@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { normaliseConfig, TEXT_KINDS } from '../../src/wear/presets.mjs';
 import { contrastGauge } from '../../src/wear/gauges.mjs';
+import { ageContrast } from '../../src/wear/age.mjs';
 import { outlineEnv, readConfig, writeWear } from '../build-wear.mjs';
 import { missingMessage, wearPython } from './python.mjs';
 
@@ -32,6 +33,10 @@ const RANGES = {
   'sure.density': [0, 1],
   'sure.strength': [0, 0.8],
   'sure.fold': [0, 1],
+  'age.fade': [0, 1],
+  'age.mottle': [0, 1],
+  'age.rules': [0, 1],
+  'age.chips': [0, 1],
 };
 const COLOUR = /^#[0-9a-f]{6}$/i;
 
@@ -68,6 +73,20 @@ export function validate(config, tokens) {
       problems.push(
         `${theme} で文字のコントラストが ${min.toFixed(2)}:1 になります（4.5:1 未満）。`,
       );
+  for (const [theme, { text, ui, failed }] of Object.entries(ageContrast(config, tokens))) {
+    for (const [what, value, min] of failed)
+      problems.push(
+        `${theme} の経年で${what}が ${value.toFixed(2)}:1 になります（${min}:1 未満）。`,
+      );
+    if (text < 4.5)
+      problems.push(
+        `${theme} の経年で文字のコントラストが ${text.toFixed(2)}:1 になります（4.5:1 未満）。`,
+      );
+    if (ui < 3)
+      problems.push(
+        `${theme} の経年でフォーカスのコントラストが ${ui.toFixed(2)}:1 になります（3:1 未満）。`,
+      );
+  }
   return problems;
 }
 

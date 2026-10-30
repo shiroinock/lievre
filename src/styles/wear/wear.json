@@ -29,6 +29,12 @@
       "strength": 0.35,
       "fold": 0.6
     },
+    "age": {
+      "fade": 0.8,
+      "mottle": 0.35,
+      "rules": 0.6,
+      "chips": 0.6
+    },
     "tones": {
       "paper": {
         "yake": "#f2dca6",
@@ -68,7 +74,8 @@
     "surface": "24cbd0f38917608c",
     "kasure": "2366133b09102344",
     "yake": "023e5f76f94559b9",
-    "sure": "89342154ecf77cc3"
+    "sure": "89342154ecf77cc3",
+    "mottle": "31002734a21815fc"
   },
   "bytes": {
     "yake-paper.png": 6718,
@@ -77,6 +84,14 @@
     "yake-ink.png": 6718,
     "sure-ink.png": 3043,
     "surface-ink.png": 16771,
-    "kasure.png": 4872
+    "kasure.png": 4872,
+    "age-mottle-paper-light.png": 3133,
+    "age-mottle-paper-heavy.png": 3133,
+    "age-mottle-ink-light.png": 3133,
+    "age-mottle-ink-heavy.png": 3133,
+    "age-chip-tl.png": 195,
+    "age-chip-tr.png": 200,
+    "age-chip-br.png": 200,
+    "age-chip-bl.png": 202
   }
 }

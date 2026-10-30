@@ -93,6 +93,9 @@ import '@kei-design/react/styles.css';
 - `wearSeed?: string` — 試作：live の模様を決めるソルト。既定は wear.config.json のソルトで、baked と同じ模様になります。
 baked はビルド時の値（npm run wear）で決まります。
 - `wearConfig?: WearConfig` — 試作：live の強さ。既定は wear.config.json の値。調整の画面（npm run wear:tune）が使います。
+- `age?: Age` — 試作：経年。none（既定）・light・heavy。褪色・インクのむら・罫線のかすれ・角の欠けを
+部品に渡します。入れ子にでき、質感（wear）とは別に効きます。状態（フォーカス・選択・エラー・無効）には
+かけません。強いコントラストを求める設定と強制カラーモードでは none になります。
 - ほかに HTMLAttributes<HTMLDivElement> の属性を受け取ります。
 
 ### PortalSurface
@@ -454,7 +457,7 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### useKeiTheme
 
-`useKeiTheme() => { theme: Theme; density: Density; typography: Typography; wear: Wear; wearSeed: string; wearConfig: WearConfig; wearStyle?: CSSProperties | undefined; }`
+`useKeiTheme() => { theme: Theme; density: Density; typography: Typography; wear: Wear; wearSeed: string; wearConfig: WearConfig; wearStyle?: CSSProperties | undefined; age: Age; }`
 
 ### useEffectiveWear
 
@@ -462,6 +465,12 @@ baked はビルド時の値（npm run wear）で決まります。
 
 The wear actually drawn: off when the reader asks for more contrast or forced colours,
 and baked instead of live when they ask for less motion.
+
+### useEffectiveAge
+
+`useEffectiveAge(age: Age) => Age`
+
+The age actually drawn: none when the reader asks for more contrast or forced colours.
 
 ### useToast
 
@@ -471,6 +480,7 @@ ToastProviderの子孫で使用します。保存結果や一時的な通知向�
 
 ## 型とその他
 
+- `type Age = 'none' | 'light' | 'heavy';`
 - `type Theme = 'paper' | 'ink';`
 - `type Wear = 'off' | 'baked' | 'live';` — 試作：質感の段階。off は質感なし。baked はビルド時にソルトから焼いた模様を貼るだけで軽い。
 live は wearSeed から SVG のフィルタを作り、文字も歪ませる。重い。

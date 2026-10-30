@@ -164,7 +164,11 @@ body {
 }
 .tune-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+}
+.tune-buttons > * {
+  white-space: nowrap;
 }
 .tune-fonts {
   display: grid;

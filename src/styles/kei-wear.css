@@ -11,9 +11,14 @@
  * wear/rules.css places the dry brush, the tile offsets and the live filters for each text kind.
  * Never worn: focus outlines, controls (anything focusable), and status colours or symbols.
  * Nothing here changes the size or position of a box.
+ *
+ * Age (<KeiProvider age="none | light | heavy">) is a separate axis in wear/age.css: faded inks,
+ * slipped fills, mottled faces, broken rules and chipped corners, handed to the parts listed in
+ * src/wear/age.mjs (AGE_PLACES). It works with any wear setting, off included.
  */
 @import './wear/baked.css';
 @import './wear/rules.css';
+@import './wear/age.css';
 
 @layer kei.components {
   /* Wear is decoration: none of it applies when the reader asks for plainer or stronger

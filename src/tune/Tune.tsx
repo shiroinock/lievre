@@ -5,6 +5,7 @@ import tokens from '../../tokens/tokens.json';
 import {
   Badge,
   Button,
+  Card,
   DataTable,
   Heading,
   KeiProvider,
@@ -12,6 +13,7 @@ import {
   Metric,
   Text,
   TextField,
+  type Age,
   type Theme,
   type Wear,
 } from '../index';
@@ -61,7 +63,7 @@ type Slider = {
   max: number;
   step: number;
 };
-type Group = 'outline' | 'yake' | 'sure';
+type Group = 'outline' | 'yake' | 'sure' | 'age';
 function groupSlider<G extends Group>(
   group: G,
   label: string,
@@ -180,6 +182,26 @@ const sliders: Slider[] = [
     1,
     0.05,
   ),
+  groupSlider(
+    'age',
+    '褪色',
+    '強調と状態の色が、黄みの灰へ寄る度合い。文字の対比が 4.5:1 を割る手前で止まる',
+    'fade',
+    0,
+    1,
+    0.05,
+  ),
+  groupSlider(
+    'age',
+    'インクのむら',
+    '塗りの濃淡。上の文字の対比が 4.5:1 を保つ濃さで頭打ちになる',
+    'mottle',
+    0,
+    1,
+    0.05,
+  ),
+  groupSlider('age', '罫線のかすれ', '1px の線が途切れる割合', 'rules', 0, 1, 0.05),
+  groupSlider('age', '角の欠け', 'カードとボタンの角が欠ける大きさ', 'chips', 0, 1, 0.05),
 ];
 
 type Status = { state: string; log?: string; problems?: string[]; error?: string };
@@ -373,6 +395,30 @@ export function Tune() {
             実行時の列は、縁の荒れを SVG
             のフィルタで近似します。画素を動かすので、フォントの太さのむらは表せず、ノイズの形もフォントとは違います。焼き込みと同じ見た目は「焼き込み（調整中の値）」の列で確かめてください。この列は、見本の文字だけを開発サーバーでその場で焼き込みます（2秒ほど）。
           </Text>
+        </section>
+        <section aria-labelledby="tune-age">
+          <Heading level={2} size="section" id="tune-age">
+            経年を見比べる
+          </Heading>
+          <Text size="small" tone="muted">
+            調整中の値で、経年なし・弱・強を並べます。フォーカス・選択・エラーの印と、無効の見た目には経年をかけません。表の行にポインターを重ねるとホバーを確かめられます。
+          </Text>
+          <div className="tune-columns">
+            {(['none', 'light', 'heavy'] as Age[]).map((age) => (
+              <KeiProvider
+                key={age}
+                theme={theme}
+                age={age}
+                wearConfig={shown}
+                className="tune-specimen tune-age"
+              >
+                <Text size="small" tone="muted">
+                  {ageNames[age]}
+                </Text>
+                <AgeSamples />
+              </KeiProvider>
+            ))}
+          </div>
         </section>
         <section aria-labelledby="tune-sheet" className="tune-sheet-section">
           <Heading level={2} size="section" id="tune-sheet">
@@ -715,6 +761,55 @@ const rows = [
   { id: 'SYN-20482', at: '12:34:56', rate: '87.0', count: '312' },
   { id: 'SYN-20483', at: '18:00:30', rate: '100.0', count: '8,976' },
 ];
+
+const ageNames: Record<Age, string> = { none: '経年なし', light: '経年・弱', heavy: '経年・強' };
+
+/** The three parts the age axis is tried on, with the states it must leave alone. */
+function AgeSamples() {
+  const [selected, setSelected] = useState(['SYN-20482']);
+  const [sort, setSort] = useState<{ key: string; direction: 'asc' | 'desc' } | null>({
+    key: 'count',
+    direction: 'desc',
+  });
+  return (
+    <>
+      <div className="tune-buttons">
+        <Button variant="primary">保存する</Button>
+        <Button variant="secondary">取り消す</Button>
+        <Button variant="ghost">詳細</Button>
+        <Button variant="primary" disabled>
+          送信済み
+        </Button>
+      </div>
+      <Card eyebrow="SYN-07" title="同期の状況">
+        <Text size="small">
+          最終同期 <span className="k-mono">12:34:56</span> ／ <Badge tone="success">正常</Badge>{' '}
+          <Badge tone="warning">遅延 2件</Badge> <Badge tone="danger">失敗 1件</Badge>
+        </Text>
+      </Card>
+      <DataTable
+        caption="同期の履歴"
+        rows={rows}
+        getRowId={(r) => r.id}
+        selectable
+        selectedIds={selected}
+        onSelectionChange={setSelected}
+        sorting={sort}
+        onSortingChange={setSort}
+        columns={[
+          { key: 'id', header: 'ID', render: (r) => <span className="k-mono">{r.id}</span> },
+          {
+            key: 'count',
+            header: '件数',
+            align: 'right',
+            sortValue: (r) => Number(r.count.replace(',', '')),
+            render: (r) => <span className="k-mono">{r.count}</span>,
+          },
+        ]}
+      />
+    </>
+  );
+}
 
 function Specimen() {
   return (
