@@ -115,5 +115,29 @@ describe('Semantic color contrast and token synchronization', () => {
     it(`${theme}: focus ring reaches 3:1 on the working surface`, () => {
       expect(ratio(resolve(set, 'focus'), resolve(set, 'bg'))).toBeGreaterThanOrEqual(3);
     });
+    // The app frame (sidebar) is the theme's own dark surface: its text, the selected item and the
+    // focus outline (drawn in on-frame) must hold on every frame tint.
+    for (const background of ['frame', 'frame-hover', 'frame-inset'])
+      for (const foreground of ['on-frame', 'frame-muted'])
+        it(`${theme}: frame ${foreground} / ${background} reaches 4.5:1`, () => {
+          expect(ratio(resolve(set, foreground), resolve(set, background))).toBeGreaterThanOrEqual(
+            4.5,
+          );
+        });
+    it(`${theme}: frame selected item text reaches 4.5:1`, () => {
+      expect(
+        ratio(resolve(set, 'on-frame-selected'), resolve(set, 'frame-selected')),
+      ).toBeGreaterThanOrEqual(4.5);
+    });
+    for (const background of ['frame', 'frame-hover'])
+      it(`${theme}: frame selected item and focus outline / ${background} reach 3:1`, () => {
+        expect(
+          ratio(resolve(set, 'frame-selected'), resolve(set, background)),
+        ).toBeGreaterThanOrEqual(3);
+        expect(ratio(resolve(set, 'on-frame'), resolve(set, background))).toBeGreaterThanOrEqual(3);
+      });
+    it(`${theme}: the frame line shows against the frame`, () => {
+      expect(ratio(resolve(set, 'frame-line'), resolve(set, 'frame'))).toBeGreaterThan(1.2);
+    });
   }
 });

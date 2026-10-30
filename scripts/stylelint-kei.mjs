@@ -128,9 +128,9 @@ const spacingGrid = rule('spacing-grid', '', (root, fail) => {
 // Content sits on the theme's surfaces; re-pointing them (e.g. to ultramarine) leaves no colour for "pressable".
 const surfaceTokens = rule(
   'surface-tokens',
-  '面のトークン（--k-bg / --k-surface*）は kei.tokens のテーマでだけ定義してください。中身の地を別の色にするなら、KeiProvider の theme を入れ子にします。ウルトラマリンの面はアプリの枠（サイドバー）だけです。',
+  '面のトークン（--k-bg / --k-surface* / --k-frame* / --k-on-frame*）は kei.tokens のテーマでだけ定義してください。中身の地を別の色にするなら、KeiProvider の theme を入れ子にします。アプリの枠（サイドバー）は --k-frame を使います（Paper ではウルトラマリン）。',
   (root, fail) => {
-    root.walkDecls(/^--k-(bg|surface[\w-]*)$/, (decl) => {
+    root.walkDecls(/^--k-(bg|surface[\w-]*|frame[\w-]*|on-frame[\w-]*)$/, (decl) => {
       if (!inside(decl, (a) => a.name === 'layer' && a.params.trim() === 'kei.tokens')) fail(decl);
     });
   },
