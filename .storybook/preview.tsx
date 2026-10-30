@@ -42,7 +42,7 @@ const preview: Preview = {
         items: [
           { value: 'kei', title: 'kei' },
           { value: 'ash', title: 'ash' },
-          { value: 'rust-07', title: 'rust-07' },
+          { value: 'soot-07', title: 'soot-07' },
         ],
         dynamicTitle: true,
       },
