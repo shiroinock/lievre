@@ -1,4 +1,4 @@
-// Which Python bakes the worn fonts: KEI_WEAR_PYTHON, then the repo's .venv-wear (made by
+// Which Python bakes the worn fonts: LIEVRE_WEAR_PYTHON, then the repo's .venv-wear (made by
 // `npm run wear:setup`), then python3 on PATH.
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 export const VENV = fileURLToPath(new URL('../../.venv-wear/', import.meta.url));
 
 export function wearPython() {
-  if (process.env.KEI_WEAR_PYTHON) return process.env.KEI_WEAR_PYTHON;
+  if (process.env.LIEVRE_WEAR_PYTHON) return process.env.LIEVRE_WEAR_PYTHON;
   const venv = `${VENV}bin/python3`;
   return existsSync(venv) ? venv : 'python3';
 }

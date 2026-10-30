@@ -11,7 +11,7 @@ const meta = {
   parameters: {
     layoutGate: {
       parts: [
-        { name: 'アバター', selector: '.k-avatar', checks: ['inset-x', 'inset-y', 'grid-height'] },
+        { name: 'アバター', selector: '.lv-avatar', checks: ['inset-x', 'inset-y', 'grid-height'] },
       ],
     } satisfies LayoutGate,
     docs: {

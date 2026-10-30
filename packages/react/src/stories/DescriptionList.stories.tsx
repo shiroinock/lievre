@@ -11,21 +11,21 @@ const meta = {
       parts: [
         {
           name: '説明リストの行',
-          selector: '.k-dl-item',
+          selector: '.lv-dl-item',
           checks: [{ baseline: ':scope > *' }],
         },
         {
           name: '横並びの説明リスト',
-          selector: ".k-dl[data-layout='row']",
+          selector: ".lv-dl[data-layout='row']",
           checks: [
-            { textEdge: 'start', of: ':scope > .k-dl-item > .k-dl-label' },
-            { textEdge: 'start', of: ':scope > .k-dl-item > .k-dl-value' },
+            { textEdge: 'start', of: ':scope > .lv-dl-item > .lv-dl-label' },
+            { textEdge: 'start', of: ':scope > .lv-dl-item > .lv-dl-value' },
             'fits',
           ],
         },
-        { name: '縦積みの説明リスト', selector: ".k-dl[data-layout='stack']", checks: ['fits'] },
-        { name: '項目名', selector: '.k-dl-label', checks: ['line-grid'] },
-        { name: '値', selector: '.k-dl-value', checks: ['line-grid'] },
+        { name: '縦積みの説明リスト', selector: ".lv-dl[data-layout='stack']", checks: ['fits'] },
+        { name: '項目名', selector: '.lv-dl-label', checks: ['line-grid'] },
+        { name: '値', selector: '.lv-dl-value', checks: ['line-grid'] },
       ],
     } satisfies LayoutGate,
     docs: {
@@ -43,7 +43,7 @@ const meta = {
       { label: '受付日時', value: '2026-10-24 09:42', mono: true },
       {
         label: '連絡先のメールアドレス',
-        value: 'hanako.kei@example.co.jp',
+        value: 'hanako.lievre@example.co.jp',
       },
     ],
   },

@@ -16,7 +16,7 @@ try {
   execFileSync(python, ['-c', 'import fontTools, brotli'], { stdio: 'ignore' });
 } catch {
   console.error(
-    `${missingMessage(python)}\n別の Python を使う場合は KEI_WEAR_PYTHON で指定してください。`,
+    `${missingMessage(python)}\n別の Python を使う場合は LIEVRE_WEAR_PYTHON で指定してください。`,
   );
   process.exit(1);
 }
@@ -27,14 +27,14 @@ const dir = `wear-fonts/${hashString(`${salt}:${strength}:${FONT_VERSION}`).toSt
 const started = Date.now();
 if (!existsSync(`${dir}/report.json`))
   execFileSync(python, ['scripts/wear/font.py', salt, dir], { stdio: 'inherit', env });
-// KEI Mono only covers the Latin range in fonts.css; the worn copy takes exactly the same range.
+// Lievre Mono only covers the Latin range in fonts.css; the worn copy takes exactly the same range.
 const monoRange = readFileSync('src/styles/fonts.css', 'utf8').match(
-  /font-family: 'KEI Mono';[\s\S]*?unicode-range: ([^;]+);/,
+  /font-family: 'Lievre Mono';[\s\S]*?unicode-range: ([^;]+);/,
 )[1];
 const css = readFileSync(`${dir}/fonts.css`, 'utf8')
   .replace(/url\(\.\//g, `url(./${dir.slice('wear-fonts/'.length)}/`)
   .replace(
-    /(font-family: 'KEI Worn Mono';[\s\S]*?unicode-range: )[^;]+;/g,
+    /(font-family: 'Lievre Worn Mono';[\s\S]*?unicode-range: )[^;]+;/g,
     (_, head) => `${head}${monoRange};`,
   );
 // Advance widths must match the originals glyph for glyph, or the 1:2 grid and figure columns break.

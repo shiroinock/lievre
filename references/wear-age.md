@@ -7,10 +7,10 @@
 ## 使い方
 
 ```tsx
-<KeiProvider age="light">…</KeiProvider>   // none（既定）・light・heavy
-<KeiProvider age="heavy">
-  <KeiProvider age="none">ここだけ新しい</KeiProvider>
-</KeiProvider>
+<LievreProvider age="light">…</LievreProvider>   // none（既定）・light・heavy
+<LievreProvider age="heavy">
+  <LievreProvider age="none">ここだけ新しい</LievreProvider>
+</LievreProvider>
 ```
 
 - `age` は入れ子にでき、指定がなければ外側の値を受け継ぎます。ポータル（Dialog など）にも `data-age` が渡ります。
@@ -23,18 +23,18 @@
 
 | 素材 | 何をするか | 部品への渡し方 |
 | --- | --- | --- |
-| 褪色（fade） | 色のトークンを全て、OKLab で同じ明るさのまま黄みの灰へ寄せる。強調・状態の色、その淡い地（`-soft`・`selected`・`skeleton`）、アプリの枠（`frame*`）は量の 1 倍、地・面・線・文字（`bg`・`surface*`・`border*`・`text`・`muted`・`subtle`・`on-*`・枠の上の色）は 0.5 倍。半透明の `overlay` だけは下の色を暗くするものなので褪せない | トークンの値を差し替える（`--k-accent` など）。全ての部品・アイコン・ポータルに効く |
-| インクのむら（mottle） | 塗りの面に紙の色がまだらに透ける | `.k-button--primary`・`.k-button--danger`・`.k-age-fill`。画像はテーマと強さごと |
-| 罫線のかすれ（rules） | 1px の線が長さに沿って濃くなったり薄くなったりし、ごくまれに 1〜3px 途切れる | カードの輪郭（`.k-card`・`.k-age-sheet`）と表の行の罫線（`.k-table` の行・`.k-age-rule`） |
-| 角の欠け（chips） | 角が1〜2か所、小さく欠ける。欠ける形だけを箱から切り抜くマスクなので、どの拡大率でも継ぎ目が出ない | カード（強）、ボタン（`.k-button`・`.k-age-corner`、0.35 倍） |
+| 褪色（fade） | 色のトークンを全て、OKLab で同じ明るさのまま黄みの灰へ寄せる。強調・状態の色、その淡い地（`-soft`・`selected`・`skeleton`）、アプリの枠（`frame*`）は量の 1 倍、地・面・線・文字（`bg`・`surface*`・`border*`・`text`・`muted`・`subtle`・`on-*`・枠の上の色）は 0.5 倍。半透明の `overlay` だけは下の色を暗くするものなので褪せない | トークンの値を差し替える（`--lv-accent` など）。全ての部品・アイコン・ポータルに効く |
+| インクのむら（mottle） | 塗りの面に紙の色がまだらに透ける | `.lv-button--primary`・`.lv-button--danger`・`.lv-age-fill`。画像はテーマと強さごと |
+| 罫線のかすれ（rules） | 1px の線が長さに沿って濃くなったり薄くなったりし、ごくまれに 1〜3px 途切れる | カードの輪郭（`.lv-card`・`.lv-age-sheet`）と表の行の罫線（`.lv-table` の行・`.lv-age-rule`） |
+| 角の欠け（chips） | 角が1〜2か所、小さく欠ける。欠ける形だけを箱から切り抜くマスクなので、どの拡大率でも継ぎ目が出ない | カード（強）、ボタン（`.lv-button`・`.lv-age-corner`、0.35 倍） |
 
-`.k-age-*` のクラスは、ほかの部品やアプリの部品が同じ素材を受け取るためのものです。
+`.lv-age-*` のクラスは、ほかの部品やアプリの部品が同じ素材を受け取るためのものです。
 
 版ズレ（ラベルや塗りを少しずらして二度刷りに見せる素材）も試作しましたが、機械的で、色も不自然に見えたため、材料ごとやめました。文字にも面にも二重の刷りは重ねません。文字の影（`text-shadow`）は stylelint が止めます。
 
 ### 場所による強さ
 
-[age.mjs の AGE_PLACES](../packages/react/src/wear/age.mjs) に、場所ごとの倍率を置いています。カードは罫線のかすれも角の欠けも 1 倍、表の罫線は 0.5 倍（13〜14px の行が読みにくくならないよう）、ボタンの角は 0.35 倍、入力欄には何もかけません。褪色だけはトークンなので、見出しも Meter もサイドバーも含めて全体に同じだけ効きます。トークンを通らない色が部品やデモに残ると、そこだけ褪せずに浮くので、stylelint の `kei/colour-tokens` が `kei.tokens` の外の色の値（`#…`・`rgb()`・`oklch()`・色の名前）を止め、TSX のインラインの色はテストが止めます（透明度だけを使うマスクの `#000` と、トークンから計算して作る `src/styles/wear/` は例外）。
+[age.mjs の AGE_PLACES](../packages/react/src/wear/age.mjs) に、場所ごとの倍率を置いています。カードは罫線のかすれも角の欠けも 1 倍、表の罫線は 0.5 倍（13〜14px の行が読みにくくならないよう）、ボタンの角は 0.35 倍、入力欄には何もかけません。褪色だけはトークンなので、見出しも Meter もサイドバーも含めて全体に同じだけ効きます。トークンを通らない色が部品やデモに残ると、そこだけ褪せずに浮くので、stylelint の `lievre/colour-tokens` が `lievre.tokens` の外の色の値（`#…`・`rgb()`・`oklch()`・色の名前）を止め、TSX のインラインの色はテストが止めます（透明度だけを使うマスクの `#000` と、トークンから計算して作る `src/styles/wear/` は例外）。
 
 ### 境目を出さない
 
@@ -56,12 +56,12 @@
 
 ### 試作の範囲
 
-今回は Button（primary / secondary / ghost / 無効）、Card、DataTable（選択した行、ホバー、並べ替えの見出し）で試しました。CSS は [src/styles/wear/age.css](../packages/react/src/styles/wear/age.css) に生成し、[kei-wear.css](../packages/react/src/styles/kei-wear.css) から読み込みます。kei.css の Button・Card・表の規則には手を入れていません。
+今回は Button（primary / secondary / ghost / 無効）、Card、DataTable（選択した行、ホバー、並べ替えの見出し）で試しました。CSS は [src/styles/wear/age.css](../packages/react/src/styles/wear/age.css) に生成し、[lievre-wear.css](../packages/react/src/styles/lievre-wear.css) から読み込みます。lievre.css の Button・Card・表の規則には手を入れていません。
 
 ## 状態は経年の外に置く
 
-- **フォーカス**：`--k-focus` は褪せる前の `accent` に固定します。マスクはフォーカスの枠も切ってしまうので、フォーカスしているボタン（`:focus-visible`）と、中にフォーカスがあるカード（`:focus-within`）には角の欠けをかけません。
-- **選択・状態の印**：次の要素の中では、強調と状態の色（`accent`・`accent-hover`・`success`・`warning`・`danger`・`info`）を褪せる前の値に戻します（`AGE_STATES`）。選択した行の左端の線とそのチェック（`tr[data-selected] > :first-child`）、選んでいるタブの線（`[role='tab'][data-state='active']`）、エラー（`aria-invalid`・`.k-field-error`・`[data-tone='error']`）。行全体・チェック全般・現在地・並べ替えの見出しは、以前は戻していましたが、それでは画面のあちこちに褪せない色が残ったので、印そのものだけにしました。選択の面（`selected`）は褪せても、面と 1.3:1 以上の差を保ちます。
+- **フォーカス**：`--lv-focus` は褪せる前の `accent` に固定します。マスクはフォーカスの枠も切ってしまうので、フォーカスしているボタン（`:focus-visible`）と、中にフォーカスがあるカード（`:focus-within`）には角の欠けをかけません。
+- **選択・状態の印**：次の要素の中では、強調と状態の色（`accent`・`accent-hover`・`success`・`warning`・`danger`・`info`）を褪せる前の値に戻します（`AGE_STATES`）。選択した行の左端の線とそのチェック（`tr[data-selected] > :first-child`）、選んでいるタブの線（`[role='tab'][data-state='active']`）、エラー（`aria-invalid`・`.lv-field-error`・`[data-tone='error']`）。行全体・チェック全般・現在地・並べ替えの見出しは、以前は戻していましたが、それでは画面のあちこちに褪せない色が残ったので、印そのものだけにしました。選択の面（`selected`）は褪せても、面と 1.3:1 以上の差を保ちます。
 - **無効**：むらと角の欠けは `:not(:disabled)` にしかかけません。無効のボタンは沈んだ面（`surface-sunken`）に補助の文字色（`muted`）で、どちらも地・文字として半分だけ褪せるので、ほとんど見た目が変わりません。
 - **色だけで示さない**：経年は状態の印（チェック、選択した行の帯、並べ替えの矢印、エラーの文言）を消したり形を変えたりしません。
 - **動きを減らす設定**：経年は動きを持ちません（画像とグラデーションだけで、アニメーションはありません）。
@@ -110,14 +110,14 @@
 
 - `src/styles/wear/age.css`：強さごとの形（むらの位置・欠け・かすれ）の変数、テーマと強さごとの褪色した色、規則（57KB。罫線の周期を 720px に延ばし、全ての色のトークンを出すので増えました）。
 - `age-mottle-{theme}-{light|heavy}.png`：128px 四方を 256px に広げて使う（8枚、各3KB）。`age-chip-{tl,tr,br,bl}.png`：32px 四方（4枚、各0.2KB）。
-- 調整画面は、自分の値を渡した KeiProvider で、同じ変数と画像をその場で作って当てます（[live.tsx の liveAgeStyle](../packages/react/src/wear/live.tsx)）。
+- 調整画面は、自分の値を渡した LievreProvider で、同じ変数と画像をその場で作って当てます（[live.tsx の liveAgeStyle](../packages/react/src/wear/live.tsx)）。
 
 ## テスト
 
 [src/test/age.test.tsx](../packages/react/src/test/age.test.tsx) と [age-validate.test.tsx](../packages/react/src/test/age-validate.test.tsx)：
 
 - 全てのプリセットと、全てのスライダーを最大にした値で、褪色した全ての組が 4.5:1、フォーカスが 3:1 以上。
-- 褪色は求めた量を超えず、色のあるトークンの彩度を増やさない。青は紫を通らず灰青へ褪せる。kei.css の色のトークンは `overlay` と `focus` を除いて全て褪色の対象に入っている。
+- 褪色は求めた量を超えず、色のあるトークンの彩度を増やさない。青は紫を通らず灰青へ褪せる。lievre.css の色のトークンは `overlay` と `focus` を除いて全て褪色の対象に入っている。
 - 罫線は濃さが 0.15 以上変わり、途切れは周期の中で 6 か所以下、区間の長さは1つの値に偏らない。
 - むらは 0 より大きく、設定の値以下。
 - フォーカスと状態の印が褪せる前の色を使う。選択した行の左端の線が、表の罫線と重ねて描かれる。age.css に `:focus` の装飾がない。ボタンへの規則は全て `:not(:disabled…)`。

@@ -7,7 +7,7 @@ const meta = {
   args: { children: '読み進めるための本文。役割に応じてサイズを選びます。' },
   parameters: {
     layoutGate: {
-      parts: [{ name: '文章', selector: '.k-text', checks: ['fits'] }],
+      parts: [{ name: '文章', selector: '.lv-text', checks: ['fits'] }],
     } satisfies LayoutGate,
   },
 } satisfies Meta<typeof Text>;

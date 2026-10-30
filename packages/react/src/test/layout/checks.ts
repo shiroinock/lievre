@@ -6,7 +6,7 @@ export type Violation = { part: string; check: string; element: string; message:
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const px = (n: number) => `${r1(n)}px`;
-// Text kept only for screen readers (VisuallyHidden, .k-sr-only) sits in a box clipped to 1px:
+// Text kept only for screen readers (VisuallyHidden, .lv-sr-only) sits in a box clipped to 1px:
 // it is not on the screen, so no check measures it.
 const clippedAway = (el: Element) => {
   for (let a: Element | null = el; a && a !== document.body; a = a.parentElement) {
@@ -142,7 +142,7 @@ function checkOne(el: Element, check: LayoutCheck): string | null {
     const mixed =
       inner > lines * lh + CRITERIA.line && faces.size > 1
         ? `line-height は ${px(lh)} ですが、同じ行に ${[...faces].join('・')} の文字が混ざり、行の箱がそれより高くなっています。混ぜた側（等幅の数字・単位など）の line-height を小さく（1 など）するか、行の高さを 4px に丸めてください。`
-        : `line-height が ${px(lh)} です。4px の倍数になるトークン（--k-line-tight・--k-line-body）を使ってください。`;
+        : `line-height が ${px(lh)} です。4px の倍数になるトークン（--lv-line-tight・--lv-line-body）を使ってください。`;
     return `行の箱の高さが ${px(inner)} で、${CRITERIA.grid}px の倍数から ${px(Math.min(off, CRITERIA.grid - off))} ずれています。基準：${CRITERIA.grid}px の倍数（差 ${CRITERIA.line}px 以内）。${mixed}`;
   }
 
@@ -302,7 +302,7 @@ const INTERACTIVE =
 /** 操作できる要素のうち、どの部品の宣言にも入っていないもの。 */
 export function undeclared(parts: LayoutPart[], root: ParentNode = document) {
   return [...root.querySelectorAll(INTERACTIVE)]
-    .filter((el) => visible(el) && el.closest('.kei'))
+    .filter((el) => visible(el) && el.closest('.lievre'))
     .filter((el) => !parts.some((p) => el.closest(p.selector)))
     .map(describe);
 }

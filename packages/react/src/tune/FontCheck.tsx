@@ -1,6 +1,6 @@
 // Measures the baked worn faces against the plain ones in the browser: every string keeps its
 // width, Latin stays half as wide as kana and kanji, and outlines move only within their own box.
-// The results are also left on window.__keiWearFontCheck for scripted checks.
+// The results are also left on window.__lievreWearFontCheck for scripted checks.
 import { useEffect, useState } from 'react';
 import { Badge, Heading, Text } from '../index';
 
@@ -8,15 +8,15 @@ const WEIGHTS = [400, 500, 600];
 const STRINGS = ['0123456789', 'SYN-20481', '12:34:56', '98.4%', '計測ラボの同期', 'Wear 擦れ'];
 const PAIRS = [
   {
-    name: 'KEI Mono',
-    plain: "'KEI Mono', 'IBM Plex Sans JP'",
-    worn: "'KEI Worn Mono', 'KEI Worn Sans'",
+    name: 'Lievre Mono',
+    plain: "'Lievre Mono', 'IBM Plex Sans JP'",
+    worn: "'Lievre Worn Mono', 'Lievre Worn Sans'",
   },
-  { name: 'Plex Sans JP', plain: "'IBM Plex Sans JP'", worn: "'KEI Worn Sans'" },
+  { name: 'Plex Sans JP', plain: "'IBM Plex Sans JP'", worn: "'Lievre Worn Sans'" },
 ];
 const INK = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const SIZE = 64;
-const WORN = ['KEI Worn Mono', 'KEI Worn Sans'];
+const WORN = ['Lievre Worn Mono', 'Lievre Worn Sans'];
 // Every character measured below: each one may sit in its own subset file.
 const MEASURED = [...new Set([...STRINGS, INK, 'あA'].join(''))].join('');
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -66,7 +66,7 @@ async function wornFacesReady() {
     if (sources.length && sources.every((src) => src.includes(folder))) break;
     await sleep(250);
   }
-  const families = ['KEI Mono', ...WORN, 'IBM Plex Sans JP'];
+  const families = ['Lievre Mono', ...WORN, 'IBM Plex Sans JP'];
   const fonts = families.flatMap((f) => WEIGHTS.map((w) => `${w} 16px '${f}'`));
   await Promise.all(fonts.map((font) => document.fonts.load(font, MEASURED)));
   await document.fonts.ready;
@@ -95,7 +95,7 @@ async function measure(reach: number): Promise<Result> {
       })),
     ),
   );
-  // One Latin character of KEI Mono is half a kana or kanji.
+  // One Latin character of Lievre Mono is half a kana or kanji.
   const ratio = WEIGHTS.map(
     (w) =>
       width(`${w} ${SIZE}px ${PAIRS[0].worn}`, 'あ') /
@@ -132,7 +132,7 @@ export function FontCheck({ reach, stamp }: { reach: number; stamp: number }) {
     measure(reach).then((r) => {
       if (!current) return;
       setResult(r);
-      (window as unknown as { __keiWearFontCheck: Result }).__keiWearFontCheck = r;
+      (window as unknown as { __lievreWearFontCheck: Result }).__lievreWearFontCheck = r;
     });
     return () => {
       current = false;

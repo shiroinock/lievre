@@ -13,7 +13,7 @@ const meta = {
       parts: [
         {
           name: 'ヒントを出すボタン',
-          selector: '.k-button',
+          selector: '.lv-button',
           checks: [
             'inset-x',
             'inset-y',
@@ -23,7 +23,7 @@ const meta = {
             { icon: 'svg' },
           ],
         },
-        { name: 'ツールチップ', selector: '.k-tooltip', checks: ['inset-y', 'fits'] },
+        { name: 'ツールチップ', selector: '.lv-tooltip', checks: ['inset-y', 'fits'] },
       ],
     } satisfies LayoutGate,
     docs: {

@@ -1,8 +1,8 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 
-<Meta title="はじめに/KEI を使う" />
+<Meta title="はじめに/lievre を使う" />
 
-# KEI（計）
+# Lièvre
 
 日本語の画面を基準に設計した、React のコンポーネントと CSS トークンです。読み物、登録フロー、管理画面まで同じ部品で組み立てられます。ウルトラマリンを操作の色にして、影のない面と1pxの線で階層をつくります。
 
@@ -19,22 +19,22 @@ import { Meta } from '@storybook/addon-docs/blocks';
 - **Controls**：propsを変更。**Accessibility**：自動検査。**Interactions**：play付きStoryの操作と結果。
 - 画面幅は **Viewport** から変更できます。
 
-本文は標準16px。`KeiProvider typography="interface"` では14pxとなり、管理画面の表現に使えます。密度は文字サイズから独立しており、入れ子のProviderは未指定のテーマ・密度・文字設定を引き継ぎます。
+本文は標準16px。`LievreProvider typography="interface"` では14pxとなり、管理画面の表現に使えます。密度は文字サイズから独立しており、入れ子のProviderは未指定のテーマ・密度・文字設定を引き継ぎます。
 
 ## 最小の使い方
 
 このパッケージはnpmには公開していません。付属のソースを使うか、`npm run build:lib` の後に `npm pack` でローカルパッケージを作成してください。
 
 ```tsx
-import { KeiProvider, Button, TextField } from '@kei-design/react';
-import '@kei-design/react/styles.css';
+import { LievreProvider, Button, TextField } from '@lievre/react';
+import '@lievre/react/styles.css';
 
 export function Workspace() {
   return (
-    <KeiProvider theme="paper" density="comfortable">
+    <LievreProvider theme="paper" density="comfortable">
       <TextField label="ワークスペース名" defaultValue="計測ラボ" />
       <Button variant="primary">作業を追加</Button>
-    </KeiProvider>
+    </LievreProvider>
   );
 }
 ```
@@ -49,11 +49,11 @@ function SaveButton() {
   return <Button onClick={() => toast({ title: '保存しました' })}>保存</Button>;
 }
 
-<KeiProvider>
+<LievreProvider>
   <ToastProvider>
     <SaveButton />
   </ToastProvider>
-</KeiProvider>;
+</LievreProvider>;
 ```
 
 ## 操作の約束
@@ -93,7 +93,7 @@ function SaveButton() {
 
 ## いまの範囲
 
-React + TypeScript、CSSトークン、2テーマ、2段階の密度、入力・選択・フィードバック・計器・テーブル・ナビゲーションと画面例。バックエンドとの接続は含みません。画面例のデータはローカルのサンプルで、再読み込みでリセットされます。
+React + TypeScript、CSSトークン、2テーマ、2段階の密度、入力・選択・フィードバック・メーター・テーブル・ナビゲーションと画面例。バックエンドとの接続は含みません。画面例のデータはローカルのサンプルで、再読み込みでリセットされます。
 
 カレンダー、複数選択コンボボックス、大規模テーブルの仮想化、リッチテキスト、実データのチャートは、この案でまだ実装していない拡張候補です。
 
@@ -103,4 +103,4 @@ React + TypeScript、CSSトークン、2テーマ、2段階の密度、入力・
 
 ## トークンの書き出し
 
-`packages/tokens/tokens.css`（`@kei-design/tokens`）が正です。値を変えたら `npm run tokens` で `tokens.json`（Design Tokens 形式）を作り直してください。テストで両者が一致しているかを確認しています。部品集の `styles.css` は、このトークンの層を読み込んで1つにまとめています。
+`packages/tokens/tokens.css`（`@lievre/tokens`）が正です。値を変えたら `npm run tokens` で `tokens.json`（Design Tokens 形式）を作り直してください。テストで両者が一致しているかを確認しています。部品集の `styles.css` は、このトークンの層を読み込んで1つにまとめています。

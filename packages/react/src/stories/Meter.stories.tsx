@@ -11,14 +11,14 @@ const meta = {
   parameters: {
     layoutGate: {
       parts: [
-        { name: 'メーター', selector: '.k-meter', checks: ['fits'] },
-        { name: 'メーターの読み値', selector: '.k-meter-reading > strong', checks: ['line-grid'] },
+        { name: 'メーター', selector: '.lv-meter', checks: ['fits'] },
+        { name: 'メーターの読み値', selector: '.lv-meter-reading > strong', checks: ['line-grid'] },
       ],
     } satisfies LayoutGate,
     docs: {
       description: {
         component:
-          '計器を思わせる測定値の表示。valueは0〜maxの範囲。role=meterと現在値・範囲を設定します。',
+          '針と目盛りで測定値を示す表示。valueは0〜maxの範囲。role=meterと現在値・範囲を設定します。',
       },
     },
   },

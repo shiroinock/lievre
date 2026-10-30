@@ -63,7 +63,7 @@ for (const [key, query] of variants)
   }
 await browser.close();
 console.log(
-  '| 土台 | KEI の守り | 変換前の候補 | 変換中の候補 | 確定後の候補 | 入力欄 | 選んだ値 |',
+  '| 土台 | lievre の守り | 変換前の候補 | 変換中の候補 | 確定後の候補 | 入力欄 | 選んだ値 |',
 );
 console.log('| --- | --- | --: | --: | --: | --- | --- |');
 for (const r of rows)

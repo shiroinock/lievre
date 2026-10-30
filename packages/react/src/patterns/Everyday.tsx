@@ -204,7 +204,7 @@ export function ArticleExample({
               {g.description}
             </Text>
             <Text size="small" tone="muted">
-              KEI編集部 · 2026年10月24日 · 約{g.time}
+              Lièvre 編集部 · 2026年10月24日 · 約{g.time}
             </Text>
           </Stack>
         </header>
@@ -272,7 +272,7 @@ export function RegistrationExample() {
       const invalid = formRef.current?.querySelector<HTMLElement>('[aria-invalid=true]');
       invalid?.focus();
       invalid
-        ?.closest('.k-field,.k-check-field')
+        ?.closest('.lv-field,.lv-check-field')
         ?.scrollIntoView({ block: 'center', behavior: 'instant' });
     }
   }, [attempt]);

@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { render, screen } from '@testing-library/react';
-import tokens from '@kei-design/tokens/tokens.json';
+import tokens from '@lievre/tokens/tokens.json';
 import { buildWear, readConfig } from '../../scripts/build-wear.mjs';
 import { normaliseConfig, PRESETS, type WearConfig } from '../wear/presets.mjs';
 import {
@@ -20,7 +20,7 @@ import {
 import { deltaE, fade, hexToOklch } from '../wear/oklch.mjs';
 import { ratio, resolve, themeTokens } from '../wear/contrast.mjs';
 import { THEMES } from '../wear/textures.mjs';
-import { KeiProvider } from '../index';
+import { LievreProvider } from '../index';
 
 const presets = Object.keys(PRESETS).map((name) =>
   normaliseConfig({ preset: name, ...PRESETS[name as keyof typeof PRESETS] }),
@@ -138,21 +138,21 @@ describe('Age: states stay fresh', () => {
       for (const level of levels) {
         const vars = ageInkVars(readConfig(), tokens, theme, level, (n: string) => n);
         const set = themeTokens(tokens, theme);
-        expect(vars['--k-focus']).toBe(resolve(set, 'accent'));
+        expect(vars['--lv-focus']).toBe(resolve(set, 'accent'));
         for (const name of STATE_INKS)
-          expect(vars[`--k-age-fresh-${name}`]).toBe(resolve(set, name));
+          expect(vars[`--lv-age-fresh-${name}`]).toBe(resolve(set, name));
       }
     for (const state of AGE_STATES) expect(css).toContain(state);
-    expect(css).toMatch(/--k-accent: var\(--k-age-fresh-accent\)/);
+    expect(css).toMatch(/--lv-accent: var\(--lv-age-fresh-accent\)/);
     // The worn table rule must not paint over the selected row's leading edge.
     expect(css).toMatch(
-      /tr\[data-selected\]:not\(:last-child\) > :first-child \{\s*background-image: linear-gradient\(var\(--k-accent\), var\(--k-accent\)\), var\(--k-age-rule\)/,
+      /tr\[data-selected\]:not\(:last-child\) > :first-child \{\s*background-image: linear-gradient\(var\(--lv-accent\), var\(--lv-accent\)\), var\(--lv-age-rule\)/,
     );
   });
 
   it('draws nothing aged on a disabled or focused control, and leaves focus styling alone', () => {
     expect(css).not.toMatch(/:focus(?!-visible\)|-within\))/);
-    for (const rule of css.match(/^\s*[^{}\n]*\.k-button[^{}\n]*\{/gm) ?? [])
+    for (const rule of css.match(/^\s*[^{}\n]*\.lv-button[^{}\n]*\{/gm) ?? [])
       expect(rule).toMatch(/:not\(:disabled/);
   });
 
@@ -210,10 +210,10 @@ describe('Age: generated and provided', () => {
       'background-repeat',
     ]);
     expect(
-      declarations.map((d) => d.trim()).filter((d) => !allowed.has(d) && !d.startsWith('--k-')),
+      declarations.map((d) => d.trim()).filter((d) => !allowed.has(d) && !d.startsWith('--lv-')),
     ).toEqual([]);
     // The ring is 1px, the width the card's own border already has.
-    expect(css).toContain('border: 1px solid var(--k-border)');
+    expect(css).toContain('border: 1px solid var(--lv-border)');
     // Nothing here outside the guard for more contrast and forced colours.
     expect(css).toMatch(
       /@media \(not \(prefers-contrast: more\)\) and \(not \(forced-colors: active\)\)/,
@@ -224,13 +224,13 @@ describe('Age: generated and provided', () => {
     const css = readFileSync('src/styles/wear/age.css', 'utf8');
     // A chip is its own piece cut out of the box, not a square stitched to the rest of the box.
     expect(css).not.toContain('conic-gradient');
-    for (const mask of css.match(/--k-age-chips-[\w-]+: [^;]+/g) ?? [])
+    for (const mask of css.match(/--lv-age-chips-[\w-]+: [^;]+/g) ?? [])
       expect(mask).toMatch(/no-repeat exclude, linear-gradient\(#000, #000\)$/);
     // No inner shadow or paper-coloured band (DESIGN.md allows no highlight inside an edge), and
     // no second print of a label: misregistration was tried and dropped.
     expect(css).not.toContain('box-shadow');
     expect(css).not.toContain('text-shadow');
-    expect(css).not.toContain('--k-age-shift');
+    expect(css).not.toContain('--lv-age-shift');
   });
 
   it('defaults to none, nests, and turns off for more contrast and forced colours', () => {
@@ -242,18 +242,18 @@ describe('Age: generated and provided', () => {
       }));
     media([]);
     const { unmount } = render(
-      <KeiProvider data-testid="outer" age="heavy">
-        <KeiProvider data-testid="inner" />
-      </KeiProvider>,
+      <LievreProvider data-testid="outer" age="heavy">
+        <LievreProvider data-testid="inner" />
+      </LievreProvider>,
     );
     expect(screen.getByTestId('outer')).toHaveAttribute('data-age', 'heavy');
     expect(screen.getByTestId('inner')).toHaveAttribute('data-age', 'heavy');
     unmount();
-    render(<KeiProvider data-testid="plain" />);
+    render(<LievreProvider data-testid="plain" />);
     expect(screen.getByTestId('plain')).toHaveAttribute('data-age', 'none');
     for (const query of ['(prefers-contrast: more)', '(forced-colors: active)']) {
       media([query]);
-      const { unmount: done } = render(<KeiProvider data-testid="scope" age="heavy" />);
+      const { unmount: done } = render(<LievreProvider data-testid="scope" age="heavy" />);
       expect(screen.getByTestId('scope')).toHaveAttribute('data-age', 'none');
       done();
     }

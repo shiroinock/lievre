@@ -10,7 +10,8 @@ type RuleName =
   | 'icon-button-label'
   | 'icon-only-button'
   | 'table-pagination'
-  | 'unit-outside-mono';
+  | 'unit-outside-mono'
+  | 'no-legacy-prefix';
 
 type Rule = {
   meta: {
@@ -24,14 +25,14 @@ type Rule = {
 };
 
 declare const plugin: {
-  meta: { name: 'kei'; version: string };
+  meta: { name: 'lievre'; version: string };
   rules: Record<RuleName, Rule>;
   configs: {
     /** ESLint の flat config に足すと、すべてのルールを error で有効にします。 */
     recommended: {
-      name: 'kei/recommended';
-      plugins: { kei: typeof plugin };
-      rules: Record<`kei/${RuleName}`, 'error'>;
+      name: 'lievre/recommended';
+      plugins: { lievre: typeof plugin };
+      rules: Record<`lievre/${RuleName}`, 'error'>;
     };
   };
 };

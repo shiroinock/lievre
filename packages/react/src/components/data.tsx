@@ -40,7 +40,7 @@ export function Sparkline({
     .join(' ');
   return (
     <svg
-      className={cx('k-sparkline', `k-sparkline--${color}`)}
+      className={cx('lv-sparkline', `lv-sparkline--${color}`)}
       viewBox="0 0 200 50"
       // Stretch to the box: the stroke stays 2px (non-scaling), so only the data is scaled.
       preserveAspectRatio="none"
@@ -48,7 +48,7 @@ export function Sparkline({
       aria-labelledby={id}
     >
       <title id={id}>{label}</title>
-      <path d="M0 45H200M0 25H200M0 5H200" className="k-chart-grid" />
+      <path d="M0 45H200M0 25H200M0 5H200" className="lv-chart-grid" />
       {safe.length > 1 && (
         <polyline
           fill="none"
@@ -61,7 +61,7 @@ export function Sparkline({
     </svg>
   );
 }
-/** 計器の読み値。value は等幅、unit は本文の書体で並べます。 */
+/** 測った値の読み値。value は等幅、unit は本文の書体で並べます。 */
 export function Metric({
   label,
   value,
@@ -84,20 +84,20 @@ export function Metric({
   code?: string;
 }) {
   return (
-    <section className="k-metric" aria-label={label}>
-      <div className="k-metric-top">
+    <section className="lv-metric" aria-label={label}>
+      <div className="lv-metric-top">
         <span>{label}</span>
-        {code && <span className="k-metric-code">{code}</span>}
+        {code && <span className="lv-metric-code">{code}</span>}
       </div>
-      <div className="k-metric-value">
+      <div className="lv-metric-value">
         {value}
         <span>{unit}</span>
       </div>
       <div
         className={cx(
-          'k-metric-change',
-          trend === 'up' && 'k-text-success',
-          trend === 'down' && 'k-text-danger',
+          'lv-metric-change',
+          trend === 'up' && 'lv-text-success',
+          trend === 'down' && 'lv-text-danger',
         )}
       >
         {trend === 'up' && <ArrowUpRight size={14} aria-hidden />}
@@ -130,19 +130,19 @@ export function Meter({
   const degrees = -135 + (safe / safeMax) * 270;
   return (
     <div
-      className="k-meter"
+      className="lv-meter"
       role="meter"
       aria-label={label}
       aria-valuenow={safe}
       aria-valuemin={0}
       aria-valuemax={safeMax}
     >
-      <div className="k-meter-face" aria-hidden>
-        <div className="k-meter-ticks" />
-        <div className="k-meter-hand" style={{ transform: `rotate(${degrees}deg)` }} />
-        <span className="k-meter-hub" />
+      <div className="lv-meter-face" aria-hidden>
+        <div className="lv-meter-ticks" />
+        <div className="lv-meter-hand" style={{ transform: `rotate(${degrees}deg)` }} />
+        <span className="lv-meter-hub" />
       </div>
-      <div className="k-meter-reading" aria-hidden>
+      <div className="lv-meter-reading" aria-hidden>
         <strong>
           {safe}
           <small>{unit}</small>
@@ -156,7 +156,7 @@ export function Meter({
 export type Column<T> = {
   key: string;
   header: string;
-  /** セルの中身。数値は `<span className="k-mono">` で包み、単位はその外に置きます。 */
+  /** セルの中身。数値は `<span className="lv-mono">` で包み、単位はその外に置きます。 */
   render: (row: T) => ReactNode;
   /** 渡した列だけ並べ替えられます。 */
   sortValue?: (row: T) => string | number;
@@ -295,17 +295,17 @@ export function DataTable<T>(props: DataTableProps<T>) {
   const some = visibleIds.some((id) => selection.includes(id));
   const table = (
     <div
-      className="k-table-wrap"
+      className="lv-table-wrap"
       role="region"
       aria-label={`${caption}（横スクロール対応）`}
       tabIndex={0}
     >
-      <table className="k-table">
-        <caption className="k-sr-only">{caption}</caption>
+      <table className="lv-table">
+        <caption className="lv-sr-only">{caption}</caption>
         <thead>
           <tr>
             {selectable && (
-              <th scope="col" className="k-table-select">
+              <th scope="col" className="lv-table-select">
                 <input
                   type="checkbox"
                   aria-label="表示中のすべてを選択"
@@ -341,7 +341,7 @@ export function DataTable<T>(props: DataTableProps<T>) {
               >
                 {col.sortValue ? (
                   <button
-                    className="k-table-sort"
+                    className="lv-table-sort"
                     onClick={() =>
                       setSort({
                         key: col.key,
@@ -423,7 +423,7 @@ export function DataTable<T>(props: DataTableProps<T>) {
                   {onRowClick && (
                     <td>
                       <button
-                        className="k-table-detail"
+                        className="lv-table-detail"
                         aria-label={`${id} の詳細を開く`}
                         onClick={() => onRowClick(row)}
                       >
@@ -450,10 +450,10 @@ export function DataTable<T>(props: DataTableProps<T>) {
   const first = total ? (current - 1) * size + 1 : 0;
   const last = Math.min(current * size, total);
   return (
-    <div className="k-table-paged">
+    <div className="lv-table-paged">
       {table}
-      <div className="k-table-pager">
-        <span className="k-table-count k-tabular">
+      <div className="lv-table-pager">
+        <span className="lv-table-count lv-tabular">
           {total ? `${total}件中 ${first}〜${last}件目` : '0件'}
         </span>
         <Pagination page={current} totalPages={totalPages} onPageChange={setPage} />
@@ -466,7 +466,7 @@ export type DescriptionItem = {
   /** 項目名。 */
   label: string;
   value: ReactNode;
-  /** 値が数値・ID・日時・コードのとき true。等幅で桁をそろえます。単位は value の中で `.k-mono` の外に置けないので、単位のある値は false のまま `<span className="k-mono">` で包みます。 */
+  /** 値が数値・ID・日時・コードのとき true。等幅で桁をそろえます。単位は value の中で `.lv-mono` の外に置けないので、単位のある値は false のまま `<span className="lv-mono">` で包みます。 */
   mono?: boolean;
   /** layout="stack" で段を組むとき、行の幅いっぱいに広げます（メモなど長い値）。 */
   wide?: boolean;
@@ -492,7 +492,7 @@ export function DescriptionList({
   return (
     <dl
       {...props}
-      className={cx('k-dl', className)}
+      className={cx('lv-dl', className)}
       data-layout={layout}
       style={
         {
@@ -503,9 +503,9 @@ export function DescriptionList({
       }
     >
       {items.map((item, i) => (
-        <div key={i} className="k-dl-item" data-wide={item.wide || undefined}>
-          <dt className="k-dl-label">{item.label}</dt>
-          <dd className={cx('k-dl-value', item.mono && 'k-mono')}>{item.value}</dd>
+        <div key={i} className="lv-dl-item" data-wide={item.wide || undefined}>
+          <dt className="lv-dl-label">{item.label}</dt>
+          <dd className={cx('lv-dl-value', item.mono && 'lv-mono')}>{item.value}</dd>
         </div>
       ))}
     </dl>

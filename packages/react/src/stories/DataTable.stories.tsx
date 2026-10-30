@@ -5,9 +5,9 @@ import { DataTable, Badge, type Column, type TableSort } from '../index';
 import { expect, userEvent, within } from 'storybook/test';
 type Row = { id: string; name: string; value: number; status: string };
 const rows: Row[] = [
-  { id: 'KEI-01', name: 'センサーA', value: 42, status: '稼働中' },
-  { id: 'KEI-02', name: 'ゲートウェイB', value: 16, status: '要確認' },
-  { id: 'KEI-03', name: 'ストレージC', value: 68, status: '稼働中' },
+  { id: 'lievre-01', name: 'センサーA', value: 42, status: '稼働中' },
+  { id: 'lievre-02', name: 'ゲートウェイB', value: 16, status: '要確認' },
+  { id: 'lievre-03', name: 'ストレージC', value: 68, status: '稼働中' },
 ];
 const columns: Column<Row>[] = [
   { key: 'name', header: '名前', render: (r) => r.name, sortValue: (r) => r.name },
@@ -17,7 +17,7 @@ const columns: Column<Row>[] = [
     align: 'right',
     render: (r) => (
       <span>
-        <span className="k-mono">{r.value}</span>%
+        <span className="lv-mono">{r.value}</span>%
       </span>
     ),
     sortValue: (r) => r.value,
@@ -46,22 +46,27 @@ const meta = {
   parameters: {
     layoutGate: {
       parts: [
-        { name: '表の見出しのセル', selector: '.k-table th', checks: ['inset-y'] },
+        { name: '表の見出しのセル', selector: '.lv-table th', checks: ['inset-y'] },
         // The empty state is a block of several lines; like a panel, its half-leading is not
         // held to the one-line centre. EmptyState is measured in its own story.
         {
           name: '表のセル',
-          selector: '.k-table td:not(:has(.k-empty))',
+          selector: '.lv-table td:not(:has(.lv-empty))',
           checks: ['inset-y', 'line-grid'],
         },
         {
           name: 'ページ送りの帯',
-          selector: '.k-table-pager',
-          checks: ['inset-x', 'inset-y', 'fits', { icon: '.k-pagination', text: '.k-table-count' }],
+          selector: '.lv-table-pager',
+          checks: [
+            'inset-x',
+            'inset-y',
+            'fits',
+            { icon: '.lv-pagination', text: '.lv-table-count' },
+          ],
         },
         {
           name: '並べ替えのボタン',
-          selector: '.k-table-sort',
+          selector: '.lv-table-sort',
           checks: ['grid-height', { icon: 'svg' }],
         },
       ],
@@ -104,7 +109,7 @@ export const SortAndSelect: Story = {
 };
 
 const many: Row[] = Array.from({ length: 12 }, (_, i) => ({
-  id: `KEI-${String(i + 1).padStart(2, '0')}`,
+  id: `lievre-${String(i + 1).padStart(2, '0')}`,
   name: `機材${i + 1}`,
   // 1ページ目に最小も最大も来ない並びにして、区切ってから並べ替えると結果が変わるようにする。
   value: [40, 55, 61, 47, 3, 72, 58, 99, 44, 50, 66, 52][i],

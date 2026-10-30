@@ -11,10 +11,10 @@ const meta = {
       parts: [
         {
           name: '読み込み中の印',
-          selector: '.k-spinner',
+          selector: '.lv-spinner',
           checks: [{ icon: 'svg' }, 'grid-height'],
         },
-        { name: '文の中の印', selector: '.k-text', checks: [{ icon: '.k-spinner > svg' }] },
+        { name: '文の中の印', selector: '.lv-text', checks: [{ icon: '.lv-spinner > svg' }] },
       ],
     } satisfies LayoutGate,
     docs: {

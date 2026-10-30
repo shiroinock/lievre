@@ -11,11 +11,11 @@ const meta = {
   parameters: {
     layoutGate: {
       parts: [
-        { name: '指標', selector: '.k-metric', checks: ['padding-equal', 'fits'] },
-        { name: '指標の変化', selector: '.k-metric-change', checks: [{ icon: 'svg' }] },
-        { name: '指標の見出し', selector: '.k-metric-top', checks: [{ baseline: ':scope > *' }] },
-        { name: '指標の値', selector: '.k-metric-value', checks: ['line-grid'] },
-        { name: '折れ線', selector: '.k-sparkline', checks: ['fills-x'] },
+        { name: '指標', selector: '.lv-metric', checks: ['padding-equal', 'fits'] },
+        { name: '指標の変化', selector: '.lv-metric-change', checks: [{ icon: 'svg' }] },
+        { name: '指標の見出し', selector: '.lv-metric-top', checks: [{ baseline: ':scope > *' }] },
+        { name: '指標の値', selector: '.lv-metric-value', checks: ['line-grid'] },
+        { name: '折れ線', selector: '.lv-sparkline', checks: ['fills-x'] },
       ],
     } satisfies LayoutGate,
     docs: {

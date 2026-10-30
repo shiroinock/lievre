@@ -3,7 +3,7 @@
 import { describe, it, beforeAll } from 'vitest';
 import { composeStories, setProjectAnnotations } from '@storybook/react';
 import preview from '../../../.storybook/preview';
-import * as kei from '../../index';
+import * as lievre from '../../index';
 import { checkPart, undeclared, type Violation } from './checks';
 import { CHECK_LABEL, STRESS_SKIPS, type LayoutGate } from './declare';
 import { BASELINE, NOT_A_PART, type Combo } from './baseline';
@@ -70,10 +70,10 @@ describe('配置の宣言', () => {
       if ('parts' in gate) {
         if (!gate.parts.length) return [`${file} の layoutGate.parts が空です。`];
         return gate.parts
-          .filter((p) => !p.selector.trim().startsWith('.k-') || !p.checks.length)
+          .filter((p) => !p.selector.trim().startsWith('.lv-') || !p.checks.length)
           .map(
             (p) =>
-              `${file} の部品「${p.name}」：selector は .k- で始め、checks を1つ以上書いてください。`,
+              `${file} の部品「${p.name}」：selector は .lv- で始め、checks を1つ以上書いてください。`,
           );
       }
       return [];
@@ -90,7 +90,7 @@ describe('配置の宣言', () => {
         })
         .map(({ module }) => module.default.component),
     );
-    const missing = Object.entries(kei)
+    const missing = Object.entries(lievre)
       .filter(([name, value]) => /^[A-Z]/.test(name) && value && typeof value !== 'string')
       .filter(([name, value]) => !covered.has(value) && !(name in NOT_A_PART))
       .map(

@@ -13,7 +13,7 @@ const meta = {
       parts: [
         {
           name: '開くボタン',
-          selector: '.k-button',
+          selector: '.lv-button',
           checks: [
             'inset-x',
             'inset-y',
@@ -25,19 +25,19 @@ const meta = {
         },
         {
           name: 'アイコンだけの開くボタン',
-          selector: '.k-icon-button',
+          selector: '.lv-icon-button',
           checks: ['inset-x', 'inset-y', 'control-height', 'square'],
         },
-        { name: 'ポップオーバー', selector: '.k-popover', checks: ['padding-equal', 'fits'] },
+        { name: 'ポップオーバー', selector: '.lv-popover', checks: ['padding-equal', 'fits'] },
         {
           name: 'チェックボックスの欄',
-          selector: '.k-check-field',
-          checks: [{ icon: '.k-checkbox', text: '.k-check-label' }],
+          selector: '.lv-check-field',
+          checks: [{ icon: '.lv-checkbox', text: '.lv-check-label' }],
         },
         {
           name: 'ポップオーバーの操作',
-          selector: '.k-popover-actions',
-          checks: [{ sameHeight: '.k-button' }],
+          selector: '.lv-popover-actions',
+          checks: [{ sameHeight: '.lv-button' }],
         },
       ],
     } satisfies LayoutGate,
@@ -77,7 +77,7 @@ const meta = {
             checked={states.includes('done')}
             onCheckedChange={toggle('done')}
           />
-          <div className="k-popover-actions">
+          <div className="lv-popover-actions">
             <Button size="sm" onClick={() => setStates([])}>
               条件を外す
             </Button>

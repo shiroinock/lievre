@@ -178,18 +178,18 @@ export function wearVars(config, kasure) {
   const place = placements(config.salt);
   const at = ([x, y]) => `${x}px ${y}px`;
   const vars = {
-    '--k-wear-kasure': kasure,
-    '--k-wear-rule': rule,
-    '--k-wear-dash': dash,
-    '--k-wear-root-pos': at(place.root[0]),
+    '--lv-wear-kasure': kasure,
+    '--lv-wear-rule': rule,
+    '--lv-wear-dash': dash,
+    '--lv-wear-root-pos': at(place.root[0]),
   };
-  for (let n = 0; n < VARIANTS; n++) vars[`--k-wear-card-pos-${n}`] = at(place.card[n]);
+  for (let n = 0; n < VARIANTS; n++) vars[`--lv-wear-card-pos-${n}`] = at(place.card[n]);
   for (const kind of Object.keys(TEXT_KINDS)) {
     const depth = config.kinds[kind].kasure;
     const flat = `#000000${hex2(1 - depth)}`;
-    vars[`--k-wear-${kind}-mask`] =
-      depth > 0 ? `linear-gradient(${flat}, ${flat}), var(--k-wear-kasure)` : 'none';
-    for (let n = 0; n < VARIANTS; n++) vars[`--k-wear-${kind}-pos-${n}`] = at(place[kind][n]);
+    vars[`--lv-wear-${kind}-mask`] =
+      depth > 0 ? `linear-gradient(${flat}, ${flat}), var(--lv-wear-kasure)` : 'none';
+    for (let n = 0; n < VARIANTS; n++) vars[`--lv-wear-${kind}-pos-${n}`] = at(place[kind][n]);
   }
   return vars;
 }
@@ -204,8 +204,8 @@ export function sheetVars(config) {
   const r = `${reach}px`;
   const ink = `#000000${hex2(config.sure.fold)}`;
   return {
-    '--k-wear-yake-reach': r,
-    '--k-wear-sure-mask':
+    '--lv-wear-yake-reach': r,
+    '--lv-wear-sure-mask':
       `linear-gradient(to right, #000, transparent ${r}, transparent calc(${fold.toFixed(1)}% - 40px), ` +
       `${ink} ${fold.toFixed(1)}%, transparent calc(${fold.toFixed(1)}% + 40px), ` +
       `transparent calc(100% - ${r}), #000), ` +
@@ -227,10 +227,10 @@ export function sheetThemeVars(config, theme, urls, tokens) {
   const blur = Math.round(config.yake.reach * 0.3);
   return {
     // Control outlines darken with the paper just enough to keep 3:1 on it.
-    ...(outline !== resolve(set, 'border-strong') && { '--k-border-strong': outline }),
-    '--k-wear-yake': urls.yake,
-    '--k-wear-sure': urls.sure,
-    '--k-wear-rim':
+    ...(outline !== resolve(set, 'border-strong') && { '--lv-border-strong': outline }),
+    '--lv-wear-yake': urls.yake,
+    '--lv-wear-sure': urls.sure,
+    '--lv-wear-rim':
       alpha > 0
         ? `inset 0 0 ${blur}px ${Math.round(blur / 6)}px rgb(${r} ${g} ${b} / ${alpha.toFixed(3)})`
         : 'none',
@@ -239,15 +239,15 @@ export function sheetThemeVars(config, theme, urls, tokens) {
 
 /**
  * Which face each text kind is set in under baked wear: the worn faces from npm run wear:font for
- * the kinds whose edges wear, the plain ones otherwise. The tuning page swaps --k-wear-sans and
- * --k-wear-mono for faces baked on the spot from unsaved values.
+ * the kinds whose edges wear, the plain ones otherwise. The tuning page swaps --lv-wear-sans and
+ * --lv-wear-mono for faces baked on the spot from unsaved values.
  */
 export function faceVars(config) {
   const vars = {};
   for (const [kind, { font }] of Object.entries(TEXT_KINDS)) {
     const worn = config.kinds[kind].distort;
-    vars[`--k-wear-${kind}-face`] = worn ? `var(--k-wear-${font})` : `var(--k-font-${font})`;
-    vars[`--k-wear-${kind}-mono`] = worn ? 'var(--k-wear-mono)' : 'var(--k-font-mono)';
+    vars[`--lv-wear-${kind}-face`] = worn ? `var(--lv-wear-${font})` : `var(--lv-font-${font})`;
+    vars[`--lv-wear-${kind}-mono`] = worn ? 'var(--lv-wear-mono)' : 'var(--lv-font-mono)';
   }
   return vars;
 }

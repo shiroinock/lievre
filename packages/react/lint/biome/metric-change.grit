@@ -1,4 +1,4 @@
-// kei/metric-change: `trend` only changes the arrow and colour, so the direction needs words.
+// lievre/metric-change: `trend` only changes the arrow and colour, so the direction needs words.
 language js(typescript, jsx);
 
 JsxSelfClosingElement(name = "Metric", attributes = $attributes) as $metric where {
@@ -6,6 +6,6 @@ JsxSelfClosingElement(name = "Metric", attributes = $attributes) as $metric wher
   $trend <: r"[{]?[\x22\x27\x60](?:up|down)[\x22\x27\x60][}]?",
   $attributes <: not contains or { JsxAttribute(name = "change"), JsxSpreadAttribute() },
   $metric <: within JsModule() as $module,
-  $module <: contains `import $_ from "@kei-design/react"`,
+  $module <: contains `import $_ from "@lievre/react"`,
   register_diagnostic(span = $metric, message = "Metric の trend は矢印と色だけで、読み上げでは向きが伝わりません。change に向きを言葉で書いてください（change='前週比 +0.02 ポイント上昇'）。")
 }

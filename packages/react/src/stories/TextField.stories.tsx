@@ -13,7 +13,7 @@ const meta = {
       parts: [
         {
           name: '入力欄',
-          selector: '.k-input',
+          selector: '.lv-input',
           checks: ['inset-y', 'control-height', { padding: 'input' }],
         },
       ],
@@ -48,7 +48,7 @@ export const Error: Story = {
   },
 };
 export const Disabled: Story = { args: { disabled: true, defaultValue: '変更できません' } };
-export const ReadOnly: Story = { args: { readOnly: true, defaultValue: 'KEI-024' } };
+export const ReadOnly: Story = { args: { readOnly: true, defaultValue: 'lievre-024' } };
 export const Password: Story = {
   args: {
     label: 'パスワード',

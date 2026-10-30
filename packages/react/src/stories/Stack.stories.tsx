@@ -10,8 +10,8 @@ const meta = {
       parts: [
         {
           name: 'スタック',
-          selector: '.k-stack',
-          checks: ['fits', { sameHeight: '.k-input, .k-select-trigger, .k-button' }],
+          selector: '.lv-stack',
+          checks: ['fits', { sameHeight: '.lv-input, .lv-select-trigger, .lv-button' }],
         },
       ],
     } satisfies LayoutGate,

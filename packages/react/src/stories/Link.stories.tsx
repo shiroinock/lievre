@@ -7,7 +7,7 @@ const meta = {
   args: { children: '詳細を読む', href: '#link-destination' },
   parameters: {
     layoutGate: {
-      parts: [{ name: 'リンク', selector: '.k-link', checks: ['fits'] }],
+      parts: [{ name: 'リンク', selector: '.lv-link', checks: ['fits'] }],
     } satisfies LayoutGate,
   },
 } satisfies Meta<typeof Link>;

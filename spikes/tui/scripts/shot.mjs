@@ -10,7 +10,7 @@ const root = new URL('../../', here);
 const out = new URL('out/', here);
 
 // The terminal's own theme: a light one for Paper and a dark one for Ink, each with the 16 colors
-// of macOS Terminal's "Basic" profile. 16-color output shows these values, not KEI's.
+// of macOS Terminal's "Basic" profile. 16-color output shows these values, not lievre's.
 const ANSI = {
   black: '#000000',
   red: '#990000',

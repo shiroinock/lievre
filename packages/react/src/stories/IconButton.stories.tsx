@@ -12,10 +12,10 @@ const meta = {
       parts: [
         {
           name: 'アイコンだけのボタン',
-          selector: '.k-icon-button',
+          selector: '.lv-icon-button',
           checks: ['inset-x', 'inset-y', 'control-height', 'square', 'focus-room'],
         },
-        { name: 'ツールチップ', selector: '.k-tooltip', checks: ['inset-y', 'fits'] },
+        { name: 'ツールチップ', selector: '.lv-tooltip', checks: ['inset-y', 'fits'] },
       ],
     } satisfies LayoutGate,
     docs: {
@@ -69,7 +69,7 @@ export const InContext: Story = {
         ]}
         getRowId={(r) => r.id}
         columns={[
-          { key: 'id', header: 'ID', render: (r) => <span className="k-mono">{r.id}</span> },
+          { key: 'id', header: 'ID', render: (r) => <span className="lv-mono">{r.id}</span> },
           { key: 'name', header: '作業', render: (r) => r.name },
           {
             key: 'actions',

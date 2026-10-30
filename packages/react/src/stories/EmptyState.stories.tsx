@@ -18,7 +18,7 @@ const meta = {
   component: EmptyState,
   parameters: {
     layoutGate: {
-      parts: [{ name: '空の状態', selector: '.k-empty', checks: ['inset-x'] }],
+      parts: [{ name: '空の状態', selector: '.lv-empty', checks: ['inset-x'] }],
     } satisfies LayoutGate,
     docs: {
       description: {

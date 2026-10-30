@@ -10,7 +10,7 @@ const meta = {
   component: Kbd,
   parameters: {
     layoutGate: {
-      parts: [{ name: 'キー', selector: '.k-kbd', checks: ['inset-x', 'inset-y', 'grid-height'] }],
+      parts: [{ name: 'キー', selector: '.lv-kbd', checks: ['inset-x', 'inset-y', 'grid-height'] }],
     } satisfies LayoutGate,
     docs: {
       description: {

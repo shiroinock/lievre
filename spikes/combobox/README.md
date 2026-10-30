@@ -4,18 +4,18 @@
 
 ## 中身
 
-| ファイル                    | 内容                                                                                                                                                                                               |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/shared.tsx`            | 3つの土台で共通にする層。KEI に入れるときは、ここが KEI の側で持つ部分になる。正規化（`normalize`）、IME の守り（`useImeGuard`）、PortalSurface の入れ物、Radix の Popover を枠にする `RadixShell` |
-| `src/AriaCombobox.tsx`      | React Aria（react-aria-components）。`shell='radix'` は枠を Radix にする試み（うまく動かない。理由はファイルの注記）                                                                               |
-| `src/AriakitCombobox.tsx`   | Ariakit。`shell='radix'` で枠を Radix の Popover にする                                                                                                                                            |
-| `src/DownshiftCombobox.tsx` | Downshift（`useCombobox`）。`shell='own'` は floating-ui と PortalSurface を自分で組み、`shell='radix'` は Radix の Popover にする                                                                 |
-| `src/AriaDatePicker.tsx`    | DatePicker に広げられるかを見る最小の試作（React Aria・和暦）                                                                                                                                      |
-| `src/spike.css`             | Combobox の見た目。kei.css の Select と同じ値                                                                                                                                                      |
-| `test/behavior.mjs`         | 同じ操作を全部の組み合わせと KEI の Select に流す（Chromium・WebKit）                                                                                                                              |
-| `test/summary.mjs`          | 結果を ○／× の表（`test/summary.md`）にする                                                                                                                                                        |
-| `test/ime-cdp.mjs`          | Chromium の IME の経路（CDP）で変換中の文字を入れて確かめる                                                                                                                                        |
-| `scripts/size.mjs`          | KEI のライブラリに足したときの gzip の増分を測る                                                                                                                                                   |
+| ファイル                    | 内容                                                                                                                                                                                                     |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/shared.tsx`            | 3つの土台で共通にする層。lievre に入れるときは、ここが lievre の側で持つ部分になる。正規化（`normalize`）、IME の守り（`useImeGuard`）、PortalSurface の入れ物、Radix の Popover を枠にする `RadixShell` |
+| `src/AriaCombobox.tsx`      | React Aria（react-aria-components）。`shell='radix'` は枠を Radix にする試み（うまく動かない。理由はファイルの注記）                                                                                     |
+| `src/AriakitCombobox.tsx`   | Ariakit。`shell='radix'` で枠を Radix の Popover にする                                                                                                                                                  |
+| `src/DownshiftCombobox.tsx` | Downshift（`useCombobox`）。`shell='own'` は floating-ui と PortalSurface を自分で組み、`shell='radix'` は Radix の Popover にする                                                                       |
+| `src/AriaDatePicker.tsx`    | DatePicker に広げられるかを見る最小の試作（React Aria・和暦）                                                                                                                                            |
+| `src/spike.css`             | Combobox の見た目。lievre.css の Select と同じ値                                                                                                                                                         |
+| `test/behavior.mjs`         | 同じ操作を全部の組み合わせと lievre の Select に流す（Chromium・WebKit）                                                                                                                                 |
+| `test/summary.mjs`          | 結果を ○／× の表（`test/summary.md`）にする                                                                                                                                                              |
+| `test/ime-cdp.mjs`          | Chromium の IME の経路（CDP）で変換中の文字を入れて確かめる                                                                                                                                              |
+| `scripts/size.mjs`          | lievre のライブラリに足したときの gzip の増分を測る                                                                                                                                                      |
 
 ## 動かし方
 

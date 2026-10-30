@@ -1,14 +1,14 @@
 // The wear tuning page (npm run wear:tune). Values change the live column at once; 保存 writes
 // wear.config.json through the dev server, which regenerates the baked textures and fonts.
 import { useDeferredValue, useEffect, useMemo, useState, type CSSProperties } from 'react';
-import tokens from '@kei-design/tokens/tokens.json';
+import tokens from '@lievre/tokens/tokens.json';
 import {
   Badge,
   Button,
   Card,
   DataTable,
   Heading,
-  KeiProvider,
+  LievreProvider,
   Meter,
   Metric,
   Text,
@@ -45,12 +45,12 @@ const levelTone = { ok: 'success', caution: 'warning', warn: 'danger' } as const
 const levelName = { ok: '目安内', caution: '注意', warn: '超過' };
 const pct = (v: number) => (
   <>
-    <span className="k-mono">{(v * 100).toFixed(0)}</span>%
+    <span className="lv-mono">{(v * 100).toFixed(0)}</span>%
   </>
 );
 const px = (v: number) => (
   <>
-    <span className="k-mono">{v.toFixed(2)}</span>px
+    <span className="lv-mono">{v.toFixed(2)}</span>px
   </>
 );
 
@@ -218,14 +218,14 @@ export function Tune() {
   const dirty = JSON.stringify(config) !== JSON.stringify(saved);
 
   useEffect(() => {
-    fetch('/__kei-wear/config')
+    fetch('/__lievre-wear/config')
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((c: WearConfig) => {
         setConfig(c);
         setSaved(c);
       })
       .catch(() => setStatus({ state: 'offline' }));
-    fetch('/__kei-wear/status')
+    fetch('/__lievre-wear/status')
       .then((r) => r.json())
       .then((s: Status) => s.state === 'running' && setStatus(s))
       .catch(() => {});
@@ -233,7 +233,7 @@ export function Tune() {
   useEffect(() => {
     if (status.state !== 'running') return;
     const timer = setInterval(async () => {
-      const next: Status = await (await fetch('/__kei-wear/status')).json();
+      const next: Status = await (await fetch('/__lievre-wear/status')).json();
       if (next.state === 'running') return;
       setStatus(next);
       setBaked((n) => n + 1);
@@ -243,7 +243,7 @@ export function Tune() {
 
   async function save() {
     setStatus({ state: 'saving' });
-    const response = await fetch('/__kei-wear/config', {
+    const response = await fetch('/__lievre-wear/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(config),
@@ -262,7 +262,7 @@ export function Tune() {
     }));
 
   return (
-    <KeiProvider theme={theme} className="tune">
+    <LievreProvider theme={theme} className="tune">
       <aside className="tune-controls" aria-label="質感の値">
         <Heading level={1} size="section">
           質感の調整
@@ -272,7 +272,7 @@ export function Tune() {
           に書き、焼き込みの画像とフォントを作り直します。
         </Text>
         <fieldset className="tune-presets">
-          <legend className="k-label">プリセット</legend>
+          <legend className="lv-label">プリセット</legend>
           {(Object.keys(PRESETS) as (keyof typeof PRESETS)[]).map((name) => (
             <Button
               key={name}
@@ -292,7 +292,7 @@ export function Tune() {
         />
         {sliders.map((s) => (
           <label key={s.label} className="tune-slider">
-            <span className="k-label">
+            <span className="lv-label">
               {s.label} <output>{s.get(config)}</output>
             </span>
             <input
@@ -316,7 +316,7 @@ export function Tune() {
           }
         />
         <table className="tune-kinds">
-          <caption className="k-label">文字の種類ごと</caption>
+          <caption className="lv-label">文字の種類ごと</caption>
           <thead>
             <tr>
               <th scope="col">種類</th>
@@ -353,9 +353,9 @@ export function Tune() {
           </tbody>
         </table>
         <label className="tune-slider">
-          <span className="k-label">テーマ</span>
+          <span className="lv-label">テーマ</span>
           <select
-            className="k-select"
+            className="lv-select"
             value={theme}
             onChange={(e) => setTheme(e.target.value as Theme)}
           >
@@ -405,7 +405,7 @@ export function Tune() {
           </Text>
           <div className="tune-columns">
             {(['none', 'light', 'heavy'] as Age[]).map((age) => (
-              <KeiProvider
+              <LievreProvider
                 key={age}
                 theme={theme}
                 age={age}
@@ -416,7 +416,7 @@ export function Tune() {
                   {ageNames[age]}
                 </Text>
                 <AgeSamples />
-              </KeiProvider>
+              </LievreProvider>
             ))}
           </div>
         </section>
@@ -427,13 +427,13 @@ export function Tune() {
           <Text size="small" tone="muted">
             ヤケとスレは画面（ビューポート）の端から付きます。ここでは、この枠を1枚の紙として、調整中の値（実行時）で表示します。端の近くに、サイドバーの文字と表の端の列を置いています。
           </Text>
-          <KeiProvider theme={theme} wear="live" wearConfig={shown} className="tune-sheet">
+          <LievreProvider theme={theme} wear="live" wearConfig={shown} className="tune-sheet">
             <WideSheet />
-          </KeiProvider>
+          </LievreProvider>
         </section>
         <FontCheck reach={edgeReach(saved)} stamp={baked} />
       </main>
-    </KeiProvider>
+    </LievreProvider>
   );
 }
 
@@ -482,9 +482,9 @@ function Gauges({ g }: { g: ReturnType<typeof gauges> }) {
         以上薄くなる画素の割合で、目安は {pct(GUIDES.thinned[0])} まで。{GUIDES.smallSize}px
         未満の文字の縁を荒らすと「注意」にします。
       </Text>
-      <div className="k-table-wrap">
-        <table className="k-table">
-          <caption className="k-label">文字の大きさごとの目安</caption>
+      <div className="lv-table-wrap">
+        <table className="lv-table">
+          <caption className="lv-label">文字の大きさごとの目安</caption>
           <thead>
             <tr>
               <th scope="col">大きさ</th>
@@ -502,7 +502,7 @@ function Gauges({ g }: { g: ReturnType<typeof gauges> }) {
                 <td>{px(s.outline.px)}</td>
                 <td>{pct(s.outline.ratio)}</td>
                 <td>{pct(s.kasure.thinned)}</td>
-                <td className="k-mono">{s.kasure.faintest.toFixed(2)}</td>
+                <td className="lv-mono">{s.kasure.faintest.toFixed(2)}</td>
                 <td>
                   <Level level={worse(s.outline.level, s.kasure.level)} />
                 </td>
@@ -511,9 +511,9 @@ function Gauges({ g }: { g: ReturnType<typeof gauges> }) {
           </tbody>
         </table>
       </div>
-      <div className="k-table-wrap">
-        <table className="k-table">
-          <caption className="k-label">
+      <div className="lv-table-wrap">
+        <table className="lv-table">
+          <caption className="lv-label">
             汚れ・ヤケ・スレが最も濃い点の上で、全ての文字色（本文・補助・状態の色・リンク）と最も薄いカスレの文字が
             4.5:1 に、フォーカスの枠と操作の輪郭が 3:1
             に届くか（文字は、いちばん低くなる層を添えます）
@@ -531,8 +531,8 @@ function Gauges({ g }: { g: ReturnType<typeof gauges> }) {
             <tr>
               {Object.entries(g.contrast).map(([t, c]) => (
                 <td key={t}>
-                  文字 <span className="k-mono">{c.min.toFixed(2)}:1</span>（{c.at}）／ 輪郭{' '}
-                  <span className="k-mono">{c.ui.toFixed(2)}:1</span> <Level level={c.level} />
+                  文字 <span className="lv-mono">{c.min.toFixed(2)}:1</span>（{c.at}）／ 輪郭{' '}
+                  <span className="lv-mono">{c.ui.toFixed(2)}:1</span> <Level level={c.level} />
                 </td>
               ))}
             </tr>
@@ -577,7 +577,7 @@ function PreviewColumn({ theme, config }: { theme: Theme; config: WearConfig }) 
       setPreview((p) => ({ ...p, state: 'baking' }));
       const text = document.querySelector('.tune-specimen')?.textContent ?? '';
       try {
-        const response = await fetch('/__kei-wear/preview', {
+        const response = await fetch('/__lievre-wear/preview', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ config, text }),
@@ -586,8 +586,8 @@ function PreviewColumn({ theme, config }: { theme: Theme; config: WearConfig }) 
         if (!response.ok) throw new Error(body.error ?? body.problems?.join(' '));
         await Promise.all(
           (body.faces as Face[]).map((f) => {
-            const family = `${f.family === 'KEI Worn Mono' ? 'KEI Preview Mono' : 'KEI Preview Sans'} ${body.key}`;
-            const face = new FontFace(family, `url(/__kei-wear/preview/${body.key}/${f.file})`, {
+            const family = `${f.family === 'Lievre Worn Mono' ? 'lievre Preview Mono' : 'lievre Preview Sans'} ${body.key}`;
+            const face = new FontFace(family, `url(/__lievre-wear/preview/${body.key}/${f.file})`, {
               weight: String(f.weight),
               unicodeRange: f.unicodeRange,
               // size-adjust is not in TypeScript's DOM types yet.
@@ -616,9 +616,10 @@ function PreviewColumn({ theme, config }: { theme: Theme; config: WearConfig }) 
       ...faceVars(config),
     };
     if (preview.key) {
-      vars['--k-wear-sans'] = `'KEI Preview Sans ${preview.key}', 'IBM Plex Sans JP', sans-serif`;
-      vars['--k-wear-mono'] =
-        `'KEI Preview Mono ${preview.key}', 'KEI Mono', 'KEI Preview Sans ${preview.key}', 'IBM Plex Sans JP', monospace`;
+      vars['--lv-wear-sans'] =
+        `'lievre Preview Sans ${preview.key}', 'IBM Plex Sans JP', sans-serif`;
+      vars['--lv-wear-mono'] =
+        `'lievre Preview Mono ${preview.key}', 'Lievre Mono', 'lievre Preview Sans ${preview.key}', 'IBM Plex Sans JP', monospace`;
     }
     return vars as CSSProperties;
   }, [config, theme, preview.key]);
@@ -633,9 +634,9 @@ function PreviewColumn({ theme, config }: { theme: Theme; config: WearConfig }) 
       <Text size="small" tone="muted">
         焼き込み（調整中の値・見本の文字だけ）{note && ` ― ${note}`}
       </Text>
-      <KeiProvider theme={theme} wear="baked" className="tune-specimen" style={style}>
+      <LievreProvider theme={theme} wear="baked" className="tune-specimen" style={style}>
         <Specimen />
-      </KeiProvider>
+      </LievreProvider>
     </div>
   );
 }
@@ -656,9 +657,9 @@ function Column({
       <Text size="small" tone="muted">
         {title}
       </Text>
-      <KeiProvider theme={theme} wear={wear} wearConfig={config} className="tune-specimen">
+      <LievreProvider theme={theme} wear={wear} wearConfig={config} className="tune-specimen">
         <Specimen />
-      </KeiProvider>
+      </LievreProvider>
     </div>
   );
 }
@@ -680,14 +681,14 @@ function ToneControls({
 }) {
   return (
     <fieldset className="tune-tones">
-      <legend className="k-label">{themeNames[theme]} の色味（テーマは下で切り替え）</legend>
+      <legend className="lv-label">{themeNames[theme]} の色味（テーマは下で切り替え）</legend>
       <label>
         <input
           type="color"
           value={tone.yake}
           onChange={(e) => onChange({ ...tone, yake: e.target.value })}
         />
-        <span className="k-text--small">ヤケの色</span>
+        <span className="lv-text--small">ヤケの色</span>
       </label>
       <label>
         <input
@@ -695,10 +696,10 @@ function ToneControls({
           value={tone.sure}
           onChange={(e) => onChange({ ...tone, sure: e.target.value })}
         />
-        <span className="k-text--small">スレの色</span>
+        <span className="lv-text--small">スレの色</span>
       </label>
       <label className="tune-slider">
-        <span className="k-text--small">
+        <span className="lv-text--small">
           このテーマでの強さ <output>{tone.amount}</output>
         </span>
         <input
@@ -737,13 +738,13 @@ function WideSheet() {
           rows={rows}
           getRowId={(r) => r.id}
           columns={[
-            { key: 'id', header: 'ID', render: (r) => <span className="k-mono">{r.id}</span> },
-            { key: 'at', header: '時刻', render: (r) => <span className="k-mono">{r.at}</span> },
+            { key: 'id', header: 'ID', render: (r) => <span className="lv-mono">{r.id}</span> },
+            { key: 'at', header: '時刻', render: (r) => <span className="lv-mono">{r.at}</span> },
             {
               key: 'count',
               header: '件数',
               align: 'right',
-              render: (r) => <span className="k-mono">{r.count}</span>,
+              render: (r) => <span className="lv-mono">{r.count}</span>,
             },
           ]}
         />
@@ -783,7 +784,7 @@ function AgeSamples() {
       </div>
       <Card eyebrow="SYN-07" title="同期の状況">
         <Text size="small">
-          最終同期 <span className="k-mono">12:34:56</span> ／ <Badge tone="success">正常</Badge>{' '}
+          最終同期 <span className="lv-mono">12:34:56</span> ／ <Badge tone="success">正常</Badge>{' '}
           <Badge tone="warning">遅延 2件</Badge> <Badge tone="danger">失敗 1件</Badge>
         </Text>
       </Card>
@@ -797,13 +798,13 @@ function AgeSamples() {
         sorting={sort}
         onSortingChange={setSort}
         columns={[
-          { key: 'id', header: 'ID', render: (r) => <span className="k-mono">{r.id}</span> },
+          { key: 'id', header: 'ID', render: (r) => <span className="lv-mono">{r.id}</span> },
           {
             key: 'count',
             header: '件数',
             align: 'right',
             sortValue: (r) => Number(r.count.replace(',', '')),
-            render: (r) => <span className="k-mono">{r.count}</span>,
+            render: (r) => <span className="lv-mono">{r.count}</span>,
           },
         ]}
       />
@@ -824,28 +825,28 @@ function Specimen() {
         機材の点検
       </Heading>
       <Text>16px 本文：鬱蒼とした棚の奥の機材も、記録は揃っています。Wear 0123456789</Text>
-      <div style={{ '--k-body': 'var(--k-text-md)' } as CSSProperties}>
+      <div style={{ '--lv-body': 'var(--lv-text-md)' } as CSSProperties}>
         <Text>14px 本文：同期は 12 分 34 秒で終わりました。Wear 0123456789</Text>
       </div>
       <Text size="small">12px 補足：最終更新 2026-10-24 12:34 ／ 担当 計測班</Text>
       <Text>
-        ID <span className="k-mono">SYN-20481</span> ／ <span className="k-mono">12:34:56</span> ／{' '}
-        <span className="k-mono">98.4</span>%
+        ID <span className="lv-mono">SYN-20481</span> ／ <span className="lv-mono">12:34:56</span>{' '}
+        ／ <span className="lv-mono">98.4</span>%
       </Text>
       <DataTable
-        caption="同期の履歴（数値は KEI Mono = Plex Mono）"
+        caption="同期の履歴（数値は Lievre Mono = Plex Mono）"
         rows={rows}
         getRowId={(r) => r.id}
         columns={[
-          { key: 'id', header: 'ID', render: (r) => <span className="k-mono">{r.id}</span> },
-          { key: 'at', header: '時刻', render: (r) => <span className="k-mono">{r.at}</span> },
+          { key: 'id', header: 'ID', render: (r) => <span className="lv-mono">{r.id}</span> },
+          { key: 'at', header: '時刻', render: (r) => <span className="lv-mono">{r.at}</span> },
           {
             key: 'rate',
             header: '成功率',
             align: 'right',
             render: (r) => (
               <span>
-                <span className="k-mono">{r.rate}</span>%
+                <span className="lv-mono">{r.rate}</span>%
               </span>
             ),
           },
@@ -853,7 +854,7 @@ function Specimen() {
             key: 'count',
             header: '件数',
             align: 'right',
-            render: (r) => <span className="k-mono">{r.count}</span>,
+            render: (r) => <span className="lv-mono">{r.count}</span>,
           },
         ]}
       />

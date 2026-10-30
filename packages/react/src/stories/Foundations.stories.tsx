@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { LayoutGate } from '../test/layout/declare';
-import { KeiProvider, Button, TextField, Badge, Card, DataTable } from '../index';
+import { LievreProvider, Button, TextField, Badge, Card, DataTable } from '../index';
 import {
   ColorFoundation,
   TypeFoundation,
@@ -18,7 +18,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '全81件の参考を、計器・構造・組版・素材の4つの軸へ翻訳。上部の配色・表示密度ツールバーで切り替えて比較できます。',
+          '全81件の参考を、メーター・構造・組版・素材の4つの軸へ翻訳。上部の配色・表示密度ツールバーで切り替えて比較できます。',
       },
     },
   },
@@ -41,9 +41,9 @@ export const ThemeComparison: Story = {
       }}
     >
       {(['paper', 'ink'] as const).map((theme) => (
-        <KeiProvider key={theme} theme={theme} style={{ padding: 24, borderRadius: 8 }}>
+        <LievreProvider key={theme} theme={theme} style={{ padding: 24, borderRadius: 8 }}>
           <div className="gallery-stack">
-            <span className="k-eyebrow">
+            <span className="lv-eyebrow">
               {theme === 'paper' ? 'Paper（明るい面）' : 'Ink（暗い面）'}
             </span>
             <TextField label="ワークスペース名" defaultValue="計測ラボ" />
@@ -54,7 +54,7 @@ export const ThemeComparison: Story = {
               </Badge>
             </div>
           </div>
-        </KeiProvider>
+        </LievreProvider>
       ))}
     </div>
   ),
@@ -71,7 +71,7 @@ export const DensityComparison: Story = {
       }}
     >
       {(['comfortable', 'compact'] as const).map((density) => (
-        <KeiProvider key={density} density={density} className="density-comparison">
+        <LievreProvider key={density} density={density} className="density-comparison">
           <Card title={density === 'comfortable' ? '標準' : '高密度'} eyebrow="本文16px・補助12px">
             <div className="gallery-stack">
               <TextField
@@ -83,8 +83,8 @@ export const DensityComparison: Story = {
                 caption="表示密度の比較"
                 getRowId={(r) => r.id}
                 rows={[
-                  { id: 'KEI-024', name: 'センサーログの同期' },
-                  { id: 'KEI-023', name: '週次レポートの生成' },
+                  { id: 'lievre-024', name: 'センサーログの同期' },
+                  { id: 'lievre-023', name: '週次レポートの生成' },
                 ]}
                 columns={[
                   {
@@ -102,7 +102,7 @@ export const DensityComparison: Story = {
               <Button variant="primary">変更を保存する</Button>
             </div>
           </Card>
-        </KeiProvider>
+        </LievreProvider>
       ))}
     </div>
   ),

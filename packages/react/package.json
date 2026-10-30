@@ -1,7 +1,7 @@
 {
-  "name": "@kei-design/react",
+  "name": "@lievre/react",
   "version": "0.2.0",
-  "description": "KEI — Japanese-first instrument-inspired design system",
+  "description": "lievre — 日本語の画面のための React の部品と CSS トークン",
   "type": "module",
   "private": true,
   "sideEffects": [
@@ -10,9 +10,9 @@
   "exports": {
     ".": {
       "types": "./lib/index.d.ts",
-      "import": "./lib/kei.js"
+      "import": "./lib/lievre.js"
     },
-    "./styles.css": "./lib/kei.css",
+    "./styles.css": "./lib/lievre.css",
     "./tokens.json": "./lib/tokens.json",
     "./llms.txt": "./llms.txt",
     "./lint": {
@@ -21,12 +21,17 @@
     },
     "./lint/biome/*": "./lint/biome/*"
   },
+  "bin": {
+    "lievre-migrate": "./bin/lievre-migrate.mjs"
+  },
   "files": [
     "lib",
+    "bin",
     "llms.txt",
     "lint",
     "README.md",
-    "DESIGN.md"
+    "DESIGN.md",
+    "MIGRATION.md"
   ],
   "scripts": {
     "dev": "vite --host 127.0.0.1",
@@ -47,8 +52,8 @@
     "wear:tune": "vite --open /tune.html",
     "llms": "node scripts/build-llms.mjs",
     "bench:agent": "npm run build:lib && node bench/agent/misuse.mjs && node bench/agent/context.mjs",
-    "prepack": "cp ../../DESIGN.md DESIGN.md",
-    "postpack": "rm DESIGN.md"
+    "prepack": "cp ../../DESIGN.md ../../MIGRATION.md .",
+    "postpack": "rm DESIGN.md MIGRATION.md"
   },
   "peerDependencies": {
     "react": "^18.3.0 || ^19.0.0",
@@ -62,7 +67,7 @@
     "@biomejs/biome": "^2.6.2",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/ibm-plex-sans-jp": "^5.3.1",
-    "@kei-design/tokens": "0.2.0",
+    "@lievre/tokens": "0.2.0",
     "@storybook/addon-a11y": "10.6.3",
     "@storybook/addon-docs": "10.6.3",
     "@storybook/react-vite": "10.6.3",

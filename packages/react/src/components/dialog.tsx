@@ -32,22 +32,22 @@ export function Dialog({
       <DialogPrimitive.Trigger asChild>{trigger}</DialogPrimitive.Trigger>
       <DialogPrimitive.Portal>
         <PortalSurface>
-          <DialogPrimitive.Overlay className="k-dialog-overlay" />
-          <DialogPrimitive.Content className="k-dialog">
-            <header className="k-dialog-header">
+          <DialogPrimitive.Overlay className="lv-dialog-overlay" />
+          <DialogPrimitive.Content className="lv-dialog">
+            <header className="lv-dialog-header">
               <div>
-                {eyebrow && <div className="k-eyebrow">{eyebrow}</div>}
-                <DialogPrimitive.Title className="k-dialog-title">{title}</DialogPrimitive.Title>
-                <DialogPrimitive.Description className="k-dialog-description">
+                {eyebrow && <div className="lv-eyebrow">{eyebrow}</div>}
+                <DialogPrimitive.Title className="lv-dialog-title">{title}</DialogPrimitive.Title>
+                <DialogPrimitive.Description className="lv-dialog-description">
                   {description}
                 </DialogPrimitive.Description>
               </div>
-              <DialogPrimitive.Close className="k-icon-button" aria-label="ダイアログを閉じる">
+              <DialogPrimitive.Close className="lv-icon-button" aria-label="ダイアログを閉じる">
                 <X size={16} />
               </DialogPrimitive.Close>
             </header>
-            <div className="k-dialog-body">{children}</div>
-            {footer && <footer className="k-dialog-footer">{footer}</footer>}
+            <div className="lv-dialog-body">{children}</div>
+            {footer && <footer className="lv-dialog-footer">{footer}</footer>}
           </DialogPrimitive.Content>
         </PortalSurface>
       </DialogPrimitive.Portal>
@@ -118,9 +118,9 @@ export function ConfirmDialog({
       {trigger && <DialogPrimitive.Trigger asChild>{trigger}</DialogPrimitive.Trigger>}
       <DialogPrimitive.Portal>
         <PortalSurface>
-          <DialogPrimitive.Overlay className="k-dialog-overlay" />
+          <DialogPrimitive.Overlay className="lv-dialog-overlay" />
           <DialogPrimitive.Content
-            className="k-dialog k-dialog--confirm"
+            className="lv-dialog lv-dialog--confirm"
             role="alertdialog"
             onOpenAutoFocus={(event) => {
               event.preventDefault();
@@ -133,22 +133,22 @@ export function ConfirmDialog({
               if (opener.current?.isConnected) opener.current.focus();
             }}
           >
-            <div className="k-dialog-body">
-              <header className="k-dialog-header">
-                <DialogPrimitive.Title className="k-dialog-title">{title}</DialogPrimitive.Title>
+            <div className="lv-dialog-body">
+              <header className="lv-dialog-header">
+                <DialogPrimitive.Title className="lv-dialog-title">{title}</DialogPrimitive.Title>
                 <DialogPrimitive.Close
-                  className="k-icon-button"
+                  className="lv-icon-button"
                   aria-label="閉じる"
                   disabled={pending}
                 >
                   <X size={16} />
                 </DialogPrimitive.Close>
               </header>
-              <DialogPrimitive.Description className="k-dialog-description">
+              <DialogPrimitive.Description className="lv-dialog-description">
                 {description}
               </DialogPrimitive.Description>
               {children}
-              <footer className="k-confirm-actions">
+              <footer className="lv-confirm-actions">
                 <Button ref={cancel} disabled={pending} onClick={() => setOpen(false)}>
                   {cancelLabel}
                 </Button>

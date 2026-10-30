@@ -10,7 +10,7 @@ const meta = {
   component: Textarea,
   parameters: {
     layoutGate: {
-      parts: [{ name: '複数行の入力欄', selector: '.k-textarea', checks: ['grid-height'] }],
+      parts: [{ name: '複数行の入力欄', selector: '.lv-textarea', checks: ['grid-height'] }],
     } satisfies LayoutGate,
     docs: { description: { component: '複数行の入力。幅は親に従い、縦方向にリサイズできます。' } },
   },

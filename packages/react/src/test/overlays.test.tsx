@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import type { ReactNode } from 'react';
 import {
-  KeiProvider,
+  LievreProvider,
   Button,
   Dialog,
   Select,
@@ -81,10 +81,10 @@ const OVERLAYS: Overlay[] = [
 const user = () => userEvent.setup({ pointerEventsCheck: 0 });
 function setup(ui: ReactNode) {
   render(
-    <KeiProvider theme="ink" density="compact">
+    <LievreProvider theme="ink" density="compact">
       <p data-testid="outside">外側</p>
       {ui}
-    </KeiProvider>,
+    </LievreProvider>,
   );
 }
 
@@ -97,7 +97,7 @@ for (const overlay of OVERLAYS)
     it('開いた中身にテーマと密度を引き継ぐ', async () => {
       setup(ui);
       await user().click(triggerOf(overlay));
-      const scope = (await screen.findByRole(role)).closest('.kei');
+      const scope = (await screen.findByRole(role)).closest('.lievre');
       expect(scope).toHaveAttribute('data-theme', 'ink');
       expect(scope).toHaveAttribute('data-density', 'compact');
     });
@@ -148,7 +148,7 @@ describe('DropdownMenu の項目', () => {
     expect(danger).toHaveAttribute('data-tone', 'danger');
     // Rows without an icon keep the empty icon column, so their text starts in line.
     expect(
-      screen.getByRole('menuitem', { name: '担当を変える' }).querySelector('.k-menu-lead'),
+      screen.getByRole('menuitem', { name: '担当を変える' }).querySelector('.lv-menu-lead'),
     ).toBeInTheDocument();
     await u.keyboard('{Enter}');
     expect(remove).toHaveBeenCalledOnce();
@@ -178,7 +178,7 @@ describe('ConfirmDialog の実行', () => {
     expect(dialog).toHaveAccessibleDescription('削除した作業は元に戻せません。');
     expect(screen.getByRole('button', { name: 'キャンセル' })).toHaveFocus();
     const run = screen.getByRole('button', { name: '3件を削除する' });
-    expect(run).toHaveClass('k-button--danger');
+    expect(run).toHaveClass('lv-button--danger');
     await u.click(run);
     expect(run).toHaveAttribute('aria-busy', 'true');
     await u.keyboard('{Escape}');

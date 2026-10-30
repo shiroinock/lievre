@@ -1,4 +1,4 @@
-// 3つの土台の Combobox と、KEI の Select（Radix）に同じ操作を流し、結果を表にする。
+// 3つの土台の Combobox と、lievre の Select（Radix）に同じ操作を流し、結果を表にする。
 // 使い方：spikes/combobox で `npm run dev` を動かしたまま `npm run check`（`npm run check -- downshift,aria` で一部だけ）。
 // 結果は test/results.json。
 // IME は合成のイベントで、Chrome の順（Enter が isComposing=true で compositionend の前）と
@@ -221,7 +221,7 @@ const scenarios = {
       : null;
     const portal = await page.evaluate(() => {
       const list = window.__list();
-      const surface = list?.closest('.kei-portal');
+      const surface = list?.closest('.lievre-portal');
       return {
         surfaceTheme: surface?.getAttribute('data-theme') ?? null,
         underBody: surface?.parentElement === document.body,
@@ -392,9 +392,9 @@ for (const [name, type] of [
       const theme = await page.evaluate(() => {
         const list = window.__list();
         return {
-          surfaceTheme: list?.closest('.kei-portal')?.getAttribute('data-theme') ?? null,
+          surfaceTheme: list?.closest('.lievre-portal')?.getAttribute('data-theme') ?? null,
           background: list
-            ? getComputedStyle(list.closest('.k-combobox-popover, .k-select-content') ?? list)
+            ? getComputedStyle(list.closest('.lv-combobox-popover, .lv-select-content') ?? list)
                 .backgroundColor
             : null,
         };

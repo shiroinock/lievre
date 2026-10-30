@@ -48,7 +48,7 @@ export function AriaCombobox({
     <>
       {portal}
       <ComboBox
-        className="k-field"
+        className="lv-field"
         items={items}
         selectedKey={value ?? null}
         onSelectionChange={(key) => {
@@ -64,49 +64,49 @@ export function AriaCombobox({
         allowsEmptyCollection
         menuTrigger="input"
       >
-        <Label className="k-label">
+        <Label className="lv-label">
           {label}
           {required && (
-            <span aria-hidden className="k-required">
+            <span aria-hidden className="lv-required">
               {' '}
               *
             </span>
           )}
         </Label>
-        <div className="k-combobox" ref={anchorRef} {...ime.wrapperHandlers}>
+        <div className="lv-combobox" ref={anchorRef} {...ime.wrapperHandlers}>
           <Input
-            className="k-input k-combobox-input"
+            className="lv-input lv-combobox-input"
             placeholder={placeholder}
             {...ime.inputHandlers}
           />
-          <Button className="k-combobox-button" aria-label="候補を開く">
+          <Button className="lv-combobox-button" aria-label="候補を開く">
             <ChevronDown size={16} />
           </Button>
         </div>
         {(error || hint) && (
           <Text
             slot="description"
-            className={error ? 'k-field-hint k-field-error' : 'k-field-hint'}
+            className={error ? 'lv-field-hint lv-field-error' : 'lv-field-hint'}
           >
             {error || hint}
           </Text>
         )}
         {shell === 'own' ? (
           <Popover
-            className="k-combobox-popover"
+            className="lv-combobox-popover"
             offset={5}
             UNSTABLE_portalContainer={container ?? undefined}
           >
             <ListBox<ComboboxOption>
-              className="k-combobox-list"
-              renderEmptyState={() => <div className="k-combobox-empty">{emptyText}</div>}
+              className="lv-combobox-list"
+              renderEmptyState={() => <div className="lv-combobox-empty">{emptyText}</div>}
             >
               {(o) => (
-                <ListBoxItem id={o.value} textValue={o.label} className="k-combobox-item">
+                <ListBoxItem id={o.value} textValue={o.label} className="lv-combobox-item">
                   {({ isSelected }) => (
                     <>
                       <span>{o.label}</span>
-                      {isSelected && <Check size={14} className="k-combobox-check" />}
+                      {isSelected && <Check size={14} className="lv-combobox-check" />}
                     </>
                   )}
                 </ListBoxItem>
@@ -116,15 +116,15 @@ export function AriaCombobox({
         ) : (
           <AriaRadixShell anchor={anchorRef}>
             <ListBox<ComboboxOption>
-              className="k-combobox-list"
-              renderEmptyState={() => <div className="k-combobox-empty">{emptyText}</div>}
+              className="lv-combobox-list"
+              renderEmptyState={() => <div className="lv-combobox-empty">{emptyText}</div>}
             >
               {(o) => (
-                <ListBoxItem id={o.value} textValue={o.label} className="k-combobox-item">
+                <ListBoxItem id={o.value} textValue={o.label} className="lv-combobox-item">
                   {({ isSelected }) => (
                     <>
                       <span>{o.label}</span>
-                      {isSelected && <Check size={14} className="k-combobox-check" />}
+                      {isSelected && <Check size={14} className="lv-combobox-check" />}
                     </>
                   )}
                 </ListBoxItem>

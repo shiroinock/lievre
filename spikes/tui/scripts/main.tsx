@@ -84,6 +84,6 @@ function App({ theme }: { theme: ThemeName }) {
 }
 
 const level = detectLevel();
-// Ink colors through chalk's shared instance; KEI has already chosen the level.
+// Ink colors through chalk's shared instance; lievre has already chosen the level.
 chalk.level = { none: 0, '16': 1, '256': 2, truecolor: 3 }[level] as 0 | 1 | 2 | 3;
 render(<App theme={await detectTheme()} />);

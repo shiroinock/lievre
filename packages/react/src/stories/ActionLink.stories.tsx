@@ -10,7 +10,7 @@ const meta = {
       parts: [
         {
           name: 'リンクのボタン',
-          selector: '.k-button',
+          selector: '.lv-button',
           checks: [
             'inset-x',
             'inset-y',

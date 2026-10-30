@@ -1,10 +1,10 @@
 // Dev-server endpoints for the wear tuning page (npm run wear:tune). Only `vite` serve loads this,
 // and it answers only requests from this machine, so nothing in a build can write the config.
-//   GET  /__kei-wear/config  the saved wear.config.json
-//   POST /__kei-wear/config  save values, regenerate src/styles/wear/ and start the font build
-//   GET  /__kei-wear/status  the font build's progress
-//   POST /__kei-wear/preview bake only the sample characters with unsaved values (about 2s)
-//   GET  /__kei-wear/preview/<key>/<file>  a face baked by the preview
+//   GET  /__lievre-wear/config  the saved wear.config.json
+//   POST /__lievre-wear/config  save values, regenerate src/styles/wear/ and start the font build
+//   GET  /__lievre-wear/status  the font build's progress
+//   POST /__lievre-wear/preview bake only the sample characters with unsaved values (about 2s)
+//   GET  /__lievre-wear/preview/<key>/<file>  a face baked by the preview
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -90,7 +90,7 @@ export function validate(config, tokens) {
   return problems;
 }
 
-const PREVIEWS = 'node_modules/.kei-wear-preview';
+const PREVIEWS = 'node_modules/.lievre-wear-preview';
 
 /** Bakes the given characters with the config's salt and outline; resolves to the faces written. */
 function bakePreview(config, text) {
@@ -142,14 +142,14 @@ export function wearTuneServer() {
     });
   }
   return {
-    name: 'kei-wear-tune',
+    name: 'lievre-wear-tune',
     apply: 'serve',
     // The page already holds what it saved; reloading on the config write would drop its state.
     handleHotUpdate({ file }) {
       if (file.endsWith('/wear.config.json')) return [];
     },
     configureServer(server) {
-      server.middlewares.use('/__kei-wear', (req, res) => {
+      server.middlewares.use('/__lievre-wear', (req, res) => {
         const send = (status, body) => {
           res.statusCode = status;
           res.setHeader('Content-Type', 'application/json; charset=utf-8');

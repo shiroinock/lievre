@@ -118,7 +118,7 @@ export function ComponentGallery() {
               <Avatar name="佐藤" />
               <Avatar name="田中" />
               <Avatar name="鈴木" size="sm" />
-              <span className="k-muted">担当者の識別</span>
+              <span className="lv-muted">担当者の識別</span>
             </div>
           </div>
         </Card>
@@ -166,14 +166,14 @@ export function ComponentGallery() {
               checked={enabled}
               onCheckedChange={setEnabled}
             />
-            <span className="k-muted" aria-live="polite">
+            <span className="lv-muted" aria-live="polite">
               自動同期は{enabled ? 'オン' : 'オフ'}です
             </span>
           </div>
         </Card>
         <Card title="Dialog & Toast">
           <div className="gallery-stack">
-            <p className="k-muted">操作の区切りを明確にし、結果を短く伝えます。</p>
+            <p className="lv-muted">操作の区切りを明確にし、結果を短く伝えます。</p>
             <div className="button-row">
               <Dialog
                 trigger={<Button>設定を開く</Button>}
@@ -223,13 +223,13 @@ export function ComponentGallery() {
                   value: 'all',
                   label: 'すべて',
                   count: 8,
-                  content: <p className="k-muted">すべての作業を表示しています。</p>,
+                  content: <p className="lv-muted">すべての作業を表示しています。</p>,
                 },
                 {
                   value: 'running',
                   label: '稼働中',
                   count: 4,
-                  content: <p className="k-text-success">稼働中の作業は4件です。</p>,
+                  content: <p className="lv-text-success">稼働中の作業は4件です。</p>,
                 },
               ]}
             />
@@ -272,7 +272,7 @@ export function ComponentGallery() {
             <Skeleton height={20} />
             <Skeleton height={20} />
             <Skeleton width="70%" height={20} />
-            <span className="k-muted">レイアウトを保って、読み込みを待つ。</span>
+            <span className="lv-muted">レイアウトを保って、読み込みを待つ。</span>
           </div>
         </Card>
         <Card title="EmptyState">

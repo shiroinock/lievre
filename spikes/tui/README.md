@@ -1,6 +1,6 @@
 # 端末（TUI）の試作
 
-KEI のデザイン言語を端末に広げるための試作です。改名の予定に合わせて、仮に `@lievre/tui` という名前にしています（`private` で、公開しません）。比較と推奨は [docs/tui-foundation.md](../../docs/tui-foundation.md) にあります。
+lievre のデザイン言語を端末に広げるための試作です。改名の予定に合わせて、仮に `@lievre/tui` という名前にしています（`private` で、公開しません）。比較と推奨は [docs/tui-foundation.md](../../docs/tui-foundation.md) にあります。
 
 **部品（`src/core` と `src/ink`）は [packages/tui](../../packages/tui/README.md) に移しました。** ここに残したのは、操作できる見本、画面の書き出し、試しの書体です。どれも `packages/tui/src` をパスで読みます。
 

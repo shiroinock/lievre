@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import tokens from '@kei-design/tokens/tokens.json';
+import tokens from '@lievre/tokens/tokens.json';
 import { readFileSync } from 'node:fs';
 import { KASURE_FLOOR, SURFACE_MAX, WEAR_CONFIG } from '../wear/params.mjs';
 import {
@@ -14,7 +14,7 @@ import {
 const themes = ['paper', 'ink'] as const;
 const themeTokens = (theme: (typeof themes)[number]) => tokensFor(tokens, theme);
 
-// tokens.json is kept in step with tokens.css by the test in @kei-design/tokens.
+// tokens.json is kept in step with tokens.css by the test in @lievre/tokens.
 describe('Semantic color contrast', () => {
   for (const theme of themes) {
     const set = themeTokens(theme);
@@ -169,9 +169,9 @@ describe('Semantic color contrast', () => {
   // The meter's ticks are border-strong straight on the card's surface: wear draws no band under
   // the scale, so the dial ages with the surface like every other part (off, baked and live).
   it('draws the meter ticks in border-strong, with nothing under them', () => {
-    const css = readFileSync('src/styles/kei.css', 'utf8');
-    expect(css).toMatch(/\.k-meter-ticks \{[^}]*var\(--k-border-strong\)/);
-    expect(readFileSync('src/styles/kei-wear.css', 'utf8')).not.toContain('k-meter-face');
+    const css = readFileSync('src/styles/lievre.css', 'utf8');
+    expect(css).toMatch(/\.lv-meter-ticks \{[^}]*var\(--lv-border-strong\)/);
+    expect(readFileSync('src/styles/lievre-wear.css', 'utf8')).not.toContain('lv-meter-face');
   });
   // Under wear (baked and live) the ticks take the held outline, like control outlines, so they
   // keep 3:1 on the stained, browned and scuffed surface too.

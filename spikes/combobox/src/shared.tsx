@@ -1,4 +1,4 @@
-// 3つの土台で共通にする部分。KEI に入れるときは、ここが「KEI の側で持つ層」になる。
+// 3つの土台で共通にする部分。lievre に入れるときは、ここが「lievre の側で持つ層」になる。
 import {
   useCallback,
   useId,
@@ -21,7 +21,7 @@ export type ComboboxOption = {
   disabled?: boolean;
 };
 
-/** KEI の Combobox の props。Select と同じ形にして、土台の型は外に出さない。 */
+/** lievre の Combobox の props。Select と同じ形にして、土台の型は外に出さない。 */
 export type ComboboxProps = {
   label: string;
   options: ComboboxOption[];
@@ -141,11 +141,11 @@ export function Field({
   children: ReactNode;
 }) {
   return (
-    <div className="k-field">
-      <label className="k-label" htmlFor={id} {...labelProps}>
+    <div className="lv-field">
+      <label className="lv-label" htmlFor={id} {...labelProps}>
         {label}
         {required && (
-          <span aria-hidden className="k-required">
+          <span aria-hidden className="lv-required">
             {' '}
             *
           </span>
@@ -155,7 +155,7 @@ export function Field({
       {(error || hint) && (
         <p
           id={`${id}-description`}
-          className={error ? 'k-field-hint k-field-error' : 'k-field-hint'}
+          className={error ? 'lv-field-hint lv-field-error' : 'lv-field-hint'}
         >
           {error || hint}
         </p>
@@ -219,7 +219,7 @@ export function RadixShell({
           <PopoverPrimitive.Content
             ref={content}
             role="presentation"
-            className="k-combobox-popover"
+            className="lv-combobox-popover"
             sideOffset={5}
             align="start"
             // 入力欄にフォーカスを残す。開閉で動かさない。

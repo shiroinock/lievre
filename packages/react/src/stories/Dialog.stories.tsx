@@ -13,7 +13,7 @@ const meta = {
       parts: [
         {
           name: '開くボタン',
-          selector: '.k-button',
+          selector: '.lv-button',
           checks: [
             'inset-x',
             'inset-y',
@@ -25,19 +25,19 @@ const meta = {
         },
         {
           name: 'ダイアログの見出し',
-          selector: '.k-dialog-header',
-          checks: [{ icon: '.k-icon-button', text: '.k-dialog-title' }],
+          selector: '.lv-dialog-header',
+          checks: [{ icon: '.lv-icon-button', text: '.lv-dialog-title' }],
         },
         {
           name: '閉じるボタン',
-          selector: '.k-icon-button',
+          selector: '.lv-icon-button',
           checks: ['inset-x', 'inset-y', 'control-height'],
         },
-        { name: 'ダイアログの本文', selector: '.k-dialog-body', checks: ['padding-equal'] },
+        { name: 'ダイアログの本文', selector: '.lv-dialog-body', checks: ['padding-equal'] },
         {
           name: 'ダイアログの操作',
-          selector: '.k-dialog-footer',
-          checks: ['action-band', { sameHeight: '.k-button' }],
+          selector: '.lv-dialog-footer',
+          checks: ['action-band', { sameHeight: '.lv-button' }],
         },
       ],
     } satisfies LayoutGate,
@@ -72,7 +72,7 @@ export const Default: Story = {};
 export const LongContent: Story = {
   args: {
     children: (
-      <div className="k-form-stack">
+      <div className="lv-form-stack">
         {Array.from({ length: 8 }, (_, i) => (
           <TextField key={i} label={`設定項目 ${i + 1}`} placeholder="値を入力" />
         ))}

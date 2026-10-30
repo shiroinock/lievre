@@ -67,19 +67,19 @@ const all = {
     'src/components/primitives.tsx',
     'src/components/system.tsx',
   ]),
-  implementation: size(['lib/kei.js']),
+  implementation: size(['lib/lievre.js']),
 };
 
-console.log(`KEI（${root}）`);
+console.log(`lievre（${root}）`);
 console.log('| 課題 | README＋型 | ＋DESIGN.md | llms.txt だけ |');
 console.log('| --- | --: | --: | --: |');
 for (const r of rows)
   console.log(`| ${r.task} | ${r.types} | ${r.typesAndDesign} | ${r.llms ?? 'なし'} |`);
 console.log(
-  `\n型と文書すべて ${all.allTypes}、部品のソース ${all.source}、lib/kei.js ${all.implementation}（トークンの見積もり）`,
+  `\n型と文書すべて ${all.allTypes}、部品のソース ${all.source}、lib/lievre.js ${all.implementation}（トークンの見積もり）`,
 );
 
-const result = { date: new Date().toISOString(), kei: { tasks: rows, ...all } };
+const result = { date: new Date().toISOString(), lievre: { tasks: rows, ...all } };
 if (process.argv.includes('--external')) {
   const docs = JSON.parse(readFileSync(join(import.meta.dirname, 'external-docs.json'), 'utf8'));
   result.external = {};

@@ -1,4 +1,4 @@
-// kei/button-type-in-form: a Button in a form without `type` does not submit.
+// lievre/button-type-in-form: a Button in a form without `type` does not submit.
 language js(typescript, jsx);
 
 or {
@@ -11,6 +11,6 @@ or {
   // A Button passed as a prop (trigger, footer) is placed by its component, not the form.
   $button <: not within JsxAttribute() as $prop where { $prop <: within $form },
   $button <: within JsModule() as $module,
-  $module <: contains `import $_ from "@kei-design/react"`,
+  $module <: contains `import $_ from "@lievre/react"`,
   register_diagnostic(span = $button, message = "form の中の Button は type を省くと type='button' になり、押しても送信しません。送信するボタンには type='submit'、送信しないボタンには type='button' と書いてください。")
 }

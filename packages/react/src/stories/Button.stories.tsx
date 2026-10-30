@@ -13,7 +13,7 @@ const meta = {
       parts: [
         {
           name: 'ボタン',
-          selector: '.k-button',
+          selector: '.lv-button',
           checks: [
             'inset-x',
             'inset-y',

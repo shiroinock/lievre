@@ -7,7 +7,7 @@ const meta = {
   args: { children: '情報を、わかりやすく。', level: 2, size: 'section' },
   parameters: {
     layoutGate: {
-      parts: [{ name: '見出し', selector: '.k-heading', checks: ['fits'] }],
+      parts: [{ name: '見出し', selector: '.lv-heading', checks: ['fits'] }],
     } satisfies LayoutGate,
   },
 } satisfies Meta<typeof Heading>;

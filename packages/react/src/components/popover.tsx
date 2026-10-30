@@ -35,17 +35,17 @@ export function Popover({
       <PopoverPrimitive.Portal>
         <PortalSurface>
           <PopoverPrimitive.Content
-            className="k-popover"
+            className="lv-popover"
             side={side}
             align={align}
             sideOffset={4}
             collisionPadding={8}
             aria-labelledby={id}
           >
-            <h2 id={id} className="k-popover-title">
+            <h2 id={id} className="lv-popover-title">
               {title}
             </h2>
-            <div className="k-popover-body">{children}</div>
+            <div className="lv-popover-body">{children}</div>
           </PopoverPrimitive.Content>
         </PortalSurface>
       </PopoverPrimitive.Portal>
@@ -108,7 +108,7 @@ export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuPr
   );
   const leadCell = (content?: ReactNode) =>
     lead && (
-      <span className="k-menu-lead" aria-hidden>
+      <span className="lv-menu-lead" aria-hidden>
         {content}
       </span>
     );
@@ -120,7 +120,7 @@ export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuPr
       <MenuPrimitive.Portal>
         <PortalSurface>
           <MenuPrimitive.Content
-            className="k-menu"
+            className="lv-menu"
             align={align}
             sideOffset={4}
             collisionPadding={8}
@@ -137,29 +137,29 @@ export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuPr
           >
             {items.map((item, i) => {
               if (item.type === 'separator')
-                return <MenuPrimitive.Separator key={i} className="k-menu-separator" />;
+                return <MenuPrimitive.Separator key={i} className="lv-menu-separator" />;
               if (item.type === 'checkbox')
                 return (
                   <MenuPrimitive.CheckboxItem
                     key={i}
-                    className="k-menu-item"
+                    className="lv-menu-item"
                     checked={item.checked}
                     onCheckedChange={item.onCheckedChange}
                     disabled={item.disabled}
                     onSelect={(e) => e.preventDefault()}
                   >
                     {leadCell(
-                      <MenuPrimitive.ItemIndicator className="k-menu-indicator">
+                      <MenuPrimitive.ItemIndicator className="lv-menu-indicator">
                         <Check />
                       </MenuPrimitive.ItemIndicator>,
                     )}
-                    <span className="k-menu-label">{item.label}</span>
+                    <span className="lv-menu-label">{item.label}</span>
                   </MenuPrimitive.CheckboxItem>
                 );
               if (item.type === 'radio')
                 return (
                   <Fragment key={i}>
-                    <MenuPrimitive.Label id={`${id}-${i}`} className="k-menu-heading">
+                    <MenuPrimitive.Label id={`${id}-${i}`} className="lv-menu-heading">
                       {item.label}
                     </MenuPrimitive.Label>
                     <MenuPrimitive.RadioGroup
@@ -170,16 +170,16 @@ export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuPr
                       {item.options.map((option) => (
                         <MenuPrimitive.RadioItem
                           key={option.value}
-                          className="k-menu-item"
+                          className="lv-menu-item"
                           value={option.value}
                           disabled={option.disabled}
                         >
                           {leadCell(
-                            <MenuPrimitive.ItemIndicator className="k-menu-indicator">
+                            <MenuPrimitive.ItemIndicator className="lv-menu-indicator">
                               <Check />
                             </MenuPrimitive.ItemIndicator>,
                           )}
-                          <span className="k-menu-label">{option.label}</span>
+                          <span className="lv-menu-label">{option.label}</span>
                         </MenuPrimitive.RadioItem>
                       ))}
                     </MenuPrimitive.RadioGroup>
@@ -188,7 +188,7 @@ export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuPr
               return (
                 <MenuPrimitive.Item
                   key={i}
-                  className="k-menu-item"
+                  className="lv-menu-item"
                   onSelect={() => {
                     chosen.current = item.onSelect;
                   }}
@@ -196,8 +196,8 @@ export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuPr
                   data-tone={item.tone}
                 >
                   {leadCell(item.icon)}
-                  <span className="k-menu-label">{item.label}</span>
-                  {item.shortcut && <kbd className="k-menu-shortcut">{item.shortcut}</kbd>}
+                  <span className="lv-menu-label">{item.label}</span>
+                  {item.shortcut && <kbd className="lv-menu-shortcut">{item.shortcut}</kbd>}
                 </MenuPrimitive.Item>
               );
             })}

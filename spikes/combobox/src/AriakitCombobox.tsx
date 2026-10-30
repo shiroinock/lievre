@@ -49,28 +49,28 @@ export function AriakitCombobox({
           key={o.value}
           value={o.label}
           disabled={o.disabled}
-          className="k-combobox-item"
+          className="lv-combobox-item"
           aria-selected={o.value === value}
         >
           <span>{o.label}</span>
-          {o.value === value && <Check size={14} className="k-combobox-check" />}
+          {o.value === value && <Check size={14} className="lv-combobox-check" />}
         </ComboboxItem>
       ))}
-      {items.length === 0 && <div className="k-combobox-empty">{emptyText}</div>}
+      {items.length === 0 && <div className="lv-combobox-empty">{emptyText}</div>}
     </>
   );
   const field = (
-    <div className="k-combobox" ref={anchorRef} {...ime.wrapperHandlers}>
+    <div className="lv-combobox" ref={anchorRef} {...ime.wrapperHandlers}>
       <Combobox
         id={id}
-        className="k-input k-combobox-input"
+        className="lv-input lv-combobox-input"
         placeholder={placeholder}
         aria-invalid={!!error || undefined}
         aria-describedby={error || hint ? descriptionId : undefined}
         aria-required={required || undefined}
         {...ime.inputHandlers}
       />
-      <ComboboxDisclosure className="k-combobox-button" aria-label="候補を開く">
+      <ComboboxDisclosure className="lv-combobox-button" aria-label="候補を開く">
         <ChevronDown size={16} />
       </ComboboxDisclosure>
     </div>
@@ -89,11 +89,11 @@ export function AriakitCombobox({
       setOpen={setOpen}
     >
       {portal}
-      <div className="k-field">
-        <ComboboxLabel className="k-label">
+      <div className="lv-field">
+        <ComboboxLabel className="lv-label">
           {label}
           {required && (
-            <span aria-hidden className="k-required">
+            <span aria-hidden className="lv-required">
               {' '}
               *
             </span>
@@ -103,7 +103,7 @@ export function AriakitCombobox({
           <>
             {field}
             <ComboboxPopover
-              className="k-combobox-popover k-combobox-list"
+              className="lv-combobox-popover lv-combobox-list"
               gutter={5}
               sameWidth
               portal
@@ -116,12 +116,15 @@ export function AriakitCombobox({
           <>
             {field}
             <RadixShell open={open} onOpenChange={setOpen} anchor={anchorRef}>
-              <ComboboxList className="k-combobox-list">{list}</ComboboxList>
+              <ComboboxList className="lv-combobox-list">{list}</ComboboxList>
             </RadixShell>
           </>
         )}
         {(error || hint) && (
-          <p id={descriptionId} className={error ? 'k-field-hint k-field-error' : 'k-field-hint'}>
+          <p
+            id={descriptionId}
+            className={error ? 'lv-field-hint lv-field-error' : 'lv-field-hint'}
+          >
             {error || hint}
           </p>
         )}

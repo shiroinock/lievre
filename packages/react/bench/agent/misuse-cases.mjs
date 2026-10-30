@@ -1,5 +1,5 @@
-// Mistakes an agent is likely to make with KEI. Each case is a whole consumer file that
-// imports '@kei-design/react' and exports `Case`. `fix` lists words a message must contain
+// Mistakes an agent is likely to make with lievre. Each case is a whole consumer file that
+// imports '@lievre/react' and exports `Case`. `fix` lists words a message must contain
 // for the agent to be able to fix the mistake from the message alone.
 export const cases = [
   {
@@ -7,7 +7,7 @@ export const cases = [
     task: 'T1',
     mistake: 'TextField に label を渡さず placeholder だけにする',
     fix: ['label'],
-    code: `import { TextField } from '@kei-design/react';
+    code: `import { TextField } from '@lievre/react';
 export const Case = () => <TextField placeholder="ワークスペース名" />;`,
   },
   {
@@ -15,7 +15,7 @@ export const Case = () => <TextField placeholder="ワークスペース名" />;`
     task: 'T1',
     mistake: 'Switch に onChange を渡す（正しくは onCheckedChange）',
     fix: ['onCheckedChange'],
-    code: `import { Switch } from '@kei-design/react';
+    code: `import { Switch } from '@lievre/react';
 export const Case = () => <Switch label="メールで通知する" onChange={() => {}} />;`,
   },
   {
@@ -23,7 +23,7 @@ export const Case = () => <Switch label="メールで通知する" onChange={() 
     task: 'T1',
     mistake: 'form の中の Button を送信ボタンのつもりで置く（既定は type="button"）',
     fix: ['type="submit"', "type='submit'", 'submit'],
-    code: `import { Button } from '@kei-design/react';
+    code: `import { Button } from '@lievre/react';
 export const Case = () => (
   <form onSubmit={(e) => e.preventDefault()}>
     <Button variant="primary">保存する</Button>
@@ -36,7 +36,7 @@ export const Case = () => (
     mistake: 'ToastProvider の外で useToast を呼ぶ',
     bare: true,
     fix: ['ToastProvider'],
-    code: `import { useToast } from '@kei-design/react';
+    code: `import { useToast } from '@lievre/react';
 export const Case = () => {
   const toast = useToast();
   return <button onClick={() => toast({ title: '保存しました' })}>保存</button>;
@@ -47,19 +47,19 @@ export const Case = () => {
     task: 'T3',
     mistake: "Toast の tone に Badge と同じ 'danger' を渡す（正しくは 'error'）",
     fix: ['error'],
-    code: `import { useToast } from '@kei-design/react';
+    code: `import { useToast } from '@lievre/react';
 export const Case = () => {
   const toast = useToast();
   return <button onClick={() => toast({ title: '削除できません', tone: 'danger' })}>削除</button>;
 };`,
   },
   {
-    id: 'no-kei-provider',
+    id: 'no-lievre-provider',
     task: 'T1',
-    mistake: 'KeiProvider で包まずに部品を置く（.kei の外ではスタイルが効かない）',
+    mistake: 'LievreProvider で包まずに部品を置く（.lievre の外ではスタイルが効かない）',
     bare: true,
-    fix: ['KeiProvider'],
-    code: `import { Button } from '@kei-design/react';
+    fix: ['LievreProvider'],
+    code: `import { Button } from '@lievre/react';
 export const Case = () => <Button variant="primary">保存する</Button>;`,
   },
   {
@@ -68,7 +68,7 @@ export const Case = () => <Button variant="primary">保存する</Button>;`,
     mistake:
       '区切った1ページ分の rows を DataTable に渡し、Pagination を横に置く（並べ替えは1ページの中だけになる）',
     fix: ['pageSize'],
-    code: `import { DataTable, Pagination } from '@kei-design/react';
+    code: `import { DataTable, Pagination } from '@lievre/react';
 import { useState } from 'react';
 type Row = { id: string; amount: number };
 const all: Row[] = Array.from({ length: 20 }, (_, i) => ({ id: 'INV-' + i, amount: (i * 37) % 20 }));
@@ -92,7 +92,7 @@ export const Case = () => {
     task: 'T2',
     mistake: 'DataTable に caption を渡さない',
     fix: ['caption'],
-    code: `import { DataTable } from '@kei-design/react';
+    code: `import { DataTable } from '@lievre/react';
 export const Case = () => (
   <DataTable rows={[{ id: 'a' }]} getRowId={(r) => r.id} columns={[{ key: 'id', header: 'ID', render: (r) => r.id }]} />
 );`,
@@ -102,7 +102,7 @@ export const Case = () => (
     task: 'T2',
     mistake: 'TanStack 風に accessorKey / cell で列を書く',
     fix: ['render', 'key'],
-    code: `import { DataTable } from '@kei-design/react';
+    code: `import { DataTable } from '@lievre/react';
 export const Case = () => (
   <DataTable
     caption="請求書"
@@ -115,16 +115,16 @@ export const Case = () => (
   {
     id: 'unit-inside-mono',
     task: 'T2',
-    mistake: '単位を .k-mono の中に入れる',
-    fix: ['.k-mono の外', 'k-mono'],
-    code: `export const Case = () => <span className="k-mono">{1200}%</span>;`,
+    mistake: '単位を .lv-mono の中に入れる',
+    fix: ['.lv-mono の外', 'lv-mono'],
+    code: `export const Case = () => <span className="lv-mono">{1200}%</span>;`,
   },
   {
     id: 'dialog-no-description',
     task: 'T3',
     mistake: 'Dialog に description を渡さない',
     fix: ['description'],
-    code: `import { Dialog, Button } from '@kei-design/react';
+    code: `import { Dialog, Button } from '@lievre/react';
 export const Case = () => (
   <Dialog trigger={<Button>削除</Button>} title="プロジェクトを削除">本文</Dialog>
 );`,
@@ -134,7 +134,7 @@ export const Case = () => (
     task: 'T3',
     mistake: "危険な操作に shadcn と同じ variant='destructive' を使う",
     fix: ['danger'],
-    code: `import { Button } from '@kei-design/react';
+    code: `import { Button } from '@lievre/react';
 export const Case = () => <Button variant="destructive">削除する</Button>;`,
   },
   {
@@ -142,7 +142,7 @@ export const Case = () => <Button variant="destructive">削除する</Button>;`,
     task: 'T3',
     mistake: 'footer のキャンセルを DialogClose で包まない（押しても閉じない）',
     fix: ['DialogClose'],
-    code: `import { Dialog, Button } from '@kei-design/react';
+    code: `import { Dialog, Button } from '@lievre/react';
 export const Case = () => (
   <Dialog
     open
@@ -160,7 +160,7 @@ export const Case = () => (
     task: 'T4',
     mistake: 'Select に option を子として渡す（正しくは options）',
     fix: ['options'],
-    code: `import { Select } from '@kei-design/react';
+    code: `import { Select } from '@lievre/react';
 export const Case = () => (
   <Select label="プラン">
     <option value="lite">ライト</option>
@@ -172,7 +172,7 @@ export const Case = () => (
     task: 'T4',
     mistake: 'RadioGroup に onChange を渡す（正しくは onValueChange）',
     fix: ['onValueChange'],
-    code: `import { RadioGroup } from '@kei-design/react';
+    code: `import { RadioGroup } from '@lievre/react';
 export const Case = () => (
   <RadioGroup label="支払い方法" options={[{ value: 'card', label: 'クレジットカード' }]} onChange={() => {}} />
 );`,
@@ -182,7 +182,7 @@ export const Case = () => (
     task: 'T4',
     mistake: 'Checkbox の onCheckedChange を boolean として受ける（indeterminate がある）',
     fix: ['indeterminate'],
-    code: `import { Checkbox } from '@kei-design/react';
+    code: `import { Checkbox } from '@lievre/react';
 import { useState } from 'react';
 export const Case = () => {
   const [agreed, setAgreed] = useState(false);
@@ -194,7 +194,7 @@ export const Case = () => {
     task: 'T4',
     mistake: 'エラー文を部品の外に p で置き、error に渡さない',
     fix: ['error'],
-    code: `import { Select } from '@kei-design/react';
+    code: `import { Select } from '@lievre/react';
 export const Case = () => (
   <div>
     <Select label="プラン" options={[{ value: 'lite', label: 'ライト' }]} />
@@ -207,7 +207,7 @@ export const Case = () => (
     task: 'T5',
     mistake: 'Metric の value に単位まで入れる（"99.95%"）',
     fix: ['unit'],
-    code: `import { Metric } from '@kei-design/react';
+    code: `import { Metric } from '@lievre/react';
 export const Case = () => <Metric label="稼働率" value="99.95%" change="+0.02" trend="up" />;`,
   },
   {
@@ -215,7 +215,7 @@ export const Case = () => <Metric label="稼働率" value="99.95%" change="+0.02
     task: 'T5',
     mistake: 'Badge を色と点だけにして文字を入れない',
     fix: ['children', '文字'],
-    code: `import { Badge } from '@kei-design/react';
+    code: `import { Badge } from '@lievre/react';
 export const Case = () => <Badge tone="danger" dot />;`,
   },
   {
@@ -223,7 +223,7 @@ export const Case = () => <Badge tone="danger" dot />;`,
     task: 'T5',
     mistake: "Badge の tone に Toast と同じ 'error' を渡す（正しくは 'danger'）",
     fix: ['danger'],
-    code: `import { Badge } from '@kei-design/react';
+    code: `import { Badge } from '@lievre/react';
 export const Case = () => <Badge tone="error">停止</Badge>;`,
   },
   {
@@ -231,7 +231,7 @@ export const Case = () => <Badge tone="error">停止</Badge>;`,
     task: 'T5',
     mistake: 'Tabs に label を渡さない',
     fix: ['label'],
-    code: `import { Tabs } from '@kei-design/react';
+    code: `import { Tabs } from '@lievre/react';
 export const Case = () => <Tabs items={[{ value: 'a', label: '概要', content: '本文' }]} />;`,
   },
 ];

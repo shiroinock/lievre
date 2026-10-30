@@ -1,7 +1,7 @@
 import { useId, useMemo, useState } from 'react';
 import { Plus, Download, Search, SlidersHorizontal, ChevronRight } from 'lucide-react';
 import {
-  KeiProvider,
+  LievreProvider,
   Badge,
   Button,
   Card,
@@ -34,7 +34,7 @@ export type WorkItem = {
 };
 export const initialWork: WorkItem[] = [
   {
-    id: 'KEI-024',
+    id: 'lievre-024',
     name: 'センサーログの同期',
     category: 'データ収集',
     status: '稼働中',
@@ -43,7 +43,7 @@ export const initialWork: WorkItem[] = [
     priority: 1,
   },
   {
-    id: 'KEI-023',
+    id: 'lievre-023',
     name: '週次レポートの生成',
     category: 'レポート',
     status: '稼働中',
@@ -52,7 +52,7 @@ export const initialWork: WorkItem[] = [
     priority: 2,
   },
   {
-    id: 'KEI-022',
+    id: 'lievre-022',
     name: 'ゲートウェイの接続確認',
     category: 'インフラ',
     status: '要確認',
@@ -61,7 +61,7 @@ export const initialWork: WorkItem[] = [
     priority: 1,
   },
   {
-    id: 'KEI-021',
+    id: 'lievre-021',
     name: 'アーカイブの整合性検証',
     category: 'データ管理',
     status: '待機中',
@@ -70,7 +70,7 @@ export const initialWork: WorkItem[] = [
     priority: 3,
   },
   {
-    id: 'KEI-020',
+    id: 'lievre-020',
     name: '温度データの正規化',
     category: 'データ収集',
     status: '稼働中',
@@ -79,7 +79,7 @@ export const initialWork: WorkItem[] = [
     priority: 2,
   },
   {
-    id: 'KEI-019',
+    id: 'lievre-019',
     name: 'バックアップの差分確認',
     category: 'データ管理',
     status: '待機中',
@@ -88,7 +88,7 @@ export const initialWork: WorkItem[] = [
     priority: 3,
   },
   {
-    id: 'KEI-018',
+    id: 'lievre-018',
     name: 'エッジ端末の更新',
     category: 'インフラ',
     status: '要確認',
@@ -97,7 +97,7 @@ export const initialWork: WorkItem[] = [
     priority: 1,
   },
   {
-    id: 'KEI-017',
+    id: 'lievre-017',
     name: '品質レポートの配信準備',
     category: 'レポート',
     status: '稼働中',
@@ -155,7 +155,7 @@ export function NewWorkDialog({ onCreate }: { onCreate: (item: WorkItem) => void
     >
       <form
         id={id}
-        className="k-form-stack"
+        className="lv-form-stack"
         noValidate
         onSubmit={(e) => {
           e.preventDefault();
@@ -164,7 +164,7 @@ export function NewWorkDialog({ onCreate }: { onCreate: (item: WorkItem) => void
             return;
           }
           onCreate({
-            id: `KEI-${Date.now().toString().slice(-6)}`,
+            id: `lievre-${Date.now().toString().slice(-6)}`,
             name: name.trim(),
             category: 'カスタム',
             status: '待機中',
@@ -231,7 +231,7 @@ function WorkDetails({ item }: { item: WorkItem }) {
         </DialogClose>
       }
     >
-      <div className="k-form-stack">
+      <div className="lv-form-stack">
         <DescriptionList
           layout="stack"
           columns={2}
@@ -261,11 +261,11 @@ function WorkDetails({ item }: { item: WorkItem }) {
 }
 export function OperationsExample({ compact = false }: { compact?: boolean }) {
   return (
-    <KeiProvider typography="interface">
+    <LievreProvider typography="interface">
       <ToastProvider>
         <OperationsContent compact={compact} />
       </ToastProvider>
-    </KeiProvider>
+    </LievreProvider>
   );
 }
 function OperationsContent({ compact }: { compact: boolean }) {
@@ -292,7 +292,7 @@ function OperationsContent({ compact }: { compact: boolean }) {
           <div className="work-name">
             <span>{r.name}</span>
             <small>
-              <span className="k-mono">{r.id}</span> · {r.category}
+              <span className="lv-mono">{r.id}</span> · {r.category}
             </small>
           </div>
         ),
@@ -330,7 +330,7 @@ function OperationsContent({ compact }: { compact: boolean }) {
         key: 'updated',
         header: '更新',
         sortValue: (r) => r.updated,
-        render: (r) => <span className="k-mono k-muted">{r.updated}</span>,
+        render: (r) => <span className="lv-mono lv-muted">{r.updated}</span>,
       },
       { key: 'actions', header: '詳細', render: (r) => <WorkDetails item={r} /> },
     ],
@@ -349,7 +349,7 @@ function OperationsContent({ compact }: { compact: boolean }) {
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'kei-work-items.csv';
+    a.download = 'lievre-work-items.csv';
     a.click();
     URL.revokeObjectURL(url);
     toast({ title: 'CSVを書き出しました', description: `${filtered.length}件の作業` });
@@ -488,17 +488,17 @@ function OperationsContent({ compact }: { compact: boolean }) {
           <Card title="最近のアクティビティ">
             <ul className="activity-list">
               {[
-                { time: '14:32', label: 'センサーログの同期を開始', id: 'KEI-024' },
-                { time: '14:28', label: '週次レポートを生成', id: 'KEI-023' },
-                { time: '14:15', label: 'ゲートウェイの再接続が必要', id: 'KEI-022' },
-                { time: '13:50', label: 'アーカイブ検証を予約', id: 'KEI-021' },
+                { time: '14:32', label: 'センサーログの同期を開始', id: 'lievre-024' },
+                { time: '14:28', label: '週次レポートを生成', id: 'lievre-023' },
+                { time: '14:15', label: 'ゲートウェイの再接続が必要', id: 'lievre-022' },
+                { time: '13:50', label: 'アーカイブ検証を予約', id: 'lievre-021' },
               ].map((a, i) => (
                 <li key={a.id}>
                   <span className="activity-dot" data-warning={i === 2} />
-                  <time className="k-mono">{a.time}</time>
+                  <time className="lv-mono">{a.time}</time>
                   <div>
                     {a.label}
-                    <small className="k-mono">{a.id}</small>
+                    <small className="lv-mono">{a.id}</small>
                   </div>
                 </li>
               ))}
@@ -516,7 +516,7 @@ export function SettingsExample() {
   return (
     <Card title="ワークスペース設定">
       <form
-        className="k-form-stack"
+        className="lv-form-stack"
         onSubmit={(e) => {
           e.preventDefault();
           setSaved(true);
@@ -550,7 +550,7 @@ export function SettingsExample() {
             設定を保存
           </Button>
           {saved && (
-            <span role="status" className="k-text-success">
+            <span role="status" className="lv-text-success">
               保存済み
             </span>
           )}

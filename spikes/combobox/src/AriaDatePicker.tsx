@@ -31,30 +31,30 @@ export function AriaDatePicker({ wareki = false }: { wareki?: boolean }) {
   return (
     <I18nProvider locale={wareki ? 'ja-JP-u-ca-japanese' : 'ja-JP'}>
       {portal}
-      <DatePicker className="k-field" value={value} onChange={setValue}>
-        <Label className="k-label">{wareki ? '生年月日（和暦）' : '生年月日'}</Label>
-        <Group className="k-input k-datepicker">
-          <DateInput className="k-datepicker-input">
-            {(segment) => <DateSegment segment={segment} className="k-datepicker-segment" />}
+      <DatePicker className="lv-field" value={value} onChange={setValue}>
+        <Label className="lv-label">{wareki ? '生年月日（和暦）' : '生年月日'}</Label>
+        <Group className="lv-input lv-datepicker">
+          <DateInput className="lv-datepicker-input">
+            {(segment) => <DateSegment segment={segment} className="lv-datepicker-segment" />}
           </DateInput>
-          <Button className="k-combobox-button" aria-label="カレンダーを開く">
+          <Button className="lv-combobox-button" aria-label="カレンダーを開く">
             <CalendarDays size={16} />
           </Button>
         </Group>
-        <Popover className="k-combobox-popover" UNSTABLE_portalContainer={container ?? undefined}>
-          <Dialog aria-label="カレンダー" className="k-calendar-dialog">
-            <Calendar className="k-calendar">
-              <header className="k-calendar-header">
-                <Button slot="previous" className="k-icon-button" aria-label="前の月">
+        <Popover className="lv-combobox-popover" UNSTABLE_portalContainer={container ?? undefined}>
+          <Dialog aria-label="カレンダー" className="lv-calendar-dialog">
+            <Calendar className="lv-calendar">
+              <header className="lv-calendar-header">
+                <Button slot="previous" className="lv-icon-button" aria-label="前の月">
                   <ChevronLeft size={16} />
                 </Button>
-                <Heading className="k-calendar-heading" />
-                <Button slot="next" className="k-icon-button" aria-label="次の月">
+                <Heading className="lv-calendar-heading" />
+                <Button slot="next" className="lv-icon-button" aria-label="次の月">
                   <ChevronRight size={16} />
                 </Button>
               </header>
-              <CalendarGrid className="k-calendar-grid">
-                {(date) => <CalendarCell date={date} className="k-calendar-cell" />}
+              <CalendarGrid className="lv-calendar-grid">
+                {(date) => <CalendarCell date={date} className="lv-calendar-cell" />}
               </CalendarGrid>
             </Calendar>
           </Dialog>

@@ -11,18 +11,18 @@ export const VARIANTS = 4;
 
 /**
  * Text kinds: which elements wear together, the face they are set in, and the size the live
- * filter is calibrated for (px). Sizes come from the type scale in kei.css.
+ * filter is calibrated for (px). Sizes come from the type scale in lievre.css.
  */
 export const TEXT_KINDS = {
-  small: { selectors: ['.k-text--small:not(.k-muted)', '.k-label'], font: 'sans', size: 12.5 },
+  small: { selectors: ['.lv-text--small:not(.lv-muted)', '.lv-label'], font: 'sans', size: 12.5 },
   text: {
-    selectors: ['.k-text--body:not(.k-muted)', '.k-text--lead:not(.k-muted)', '.k-card-title'],
+    selectors: ['.lv-text--body:not(.lv-muted)', '.lv-text--lead:not(.lv-muted)', '.lv-card-title'],
     font: 'sans',
     size: 15,
   },
-  heading: { selectors: ['.k-heading'], font: 'sans', size: 28 },
-  figure: { selectors: ['.k-metric-value', '.k-meter-reading strong'], font: 'mono', size: 32 },
-  data: { selectors: ['.k-table td'], font: 'sans', size: 13.5 },
+  heading: { selectors: ['.lv-heading'], font: 'sans', size: 28 },
+  figure: { selectors: ['.lv-metric-value', '.lv-meter-reading strong'], font: 'mono', size: 32 },
+  data: { selectors: ['.lv-table td'], font: 'sans', size: 13.5 },
 };
 
 /**
@@ -56,7 +56,7 @@ const TONES = {
 
 export const PRESETS = {
   subtle: {
-    salt: 'kei',
+    salt: 'lievre',
     outline: { rough: 4, roughScale: 24, swell: 2, swellScale: 240, step: 14 },
     kasure: { density: 4, threshold: 0.7, floor: 0.86 },
     stain: { strength: 0.05 },
@@ -73,7 +73,7 @@ export const PRESETS = {
     tones: TONES,
   },
   standard: {
-    salt: 'kei',
+    salt: 'lievre',
     outline: { rough: 7, roughScale: 26, swell: 4, swellScale: 220, step: 12 },
     kasure: { density: 6, threshold: 0.64, floor: 0.8 },
     stain: { strength: 0.08 },
@@ -90,7 +90,7 @@ export const PRESETS = {
     tones: TONES,
   },
   strong: {
-    salt: 'kei',
+    salt: 'lievre',
     outline: { rough: 11, roughScale: 28, swell: 6, swellScale: 180, step: 10 },
     kasure: { density: 8, threshold: 0.56, floor: 0.72 },
     stain: { strength: 0.09 },

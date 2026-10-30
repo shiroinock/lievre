@@ -4,7 +4,7 @@
 /** Story の meta の `parameters.layoutGate` に書く宣言。 */
 export type LayoutGate =
   | {
-      /** 測る部品。selector は `.k-` で始め、Story の描画（ポータルを含む）から探す。 */
+      /** 測る部品。selector は `.lv-` で始め、Story の描画（ポータルを含む）から探す。 */
       parts: LayoutPart[];
       /**
        * 部品を組み合わせた画面（デモ・画面例）のとき、その理由。操作の要素がすべて宣言に

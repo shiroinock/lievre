@@ -1,5 +1,5 @@
-// KEI のライブラリに各 Combobox を足したときの、gzip 後の増分を測る。
-// react・react-dom は KEI と同じく外に出す（radix-ui などは KEI の lib に入るので、重なる分は差し引かれる）。
+// lievre のライブラリに各 Combobox を足したときの、gzip 後の増分を測る。
+// react・react-dom は lievre と同じく外に出す（radix-ui などは lievre の lib に入るので、重なる分は差し引かれる）。
 import { build } from 'vite';
 import react from '@vitejs/plugin-react';
 import optimizeLocales from '@react-aria/optimize-locales-plugin';

@@ -7,7 +7,7 @@ import {
   Container,
   Grid,
   Heading,
-  KeiProvider,
+  LievreProvider,
   Link,
   RadioGroup,
   Stack,
@@ -85,11 +85,11 @@ export const ReadingAndInterface: Story = {
   render: () => (
     <Grid>
       {(['standard', 'interface'] as const).map((typography) => (
-        <KeiProvider key={typography} typography={typography} density="compact">
+        <LievreProvider key={typography} typography={typography} density="compact">
           <Card title={typography === 'standard' ? '標準本文 / 16px' : '操作画面 / 14px'}>
             <Text>同じ高密度設定でも、文字の役割は独立して選べます。</Text>
           </Card>
-        </KeiProvider>
+        </LievreProvider>
       ))}
     </Grid>
   ),

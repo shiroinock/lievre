@@ -13,11 +13,11 @@ const meta = {
       parts: [
         {
           name: 'タブ',
-          selector: '.k-tab',
+          selector: '.lv-tab',
           checks: ['inset-x', 'inset-y', 'control-height', 'fits'],
         },
-        { name: 'タブの件数', selector: '.k-tab-count', checks: ['inset-x', 'inset-y'] },
-        { name: 'タブの並び', selector: '.k-tabs-list', checks: [{ sameHeight: '.k-tab' }] },
+        { name: 'タブの件数', selector: '.lv-tab-count', checks: ['inset-x', 'inset-y'] },
+        { name: 'タブの並び', selector: '.lv-tabs-list', checks: [{ sameHeight: '.lv-tab' }] },
       ],
     } satisfies LayoutGate,
     docs: {

@@ -1,61 +1,61 @@
 /* DatePicker の最小の見た目。品質基準の確認用ではなく、和暦の表示を見るためだけ。 */
-.kei .k-datepicker {
+.lievre .lv-datepicker {
   position: relative;
   display: flex;
   align-items: center;
-  padding-right: calc(var(--k-control-height) - 2px);
+  padding-right: calc(var(--lv-control-height) - 2px);
 }
-.kei .k-datepicker-input {
+.lievre .lv-datepicker-input {
   display: flex;
-  font-family: var(--k-font-mono);
+  font-family: var(--lv-font-mono);
   font-variant-numeric: tabular-nums;
 }
-.kei .k-datepicker-segment {
+.lievre .lv-datepicker-segment {
   padding: 0 1px;
-  border-radius: var(--k-radius-sm);
+  border-radius: var(--lv-radius-sm);
   outline: 0;
 }
-.kei .k-datepicker-segment[data-placeholder] {
-  color: var(--k-subtle);
+.lievre .lv-datepicker-segment[data-placeholder] {
+  color: var(--lv-subtle);
 }
-.kei .k-datepicker-segment[data-focused] {
-  background: var(--k-accent-soft);
+.lievre .lv-datepicker-segment[data-focused] {
+  background: var(--lv-accent-soft);
 }
-.kei .k-calendar-dialog {
+.lievre .lv-calendar-dialog {
   padding: 8px;
   outline: 0;
 }
-.kei .k-calendar-header {
+.lievre .lv-calendar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 8px;
 }
-.kei .k-calendar-heading {
+.lievre .lv-calendar-heading {
   margin: 0;
-  font-size: var(--k-text-md);
+  font-size: var(--lv-text-md);
 }
-.kei .k-calendar-grid {
+.lievre .lv-calendar-grid {
   border-collapse: collapse;
 }
-.kei .k-calendar-cell {
+.lievre .lv-calendar-cell {
   display: grid;
   place-items: center;
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  font-family: var(--k-font-mono);
+  font-family: var(--lv-font-mono);
   outline: 0;
   cursor: pointer;
 }
-.kei .k-calendar-cell[data-outside-month] {
+.lievre .lv-calendar-cell[data-outside-month] {
   display: none;
 }
-.kei .k-calendar-cell[data-focused] {
-  outline: 2px solid var(--k-focus);
+.lievre .lv-calendar-cell[data-focused] {
+  outline: 2px solid var(--lv-focus);
 }
-.kei .k-calendar-cell[data-selected] {
-  background: var(--k-accent);
-  color: var(--k-on-accent);
+.lievre .lv-calendar-cell[data-selected] {
+  background: var(--lv-accent);
+  color: var(--lv-on-accent);
 }

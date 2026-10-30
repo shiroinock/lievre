@@ -1,6 +1,6 @@
-# KEI を端末（TUI）に広げる道
+# Lièvre を端末（TUI）に広げる道
 
-KEI のデザイン言語を、端末の画面にも広げるための比較です。KEI は lievre に改名する予定です。試作は [spikes/tui](../spikes/tui/README.md) に置き、その部品を土台に、ワークスペースのパッケージ [packages/tui](../packages/tui/README.md)（いまは `@kei-design/tui`）を作りました。
+lievre のデザイン言語を、端末の画面にも広げるための比較です。この文書は改名の前に書き、名前だけを改名のあとのものにしています（[MIGRATION.md](../MIGRATION.md)）。試作は [spikes/tui](../spikes/tui/README.md) に置き、その部品を土台に、ワークスペースのパッケージ [packages/tui](../packages/tui/README.md)（`@lievre/tui`）を作りました。
 
 ## TUI の道具の今（2026年10月30日に確かめた）
 
@@ -35,7 +35,7 @@ KEI のデザイン言語を、端末の画面にも広げるための比較で�
 
 **外れていません。** 端末で動く有名なツールの中でも、TypeScript で書かれたもの（Gemini CLI は Ink、OpenCode は OpenTUI）と、Go のもの（Crush）、Rust のもの（Codex CLI）が並んでいます。言語で決まる「正解」はありません。決め手になるのは、上の物差しのどれを重く見るかです。
 
-KEI の場合は、次の2点で TypeScript がいちばん合います。
+lievre の場合は、次の2点で TypeScript がいちばん合います。
 
 - 価値の中心が、Web の部品と同じトークンと約束を、端末でも同じように使えることにある。
 - WCAG AA を必ず守るので、スクリーンリーダー向けの出力が組み込みである Ink の利点が大きい。
@@ -58,21 +58,23 @@ KEI の場合は、次の2点で TypeScript がいちばん合います。
 
 ## 1. パッケージの分け方（重点）
 
-### いまの形
+### 移す前の形
 
-このリポジトリは1つのパッケージ（`@kei-design/react`、`private: true` で、npm にはまだ公開していない）です。Web の部品、トークン（`tokens/tokens.json`）、利用者向けの lint（`lint/`）、`llms.txt` を、すべて1つの `package.json` から出しています。トークンの正は `src/styles/kei.css` です。`npm run tokens` で JSON を書き出し、書き出し忘れは `npm test` が止めます。
+名前は改名したあとのものに書き換えています。
+
+このリポジトリは1つのパッケージ（`@lievre/react`、`private: true` で、npm にはまだ公開していない）です。Web の部品、トークン（`tokens/tokens.json`）、利用者向けの lint（`lint/`）、`llms.txt` を、すべて1つの `package.json` から出しています。トークンの正は `src/styles/lievre.css` です。`npm run tokens` で JSON を書き出し、書き出し忘れは `npm test` が止めます。
 
 ### 比べる案
 
-| 案                                                   | 始めの手間                                  | トークンを変えるたびの手間                                                                                                                                                | 良い点                                                                                                                                        | 困る点                                                                                                                                                               |
-| ---------------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **A. npm のワークスペースにする**（推奨）            | 1〜1.5日。改名は別に0.5〜1日                | なし。同じ PR の中で、`kei.css`・`tokens.json`・端末の値・両方のコントラストの検査が揃う                                                                                  | 依存が増えない（npm に組み込みの機能）。いまの「書き出し忘れをテストが止める」仕組みが、端末向けの値にもそのまま効く。DESIGN.md も1か所で済む | 移すときに、パスを持つ30〜40のファイルを直す。CI で、パッケージごとに何を走らせるかを決める必要がある                                                                |
-| B. 1つのパッケージのまま、TUI を別のリポジトリにする | 0.5日（新しいリポジトリの CI と設定を写す） | 毎回15〜30分。トークンを公開し、TUI の側で版を上げ、TUI の検査を流す。そのためには、いま `private` の `@kei-design/react` を公開する（または git の依存にする）必要がある | いまのリポジトリはほとんど変えずに済む                                                                                                        | トークンとコントラストの検査が2か所に分かれ、片方だけ古いまま、ということが起きる。TUI のために Web のパッケージを入れることになる（トークンだけを分けていないため） |
-| C. 1つのパッケージに TUI も入れる                    | 0.5日                                       | なし                                                                                                                                                                      | 手間が最も少ない                                                                                                                              | Web の利用者にも Ink と yoga-layout が入る。`exports` で入口を分けても、依存は分けられない                                                                           |
+| 案                                                   | 始めの手間                                  | トークンを変えるたびの手間                                                                                                                                            | 良い点                                                                                                                                        | 困る点                                                                                                                                                               |
+| ---------------------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A. npm のワークスペースにする**（推奨）            | 1〜1.5日。改名は別に0.5〜1日                | なし。同じ PR の中で、`lievre.css`・`tokens.json`・端末の値・両方のコントラストの検査が揃う                                                                           | 依存が増えない（npm に組み込みの機能）。いまの「書き出し忘れをテストが止める」仕組みが、端末向けの値にもそのまま効く。DESIGN.md も1か所で済む | 移すときに、パスを持つ30〜40のファイルを直す。CI で、パッケージごとに何を走らせるかを決める必要がある                                                                |
+| B. 1つのパッケージのまま、TUI を別のリポジトリにする | 0.5日（新しいリポジトリの CI と設定を写す） | 毎回15〜30分。トークンを公開し、TUI の側で版を上げ、TUI の検査を流す。そのためには、いま `private` の `@lievre/react` を公開する（または git の依存にする）必要がある | いまのリポジトリはほとんど変えずに済む                                                                                                        | トークンとコントラストの検査が2か所に分かれ、片方だけ古いまま、ということが起きる。TUI のために Web のパッケージを入れることになる（トークンだけを分けていないため） |
+| C. 1つのパッケージに TUI も入れる                    | 0.5日                                       | なし                                                                                                                                                                  | 手間が最も少ない                                                                                                                              | Web の利用者にも Ink と yoga-layout が入る。`exports` で入口を分けても、依存は分けられない                                                                           |
 
 日数は、このリポジトリの設定のファイルを数えて見積もりました。いずれも、作業してから CI が通るまでの目安です。
 
-**A を推奨します。** 始めの手間は B より1日ほど多くかかります。それでも、トークンを変えるたびの手間がなくなるので、10回ほど変えれば取り返せます。`src/styles/kei.css` は、この1か月で26回のコミットで変わっています。
+**A を推奨します。** 始めの手間は B より1日ほど多くかかります。それでも、トークンを変えるたびの手間がなくなるので、10回ほど変えれば取り返せます。`src/styles/lievre.css` は、この1か月で26回のコミットで変わっています。
 
 ### TUI を Go や Rust で書くとき、同じリポジトリに混ぜるとどうなるか
 
@@ -89,14 +91,14 @@ TypeScript で揃えるのが推奨なので、短く触れるだけにします
 
 ```text
 packages/
-  tokens/   @lievre/tokens   kei.css のトークンの層、tokens.json、terminal.json。依存なし
+  tokens/   @lievre/tokens   lievre.css のトークンの層、tokens.json、terminal.json。依存なし
   react/    @lievre/react    いまの src/ の部品、Storybook、配置の検査、lint、llms.txt
   tui/      @lievre/tui      Ink の部品。core（色と字の組）と ink（描画）に分ける
 spikes/     試作（ワークスペースに入れない）
 references/ docs/            リポジトリ全体のもの
 ```
 
-`kei.css` のトークンの層を `packages/tokens` に移すと、トークンの CSS と部品の CSS が別のファイルになります。`@lievre/react` の `styles.css` は、トークンの CSS を読み込んで1つのファイルにまとめて出し、利用者の手順は変えません。
+`lievre.css` のトークンの層を `packages/tokens` に移すと、トークンの CSS と部品の CSS が別のファイルになります。`@lievre/react` の `styles.css` は、トークンの CSS を読み込んで1つのファイルにまとめて出し、利用者の手順は変えません。
 
 ### 移す手順
 
@@ -111,27 +113,29 @@ references/ docs/            リポジトリ全体のもの
 
 このリポジトリで、ルートからのパスや名前を持っているファイルを `git grep` で数えました。
 
-| まとまり          | ファイル                                                                                                   | 直すこと                                                                                                                                                                                                              |
-| ----------------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| パッケージ        | `package.json`、`package-lock.json`                                                                        | ルートは `"workspaces": ["packages/*"]` と、全体を流す scripts（`npm run test -ws` など）だけにする。依存・`exports`・`files` は `packages/react/package.json` へ移す。lockfile は作り直す                            |
-| 型                | `tsconfig.json`、`tsconfig.lib.json`                                                                       | パッケージごとに置き、ルートは `references` でまとめる。`rootDir` と `include` を直す                                                                                                                                 |
-| ビルド            | `vite.config.ts`、`vite.lib.config.ts`、`index.html`                                                       | 入口（`src/library.ts`）と出力（`lib`）を相対のまま `packages/react` へ移す。デモの `index.html` も移す                                                                                                               |
-| テスト            | `vitest.config.ts`、`vitest.layout.config.ts`、`src/test/*.test.tsx`                                       | `include` と `setupFiles`。`llms.test.tsx`・`contrast.test.tsx`・`lint.test.tsx`・`consumer-lint.test.tsx` は、ルートのパス（`root`、`bin('oxlint')`、`tokens/tokens.json`）を持っているので直す                      |
-| 配置の検査        | `src/test/layout/*`、`vitest.layout.config.ts`                                                             | Story を集めるパスと、`screen-parts.ts` の読み込み。Playwright のブラウザのキャッシュは、ルートの lockfile を鍵にしたままでよい                                                                                       |
-| Storybook         | `.storybook/main.ts`、`.storybook/preview.tsx`、`.storybook/manager.ts`                                    | `packages/react/.storybook` へ移す。`stories` の glob（`../src/**`）と CSS の読み込みのパス                                                                                                                           |
-| lint              | `eslint.config.mjs`、`stylelint.config.mjs`、`scripts/stylelint-kei.mjs`、`scripts/stylelint-baseline.mjs` | `files` の glob、`settings.kei.importSources`（`'../index'`）、`npm run lint` の `"src/**/*.css"`。**stylelint の例外の一覧（`stylelint-baseline.mjs`）はファイルのパスを持つので、全部書き換える**                   |
-| 利用者向けの lint | `lint/index.js`、`lint/index.d.ts`、`lint/biome/*.grit`                                                    | `packages/react/lint` へ移す（または `@lievre/lint` に分ける）。`exports` の `./lint` と `./lint/biome/*`                                                                                                             |
-| 書き出し          | `scripts/build-tokens.mjs`、`scripts/build-llms.mjs`                                                       | `build-tokens` は `packages/tokens` へ。`tokens.json` の `$description` の中のパスも直す。`build-llms` は `src/index.ts` と `docs/llms-intro.md` を読むので、`llms-intro.md` を `packages/react` へ移すか、パスを直す |
-| 計測              | `scripts/measure-alignment.js`                                                                             | DESIGN.md に `import('/scripts/measure-alignment.js')` と書いてある。開発用のサーバーの根が `packages/react` に変わるので、置き場所と文書を合わせる                                                                   |
-| `llms.txt`        | `llms.txt`、`docs/llms-intro.md`                                                                           | `packages/react/llms.txt` にする。端末向けは `packages/tui/llms.txt` を別に作るか、同じ仕組みで2つ書き出す                                                                                                            |
-| CI                | `.github/workflows/ci.yml`                                                                                 | `npm ci` はルートのまま。各手順を `-w packages/react` などにする。TUI の検査（`renderToString` の結果の比較と、256色のコントラスト）を足す                                                                            |
-| 測る道具          | `bench/agent/*`（`context.mjs`、`misuse.mjs`、`external-docs.json`、結果の JSON）                          | `lib` と `llms.txt` へのパス                                                                                                                                                                                          |
-| 試作              | `spikes/combobox`、`spikes/tui`                                                                            | ルートの `node_modules` の react を当てにしている。ワークスペースに入れず、パスだけ直す                                                                                                                               |
-| 文書              | `README.md`、`DESIGN.md`、`AGENTS.md`、`CONTRIBUTING.md`、`docs/*.md`、`src/docs/Introduction.mdx`         | 「場所」「確かめる」の節のパスとコマンド                                                                                                                                                                              |
-| 公開の手順        | （いまはない）                                                                                             | `private: true` を外すパッケージを決める。版は `npm version -w`、公開は `npm publish -w`。依存を増やさないため、changesets などは入れない。tokens・react・tui の版は揃えて上げる                                      |
-| 無視するファイル  | `.gitignore`                                                                                               | `lib/` と `dist/` は先頭に `/` が付いていないので、各パッケージの下でもそのまま効く                                                                                                                                   |
+| まとまり          | ファイル                                                                                                      | 直すこと                                                                                                                                                                                                              |
+| ----------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| パッケージ        | `package.json`、`package-lock.json`                                                                           | ルートは `"workspaces": ["packages/*"]` と、全体を流す scripts（`npm run test -ws` など）だけにする。依存・`exports`・`files` は `packages/react/package.json` へ移す。lockfile は作り直す                            |
+| 型                | `tsconfig.json`、`tsconfig.lib.json`                                                                          | パッケージごとに置き、ルートは `references` でまとめる。`rootDir` と `include` を直す                                                                                                                                 |
+| ビルド            | `vite.config.ts`、`vite.lib.config.ts`、`index.html`                                                          | 入口（`src/library.ts`）と出力（`lib`）を相対のまま `packages/react` へ移す。デモの `index.html` も移す                                                                                                               |
+| テスト            | `vitest.config.ts`、`vitest.layout.config.ts`、`src/test/*.test.tsx`                                          | `include` と `setupFiles`。`llms.test.tsx`・`contrast.test.tsx`・`lint.test.tsx`・`consumer-lint.test.tsx` は、ルートのパス（`root`、`bin('oxlint')`、`tokens/tokens.json`）を持っているので直す                      |
+| 配置の検査        | `src/test/layout/*`、`vitest.layout.config.ts`                                                                | Story を集めるパスと、`screen-parts.ts` の読み込み。Playwright のブラウザのキャッシュは、ルートの lockfile を鍵にしたままでよい                                                                                       |
+| Storybook         | `.storybook/main.ts`、`.storybook/preview.tsx`、`.storybook/manager.ts`                                       | `packages/react/.storybook` へ移す。`stories` の glob（`../src/**`）と CSS の読み込みのパス                                                                                                                           |
+| lint              | `eslint.config.mjs`、`stylelint.config.mjs`、`scripts/stylelint-lievre.mjs`、`scripts/stylelint-baseline.mjs` | `files` の glob、`settings.lievre.importSources`（`'../index'`）、`npm run lint` の `"src/**/*.css"`。**stylelint の例外の一覧（`stylelint-baseline.mjs`）はファイルのパスを持つので、全部書き換える**                |
+| 利用者向けの lint | `lint/index.js`、`lint/index.d.ts`、`lint/biome/*.grit`                                                       | `packages/react/lint` へ移す（または `@lievre/lint` に分ける）。`exports` の `./lint` と `./lint/biome/*`                                                                                                             |
+| 書き出し          | `scripts/build-tokens.mjs`、`scripts/build-llms.mjs`                                                          | `build-tokens` は `packages/tokens` へ。`tokens.json` の `$description` の中のパスも直す。`build-llms` は `src/index.ts` と `docs/llms-intro.md` を読むので、`llms-intro.md` を `packages/react` へ移すか、パスを直す |
+| 計測              | `scripts/measure-alignment.js`                                                                                | DESIGN.md に `import('/scripts/measure-alignment.js')` と書いてある。開発用のサーバーの根が `packages/react` に変わるので、置き場所と文書を合わせる                                                                   |
+| `llms.txt`        | `llms.txt`、`docs/llms-intro.md`                                                                              | `packages/react/llms.txt` にする。端末向けは `packages/tui/llms.txt` を別に作るか、同じ仕組みで2つ書き出す                                                                                                            |
+| CI                | `.github/workflows/ci.yml`                                                                                    | `npm ci` はルートのまま。各手順を `-w packages/react` などにする。TUI の検査（`renderToString` の結果の比較と、256色のコントラスト）を足す                                                                            |
+| 測る道具          | `bench/agent/*`（`context.mjs`、`misuse.mjs`、`external-docs.json`、結果の JSON）                             | `lib` と `llms.txt` へのパス                                                                                                                                                                                          |
+| 試作              | `spikes/combobox`、`spikes/tui`                                                                               | ルートの `node_modules` の react を当てにしている。ワークスペースに入れず、パスだけ直す                                                                                                                               |
+| 文書              | `README.md`、`DESIGN.md`、`AGENTS.md`、`CONTRIBUTING.md`、`docs/*.md`、`src/docs/Introduction.mdx`            | 「場所」「確かめる」の節のパスとコマンド                                                                                                                                                                              |
+| 公開の手順        | （いまはない）                                                                                                | `private: true` を外すパッケージを決める。版は `npm version -w`、公開は `npm publish -w`。依存を増やさないため、changesets などは入れない。tokens・react・tui の版は揃えて上げる                                      |
+| 無視するファイル  | `.gitignore`                                                                                                  | `lib/` と `dist/` は先頭に `/` が付いていないので、各パッケージの下でもそのまま効く                                                                                                                                   |
 
 ### 改名（KEI → lievre）
+
+改名の前に書いた計画です。古い名前を残してあります。行った改名と、利用者が移る手順は [MIGRATION.md](../MIGRATION.md) にあります。
 
 | 対象                | いま                                                                                      | 改名後（案）                                          | 数（`git grep` で数えた）              |
 | ------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------- | -------------------------------------- |
@@ -174,11 +178,11 @@ references/ docs/            リポジトリ全体のもの
 | --------------- | ------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Ink**         | 8.0.0（2026-10-03）       | React。Flexbox（Yoga）で配置               | **推奨。** Node.js 22 で動き、このリポジトリの React 19.3.1 をそのまま使える。スクリーンリーダー向けの出力、Tab でのフォーカス、`renderToString` が揃っている                              |
 | OpenTUI         | 0.8.0（2026-10-29）       | React か Solid。中核は Zig                 | 次の候補。速さと、テストの道具（文字と色の区間を取り出せる）は Ink より上。ただし、Bun か Node.js 26.4 以上の実験の旗が要り、1.0 の前で変更が速く、スクリーンリーダーと Tab での巡回がない |
-| terminal-kit    | 3.1.4（2026-07-19）       | 命令的な API。React では書けない           | 保守は続いているが、KEI の部品の書き方と離れる                                                                                                                                             |
+| terminal-kit    | 3.1.4（2026-07-19）       | 命令的な API。React では書けない           | 保守は続いているが、lievre の部品の書き方と離れる                                                                                                                                          |
 | blessed         | 0.1.81（2015-09-03）      | 命令的な API。react-blessed（0.7.2、2021） | 保守が止まっている                                                                                                                                                                         |
 | @unblessed/core | 1.0.0-alpha.23（2025-12） | blessed の後継を目指すもの                 | alpha のまま、約10か月公開がない                                                                                                                                                           |
 
-OpenTUI は、作業用のフォルダに Bun 1.4.4 と `@opentui/core` 0.7.0 を入れて、`createTestRenderer` で KEI のカードに近い形を描きました。日本語は2セルで揃いました。`●` と `×`（幅が曖昧な字）は1セルで、Ink と同じ扱いでした。このリポジトリには入れていません。
+OpenTUI は、作業用のフォルダに Bun 1.4.4 と `@opentui/core` 0.7.0 を入れて、`createTestRenderer` で lievre のカードに近い形を描きました。日本語は2セルで揃いました。`●` と `×`（幅が曖昧な字）は1セルで、Ink と同じ扱いでした。このリポジトリには入れていません。
 
 ### 描画の道具を差し替えられるようにする
 
@@ -196,7 +200,7 @@ OpenTUI に移るときに書き直すのは `src/ink` だけで、色と字の�
 | 案                                                        | 良い点                                                                                                                                         | 困る点                                                                                                                                                                                                                     |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **標準の文字だけで描く**（U+2500〜、U+2580〜、U+1FB00〜） | 何も入れずに、どの端末でも出る。kitty・WezTerm・Ghostty・Windows Terminal・xterm.js（WebGL）は罫線を自前で描くので、線がセルの境目で途切れない | 角の丸みは `╭` の1種類しかない。ボタンの丸い端はない。U+1FB00〜（Symbols for Legacy Computing）は、自前で描かない端末では、入っていない書体が多い                                                                          |
-| **私用の領域に字を足した書体（Lievre Term）**             | 角の丸み、線の太さ、ボタンの端、フォーカスの輪を KEI に合わせて作れる                                                                          | 書体が入っていないと豆腐（□）になる（`out/*-no-font.png`）。入っているかを確かめる手段がないので、利用者が選ぶ形にしかできない。書体で描いた線は、セルの境目に継ぎ目が出る（`out/truecolor-*-lievre-term.png` の枠の上下） |
+| **私用の領域に字を足した書体（Lievre Term）**             | 角の丸み、線の太さ、ボタンの端、フォーカスの輪を lievre に合わせて作れる                                                                       | 書体が入っていないと豆腐（□）になる（`out/*-no-font.png`）。入っているかを確かめる手段がないので、利用者が選ぶ形にしかできない。書体で描いた線は、セルの境目に継ぎ目が出る（`out/truecolor-*-lievre-term.png` の枠の上下） |
 
 **標準の文字を基本にし、Lievre Term は利用者が選んだときだけ使います**（`LIEVRE_GLYPHS=lievre-term`）。Lievre Term に入れるのは、Unicode にない形だけにします。
 
@@ -222,13 +226,13 @@ OpenTUI に移るときに書き直すのは `src/ink` だけで、色と字の�
 
 試しの書体は、リポジトリにすでにある `@fontsource/ibm-plex-mono` の Latin の字（版 2.3）に、10字を足して作りました。配るときは PlemolJP（v3.1.0、2026-08-10）を元にするのがよいと考えます。日本語と罫線が入っていて、半角と全角がはじめから 1:2 だからです。
 
-ライセンスは、Plex も PlemolJP も OFL 1.1 です。予約されている名前「Plex」は使えないので、「Lievre Term」とします。PlemolJP の側で予約されている名前があるかは、配る前に確かめます。`scripts/wear/font.py`（`claude/kei-wear-age` の枝にある）と同じく fontTools で変形し、送り幅が1セルであることと、名前に「Plex」が入らないことを `font/build.py check` で検査します。
+ライセンスは、Plex も PlemolJP も OFL 1.1 です。予約されている名前「Plex」は使えないので、「Lievre Term」とします。PlemolJP の側で予約されている名前があるかは、配る前に確かめます。`scripts/wear/font.py`（`claude/lievre-wear-age` の枝にある）と同じく fontTools で変形し、送り幅が1セルであることと、名前に「Plex」が入らないことを `font/build.py check` で検査します。
 
-## 4. KEI の約束の移し方
+## 4. lievre の約束の移し方
 
 | 約束                   | 端末での守り方                                                                                                                                                                                                                                                                                       |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 読める大きさ           | 文字の大きさは利用者の端末が決めるので、アプリは変えない。KEI の側でできるのは、太字を見出しと主な操作だけに絞ること、薄い文字（`dim`）を使わないこと。薄い文字は、端末によって色が変わり、コントラストを保証できない                                                                                |
+| 読める大きさ           | 文字の大きさは利用者の端末が決めるので、アプリは変えない。lievre の側でできるのは、太字を見出しと主な操作だけに絞ること、薄い文字（`dim`）を使わないこと。薄い文字は、端末によって色が変わり、コントラストを保証できない                                                                             |
 | 色は役割で使う         | ウルトラマリン（`accent`）は「押せる・選んでいる」だけに使う。緑・黄・赤は状態だけ。状態は記号と言葉の両方で示す（`✓ 正常`・`! 注意`・`✕ 停止`）。16色では言葉は端末の文字の色のままにし、記号だけに色を付ける                                                                                       |
 | 面と線で階層をつくる   | truecolor と 256色では、カードの面（`surface`）と表の見出し（`surface-sunken`）を塗る。線は1セルの罫線で、`border-strong` を使う（Web の `border` は 1.3:1 と弱く、端末の細い線では面の差が潰れるため）。影は使わない。フォーカスは必ず見せる（`▏ ▕` か Lievre Term の輪、16色と色なしでも字で示す） |
 | 数値は比べられるように | 端末では英数字がもともと等幅なので、桁は右に揃えて、小数の桁数を固定するだけで揃う。単位は見出しに書く（`平均（秒）`）。増減は言葉でも書く（`前月より 4.2% 増`）                                                                                                                                     |
@@ -247,19 +251,19 @@ OpenTUI に移るときに書き直すのは `src/ink` だけで、色と字の�
 
 ### 色の段階
 
-| 段階      | 判定                                    | 描き方                                                                                                                                                                                         |
-| --------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| truecolor | `COLORTERM=truecolor` か `24bit`        | Web と同じ値。Web と同じ組み合わせを、同じ基準（文字 4.5、部品と輪郭 3）で検査する                                                                                                             |
-| 256色     | `TERM` に `256` を含む                  | 16〜255番だけを使う（0〜15番は利用者のテーマで値が変わる）。まず面の色をいちばん近い色に落とす。次に、前景の色を「組む背景のすべてに対して基準を満たす中で、OKLab でいちばん近い色」に落とす   |
-| 16色      | それ以外の端末                          | 値が分からないので、KEI は面を塗らない。文字は端末の色のまま。主なボタンは反転表示（コントラストは利用者の文字と背景そのもの）、ほかのボタンは下線。色は状態の記号とフォーカスの輪だけに付ける |
-| 色なし    | `NO_COLOR`、`TERM=dumb`、端末でない出力 | 色を付けない。太字・下線・反転は残す                                                                                                                                                           |
+| 段階      | 判定                                    | 描き方                                                                                                                                                                                            |
+| --------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| truecolor | `COLORTERM=truecolor` か `24bit`        | Web と同じ値。Web と同じ組み合わせを、同じ基準（文字 4.5、部品と輪郭 3）で検査する                                                                                                                |
+| 256色     | `TERM` に `256` を含む                  | 16〜255番だけを使う（0〜15番は利用者のテーマで値が変わる）。まず面の色をいちばん近い色に落とす。次に、前景の色を「組む背景のすべてに対して基準を満たす中で、OKLab でいちばん近い色」に落とす      |
+| 16色      | それ以外の端末                          | 値が分からないので、lievre は面を塗らない。文字は端末の色のまま。主なボタンは反転表示（コントラストは利用者の文字と背景そのもの）、ほかのボタンは下線。色は状態の記号とフォーカスの輪だけに付ける |
+| 色なし    | `NO_COLOR`、`TERM=dumb`、端末でない出力 | 色を付けない。太字・下線・反転は残す                                                                                                                                                              |
 
 `NO_COLOR` と `FORCE_COLOR` が両方あるときは、次の順に判断します（`src/core/palette.ts` の `detectLevel()`）。
 
 - `FORCE_COLOR=0`・`1`・`2`・`3` のように段階まで指定されていれば、それに従う。
 - そうでなければ、`NO_COLOR` が優先する。
 
-chalk は `FORCE_COLOR` を優先するので、KEI が段階を決めたあとで `chalk.level` を上書きします。
+chalk は `FORCE_COLOR` を優先するので、lievre が段階を決めたあとで `chalk.level` を上書きします。
 
 256色に落とした結果は、Paper と Ink の両方で、16の組み合わせがすべて基準を満たしました（`spikes/tui/out/contrast.md`）。表の選んだ行には状態の言葉も載るので、状態の色と選んだ行の組も検査します。Paper の黄（`warning`）は、この組を満たすために、茶に近い `#875F00` ではなくオリーブの `#5F5F00` に落ちます。Ink の面（`#11143A`）は、近い色がない紺なので、灰色の `#1C1C1C` になります。色みが変わる点は、トークンの側で256色向けの値を指定できるようにするかを、あとで決めます。
 
@@ -272,22 +276,22 @@ Paper は明るい背景の端末に、Ink は暗い背景の端末に当てま�
 3. `COLORFGBG` を見る。
 4. どれも分からなければ Paper にする。
 
-KEI が塗るのは自分の面（カード・表・ボタン）の中だけです。面の外の文字は端末の色のままにします。こうすると、テーマの判定を誤っても、面の外の読みやすさは損なわれません。面の中は KEI の値どうしで検査済みです。
+lievre が塗るのは自分の面（カード・表・ボタン）の中だけです。面の外の文字は端末の色のままにします。こうすると、テーマの判定を誤っても、面の外の読みやすさは損なわれません。面の中は lievre の値どうしで検査済みです。
 
 ### スクリーンリーダー
 
 端末の画面を読む人は、VoiceOver と Terminal.app、NVDA と Windows Terminal などを使っています。どれも画面の文字をそのまま読むので、画面全体を描き直す TUI は読みにくくなります。
 
-- Ink の `INK_SCREEN_READER=true`（`isScreenReaderEnabled`）では、枠を描かずに、役割と状態を添えた線形の出力にする（`spikes/tui/out/screen-reader.txt`）。KEI の部品は `aria-role` と `aria-state` を必ず持つ。
+- Ink の `INK_SCREEN_READER=true`（`isScreenReaderEnabled`）では、枠を描かずに、役割と状態を添えた線形の出力にする（`spikes/tui/out/screen-reader.txt`）。lievre の部品は `aria-role` と `aria-state` を必ず持つ。
 - 罫線のような飾りは `aria-hidden` にする。読ませると「罫線 横」が何十回も続く。
 - 表の Box に `aria-label` を付けると、Ink はラベルだけを読み、中の行を読まない。そのため表にはラベルを付けず、見出しの行を読ませる。
 - フォーカスしている部品の位置に、端末のカーソルを置く（Ink の `useCursor`）。画面拡大や点字ディスプレイは、カーソルを追うものが多い。試作ではまだ置いていない。
 - 状態は言葉で書き、記号だけにしない。回る印（スピナー）で行を何度も描き直さず、終わったら1行で結果を書く。
-- Ink の `aria-state` には「フォーカス中」がなく、`selected` で代用した（「(selected) 保存する」と出る）。Ink に提案するか、KEI の側で言葉を足すかを、あとで決める。
+- Ink の `aria-state` には「フォーカス中」がなく、`selected` で代用した（「(selected) 保存する」と出る）。Ink に提案するか、lievre の側で言葉を足すかを、あとで決める。
 
 ## 試作で分かったこと
 
-- Ink 8 の Box は、`borderStyle` に自前の字の組を、`borderBackgroundColor` と `backgroundColor` に面の色を受け取る。KEI の Card はそのまま書けた。
+- Ink 8 の Box は、`borderStyle` に自前の字の組を、`borderBackgroundColor` と `backgroundColor` に面の色を受け取る。lievre の Card はそのまま書けた。
 - `renderToString` で、端末なしに ANSI の出力を作れる。スナップショットのテストに使える。
 - xterm.js の DOM の描画は、全角の字の幅が書体によって変わると、後ろの字を押し出す。WebGL の描画は格子を守る。スクリーンショットは WebGL の描画で撮った。
 - 書体で描いた罫線は、WebGL の描画でもセルの境目に薄い継ぎ目が出る。枠を標準の罫線のままにする理由の1つ。
@@ -296,6 +300,6 @@ KEI が塗るのは自分の面（カード・表・ボタン）の中だけで�
 
 - `scripts/build-tokens.mjs` で `tokens/terminal.json` を書き出し、256色の値をテストで検査する。
 - 上の「移す手順」に沿って、ワークスペースへの移行と改名を、別々の PR で行う。
-- 曖昧な文字を2セルとして数える幅の計算を、Ink に提案するか、KEI の側で包むかを決める。
+- 曖昧な文字を2セルとして数える幅の計算を、Ink に提案するか、lievre の側で包むかを決める。
 - Lievre Term を PlemolJP から作り、ボタンの端とフォーカスの輪だけを入れて配るかを決める。
 - 実機の端末（Terminal.app、iTerm2、WezTerm、Windows Terminal）と、スクリーンリーダー（VoiceOver、NVDA）で確かめる。今回は xterm.js でしか描いていない。

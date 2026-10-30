@@ -5,10 +5,10 @@ export const palette: { group: string; swatches: Swatch[] }[] = [
   {
     group: '面',
     swatches: [
-      { token: '--k-bg', name: '作業面', paper: '#F3F4F8', ink: '#0B0D26', use: '画面の地' },
-      { token: '--k-surface', name: '面', paper: '#FBFBFD', ink: '#11143A', use: 'カード・表' },
+      { token: '--lv-bg', name: '作業面', paper: '#F3F4F8', ink: '#0B0D26', use: '画面の地' },
+      { token: '--lv-surface', name: '面', paper: '#FBFBFD', ink: '#11143A', use: 'カード・表' },
       {
-        token: '--k-surface-sunken',
+        token: '--lv-surface-sunken',
         name: '凹んだ面',
         paper: '#E8EAF2',
         ink: '#070920',
@@ -19,16 +19,16 @@ export const palette: { group: string; swatches: Swatch[] }[] = [
   {
     group: '文字と線',
     swatches: [
-      { token: '--k-text', name: '文字', paper: '#121640', ink: '#ECEEFE', use: '本文・見出し' },
+      { token: '--lv-text', name: '文字', paper: '#121640', ink: '#ECEEFE', use: '本文・見出し' },
       {
-        token: '--k-muted',
+        token: '--lv-muted',
         name: '補助文字',
         paper: '#4A5070',
         ink: '#B4B9DC',
         use: '説明・ラベル',
       },
       {
-        token: '--k-border-strong',
+        token: '--lv-border-strong',
         name: '操作の輪郭',
         paper: '#7C83A4',
         ink: '#6F77B2',
@@ -40,14 +40,14 @@ export const palette: { group: string; swatches: Swatch[] }[] = [
     group: '操作',
     swatches: [
       {
-        token: '--k-accent',
+        token: '--lv-accent',
         name: 'ウルトラマリン',
         paper: '#2424D8',
         ink: '#A9B1FF',
         use: '主要操作・選択・リンク',
       },
       {
-        token: '--k-selected',
+        token: '--lv-selected',
         name: '選択の面',
         paper: '#D5D8FB',
         ink: '#2E358C',
@@ -58,10 +58,16 @@ export const palette: { group: string; swatches: Swatch[] }[] = [
   {
     group: '状態',
     swatches: [
-      { token: '--k-success', name: '正常', paper: '#0B6B58', ink: '#7DD6BF', use: '稼働中・完了' },
-      { token: '--k-warning', name: '注意', paper: '#7E5400', ink: '#EEC46A', use: '要確認' },
-      { token: '--k-danger', name: '危険', paper: '#B3261E', ink: '#FF9E91', use: 'エラー・削除' },
-      { token: '--k-info', name: '情報', paper: '#2A4AA6', ink: '#A0B9FF', use: 'お知らせ' },
+      {
+        token: '--lv-success',
+        name: '正常',
+        paper: '#0B6B58',
+        ink: '#7DD6BF',
+        use: '稼働中・完了',
+      },
+      { token: '--lv-warning', name: '注意', paper: '#7E5400', ink: '#EEC46A', use: '要確認' },
+      { token: '--lv-danger', name: '危険', paper: '#B3261E', ink: '#FF9E91', use: 'エラー・削除' },
+      { token: '--lv-info', name: '情報', paper: '#2A4AA6', ink: '#A0B9FF', use: 'お知らせ' },
     ],
   },
 ];
@@ -85,7 +91,7 @@ export function ColorFoundation() {
                 <strong>{s.name}</strong>
                 <span>{s.use}</span>
                 <code>{s.token}</code>
-                <span className="swatch-values k-mono">
+                <span className="swatch-values lv-mono">
                   {s.paper} / {s.ink}
                 </span>
               </div>
@@ -102,13 +108,13 @@ export function ColorFoundation() {
 }
 
 const typeScale = [
-  { token: '--k-text-3xl', size: 36, use: '大きな数値・ページ見出し' },
-  { token: '--k-text-2xl', size: 28, use: 'ページ見出し' },
-  { token: '--k-text-xl', size: 22, use: 'セクション見出し' },
-  { token: '--k-text-lg', size: 18, use: 'リード文' },
-  { token: '--k-text-base', size: 16, use: '本文（標準）' },
-  { token: '--k-text-md', size: 14, use: '本文（操作画面）・ボタン' },
-  { token: '--k-text-xs', size: 12, use: '補助・注記' },
+  { token: '--lv-text-3xl', size: 36, use: '大きな数値・ページ見出し' },
+  { token: '--lv-text-2xl', size: 28, use: 'ページ見出し' },
+  { token: '--lv-text-xl', size: 22, use: 'セクション見出し' },
+  { token: '--lv-text-lg', size: 18, use: 'リード文' },
+  { token: '--lv-text-base', size: 16, use: '本文（標準）' },
+  { token: '--lv-text-md', size: 14, use: '本文（操作画面）・ボタン' },
+  { token: '--lv-text-xs', size: 12, use: '補助・注記' },
 ];
 
 export function TypeFoundation() {
@@ -118,8 +124,8 @@ export function TypeFoundation() {
         <h2>文字</h2>
         <p>
           本文は16pxで行の高さ28px。操作画面では <code>typography="interface"</code>{' '}
-          で14px・24pxにします。行の高さは <code>--k-line-body</code>（約1.7倍）と{' '}
-          <code>--k-line-tight</code>
+          で14px・24pxにします。行の高さは <code>--lv-line-body</code>（約1.7倍）と{' '}
+          <code>--lv-line-tight</code>
           （約1.45倍）で、どの大きさでも4pxの倍数に丸めます。表示密度を変えても文字の大きさは変えません。書体は
           IBM Plex Sans JP と IBM Plex Mono の2つです。
         </p>
@@ -131,7 +137,7 @@ export function TypeFoundation() {
               日々の作業を、読みやすく
             </span>
             <span className="type-scale-meta">
-              <strong className="k-tabular">{t.size}px</strong>
+              <strong className="lv-tabular">{t.size}px</strong>
               <span>{t.use}</span>
               <code>{t.token}</code>
             </span>
@@ -149,13 +155,13 @@ export function TypeFoundation() {
         </div>
         <div>
           <h3>データ</h3>
-          <p className="type-figure k-mono">
+          <p className="type-figure lv-mono">
             99.2<small>%</small> 14:05
           </p>
           <p>
-            数値・時刻・ID・コードは IBM Plex Mono（<code>.k-mono</code>
+            数値・時刻・ID・コードは IBM Plex Mono（<code>.lv-mono</code>
             ）。英数字と日本語の幅を 1:2 に揃え、端末と同じように桁が並びます。文中の数値は{' '}
-            <code>.k-tabular</code> で桁だけ揃えます。
+            <code>.lv-tabular</code> で桁だけ揃えます。
           </p>
         </div>
       </div>
@@ -175,9 +181,9 @@ export function SpaceFoundation() {
       <div className="spacing-scale">
         {[1, 2, 3, 4, 6, 8, 12].map((n) => (
           <div key={n}>
-            <code>--k-space-{n}</code>
-            <span style={{ width: `var(--k-space-${n})` }} />
-            <small className="k-tabular">{n * 4}px</small>
+            <code>--lv-space-{n}</code>
+            <span style={{ width: `var(--lv-space-${n})` }} />
+            <small className="lv-tabular">{n * 4}px</small>
           </div>
         ))}
       </div>
@@ -188,10 +194,10 @@ export function SpaceFoundation() {
           { token: 'lg', px: 8, use: 'カード・ダイアログ' },
         ].map((r) => (
           <div key={r.token}>
-            <span style={{ borderRadius: `var(--k-radius-${r.token})` }} />
+            <span style={{ borderRadius: `var(--lv-radius-${r.token})` }} />
             <div>
               <strong>
-                <code>--k-radius-{r.token}</code> <span className="k-tabular">{r.px}px</span>
+                <code>--lv-radius-{r.token}</code> <span className="lv-tabular">{r.px}px</span>
               </strong>
               <p>{r.use}</p>
             </div>
@@ -266,7 +272,7 @@ export function ReferenceDirection() {
       <div className="reference-directions">
         {[
           {
-            category: 'UI・計器',
+            category: 'UI・メーター',
             count: 22,
             from: '円形ゲージ、細い目盛り、大きな数値、物理的な操作部。',
             to: 'Meter・Metric・Progress と、輪郭のはっきりしたボタン。',
@@ -307,7 +313,7 @@ export function ReferenceDirection() {
       <p className="foundation-note">
         影響の大きかった参考：
         <a href="https://jp.pinterest.com/pin/124904589661738327/" target="_blank" rel="noreferrer">
-          計器カード群
+          メーターのカード群
         </a>
         、
         <a href="https://jp.pinterest.com/pin/124904589661738326/" target="_blank" rel="noreferrer">
