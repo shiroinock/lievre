@@ -44,7 +44,7 @@ npm にはまだどちらの名前も公開していないので、移る必要�
 - 質感の焼き込みで使う Python を指定する変数は `KEI_WEAR_PYTHON` から `LIEVRE_WEAR_PYTHON` に、`KEI_WEAR_ROUGH` などは `LIEVRE_WEAR_ROUGH` などになりました。
 - 焼き込んだ書体（`packages/react/wear-fonts/`、git に入れていない）は、書体の名前が変わったので `npm run wear:font` で作り直してください。作り直すまで `npm test` の書体の検査が失敗します。
 - stylelint の独自のルールは `lievre/spacing-grid` などになりました。行ごとに外すときは `/* stylelint-disable-next-line lievre/spacing-grid -- 理由 */` と書きます。
-- 改名し損ねは `npm test`（`packages/react/src/test/naming.test.tsx`）が止めます。古い名前を書いてよいのは、この文書、`lievre-migrate` とそのテスト、`no-legacy-prefix` のテスト、`docs/tui-foundation.md` の改名の計画、ベンチマークの過去の結果だけです。
+- 改名し損ねは `npm test`（`packages/react/src/test/naming.test.tsx`）が止めます。git に入れる前の新しいファイルも見ます。古い名前を書いてよいのは、この文書、`lievre-migrate` とそのテスト、`no-legacy-prefix`（`lint/index.js`・`lint/biome/no-legacy-prefix.grit`）とそのテスト、`docs/tui-foundation.md` の改名の計画、ベンチマークの過去の結果、lockfile だけです。理由はファイルごとに検査の例外の一覧に書いています。
 
 ## 古い名前を残す移行の期間（案）
 
