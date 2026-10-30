@@ -6,7 +6,7 @@
 
 ## 結論
 
-**Downshift を Combobox の土台にし、一覧の枠（ポップアップ）は Radix の Popover にする。日付は `@internationalized/date` で計算し、DatePicker の画面の部分は KEI で作る。** React Aria と Ariakit は採りません。
+**Downshift を Combobox の土台にし、一覧の枠（ポップアップ）は Radix の Popover にする。日付は `@internationalized/date` で計算し、DatePicker の画面の部分は lievre で作る。** React Aria と Ariakit は採りません。
 
 - 足す依存がいちばん小さい（gzip で +9KB。Radix の Popover を足しても +11KB）。
 - Downshift は状態・キーボード・ARIA だけを持ち、重なりを持たない。枠を Radix の Popover にすると、Esc・外側を押したとき・ポインターの通り方・重なりの順序が、Select や Dialog と同じ仕組み（Radix の DismissableLayer）に乗る。試作では、Dialog の中で使っても Select と同じに動いた。
@@ -22,28 +22,28 @@ React Aria は DatePicker と和暦まで持つ点が有力でしたが、自前
 - 候補の絞り込み。ひらがな・カタカナ・全角半角・大文字小文字の違いを無視する（NFKC にしてからカタカナをひらがなにする）。候補には読み（`kana`）を持たせ、漢字の社名も読みで探せる。
 - キーボード（矢印・Home / End・Enter・Esc・Tab）。
 - IME の変換中は、絞り込みも確定もしない。
-- ポップアップは `PortalSurface` の中に出してテーマを引き継ぐ。見た目は kei.css の Select と同じ値（1px の線と面、フォーカスの輪郭）。
+- ポップアップは `PortalSurface` の中に出してテーマを引き継ぐ。見た目は lievre.css の Select と同じ値（1px の線と面、フォーカスの輪郭）。
 
-枠は2通りを試しました。土台そのものの枠（React Aria の Popover、Ariakit の ComboboxPopover、Downshift は floating-ui と `createPortal`）と、Radix の Popover を枠にしたもの（`+radix`）です。比べる基準として、同じ操作を KEI の Select（Radix）にも流しました。
+枠は2通りを試しました。土台そのものの枠（React Aria の Popover、Ariakit の ComboboxPopover、Downshift は floating-ui と `createPortal`）と、Radix の Popover を枠にしたもの（`+radix`）です。比べる基準として、同じ操作を lievre の Select（Radix）にも流しました。
 
-3つの土台に共通の部分は `spikes/combobox/src/shared.tsx` に置きました。KEI に入れるときも、ここは土台によらず KEI の側で持つ部分です（正規化、IME の守り、PortalSurface の入れ物、Radix の枠）。
+3つの土台に共通の部分は `spikes/combobox/src/shared.tsx` に置きました。lievre に入れるときも、ここは土台によらず lievre の側で持つ部分です（正規化、IME の守り、PortalSurface の入れ物、Radix の枠）。
 
 ## 2. 依存の大きさ
 
-今の KEI のライブラリ（`packages/react/src/library.ts`、react を外に出し、本番のビルド）に足したときの増分です。`npm run size`（`spikes/combobox/scripts/size.mjs`）で測りました。radix-ui の中身と同じパッケージ（floating-ui など）は、実際のライブラリと同じく1つにまとめています。
+今の lievre のライブラリ（`packages/react/src/library.ts`、react を外に出し、本番のビルド）に足したときの増分です。`npm run size`（`spikes/combobox/scripts/size.mjs`）で測りました。radix-ui の中身と同じパッケージ（floating-ui など）は、実際のライブラリと同じく1つにまとめています。
 
 | 足すもの                                           | gzip の増分 | 新しく入るパッケージ                                                                     |
 | -------------------------------------------------- | ----------: | ---------------------------------------------------------------------------------------- |
 | Downshift（`useCombobox`）                         |     +9.1 KB | 9（downshift、@babel/runtime、prop-types など。tslib は radix-ui と共有）                |
 | Radix の Popover（枠）                             |     +1.9 KB | 0（radix-ui に入っている。Popper・DismissableLayer は Select・Tooltip と共有）           |
-| Downshift の試作の部品（KEI の層・枠を含む）       |    +13.0 KB | —                                                                                        |
+| Downshift の試作の部品（lievre の層・枠を含む）    |    +13.0 KB | —                                                                                        |
 | Ariakit（Combobox の部品一式）                     |    +42.7 KB | 8（@ariakit の7つと use-sync-external-store。floating-ui は radix-ui と共有）            |
 | React Aria（ComboBox の部品一式）                  |    +69.1 KB | 11（react-aria、react-stately、@internationalized の3つなど。aria-hidden・tslib は共有） |
 | React Aria（日本語の文言だけに絞った場合）         |    +62.6 KB | 公式のプラグイン（@react-aria/optimize-locales-plugin）を使う                            |
 | React Aria の ComboBox と DatePicker（日本語だけ） |   +103.1 KB | —                                                                                        |
 | `@internationalized/date`（日付の計算・和暦）だけ  |     +5.0 KB | 2（@internationalized/date、@swc/helpers）                                               |
 
-基準の KEI のライブラリは gzip で 59.9KB です。React Aria の ComboBox だけで、今の KEI と同じくらいの大きさが足されます。
+基準の lievre のライブラリは gzip で 59.9KB です。React Aria の ComboBox だけで、今の lievre と同じくらいの大きさが足されます。
 
 ## 3. 操作を Select・Dialog と揃えられるか
 
@@ -67,7 +67,7 @@ React Aria は DatePicker と和暦まで持つ点が有力でしたが、自前
 
 一覧の枠を Radix の Popover にすると、Radix が重なりを1つの積み重ねとして扱うので、すべて Select と同じになりました（Esc は上の重なりから順に閉じる、ポインターは一番上の重なりに届く、外側の判定も重なりを知っている）。Ariakit と Downshift は、開閉の状態を自分で持てるので、枠だけを差し替えられます。
 
-React Aria は差し替えられませんでした。React Aria の ComboBox は、開くときに一瞬だけ候補へフォーカスを移し、入力欄の blur で「フォーカスが自前の Popover の外へ出たか」を見て閉じます。Radix の枠には React Aria の Popover がないので、開いた直後に閉じます。揃えるには、KEI の Dialog の側で React Aria の重なりを特別に扱う（Esc・外側の判定・`pointer-events`・`aria-hidden`）か、react-aria の hooks（`useComboBox`）から組み直す必要があります。React Aria の DatePicker のカレンダーも、同じ問題を持ちます。
+React Aria は差し替えられませんでした。React Aria の ComboBox は、開くときに一瞬だけ候補へフォーカスを移し、入力欄の blur で「フォーカスが自前の Popover の外へ出たか」を見て閉じます。Radix の枠には React Aria の Popover がないので、開いた直後に閉じます。揃えるには、lievre の Dialog の側で React Aria の重なりを特別に扱う（Esc・外側の判定・`pointer-events`・`aria-hidden`）か、react-aria の hooks（`useComboBox`）から組み直す必要があります。React Aria の DatePicker のカレンダーも、同じ問題を持ちます。
 
 ### 画面の上での違い
 
@@ -82,12 +82,12 @@ React Aria は差し替えられませんでした。React Aria の ComboBox は
 | PortalSurface・テーマ | ○                              | ○                                              | ○                       | ○                      |
 
 - Select は「選ぶだけ」のモーダルな一覧で、Combobox は入力欄にフォーカスを残す一覧です。外側を押したときの押した物への届き方と、Tab の扱いは、Combobox では Radix の Popover と同じ（押した物にも届く、Tab で次へ）にします。ARIA の Combobox の型（APG）も同じです。
-- Downshift の Esc（1回目は閉じる、2回目は文字を消す）は APG と同じです。React Aria の「入力を戻す」と Ariakit の「何もしない」は、KEI の層で揃える必要があります。
+- Downshift の Esc（1回目は閉じる、2回目は文字を消す）は APG と同じです。React Aria の「入力を戻す」と Ariakit の「何もしない」は、lievre の層で揃える必要があります。
 - React Aria の Home / End は、末尾・先頭の候補へ移ったあと画面が少しスクロールし（試作では 16px）、React Aria の「スクロールしたら閉じる」で一覧が閉じました。既定の動きを止めていないためと見られます。ダイアログの中（スクロールが止まっている）では起きません。
 
 ## 4. IME の扱い
 
-KEI の層で、次の守りを入れました（`useImeGuard`）。3つの土台とも、守りがあればすべての確認に通りました。
+lievre の層で、次の守りを入れました（`useImeGuard`）。3つの土台とも、守りがあればすべての確認に通りました。
 
 - 絞り込みは確定した文字でだけ行う。変換中の文字は入力欄に出すが、候補は変えない。
 - 変換中のキー（`isComposing`、または `keyCode` が 229）は、土台に渡さない。Chrome は確定の Enter を `isComposing=true` で送り、Safari は `compositionend` のあとに `isComposing=false`・`keyCode=229` の Enter を送るので、両方を見る。
@@ -103,11 +103,11 @@ KEI の層で、次の守りを入れました（`useImeGuard`）。3つの土�
 | 確定の Enter で選ばない（Safari の順） | × 入力した文字が消える | ○       | ○         |
 | 変換中の Esc で一覧を閉じない          | ○                      | ×       | ×         |
 
-- どの土台も変換中に絞り込むので、守りは土台によらず KEI の層で要ります。
+- どの土台も変換中に絞り込むので、守りは土台によらず lievre の層で要ります。
 - React Aria と Ariakit は `isComposing` を見ますが、`keyCode` 229 は見ません。React Aria は Safari の順で、確定の Enter を「候補を選ばずに確定」と受け取り、入力した文字を消しました。
 - Downshift は変換中かどうかを何も見ません。守りで補います。
 
-Chromium の IME の経路（CDP の `Input.imeSetComposition`。イベントはブラウザ自身が出す）でも確かめました（[spikes/combobox/test/ime-cdp.md](../spikes/combobox/test/ime-cdp.md)）。ここで Downshift の注意点が1つ見つかりました。**`inputValue` を外から制御すると、変換中の値の書き戻しが1回遅れて変換の範囲が崩れ、入力欄が「ととうとうきょう東京」のように重なります。** `inputValue` を Downshift に持たせ、絞り込みの文字は `onInputValueChange` で受け取る形にすると直りました。KEI の部品ではこの形に決め、Chromium の IME の経路の検査で止めます。
+Chromium の IME の経路（CDP の `Input.imeSetComposition`。イベントはブラウザ自身が出す）でも確かめました（[spikes/combobox/test/ime-cdp.md](../spikes/combobox/test/ime-cdp.md)）。ここで Downshift の注意点が1つ見つかりました。**`inputValue` を外から制御すると、変換中の値の書き戻しが1回遅れて変換の範囲が崩れ、入力欄が「ととうとうきょう東京」のように重なります。** `inputValue` を Downshift に持たせ、絞り込みの文字は `onInputValueChange` で受け取る形にすると直りました。lievre の部品ではこの形に決め、Chromium の IME の経路の検査で止めます。
 
 OS の日本語入力を使った手での確認は、この試作ではしていません（[9](#9-残っている確認)）。
 
@@ -121,7 +121,7 @@ OS の日本語入力を使った手での確認は、この試作ではして�
 | 候補の数の読み上げ（live region）      | ○「1 個のオプションを利用できます。」                             | × なし             | × なし               |
 | axe の指摘（一覧を開いた状態）         | `aria-hidden-focus`（一覧の外を隠すが、外の欄にフォーカスが届く） | なし               | なし                 |
 
-- 候補の数を読み上げるのは React Aria だけでした。Ariakit・Downshift では、KEI の層で live region（「3件の候補があります」など）を足します。
+- 候補の数を読み上げるのは React Aria だけでした。Ariakit・Downshift では、lievre の層で live region（「3件の候補があります」など）を足します。
 - React Aria と Select は、開いている間、一覧の外を `aria-hidden` にします。Combobox は入力欄にフォーカスを残す部品なので、外を隠さない（Radix の Popover の非モーダルと同じ）ほうが合います。
 - VoiceOver での確認はしていません（[9](#9-残っている確認)）。
 
@@ -155,8 +155,8 @@ DatePicker・DateRangePicker・Calendar を持ち、`@internationalized/date` �
 - 有力だった点：Combobox と DatePicker の両方を持ち、和暦・日本語の読み上げの文言・`isComposing` の扱いまでそろっている。保守も活発（Adobe、react-aria-components は過去12か月で12回の公開）。
 - 採らない理由：
   - 自前の重なりの仕組み（Popover・FocusScope・外を `aria-hidden` にする）を持ち、Radix の Dialog の中で Esc がダイアログを閉じ、候補をポインターで押せない。部品の単位では枠を Radix に差し替えられない（[3](#3-操作を-selectdialog-と揃えられるか)）。揃えるには Dialog などの Radix の部品の側を React Aria に合わせて直すことになり、「すでに radix-ui にある部品を置き換えない」「範囲を限る」に反する。
-  - いちばん大きい（ComboBox で +69KB、DatePicker と合わせて日本語だけでも +103KB。今の KEI のライブラリは 60KB）。
-  - Home / End で画面が動いて閉じる、Safari の順の確定の Enter で入力が消えるなど、KEI の層で直す点が残る。
+  - いちばん大きい（ComboBox で +69KB、DatePicker と合わせて日本語だけでも +103KB。今の lievre のライブラリは 60KB）。
+  - Home / End で画面が動いて閉じる、Safari の順の確定の Enter で入力が消えるなど、lievre の層で直す点が残る。
 
 ### Ariakit
 
@@ -171,13 +171,13 @@ DatePicker・DateRangePicker・Calendar を持ち、`@internationalized/date` �
 
 - 採る理由：いちばん小さく（+9KB）、状態・キーボード・ARIA だけを持つので、重なりは全部 Radix に任せられる。Select と同じ DismissableLayer に乗るので、操作の統一感が作りの上で保たれる。キーボードの動きも Select にいちばん近い。MIT、React 19 に対応（peer は `react >=16.12.0`）。
 - 引き受けること：
-  - IME は何も見ないので、KEI の層の守り（[4](#4-ime-の扱い)）が要る。守りはどの土台でも要るので、余分の手間ではない。
+  - IME は何も見ないので、lievre の層の守り（[4](#4-ime-の扱い)）が要る。守りはどの土台でも要るので、余分の手間ではない。
   - `inputValue` を制御しない形に決める（制御すると変換が崩れる）。
-  - 候補の数の読み上げ（live region）を KEI の層で足す。
+  - 候補の数の読み上げ（live region）を lievre の層で足す。
   - 開発の速さは3つの中でいちばん遅い（過去6か月のコミットは9件、最後の公開は 2026年6月30日の 9.4.0）。成熟して API が落ち着いているとも言える。prop-types など古い依存が付いてくる（本番のビルドでは小さい）。
   - 位置合わせは Radix の Popover に任せるので、floating-ui を直接の依存にしない。
 
-## 8. KEI に入れるときの作り
+## 8. lievre に入れるときの作り
 
 試作の `shared.tsx` を、次の形で本体に入れます。
 
@@ -185,7 +185,7 @@ DatePicker・DateRangePicker・Calendar を持ち、`@internationalized/date` �
 - **正規化**：`normalize`（NFKC → カタカナをひらがな → 小文字 → 空白を除く）を関数として書き出し、Format や検索欄でも使う。候補には読み（`kana`）を持たせられるようにする。
 - **IME の守り**：`useImeGuard` を、Combobox のほか、SearchField・DatePicker の年月日の欄にも使う。
 - **枠の約束**：入力欄にフォーカスを残す部品の枠は、Radix の Popover に次を付ける。開閉でフォーカスを動かさない（`onOpenAutoFocus`・`onCloseAutoFocus` を止める）、入力欄と一覧の中は「外側」にしない、変換中の Esc では閉じない。
-- **見た目**：一覧は Select と同じ値（`.k-select-content`・`.k-select-item`）。z-index は Dialog の上（試作では 110）にする。今の候補の印は、試作では土台ごとに属性の名前が違った（`data-focused`・`data-active-item`・`data-highlighted`）ので、KEI の部品では `data-highlighted` に揃える。
+- **見た目**：一覧は Select と同じ値（`.lv-select-content`・`.lv-select-item`）。z-index は Dialog の上（試作では 110）にする。今の候補の印は、試作では土台ごとに属性の名前が違った（`data-focused`・`data-active-item`・`data-highlighted`）ので、lievre の部品では `data-highlighted` に揃える。
 - **共通の操作の検査**：`test/behavior.mjs` の操作（矢印・Home / End・Enter・Esc・Tab・外側を押す・ポインターで選ぶ・Dialog の中・IME の2つの順・テーマ）を、`packages/react/src/test` の検査として、開閉する部品（Select・Combobox・DatePicker・DropdownMenu・Popover）に共通に流す。土台の違う部品でも同じ検査を通すことが、約束の「検査で確かめる」になる。
 
 ## 9. 残っている確認
@@ -200,7 +200,7 @@ DatePicker・DateRangePicker・Calendar を持ち、`@internationalized/date` �
 
 試作の検査で、今の部品について2つ見つかりました。この作業では直していません。
 
-1. **Dialog の中の Select の候補を、ポインターで押せない。** `.k-select-content` の z-index（80）が、Dialog の幕（`.k-dialog-overlay` の 100）と本体（101）より下にあるため、一覧が幕の下に出ます（Chromium・WebKit とも。キーボードでは選べる）。Tooltip（90）も同じ段にあります。重なりの段（z-index）を、Dialog の中に出る物が上に来るように決め直す必要があります。
+1. **Dialog の中の Select の候補を、ポインターで押せない。** `.lv-select-content` の z-index（80）が、Dialog の幕（`.lv-dialog-overlay` の 100）と本体（101）より下にあるため、一覧が幕の下に出ます（Chromium・WebKit とも。キーボードでは選べる）。Tooltip（90）も同じ段にあります。重なりの段（z-index）を、Dialog の中に出る物が上に来るように決め直す必要があります。
 2. **Radix の Esc は変換中かどうかを見ない（要実機確認）。** Radix は document の capture で `key === 'Escape'` だけを見ます。変換の取り消しの Esc がこの形で来るブラウザでは、Dialog の中の入力欄で変換を取り消しただけで、ダイアログが閉じます。Dialog の `onEscapeKeyDown` で `isComposing` と `keyCode` 229 を見て止めれば直ります。
 
 ## 試作のためにダウンロードしたもの

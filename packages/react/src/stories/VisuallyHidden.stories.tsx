@@ -12,10 +12,10 @@ const meta = {
       parts: [
         {
           name: '隠した文字を含むボタン',
-          selector: '.k-button',
+          selector: '.lv-button',
           checks: ['inset-x', 'inset-y', 'control-height', { padding: 'button' }, 'fits'],
         },
-        { name: '表の枠', selector: '.k-table-wrap', checks: ['fits'] },
+        { name: '表の枠', selector: '.lv-table-wrap', checks: ['fits'] },
       ],
     } satisfies LayoutGate,
     docs: {
@@ -60,6 +60,6 @@ export const InRowActions: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('button', { name: /詳細\s*（W-1024）/ })).toBeVisible();
-    await expect(canvas.getByText('（W-1024）')).toHaveClass('k-sr-only');
+    await expect(canvas.getByText('（W-1024）')).toHaveClass('lv-sr-only');
   },
 };

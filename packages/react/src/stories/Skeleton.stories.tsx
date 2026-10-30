@@ -10,7 +10,7 @@ const meta = {
   component: Skeleton,
   parameters: {
     layoutGate: {
-      parts: [{ name: '仮表示', selector: '.k-skeleton', checks: ['grid-height'] }],
+      parts: [{ name: '仮表示', selector: '.lv-skeleton', checks: ['grid-height'] }],
     } satisfies LayoutGate,
     docs: {
       description: {

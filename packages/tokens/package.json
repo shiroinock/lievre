@@ -1,7 +1,7 @@
 {
-  "name": "@kei-design/tokens",
+  "name": "@lievre/tokens",
   "version": "0.2.0",
-  "description": "KEI のデザイントークン（CSS と Design Tokens 形式の JSON）",
+  "description": "lievre のデザイントークン（CSS と Design Tokens 形式の JSON）",
   "type": "module",
   "private": true,
   "sideEffects": [

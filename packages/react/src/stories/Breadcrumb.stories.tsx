@@ -21,7 +21,7 @@ const meta = {
       parts: [
         {
           name: 'パンくず',
-          selector: '.k-breadcrumb',
+          selector: '.lv-breadcrumb',
           checks: ['fits', { sameHeight: ':scope > li' }],
         },
       ],

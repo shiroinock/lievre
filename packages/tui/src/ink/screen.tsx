@@ -45,7 +45,7 @@ export function Screen({
   return (
     <Lievre.Provider value={{ p, g }}>
       <Box flexDirection="column" width={56} gap={1}>
-        {/* Outside KEI's surfaces the text keeps the terminal's own colors. */}
+        {/* Outside lievre's surfaces the text keeps the terminal's own colors. */}
         {caption && <Text bold>{caption}</Text>}
         <Card title="今月の処理">
           <Box flexDirection="column">

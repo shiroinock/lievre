@@ -5,8 +5,8 @@
 ## 使い方
 
 ```tsx
-<KeiProvider wear="baked">…</KeiProvider>
-<KeiProvider wear="live" wearSeed="ash">…</KeiProvider>
+<LievreProvider wear="baked">…</LievreProvider>
+<LievreProvider wear="live" wearSeed="ash">…</LievreProvider>
 ```
 
 | 段階    | 何をするか                                                                                                         | ブラウザでの計算                         |
@@ -17,7 +17,7 @@
 
 前の試作の `clean / worn` は、`off / baked` に置き換えました。強さは `wear.config.json` で決めます。live だけは `wearConfig` で上書きでき、調整画面がこれを使います。
 
-次の場合は、`KeiProvider` が段階を自動で下げます。JavaScript がないときのために、CSS のメディアクエリでも同じように切ります。
+次の場合は、`LievreProvider` が段階を自動で下げます。JavaScript がないときのために、CSS のメディアクエリでも同じように切ります。
 
 - `prefers-contrast: more` または強制カラーモード：`off`
 - `prefers-reduced-motion: reduce`：`live` を `baked` に下げる
@@ -39,20 +39,20 @@
   - `rules.css`：文字の種類（`TEXT_KINDS`）から決まる規則。どの要素にカスレとフィルタをかけるか。baked と live で共通です。
   - `wear.json`：設定と、画素のハッシュ。テストで、`wear.config.json` から生成し直した結果と一致するかを調べます。
 - WebP ではなく PNG（16階調のパレット）にしました。WebP を書き出すには外部の部品が必要で、PNG でも十分に小さいためです。
-- `npm run wear:font`：Plex Sans JP（400 / 500 / 600）と、KEI Mono の元になっている Plex Mono の英数字（latin、400 / 500 / 600）の、全ての字形を変形します。
+- `npm run wear:font`：Plex Sans JP（400 / 500 / 600）と、Lievre Mono の元になっている Plex Mono の英数字（latin、400 / 500 / 600）の、全ての字形を変形します。
   - 字の形（骨格）は動かさず、縁だけを荒らします（[scripts/wear/font.py](../packages/react/scripts/wear/font.py)）。
     1. 輪郭の曲線と直線を、`outline.step`（標準 12/1000em）ほどの長さの短い区間に分けます。
     2. 縁の荒れ：分けた点を、輪郭の法線の向きにだけ動かします。ノイズの波長は `outline.roughScale`（標準 26/1000em）と短く、量は `outline.rough`（標準 7/1000em）です。
     3. 太さのむら：波長の長い（`outline.swellScale`、標準 220/1000em）ノイズで、法線の向きに少しふくらませたり細らせたりします。量は `outline.swell`（標準 4/1000em）です。
     4. 動く量の上限を、いちばん細い画の太さに対して決めます。縁の荒れは 20%、太さのむらは 12%、合わせて 25% までです。細い画の太さは、Sans JP の「一」「三」などで測った値（400 で 66、600 で 113）をもとに、ウェイトごとに 60 / 85 / 100（Mono は 70 / 90 / 105）としました。濁点や句読点のように小さい輪郭は、大きさに合わせて動く量をさらに減らします。細い横画、濁点、句読点、0 や 8 の穴がつぶれたり消えたりしないようにするためです。
     - 点は `hash(ソルト + "glyph" + 字形名)` で決まるノイズで動かします。ヒンティングは外します。
-  - Sans JP と Mono には、同じソルトで、同じ強さの荒れをかけます。言葉と数値で、擦れ方がそろって見えるようにするためです。KEI Worn Mono にも、KEI Mono と同じ `size-adjust: 83.333%` と unicode-range を付けます。
+  - Sans JP と Mono には、同じソルトで、同じ強さの荒れをかけます。言葉と数値で、擦れ方がそろって見えるようにするためです。Lievre Worn Mono にも、Lievre Mono と同じ `size-adjust: 83.333%` と unicode-range を付けます。
   - 動かすのは字の輪郭だけで、送り幅（advance width）は変えません。英数字と日本語の幅が 1:2 になることと、表の桁がそろうことを保つためです。左の余白（lsb）は、動かした後の輪郭の左端に合わせ直します。合わせ直さないと、描画のときに字の原点がずれるためです。
   - `npm run wear:font` は、生成のたびに（キャッシュを使ったときも）、全てのファイルの全ての字形について、送り幅（横書きの hmtx と、あれば縦書きの vmtx）と字形の並びが元のフォントと一致するかを調べます。一致しなければ止まります。今のソルトでは、372ファイル・60,510字形が一致しました。わざと1字の幅を変えたファイルでは、検査が止まることも確かめました。
   - @fontsource と同じ unicode-range の区切り（ウェイトごとに123ファイル）のまま書き出します。ページは使う区切りだけを読み込みます。実際に使う文字だけに絞る方式は使っていません。
   - 字形の左の余白（lsb）が、動かした後の輪郭の左端と一致することも調べます。
   - 結果は、ソルト・`outline` の値・生成方法の版ごとに `wear-fonts/<ハッシュ>/` へキャッシュします（git の管理外）。3ウェイトで372ファイル・19.4MB（前の歪ませる方式では 5.0MB）、8コアで生成に65〜110秒かかりました。輪郭を細かく分けて点が増えるためです。`step` を長くすると軽くなります。2回目以降はキャッシュを使います。
-  - Python 3 と fontTools・brotli が必要なので（`npm run wear:setup` で入ります）、`npm run build` には入れていません。入っていない環境では、`'KEI Worn Sans'` が見つからず、普通の Plex で表示されます。worn フォントを使うのは、設定で「縁の荒れ」を入れた文字の種類（`distort`）だけです。
+  - Python 3 と fontTools・brotli が必要なので（`npm run wear:setup` で入ります）、`npm run build` には入れていません。入っていない環境では、`'Lievre Worn Sans'` が見つからず、普通の Plex で表示されます。worn フォントを使うのは、設定で「縁の荒れ」を入れた文字の種類（`distort`）だけです。
 
 ## 紙のヤケとスレ
 
@@ -101,12 +101,12 @@ npm run wear:tune
 ```
 
 - `npm run wear:setup` は、リポジトリの中に `.venv-wear/`（git の管理外）を作り、[scripts/wear/requirements.txt](../packages/react/scripts/wear/requirements.txt) の版（fontTools 4.55.3、brotli 1.1.0）を PyPI から入れます。uv があれば uv を、なければ `python3 -m venv` と pip を使います。何度実行しても同じ結果になります。
-- 焼き込みに使う Python は、`KEI_WEAR_PYTHON`、`.venv-wear/bin/python3`、`python3` の順に選びます（[scripts/wear/python.mjs](../packages/react/scripts/wear/python.mjs)）。`npm run wear:font` と、調整画面の「保存して焼き込む」「その場の焼き込み」で共通です。
+- 焼き込みに使う Python は、`LIEVRE_WEAR_PYTHON`、`.venv-wear/bin/python3`、`python3` の順に選びます（[scripts/wear/python.mjs](../packages/react/scripts/wear/python.mjs)）。`npm run wear:font` と、調整画面の「保存して焼き込む」「その場の焼き込み」で共通です。
 - 必要なモジュールがないときは、ターミナルにも調整画面にも「npm run wear:setup を実行してください」と出します。
 
 
 - スライダーで変えられる値：縁の荒れの量と細かさ、太さのむらの量と広さ、輪郭を分ける長さ、カスレの密度・しきい値・最も薄い点、汚れの濃さ、ヤケの強さ・届く深さ・むら・角の強さ・カードの縁のヤケ、スレの密度・強さ・折り目のスレ、ソルト。選んでいるテーマの色味（ヤケの色、スレの色、そのテーマでの強さ）も変えられます。文字の種類ごとに、縁を荒らすかどうかと、カスレの深さも変えられます。
-- 変えた値は「実行時（live）」の列にすぐ反映します。隣に「質感なし」「焼き込み（保存した値）」と「焼き込みの試し（今の値）」を並べます。「焼き込みの試し」は、開発サーバーが見本の文字に使う区切りだけを今の値で焼いて（約2秒）返すもので、保存しなくても焼き込みの見た目を確かめられます。見本は、12 / 14 / 16px の本文と見出し、KEI Mono の数値・ID・時刻、表、ボタン、入力欄、Metric、Meter です。テーマは4つから選べます。
+- 変えた値は「実行時（live）」の列にすぐ反映します。隣に「質感なし」「焼き込み（保存した値）」と「焼き込みの試し（今の値）」を並べます。「焼き込みの試し」は、開発サーバーが見本の文字に使う区切りだけを今の値で焼いて（約2秒）返すもので、保存しなくても焼き込みの見た目を確かめられます。見本は、12 / 14 / 16px の本文と見出し、Lievre Mono の数値・ID・時刻、表、ボタン、入力欄、Metric、Meter です。テーマは4つから選べます。
 - 読みやすさの目安を数値で出します（[src/wear/gauges.mjs](../packages/react/src/wear/gauges.mjs)）。
   - 縁の動き（px、上限で切った後の値）と、いちばん細い画（60/1000em）に対する割合。目安は20%まで、30%を超えると「超過」です。14px 未満の文字の縁を荒らすと「注意」にします。
   - カスレで5%以上薄くなる画素の割合。目安は15%まで、30%を超えると「超過」です。
@@ -114,7 +114,7 @@ npm run wear:tune
 - 「広い面で見る」で、幅いっぱいの見本を1枚の紙として表示します。端の近くに、サイドバーの文字と、表の端の列を置いています。
 
 ![調整画面の広い見本（Sepia、標準。Sepia はあとで不採用）](images/wear-sheet/tune-wide-sheet.jpg)
-- 小さい文字ほど控えめにする仕組みとして、文字の種類（`small` / `text` / `heading` / `figure` / `data`）ごとに、縁を荒らすかとカスレの深さを分けました。CSS では計算後の文字の大きさで要素を選べないので、型の段階（`k-text--small` など）で分けています。縁の動きは em 単位なので、px では小さい文字ほど少なく動きます。
+- 小さい文字ほど控えめにする仕組みとして、文字の種類（`small` / `text` / `heading` / `figure` / `data`）ごとに、縁を荒らすかとカスレの深さを分けました。CSS では計算後の文字の大きさで要素を選べないので、型の段階（`lv-text--small` など）で分けています。縁の動きは em 単位なので、px では小さい文字ほど少なく動きます。
 - 「保存して焼き込む」で、開発サーバーが `wear.config.json` を書き、`src/styles/wear/` を生成し直し、フォントの焼き込み（`npm run wear:font`）を始めます。この窓口は `vite` の開発サーバーにしかなく、同じ機械からの、同じオリジンのページからの要求だけを受け付けます。コントラストが 4.5:1 に届かない値は保存しません。
 - プリセットは3つです（[src/wear/presets.mjs](../packages/react/src/wear/presets.mjs)）。
 
@@ -147,10 +147,10 @@ npm run wear:tune
 
 ### フォントの位置の確かめ方
 
-調整の画面の「焼き込んだフォントの位置」で、普通の字と焼き込んだ字を 0.5em の目盛りの上に並べます。同時に、ブラウザで次のことを測ります（結果は `window.__keiWearFontCheck` にも置きます）。
+調整の画面の「焼き込んだフォントの位置」で、普通の字と焼き込んだ字を 0.5em の目盛りの上に並べます。同時に、ブラウザで次のことを測ります（結果は `window.__lievreWearFontCheck` にも置きます）。
 
 - 6種類の文字列 × 3ウェイト × 2書体で、幅の差が 0.01px 未満であること。
-- KEI Worn Mono で、かな1字の幅が英字1字のちょうど2倍であること。
+- Lievre Worn Mono で、かな1字の幅が英字1字のちょうど2倍であること。
 - 英数字36字の左の端が、平均でも最大でも、縁の動きの範囲でしか動かないこと（原点がずれていれば、全ての字が同じ向きにずれます）。
 
 標準の値では、幅の差は 0.000px、比は 2.000、左の端の動きは平均 −0.13px・最大 0.43px（64px のとき、許容 1.59px）でした。
@@ -163,13 +163,13 @@ npm run wear:tune
 ## ライセンス
 
 - IBM Plex は SIL Open Font License 1.1 で、「Plex」は予約されたフォント名（Reserved Font Name）です。[IBM/plex の LICENSE.txt](https://github.com/IBM/plex/blob/master/LICENSE.txt) の冒頭に「Copyright © 2017 IBM Corp. with Reserved Font Name "Plex"」とあることを確かめました（@fontsource が同梱している LICENSE にはこの一文がありません）。
-- そのため、変形したフォントは **KEI Worn Sans** と **KEI Worn Mono** という名前にしました。name テーブルからは、著作権表示（nameID 0）を除いて「Plex」を消しています。生成したフォルダには、変更点を書き添えた OFL の全文（`LICENSE.txt`）を置きます。OFL では、フォントだけを単体で販売することはできません。
+- そのため、変形したフォントは **Lievre Worn Sans** と **Lievre Worn Mono** という名前にしました。name テーブルからは、著作権表示（nameID 0）を除いて「Plex」を消しています。生成したフォルダには、変更点を書き添えた OFL の全文（`LICENSE.txt`）を置きます。OFL では、フォントだけを単体で販売することはできません。
 
 ## 守っていること
 
-- フォーカスの枠、入力やボタンなどの操作部、状態の色や記号には、質感をかけません。リンクや操作部を含む要素にも、マスクやフィルタをかけません。テストで、`kei-wear.css` がそれらのセレクタを含まないことを調べています。
-- 補助文字（`k-muted`）には、カスレをかけません。最も濃い点のコントラストに余裕がないためです。
-- 部品の大きさや位置は変えません。`kei-wear.css` が使ってよいプロパティをテストで限っています。紙の層のために、`isolation`、`z-index`、`pointer-events`、幅 0 の `border`（`border-image` だけを描く）、内側の `box-shadow` を加えました。どれも箱の大きさを変えません。Chrome でも、demo の2画面（565要素）で、off・baked・live の間で箱が1つも動かないことを確かめました（回転し続ける読み込み中のアイコン2つは除く）。
+- フォーカスの枠、入力やボタンなどの操作部、状態の色や記号には、質感をかけません。リンクや操作部を含む要素にも、マスクやフィルタをかけません。テストで、`lievre-wear.css` がそれらのセレクタを含まないことを調べています。
+- 補助文字（`lv-muted`）には、カスレをかけません。最も濃い点のコントラストに余裕がないためです。
+- 部品の大きさや位置は変えません。`lievre-wear.css` が使ってよいプロパティをテストで限っています。紙の層のために、`isolation`、`z-index`、`pointer-events`、幅 0 の `border`（`border-image` だけを描く）、内側の `box-shadow` を加えました。どれも箱の大きさを変えません。Chrome でも、demo の2画面（565要素）で、off・baked・live の間で箱が1つも動かないことを確かめました（回転し続ける読み込み中のアイコン2つは除く）。
 - コントラストは、最も濃い点で検査しています（[src/test/contrast.test.tsx](../packages/react/src/test/contrast.test.tsx)）。
   - 汚れが最も濃い点、その上にヤケが最も濃い点、さらにスレが最も濃い点を重ねた3つの背景で、全ての文字色（本文・補助・状態の色・リンク）が4.5:1以上、フォーカスの枠と操作の輪郭が3:1以上になること。
   - その上でカスレが最も薄い点の文字でも、4.5:1以上になること。
@@ -222,4 +222,4 @@ Chrome（chrome-devtools MCP で起動したもの）で、demo アプリを `vi
 - baked の汚れはぼかした丸い斑点になりやすく、紙の染みとしてはまだ単調です。
 - `:nth-of-type` を「位置」として使っているので、同じ要素名の兄弟の中での順番でしか模様が変わりません。
 - worn フォントは、輪郭を細かく分けるので点が増え、全体で 19.4MB（元の Plex の約4倍）になりました。ページが読むのは使う区切りだけですが、読み込みは重くなります。`step` を長くするか、見出しと数値だけを荒らすと軽くできます。
-- 部品集（`npm run build:lib`）では、Vite のライブラリモードが画像を必ず CSS に埋め込みます。そのため、質感を使わなくても `lib/kei.css` が 28KB から 133KB（gzip で 35KB）に増えます。採用する場合は、`kei-wear.css` を別の読み込み口（`@kei-design/react/wear.css`）に分けるのがよいと考えています。
+- 部品集（`npm run build:lib`）では、Vite のライブラリモードが画像を必ず CSS に埋め込みます。そのため、質感を使わなくても `lib/lievre.css` が 28KB から 133KB（gzip で 35KB）に増えます。採用する場合は、`lievre-wear.css` を別の読み込み口（`@lievre/react/wear.css`）に分けるのがよいと考えています。

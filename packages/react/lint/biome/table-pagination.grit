@@ -1,4 +1,4 @@
-// kei/table-pagination: a sortable DataTable paged by a Pagination beside it, not by DataTable.
+// lievre/table-pagination: a sortable DataTable paged by a Pagination beside it, not by DataTable.
 // Only within one component: the nearest function around the DataTable must hold the Pagination.
 // GritQL cannot follow `columns={columns}`, so any `sortValue` in the file makes the table sortable.
 language js(typescript, jsx);
@@ -9,7 +9,7 @@ or {
 } where {
   $attributes <: not contains or { JsxAttribute(name = "pageSize"), JsxAttribute(name = "dataMode"), JsxSpreadAttribute() },
   $table <: within JsModule() as $module,
-  $module <: contains `import $_ from "@kei-design/react"`,
+  $module <: contains `import $_ from "@lievre/react"`,
   $module <: contains or { JsPropertyObjectMember(name = "sortValue"), JsMethodObjectMember(name = "sortValue") },
   or {
     and {

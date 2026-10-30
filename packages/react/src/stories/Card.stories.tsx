@@ -11,12 +11,12 @@ const meta = {
   parameters: {
     layoutGate: {
       parts: [
-        { name: 'カードの本文', selector: '.k-card-body', checks: ['padding-equal'] },
+        { name: 'カードの本文', selector: '.lv-card-body', checks: ['padding-equal'] },
         // The action sits on the centre of the heading block (eyebrow and title together).
         {
           name: 'カードの見出し',
-          selector: '.k-card-header',
-          checks: [{ icon: ':scope > .k-button', text: ':scope > div', block: true }],
+          selector: '.lv-card-header',
+          checks: [{ icon: ':scope > .lv-button', text: ':scope > div', block: true }],
         },
       ],
     } satisfies LayoutGate,

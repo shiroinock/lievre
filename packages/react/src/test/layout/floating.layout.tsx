@@ -5,15 +5,15 @@ import { createRoot, type Root } from 'react-dom/client';
 import { flushSync } from 'react-dom';
 import { userEvent } from 'vitest/browser';
 import type { ReactNode } from 'react';
-import { KeiProvider, Button, Popover, DropdownMenu } from '../../index';
+import { LievreProvider, Button, Popover, DropdownMenu } from '../../index';
 import '../../styles/fonts.css';
-import '../../styles/kei.css';
+import '../../styles/lievre.css';
 import { CRITERIA } from './declare';
 
 const PANELS: { name: string; selector: string; render: () => ReactNode }[] = [
   {
     name: 'ポップオーバー',
-    selector: '.k-popover',
+    selector: '.lv-popover',
     render: () => (
       <Popover trigger={<Button>開く</Button>} title="表示の設定">
         <p>表の行の高さと、数値の桁区切りを選びます。</p>
@@ -22,7 +22,7 @@ const PANELS: { name: string; selector: string; render: () => ReactNode }[] = [
   },
   {
     name: 'メニュー',
-    selector: '.k-menu',
+    selector: '.lv-menu',
     render: () => (
       <DropdownMenu
         trigger={<Button>操作</Button>}
@@ -47,9 +47,9 @@ async function open(ui: ReactNode, justify: string, selector: string) {
   root = createRoot(host);
   flushSync(() =>
     root!.render(
-      <KeiProvider>
+      <LievreProvider>
         <div style={{ display: 'flex', justifyContent: justify, padding: 8 }}>{ui}</div>
-      </KeiProvider>,
+      </LievreProvider>,
     ),
   );
   const trigger = host.querySelector('button')!;

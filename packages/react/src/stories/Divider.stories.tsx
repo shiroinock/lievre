@@ -10,7 +10,7 @@ const meta = {
   component: Divider,
   parameters: {
     layoutGate: {
-      parts: [{ name: '区切り線', selector: '.k-divider', checks: ['fits'] }],
+      parts: [{ name: '区切り線', selector: '.lv-divider', checks: ['fits'] }],
     } satisfies LayoutGate,
     docs: { description: { component: '関連するまとまりの境界。role=separatorを持ちます。' } },
   },

@@ -46,7 +46,7 @@ const ThemeContext = createContext<{
   wearConfig: WEAR_CONFIG,
   age: 'none',
 });
-export function useKeiTheme() {
+export function useLievreTheme() {
   return useContext(ThemeContext);
 }
 function useMedia(query: string) {
@@ -81,8 +81,8 @@ export function useEffectiveWear(wear: Wear): Wear {
 export function useEffectiveAge(age: Age): Age {
   return usePlain() ? 'none' : age;
 }
-/** すべての部品の配色と表示密度のスコープ。アプリのルートを包んで使います。部品のスタイルは `.kei`（この部品が出す div）の内側でだけ効きます。 */
-export function KeiProvider({
+/** すべての部品の配色と表示密度のスコープ。アプリのルートを包んで使います。部品のスタイルは `.lievre`（この部品が出す div）の内側でだけ効きます。 */
+export function LievreProvider({
   theme: givenTheme,
   density: givenDensity,
   typography: givenTypography,
@@ -114,7 +114,7 @@ export function KeiProvider({
    */
   age?: Age;
 }) {
-  const inherited = useKeiTheme();
+  const inherited = useLievreTheme();
   const theme = givenTheme ?? inherited.theme;
   const density = givenDensity ?? inherited.density;
   const typography = givenTypography ?? inherited.typography;
@@ -137,7 +137,7 @@ export function KeiProvider({
     >
       <div
         {...props}
-        className={cx('kei', className)}
+        className={cx('lievre', className)}
         style={wearStyle ? { ...wearStyle, ...style } : style}
         data-theme={theme}
         data-density={density}
@@ -153,10 +153,10 @@ export function KeiProvider({
   );
 }
 export function PortalSurface({ children }: { children: ReactNode }) {
-  const { theme, density, typography, wear, wearStyle, age } = useKeiTheme();
+  const { theme, density, typography, wear, wearStyle, age } = useLievreTheme();
   return (
     <div
-      className="kei kei-portal"
+      className="lievre lievre-portal"
       style={wearStyle}
       data-theme={theme}
       data-density={density}
@@ -180,7 +180,7 @@ export function useToast() {
   const ctx = useContext(ToastContext);
   if (!ctx)
     throw new Error(
-      'useToast は ToastProvider の内側で呼んでください：<KeiProvider><ToastProvider>{app}</ToastProvider></KeiProvider>',
+      'useToast は ToastProvider の内側で呼んでください：<LievreProvider><ToastProvider>{app}</ToastProvider></LievreProvider>',
     );
   return ctx;
 }
@@ -199,7 +199,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {children}
         {messages.map((message) => (
           <ToastPrimitive.Root
-            className="k-toast"
+            className="lv-toast"
             data-tone={message.tone ?? 'success'}
             key={message.id}
             onOpenChange={(open) => {
@@ -212,19 +212,21 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <CheckCircle2 size={20} aria-hidden />
             )}
             <div>
-              <ToastPrimitive.Title className="k-toast-title">{message.title}</ToastPrimitive.Title>
+              <ToastPrimitive.Title className="lv-toast-title">
+                {message.title}
+              </ToastPrimitive.Title>
               {message.description && (
-                <ToastPrimitive.Description className="k-toast-description">
+                <ToastPrimitive.Description className="lv-toast-description">
                   {message.description}
                 </ToastPrimitive.Description>
               )}
             </div>
-            <ToastPrimitive.Close className="k-icon-button" aria-label="通知を閉じる">
+            <ToastPrimitive.Close className="lv-icon-button" aria-label="通知を閉じる">
               <X size={16} />
             </ToastPrimitive.Close>
           </ToastPrimitive.Root>
         ))}
-        <ToastPrimitive.Viewport className="k-toast-viewport" label="通知 ({hotkey})" />
+        <ToastPrimitive.Viewport className="lv-toast-viewport" label="通知 ({hotkey})" />
       </ToastPrimitive.Provider>
     </ToastContext.Provider>
   );

@@ -11,11 +11,11 @@ const meta = {
   parameters: {
     layoutGate: {
       parts: [
-        { name: 'スイッチ', selector: '.k-switch', checks: ['inset-y', 'grid-height'] },
+        { name: 'スイッチ', selector: '.lv-switch', checks: ['inset-y', 'grid-height'] },
         {
           name: 'スイッチの欄',
-          selector: '.k-switch-field',
-          checks: [{ icon: '.k-switch', text: '.k-check-label' }],
+          selector: '.lv-switch-field',
+          checks: [{ icon: '.lv-switch', text: '.lv-check-label' }],
         },
       ],
     } satisfies LayoutGate,

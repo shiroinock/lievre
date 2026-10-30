@@ -1,5 +1,5 @@
 {
-  "name": "kei-spike-combobox",
+  "name": "lievre-spike-combobox",
   "private": true,
   "type": "module",
   "description": "Combobox の土台を比べる試作。本体には入れない。react・radix-ui・vite はリポジトリの直下のものを使う。",

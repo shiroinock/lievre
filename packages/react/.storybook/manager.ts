@@ -3,7 +3,7 @@ import { create } from 'storybook/theming';
 addons.setConfig({
   theme: create({
     base: 'light',
-    brandTitle: 'KEI デザインシステム',
+    brandTitle: 'Lièvre デザインシステム',
     brandUrl: '/',
     colorPrimary: '#2424d8',
     colorSecondary: '#2424d8',

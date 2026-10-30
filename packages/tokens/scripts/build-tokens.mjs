@@ -4,14 +4,14 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 const scopes = {
-  paper: /\.kei \{([^}]*)\}/,
-  ink: /\.kei\[data-theme='ink'\] \{([^}]*)\}/,
-  compact: /\.kei\[data-density='compact'\] \{([^}]*)\}/,
-  interface: /\.kei\[data-typography='interface'\] \{([^}]*)\}/,
+  paper: /\.lievre \{([^}]*)\}/,
+  ink: /\.lievre\[data-theme='ink'\] \{([^}]*)\}/,
+  compact: /\.lievre\[data-density='compact'\] \{([^}]*)\}/,
+  interface: /\.lievre\[data-typography='interface'\] \{([^}]*)\}/,
 };
 
 function typeOf(tokens, name, value) {
-  const alias = value.match(/^var\(--k-([\w-]+)\)$/);
+  const alias = value.match(/^var\(--lv-([\w-]+)\)$/);
   if (alias) return tokens.paper[alias[1]]?.$type ?? typeOf(tokens, alias[1], '');
   if (value.startsWith('#')) return 'color';
   if (name.startsWith('font-')) return 'fontFamily';
@@ -24,17 +24,17 @@ function typeOf(tokens, name, value) {
 
 /** Builds the exchange tokens from the tokens.css source text. */
 export function buildTokens(css) {
-  const start = css.indexOf('@layer kei.tokens {');
-  const end = css.indexOf('@layer kei.base {', start);
+  const start = css.indexOf('@layer lievre.tokens {');
+  const end = css.indexOf('@layer lievre.base {', start);
   const layer = css.slice(start, end < 0 ? undefined : end);
   const tokens = {
     $description:
-      'KEI design tokens, generated from tokens.css by scripts/build-tokens.mjs in @kei-design/tokens. Values are CSS strings; var() values alias other KEI tokens.',
+      'lievre design tokens, generated from tokens.css by scripts/build-tokens.mjs in @lievre/tokens. Values are CSS strings; var() values alias other lievre tokens.',
   };
   for (const [scope, pattern] of Object.entries(scopes)) {
     const body = layer.match(pattern)?.[1] ?? '';
     tokens[scope] = {};
-    for (const [, name, raw] of body.matchAll(/--k-([\w-]+):\s*([^;]+);/g)) {
+    for (const [, name, raw] of body.matchAll(/--lv-([\w-]+):\s*([^;]+);/g)) {
       const value = raw.replace(/\s+/g, ' ').trim();
       tokens[scope][name] = { $type: typeOf(tokens, name, value), $value: value };
     }

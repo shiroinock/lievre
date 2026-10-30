@@ -1,7 +1,7 @@
 // Live wear: the same textures and offsets as the baked build, made in the browser from
 // wearSeed, plus SVG filters that distort text where the baked build swaps in worn faces.
 import type { CSSProperties } from 'react';
-import tokens from '@kei-design/tokens/tokens.json';
+import tokens from '@lievre/tokens/tokens.json';
 import { seedFor } from './seed.mjs';
 import { liveEdge, sheetThemeVars, sheetVars, textures, wearVars } from './textures.mjs';
 import { TEXT_KINDS, VARIANTS } from './params.mjs';
@@ -59,7 +59,7 @@ export function liveWearStyle(prefix: string, config: WearConfig, theme: string)
   const urls = textureUrls(config, theme);
   const style: Record<string, string> = {
     ...wearVars(config, `url(${urls.kasure})`),
-    '--k-wear-surface': `url(${urls.surface})`,
+    '--lv-wear-surface': `url(${urls.surface})`,
     ...sheetVars(config),
     ...sheetThemeVars(
       config,
@@ -71,7 +71,7 @@ export function liveWearStyle(prefix: string, config: WearConfig, theme: string)
   for (const kind of kinds)
     if (config.kinds[kind].distort)
       for (let n = 0; n < VARIANTS; n++)
-        style[`--k-wear-${kind}-${n}`] = `url(#${prefix}-${kind}-${n})`;
+        style[`--lv-wear-${kind}-${n}`] = `url(#${prefix}-${kind}-${n})`;
   return style as CSSProperties;
 }
 

@@ -13,7 +13,7 @@ const meta = {
       parts: [
         {
           name: 'ボタン',
-          selector: '.k-button',
+          selector: '.lv-button',
           checks: [
             'inset-x',
             'inset-y',
@@ -25,19 +25,19 @@ const meta = {
         },
         {
           name: 'アイコンだけのボタン',
-          selector: '.k-icon-button',
+          selector: '.lv-icon-button',
           checks: ['inset-x', 'inset-y', 'control-height', 'square'],
         },
         {
           name: '確認の見出し',
-          selector: '.k-dialog-header',
-          checks: [{ icon: '.k-icon-button', text: '.k-dialog-title' }],
+          selector: '.lv-dialog-header',
+          checks: [{ icon: '.lv-icon-button', text: '.lv-dialog-title' }],
         },
-        { name: '確認の本文', selector: '.k-dialog-body', checks: ['padding-equal', 'fits'] },
+        { name: '確認の本文', selector: '.lv-dialog-body', checks: ['padding-equal', 'fits'] },
         {
           name: '確認の操作',
-          selector: '.k-confirm-actions',
-          checks: [{ sameHeight: '.k-button' }],
+          selector: '.lv-confirm-actions',
+          checks: [{ sameHeight: '.lv-button' }],
         },
       ],
     } satisfies LayoutGate,

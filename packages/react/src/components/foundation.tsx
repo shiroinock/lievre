@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { cx } from './system';
 export type Space = 0 | 1 | 2 | 3 | 4 | 6 | 8 | 12;
-const space = (n: Space) => (n === 0 ? 0 : `var(--k-space-${n})`);
+const space = (n: Space) => (n === 0 ? 0 : `var(--lv-space-${n})`);
 /** 用途に依存しない本文。密度と文字の役割を分けて選びます。 */
 export function Text({
   as = 'p',
@@ -24,7 +24,7 @@ export function Text({
 }): ReactElement {
   return createElement(as, {
     ...props,
-    className: cx('k-text', `k-text--${size}`, tone === 'muted' && 'k-muted', className),
+    className: cx('lv-text', `lv-text--${size}`, tone === 'muted' && 'lv-muted', className),
   });
 }
 export const Heading = forwardRef<
@@ -37,11 +37,11 @@ export const Heading = forwardRef<
   return createElement(`h${level}`, {
     ...props,
     ref,
-    className: cx('k-heading', `k-heading--${size}`, className),
+    className: cx('lv-heading', `lv-heading--${size}`, className),
   });
 });
 export function Link({ className, ...props }: AnchorHTMLAttributes<HTMLAnchorElement>) {
-  return <a {...props} className={cx('k-link', className)} />;
+  return <a {...props} className={cx('lv-link', className)} />;
 }
 /** 移動にはa要素、処理の実行にはButtonを使います。 */
 export function ActionLink({
@@ -56,7 +56,7 @@ export function ActionLink({
   return (
     <a
       {...props}
-      className={cx('k-button', `k-button--${variant}`, `k-button--${size}`, className)}
+      className={cx('lv-button', `lv-button--${variant}`, `lv-button--${size}`, className)}
     />
   );
 }
@@ -65,7 +65,7 @@ export function Container({
   className,
   ...props
 }: HTMLAttributes<HTMLDivElement> & { width?: 'reading' | 'wide' | 'full' }) {
-  return <div {...props} className={cx('k-container', `k-container--${width}`, className)} />;
+  return <div {...props} className={cx('lv-container', `lv-container--${width}`, className)} />;
 }
 export function Stack({
   gap = 4,
@@ -82,7 +82,7 @@ export function Stack({
   return (
     <div
       {...props}
-      className={cx('k-stack', className)}
+      className={cx('lv-stack', className)}
       style={{
         display: 'flex',
         flexDirection: direction,
@@ -104,7 +104,7 @@ export function Grid({
   return (
     <div
       {...props}
-      className={cx('k-grid', className)}
+      className={cx('lv-grid', className)}
       style={{
         display: 'grid',
         gridTemplateColumns: `repeat(auto-fit,minmax(min(100%,${minWidth}),1fr))`,
@@ -147,17 +147,17 @@ export function RadioGroup({
   const id = useId();
   return (
     <fieldset
-      className="k-radio-group"
+      className="lv-radio-group"
       disabled={disabled}
       aria-describedby={error ? `${id}-error` : undefined}
     >
-      <legend className="k-label">
+      <legend className="lv-label">
         {label}
         {required ? '（必須）' : ''}
       </legend>
       <Stack gap={3}>
         {options.map((o, i) => (
-          <label className="k-radio-option" key={o.value}>
+          <label className="lv-radio-option" key={o.value}>
             <input
               type="radio"
               name={name ?? id}
@@ -179,7 +179,7 @@ export function RadioGroup({
         ))}
       </Stack>
       {error && (
-        <p id={`${id}-error`} className="k-field-hint k-field-error">
+        <p id={`${id}-error`} className="lv-field-hint lv-field-error">
           {error}
         </p>
       )}

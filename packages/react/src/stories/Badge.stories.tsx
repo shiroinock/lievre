@@ -13,8 +13,8 @@ const meta = {
       parts: [
         {
           name: 'バッジ',
-          selector: '.k-badge',
-          checks: ['inset-x', 'inset-y', 'grid-height', 'fits', { icon: '.k-status-dot' }],
+          selector: '.lv-badge',
+          checks: ['inset-x', 'inset-y', 'grid-height', 'fits', { icon: '.lv-status-dot' }],
         },
       ],
     } satisfies LayoutGate,

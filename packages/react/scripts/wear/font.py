@@ -1,4 +1,4 @@
-"""Bakes worn glyphs into a renamed copy of IBM Plex Sans JP and the KEI Mono Latin files.
+"""Bakes worn glyphs into a renamed copy of IBM Plex Sans JP and the Lievre Mono Latin files.
 
 The skeleton of each glyph stays where it is; only the edge wears, as on a worn print. Every
 outline is cut into short straight runs (step), and each new point moves only along the outline's
@@ -15,14 +15,14 @@ checks that each glyph's left side bearing matches its moved outline.
 
 The files keep the Google Fonts unicode-range split from @fontsource, so a page loads only the
 slices it uses. IBM Plex is licensed under the SIL OFL 1.1 with the Reserved Font Name "Plex":
-the modified fonts must not carry that name, so they are published as "KEI Worn Sans" and
-"KEI Worn Mono".
+the modified fonts must not carry that name, so they are published as "Lievre Worn Sans" and
+"Lievre Worn Mono".
 
 Usage: python3 scripts/wear/font.py <salt> <out-dir> [weights...]
        python3 scripts/wear/font.py check <out-dir>
        python3 scripts/wear/font.py preview <out-dir>   (salt and text as JSON on stdin)
-Values come from KEI_WEAR_ROUGH, KEI_WEAR_ROUGH_SCALE, KEI_WEAR_SWELL, KEI_WEAR_SWELL_SCALE and
-KEI_WEAR_STEP (1/1000 em). Requires fontTools and brotli (pip install fonttools brotli).
+Values come from LIEVRE_WEAR_ROUGH, LIEVRE_WEAR_ROUGH_SCALE, LIEVRE_WEAR_SWELL, LIEVRE_WEAR_SWELL_SCALE and
+LIEVRE_WEAR_STEP (1/1000 em). Requires fontTools and brotli (pip install fonttools brotli).
 """
 
 import json
@@ -53,7 +53,7 @@ MONO = installed('@fontsource/ibm-plex-mono')
 
 # Font units (1000 per em); scripts/build-wear-font.mjs passes the values in wear.config.json.
 def value(name, default):
-    return float(os.environ.get(f'KEI_WEAR_{name}', default))
+    return float(os.environ.get(f'LIEVRE_WEAR_{name}', default))
 
 
 ROUGH, ROUGH_SCALE = value('ROUGH', 7), value('ROUGH_SCALE', 22)
@@ -213,11 +213,11 @@ def advances(font):
 
 def check(out):
     """Every worn file keeps the original advance of every glyph, and the same glyph order."""
-    sources = {'kei-worn-sans': SANS, 'kei-worn-mono': MONO}
+    sources = {'lievre-worn-sans': SANS, 'lievre-worn-mono': MONO}
     checked, glyphs = 0, 0
-    for target in sorted(out.glob('kei-worn-*.woff2')):
-        family = 'kei-worn-sans' if target.name.startswith('kei-worn-sans') else 'kei-worn-mono'
-        original = 'ibm-plex-sans-jp' if family == 'kei-worn-sans' else 'ibm-plex-mono'
+    for target in sorted(out.glob('lievre-worn-*.woff2')):
+        family = 'lievre-worn-sans' if target.name.startswith('lievre-worn-sans') else 'lievre-worn-mono'
+        original = 'ibm-plex-sans-jp' if family == 'lievre-worn-sans' else 'ibm-plex-mono'
         before = TTFont(sources[family] / 'files' / target.name.replace(family, original), lazy=True)
         after = TTFont(target, lazy=True)
         assert before.getGlyphOrder() == after.getGlyphOrder(), f'{target.name}: glyph order changed'
@@ -240,7 +240,7 @@ def rename(font, family):
         if record.nameID in (1, 16):
             record.string = family
         elif record.nameID == 3:
-            record.string = f'{postscript};KEI wear'
+            record.string = f'{postscript};lievre wear'
         elif record.nameID in (4, 18):
             record.string = re.sub(r'IBM Plex (Sans JP|Mono)', family, record.toUnicode())
         elif record.nameID == 6:
@@ -266,7 +266,7 @@ def bake(job):
     package, source, family, target, salt = job
     weight = int(re.search(r'-(\d00)-normal', source).group(1))
     font = TTFont(package / 'files' / source)
-    wear_glyphs(font, salt, 'mono' if family == 'KEI Worn Mono' else 'sans', weight)
+    wear_glyphs(font, salt, 'mono' if family == 'Lievre Worn Mono' else 'sans', weight)
     rename(font, family)
     font.flavor = 'woff2'
     font.save(target)
@@ -275,11 +275,11 @@ def bake(job):
 def slices(weights):
     """Every @fontsource slice to wear: all of Sans JP, and the Latin of Plex Mono."""
     for weight in weights:
-        yield from ((SANS, 'KEI Worn Sans', s, b)
-                    for s, b in faces(SANS / f'{weight}.css', 'IBM Plex Sans JP', 'KEI Worn Sans', './'))
-        # KEI Mono only takes Latin from Plex Mono; Japanese falls through to the sans.
-        yield from ((MONO, 'KEI Worn Mono', s, b)
-                    for s, b in faces(MONO / f'{weight}.css', 'IBM Plex Mono', 'KEI Worn Mono', './')
+        yield from ((SANS, 'Lievre Worn Sans', s, b)
+                    for s, b in faces(SANS / f'{weight}.css', 'IBM Plex Sans JP', 'Lievre Worn Sans', './'))
+        # Lievre Mono only takes Latin from Plex Mono; Japanese falls through to the sans.
+        yield from ((MONO, 'Lievre Worn Mono', s, b)
+                    for s, b in faces(MONO / f'{weight}.css', 'IBM Plex Mono', 'Lievre Worn Mono', './')
                     if re.search(r'-latin-\d', s))
 
 
@@ -299,9 +299,9 @@ def main():
     blocks, jobs = [], []
     report = {'salt': salt, 'outline': settings(), 'files': 0, 'bytes': 0}
     for package, family, source, block in slices(weights):
-        target = out / source.replace('ibm-plex-sans-jp', 'kei-worn-sans').replace('ibm-plex-mono', 'kei-worn-mono')
+        target = out / source.replace('ibm-plex-sans-jp', 'lievre-worn-sans').replace('ibm-plex-mono', 'lievre-worn-mono')
         block = block.replace(f'./{source}', f'./{target.name}')
-        if family == 'KEI Worn Mono':
+        if family == 'Lievre Worn Mono':
             block = block.replace('font-display: swap;', 'font-display: swap;\n  size-adjust: 83.333%;')
         if not target.exists():
             jobs.append((package, source, family, target, salt))
@@ -317,8 +317,8 @@ def main():
         + '\n'.join(block for block, _ in blocks) + '\n')
     license_text = (SANS / 'LICENSE').read_text()
     (out / 'LICENSE.txt').write_text(
-        'KEI Worn Sans and KEI Worn Mono are modified versions of IBM Plex Sans JP and IBM Plex Mono.\n'
-        'Copyright 2017 IBM Corp. with Reserved Font Name "Plex". Modified by KEI: outlines cut into\n'
+        'Lievre Worn Sans and Lievre Worn Mono are modified versions of IBM Plex Sans JP and IBM Plex Mono.\n'
+        'Copyright 2017 IBM Corp. with Reserved Font Name "Plex". Modified by lievre: outlines cut into\n'
         f'short runs and their edges roughened by seeded noise (salt "{salt}"), hinting removed,\n'
         'renamed.\n\n' + license_text)
     (out / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -357,13 +357,13 @@ def preview(out):
         subsetter.populate(text=text)
         subsetter.subset(font)
         assert set(font.getGlyphOrder()) <= set(names)
-        wear_glyphs(font, salt, 'mono' if family == 'KEI Worn Mono' else 'sans', weight)
+        wear_glyphs(font, salt, 'mono' if family == 'Lievre Worn Mono' else 'sans', weight)
         font.flavor = 'woff2'
         target = out / source.replace('ibm-plex-sans-jp', 'preview-sans').replace('ibm-plex-mono', 'preview-mono')
         font.save(target)
         faces_out.append({'family': family, 'weight': weight, 'file': target.name,
                           'unicodeRange': unicode_range,
-                          'sizeAdjust': '83.333%' if family == 'KEI Worn Mono' else '100%'})
+                          'sizeAdjust': '83.333%' if family == 'Lievre Worn Mono' else '100%'})
     print(json.dumps({'faces': faces_out, 'outline': settings()}))
 
 

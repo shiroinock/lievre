@@ -66,22 +66,22 @@ export function DownshiftCombobox({
   const options_ = items.map((o, index) => (
     <li
       key={o.value}
-      className="k-combobox-item"
+      className="lv-combobox-item"
       data-highlighted={cb.highlightedIndex === index || undefined}
       {...cb.getItemProps({ item: o, index })}
     >
       <span>{o.label}</span>
-      {o.value === value && <Check size={14} className="k-combobox-check" />}
+      {o.value === value && <Check size={14} className="lv-combobox-check" />}
     </li>
   ));
   const empty = items.length === 0 && (
-    <li className="k-combobox-empty" role="presentation">
+    <li className="lv-combobox-empty" role="presentation">
       {emptyText}
     </li>
   );
   const field = (
     <div
-      className="k-combobox"
+      className="lv-combobox"
       ref={(el) => {
         anchorRef.current = el;
         floating.refs.setReference(el);
@@ -89,7 +89,7 @@ export function DownshiftCombobox({
       {...ime.wrapperHandlers}
     >
       <input
-        className="k-input k-combobox-input"
+        className="lv-input lv-combobox-input"
         placeholder={placeholder}
         aria-invalid={!!error || undefined}
         aria-describedby={error || hint ? descriptionId : undefined}
@@ -107,7 +107,7 @@ export function DownshiftCombobox({
       />
       <button
         type="button"
-        className="k-combobox-button"
+        className="lv-combobox-button"
         aria-label="候補を開く"
         {...cb.getToggleButtonProps()}
       >
@@ -116,12 +116,12 @@ export function DownshiftCombobox({
     </div>
   );
   return (
-    <div className="k-field">
+    <div className="lv-field">
       {portal}
-      <label className="k-label" {...cb.getLabelProps()}>
+      <label className="lv-label" {...cb.getLabelProps()}>
         {label}
         {required && (
-          <span aria-hidden className="k-required">
+          <span aria-hidden className="lv-required">
             {' '}
             *
           </span>
@@ -133,7 +133,7 @@ export function DownshiftCombobox({
           {container ? (
             createPortal(
               <ul
-                className="k-combobox-popover k-combobox-list"
+                className="lv-combobox-popover lv-combobox-list"
                 hidden={!cb.isOpen}
                 {...cb.getMenuProps({
                   ref: floating.refs.setFloating,
@@ -160,7 +160,7 @@ export function DownshiftCombobox({
             onOpenChange={(open) => (open ? cb.openMenu() : cb.closeMenu())}
             anchor={anchorRef}
           >
-            <ul className="k-combobox-list" {...cb.getMenuProps({}, { suppressRefError: true })}>
+            <ul className="lv-combobox-list" {...cb.getMenuProps({}, { suppressRefError: true })}>
               {options_}
               {empty}
             </ul>
@@ -168,7 +168,7 @@ export function DownshiftCombobox({
         </>
       )}
       {(error || hint) && (
-        <p id={descriptionId} className={error ? 'k-field-hint k-field-error' : 'k-field-hint'}>
+        <p id={descriptionId} className={error ? 'lv-field-hint lv-field-error' : 'lv-field-hint'}>
           {error || hint}
         </p>
       )}

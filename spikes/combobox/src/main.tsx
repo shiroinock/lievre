@@ -2,10 +2,10 @@ import { StrictMode, useState, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { I18nProvider } from 'react-aria-components';
 import '../../../packages/react/src/styles/fonts.css';
-import '../../../packages/react/src/styles/kei.css';
+import '../../../packages/react/src/styles/lievre.css';
 import './spike.css';
 import './datepicker.css';
-import { KeiProvider, type Theme } from '../../../packages/react/src/components/system';
+import { LievreProvider, type Theme } from '../../../packages/react/src/components/system';
 import { Button, Select } from '../../../packages/react/src/components/primitives';
 import { Dialog } from '../../../packages/react/src/components/dialog';
 import { AriaCombobox } from './AriaCombobox';
@@ -66,7 +66,7 @@ function Frame({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ padding: 32, display: 'grid', gap: 24, maxWidth: 420, alignContent: 'start' }}>
-      <p className="k-field-hint">
+      <p className="lv-field-hint">
         impl={impl} shell={shell} ctx={ctx} guard={String(imeGuard)}
       </p>
       <Button variant="secondary" data-testid="outside" onClick={() => setClicks((n) => n + 1)}>
@@ -91,7 +91,7 @@ function Frame({ children }: { children: ReactNode }) {
       ) : (
         children
       )}
-      <input className="k-input" data-testid="after" aria-label="次の欄" />
+      <input className="lv-input" data-testid="after" aria-label="次の欄" />
       <p data-testid="dialog-state">{open ? 'dialog-open' : 'dialog-closed'}</p>
     </div>
   );
@@ -100,11 +100,11 @@ function Frame({ children }: { children: ReactNode }) {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <I18nProvider locale="ja-JP">
-      <KeiProvider theme={theme} style={{ minHeight: '100vh', background: 'var(--k-bg)' }}>
+      <LievreProvider theme={theme} style={{ minHeight: '100vh', background: 'var(--lv-bg)' }}>
         <Frame>
           <Field />
         </Frame>
-      </KeiProvider>
+      </LievreProvider>
     </I18nProvider>
   </StrictMode>,
 );

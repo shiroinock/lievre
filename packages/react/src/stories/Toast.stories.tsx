@@ -35,7 +35,7 @@ const meta = {
       parts: [
         {
           name: '通知を出すボタン',
-          selector: '.k-button',
+          selector: '.lv-button',
           checks: [
             'inset-x',
             'inset-y',
@@ -45,8 +45,12 @@ const meta = {
             { icon: 'svg' },
           ],
         },
-        { name: '通知', selector: '.k-toast', checks: ['padding-equal', { icon: ':scope > svg' }] },
-        { name: '通知を閉じるボタン', selector: '.k-icon-button', checks: ['inset-x', 'inset-y'] },
+        {
+          name: '通知',
+          selector: '.lv-toast',
+          checks: ['padding-equal', { icon: ':scope > svg' }],
+        },
+        { name: '通知を閉じるボタン', selector: '.lv-icon-button', checks: ['inset-x', 'inset-y'] },
       ],
     } satisfies LayoutGate,
     docs: {

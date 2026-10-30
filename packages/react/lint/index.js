@@ -1,12 +1,12 @@
-// Lint rules for apps that use KEI: mistakes the types let through. The plugin is written in
+// Lint rules for apps that use lievre: mistakes the types let through. The plugin is written in
 // ESLint's format with no imports, so Oxlint's JS plugins load the same file unchanged.
 // Each message says how to fix the mistake, so it can be fixed from the message alone.
 
-const defaultSources = ['@kei-design/react'];
+const defaultSources = ['@lievre/react'];
 
-// Which local names refer to KEI's components: `import { Button as KButton } from '@kei-design/react'`.
-function keiImports(context) {
-  const sources = context.settings?.kei?.importSources ?? defaultSources;
+// Which local names refer to lievre's components: `import { Button as KButton } from '@lievre/react'`.
+function lievreImports(context) {
+  const sources = context.settings?.lievre?.importSources ?? defaultSources;
   const names = new Map();
   const namespaces = new Set();
   for (const statement of context.sourceCode.ast.body) {
@@ -18,7 +18,7 @@ function keiImports(context) {
       else if (s.type === 'ImportNamespaceSpecifier') namespaces.add(s.local.name);
     }
   }
-  // The KEI name of a JSX element, or undefined when it is not KEI's.
+  // The lievre name of a JSX element, or undefined when it is not lievre's.
   return (name) => {
     if (name?.type === 'JSXIdentifier') return names.get(name.name);
     if (
@@ -37,7 +37,7 @@ const hasSpread = (opening) => opening.attributes.some((a) => a.type === 'JSXSpr
 const missing = (opening, name) => !attribute(opening, name) && !hasSpread(opening);
 
 // Icon libraries, also matched by subpath ('@heroicons/react/24/outline', 'react-icons/fa').
-// Apps add their own with `settings.kei.iconSources`.
+// Apps add their own with `settings.lievre.iconSources`.
 const defaultIconSources = [
   'lucide-react',
   '@radix-ui/react-icons',
@@ -47,7 +47,7 @@ const defaultIconSources = [
 
 // Local names of the components imported from an icon library.
 function iconImports(context) {
-  const sources = [...defaultIconSources, ...(context.settings?.kei?.iconSources ?? [])];
+  const sources = [...defaultIconSources, ...(context.settings?.lievre?.iconSources ?? [])];
   const names = new Set();
   for (const statement of context.sourceCode.ast.body)
     if (
@@ -113,17 +113,17 @@ function* ancestors(node) {
   for (let n = node.parent; n; n = n.parent) yield n;
 }
 
-// Visit the opening tags of the named KEI components.
-function onKei(components, check) {
+// Visit the opening tags of the named lievre components.
+function onLievre(components, check) {
   return (context) => {
-    let kei;
+    let lievre;
     return {
       Program() {
-        kei = keiImports(context);
+        lievre = lievreImports(context);
       },
       JSXOpeningElement(node) {
-        const name = kei(node.name);
-        if (components.includes(name)) check(context, node, name, kei);
+        const name = lievre(node.name);
+        if (components.includes(name)) check(context, node, name, lievre);
       },
     };
   };
@@ -146,7 +146,7 @@ const rules = {
     {
       type: "form の中の Button は type を省くと type='button' になり、押しても送信しません。送信するボタンには type='submit'、送信しないボタンには type='button' と書いてください。",
     },
-    onKei(['Button', 'IconButton'], (context, node) => {
+    onLievre(['Button', 'IconButton'], (context, node) => {
       if (!missing(node, 'type')) return;
       for (const n of ancestors(node)) {
         // A Button passed as a prop (trigger, footer) is placed by its component, not the form.
@@ -164,7 +164,7 @@ const rules = {
     {
       unit: "Metric の value には数値だけを渡し、単位は unit に分けてください（value='99.95' unit='%'）。数値は等幅、単位は本文の書体で並べます。",
     },
-    onKei(['Metric'], (context, node) => {
+    onLievre(['Metric'], (context, node) => {
       const attr = attribute(node, 'value');
       const value = staticString(attr)?.trim();
       if (!value) return;
@@ -194,7 +194,7 @@ const rules = {
       change:
         "Metric の trend は矢印と色だけで、読み上げでは向きが伝わりません。change に向きを言葉で書いてください（change='前週比 +0.02 ポイント上昇'）。",
     },
-    onKei(['Metric'], (context, node) => {
+    onLievre(['Metric'], (context, node) => {
       const trend = staticString(attribute(node, 'trend'));
       if ((trend === 'up' || trend === 'down') && missing(node, 'change'))
         context.report({ node, messageId: 'change' });
@@ -209,13 +209,13 @@ const rules = {
         'Dialog の footer の Button に onClick がなく、押しても何も起きません。閉じるだけのボタンは <DialogClose asChild><Button>キャンセル</Button></DialogClose> で包み、処理するボタンには onClick を渡してください。',
     },
     (context) => {
-      let kei;
+      let lievre;
       return {
         Program() {
-          kei = keiImports(context);
+          lievre = lievreImports(context);
         },
         JSXOpeningElement(node) {
-          const name = kei(node.name);
+          const name = lievre(node.name);
           if (
             ['Dialog', 'ConfirmDialog', 'Popover'].includes(name) &&
             attribute(node, 'open') &&
@@ -224,9 +224,9 @@ const rules = {
             context.report({ node: attribute(node, 'open'), messageId: 'open', data: { name } });
           if (name !== 'Button' || !missing(node, 'onClick') || !missing(node, 'type')) return;
           for (const n of ancestors(node)) {
-            if (n.type === 'JSXElement' && kei(n.openingElement.name) === 'DialogClose') return;
+            if (n.type === 'JSXElement' && lievre(n.openingElement.name) === 'DialogClose') return;
             if (n.type === 'JSXAttribute' && n.name.name === 'footer') {
-              if (kei(n.parent.name) === 'Dialog') context.report({ node, messageId: 'footer' });
+              if (lievre(n.parent.name) === 'Dialog') context.report({ node, messageId: 'footer' });
               return;
             }
           }
@@ -241,7 +241,7 @@ const rules = {
       trigger:
         'ConfirmDialog に trigger も open もなく、開く手段がありません。ボタンから開くなら trigger を、メニューの項目などから開くなら open と onOpenChange を渡してください。',
     },
-    onKei(['ConfirmDialog'], (context, node) => {
+    onLievre(['ConfirmDialog'], (context, node) => {
       if (missing(node, 'trigger') && missing(node, 'open'))
         context.report({ node, messageId: 'trigger' });
     }),
@@ -253,7 +253,7 @@ const rules = {
       label:
         "confirmLabel が「OK」「はい」「実行」などで、押すと何が起きるか分かりません。何に何をするかを動詞で書いてください（confirmLabel='3件を削除'）。",
     },
-    onKei(['ConfirmDialog'], (context, node) => {
+    onLievre(['ConfirmDialog'], (context, node) => {
       const attr = attribute(node, 'confirmLabel');
       const label = staticString(attr)?.trim();
       if (label != null && vagueLabel.test(label))
@@ -268,7 +268,7 @@ const rules = {
         "confirmLabel が「削除」など取り消せない操作なのに tone='danger' がありません。ConfirmDialog に tone='danger' を付けて、実行のボタンを赤にしてください。",
       menu: "「削除」など取り消せない操作のメニューの項目に tone: 'danger' がありません。項目に tone: 'danger' を付けて、赤の文字にしてください。",
     },
-    onKei(['ConfirmDialog', 'DropdownMenu'], (context, node, name) => {
+    onLievre(['ConfirmDialog', 'DropdownMenu'], (context, node, name) => {
       if (name === 'ConfirmDialog') {
         const attr = attribute(node, 'confirmLabel');
         if (destructive.test(staticString(attr) ?? '') && missing(node, 'tone'))
@@ -304,7 +304,7 @@ const rules = {
       label:
         "IconButton の label が空か記号だけで、読み上げで何のボタンか分かりません。何をするかを言葉で書いてください（label='行の操作'）。",
     },
-    onKei(['IconButton'], (context, node) => {
+    onLievre(['IconButton'], (context, node) => {
       const attr = attribute(node, 'label');
       const label = staticString(attr);
       if (label != null && /^[\s\p{P}\p{S}]*$/u.test(label))
@@ -318,22 +318,23 @@ const rules = {
       icon: "アイコンだけのボタンは IconButton を使い、label で読み上げ用の名前を付けてください（<IconButton label='行の操作' icon={<MoreHorizontal />} />）。label はツールチップにも出ます。",
     },
     (context) => {
-      let kei, icons;
+      let lievre, icons;
       return {
         Program() {
-          kei = keiImports(context);
+          lievre = lievreImports(context);
           icons = iconImports(context);
         },
         JSXElement(element) {
           const node = element.openingElement;
-          if (kei(node.name) !== 'Button' || hasSpread(node) || attribute(node, 'children')) return;
+          if (lievre(node.name) !== 'Button' || hasSpread(node) || attribute(node, 'children'))
+            return;
           const shown = element.children.filter((c) => !(c.type === 'JSXText' && !c.value.trim()));
           // Only what is surely an icon: `<FormattedMessage />` or `<SaveLabel />` may be the text.
           const isIcon = (c) => {
             const name = c.type === 'JSXElement' && c.openingElement.name;
             return (
               name?.type === 'JSXIdentifier' &&
-              (icons.has(name.name) || /Icon$/.test(name.name) || /Icon$/.test(kei(name) ?? ''))
+              (icons.has(name.name) || /Icon$/.test(name.name) || /Icon$/.test(lievre(name) ?? ''))
             );
           };
           if (shown.every(isIcon) && (shown.length > 0 || attribute(node, 'icon')))
@@ -354,16 +355,16 @@ const rules = {
       page: "並べ替えのある DataTable の外で Pagination を使うと、区切った後の行の中だけで並べ替わります。全件を rows に渡して pageSize を付け、ページ送りは DataTable に描かせてください（pageSize={10} page={page} onPageChange={setPage}）。サーバーで並べ替えて区切るなら dataMode='server' と totalCount を渡してください。",
     },
     (context) => {
-      let kei;
+      let lievre;
       const tables = [];
       // Every function (and the program) that has a Pagination somewhere inside it.
       const paged = new Set();
       return {
         Program() {
-          kei = keiImports(context);
+          lievre = lievreImports(context);
         },
         JSXOpeningElement(node) {
-          const name = kei(node.name);
+          const name = lievre(node.name);
           if (name === 'Pagination') {
             for (const n of ancestors(node))
               if (isFunction(n) || n.type === 'Program') paged.add(n);
@@ -382,11 +383,11 @@ const rules = {
     },
   ),
 
-  // Units are words, not data: `<span><span className='k-mono'>{n}</span>%</span>`.
+  // Units are words, not data: `<span><span className='lv-mono'>{n}</span>%</span>`.
   'unit-outside-mono': rule(
-    '単位は .k-mono の外に置く',
+    '単位は .lv-mono の外に置く',
     {
-      unit: "単位（%・円）は .k-mono の外に出して本文の書体にしてください：<span><span className='k-mono'>{n}</span>%</span>",
+      unit: "単位（%・円）は .lv-mono の外に出して本文の書体にしてください：<span><span className='lv-mono'>{n}</span>%</span>",
     },
     (context) => ({
       JSXText(node) {
@@ -396,29 +397,66 @@ const rules = {
           element?.type === 'JSXElement' &&
           staticString(attribute(element.openingElement, 'className'))
             ?.split(/\s+/)
-            .includes('k-mono')
+            .includes('lv-mono')
         )
           context.report({ node, messageId: 'unit' });
       },
     }),
   ),
+
+  // The names from before the rename (MIGRATION.md): classes and variables in strings that the
+  // types cannot see. `npx lievre-migrate` rewrites them.
+  'no-legacy-prefix': rule(
+    '改名の前のクラスと CSS 変数を使わない',
+    {
+      class:
+        "改名の前のクラス（k- で始まるもの）は効きません。頭を lv- に変えてください（className='lv-mono'）。まとめて直すには npx lievre-migrate を使ってください。",
+      variable:
+        '改名の前の CSS 変数（--k- で始まるもの）は値がありません。頭を --lv- に変えてください（var(--lv-accent)）。まとめて直すには npx lievre-migrate を使ってください。',
+    },
+    (context) => {
+      const check = (node, text) => {
+        if (legacyVariable.test(text)) context.report({ node, messageId: 'variable' });
+      };
+      return {
+        JSXAttribute(node) {
+          if (node.name.name !== 'className') return;
+          if (
+            staticString(node)
+              ?.split(/\s+/)
+              .some((c) => legacyClass.test(c))
+          )
+            context.report({ node, messageId: 'class' });
+        },
+        Literal(node) {
+          if (typeof node.value === 'string') check(node, node.value);
+        },
+        TemplateElement(node) {
+          check(node, node.value.raw);
+        },
+      };
+    },
+  ),
 };
+
+const legacyClass = /^k-[a-z]/;
+const legacyVariable = /--k-[a-z]/;
 
 const vagueLabel = /^(ok|yes|はい|いいえ|確認|確認する|実行|実行する|決定|了解|続ける|確定)$/i;
 const destructive = /削除|破棄|消去|解約|退会|初期化|取り消せません/;
 
 const plugin = {
-  meta: { name: 'kei', version: '0.2.0' },
+  meta: { name: 'lievre', version: '0.2.0' },
   rules,
 };
 
 const recommendedRules = Object.fromEntries(
-  Object.keys(rules).map((name) => [`kei/${name}`, 'error']),
+  Object.keys(rules).map((name) => [`lievre/${name}`, 'error']),
 );
 
-// ESLint's flat config: `export default [kei.configs.recommended]`.
+// ESLint's flat config: `export default [lievre.configs.recommended]`.
 plugin.configs = {
-  recommended: { name: 'kei/recommended', plugins: { kei: plugin }, rules: recommendedRules },
+  recommended: { name: 'lievre/recommended', plugins: { lievre: plugin }, rules: recommendedRules },
 };
 
 export default plugin;

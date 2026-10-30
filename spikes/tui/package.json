@@ -1,8 +1,8 @@
 {
-  "name": "kei-tui-spike",
+  "name": "lievre-tui-spike",
   "private": true,
   "type": "module",
-  "description": "KEI の端末向けの試作の残り（操作できる見本、画面の書き出し、試しの書体）。部品は packages/tui に移した。公開しない。",
+  "description": "lievre の端末向けの試作の残り（操作できる見本、画面の書き出し、試しの書体）。部品は packages/tui に移した。公開しない。",
   "scripts": {
     "start": "tsx scripts/main.tsx",
     "capture": "tsx scripts/capture.tsx",

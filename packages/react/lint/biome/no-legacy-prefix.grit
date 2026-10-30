@@ -1,0 +1,22 @@
+// lievre/no-legacy-prefix: classes and CSS variables from before the rename (MIGRATION.md).
+language js(typescript, jsx);
+
+or {
+  JsxAttribute(name = "className", initializer = JsxAttributeInitializerClause(value = $class)) as $attribute where {
+    $class <: r"[{]?[\x22\x27\x60](?:.*\s)?k-[a-z][\w-]*(?:\s.*)?[\x22\x27\x60][}]?",
+    register_diagnostic(span = $attribute, message = "改名の前のクラス（k- で始まるもの）は効きません。頭を lv- に変えてください（className='lv-mono'）。まとめて直すには npx lievre-migrate を使ってください。")
+  },
+  JsStringLiteralExpression() as $string where {
+    $string <: r"(?s).*--k-[a-z].*",
+    register_diagnostic(span = $string, message = "改名の前の CSS 変数（--k- で始まるもの）は値がありません。頭を --lv- に変えてください（var(--lv-accent)）。まとめて直すには npx lievre-migrate を使ってください。")
+  },
+  // A custom property set in a style object: { '--k-gap': … }.
+  JsLiteralMemberName() as $key where {
+    $key <: r"[\x22\x27]--k-[a-z].*",
+    register_diagnostic(span = $key, message = "改名の前の CSS 変数（--k- で始まるもの）は値がありません。頭を --lv- に変えてください（var(--lv-accent)）。まとめて直すには npx lievre-migrate を使ってください。")
+  },
+  JsTemplateChunkElement() as $chunk where {
+    $chunk <: r"(?s).*--k-[a-z].*",
+    register_diagnostic(span = $chunk, message = "改名の前の CSS 変数（--k- で始まるもの）は値がありません。頭を --lv- に変えてください（var(--lv-accent)）。まとめて直すには npx lievre-migrate を使ってください。")
+  }
+}

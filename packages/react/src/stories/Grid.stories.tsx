@@ -7,7 +7,7 @@ const meta = {
   args: { minWidth: '14rem', gap: 6 },
   parameters: {
     layoutGate: {
-      parts: [{ name: 'グリッド', selector: '.k-grid', checks: ['fits'] }],
+      parts: [{ name: 'グリッド', selector: '.lv-grid', checks: ['fits'] }],
     } satisfies LayoutGate,
   },
 } satisfies Meta<typeof Grid>;

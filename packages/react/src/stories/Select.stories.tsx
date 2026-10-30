@@ -13,11 +13,11 @@ const meta = {
       parts: [
         {
           name: '選択の欄',
-          selector: '.k-select-trigger',
+          selector: '.lv-select-trigger',
           checks: ['inset-y', 'control-height', { padding: 'input' }, 'fits', { icon: 'svg' }],
         },
-        { name: '選択肢の一覧', selector: '.k-select-content', checks: ['padding-equal'] },
-        { name: '選択肢', selector: '.k-select-item', checks: ['inset-y', 'control-height'] },
+        { name: '選択肢の一覧', selector: '.lv-select-content', checks: ['padding-equal'] },
+        { name: '選択肢', selector: '.lv-select-item', checks: ['inset-y', 'control-height'] },
       ],
     } satisfies LayoutGate,
     docs: {

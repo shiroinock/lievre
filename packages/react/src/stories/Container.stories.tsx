@@ -10,7 +10,7 @@ const meta = {
   },
   parameters: {
     layoutGate: {
-      parts: [{ name: 'コンテナ', selector: '.k-container', checks: ['fits'] }],
+      parts: [{ name: 'コンテナ', selector: '.lv-container', checks: ['fits'] }],
     } satisfies LayoutGate,
   },
 } satisfies Meta<typeof Container>;

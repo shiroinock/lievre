@@ -1,12 +1,12 @@
-// Turns KEI's tokens (@kei-design/tokens/tokens.json) into terminal colors.
+// Turns lievre's tokens (@lievre/tokens/tokens.json) into terminal colors.
 //
 // truecolor: the same hex values as the web.
 // 256 colors: the nearest xterm color whose contrast still passes (indices 16–255 only, since
 //   0–15 follow the user's terminal theme and their values are unknown).
-// 16 colors: the user's theme decides the values, so KEI paints no surfaces. Text stays in the
+// 16 colors: the user's theme decides the values, so lievre paints no surfaces. Text stays in the
 //   terminal's own foreground, emphasis uses reverse video, and only symbols take a color.
 // none: NO_COLOR, TERM=dumb or not a terminal. Attributes (bold, underline, reverse) stay.
-import tokenFile from '@kei-design/tokens/tokens.json' with { type: 'json' };
+import tokenFile from '@lievre/tokens/tokens.json' with { type: 'json' };
 
 export type Level = 'truecolor' | '256' | '16' | 'none';
 export type ThemeName = 'paper' | 'ink';
@@ -17,7 +17,7 @@ const tokens = tokenFile as unknown as Record<ThemeName, Record<string, { $value
 export function hex(theme: ThemeName, name: string): string {
   const value = tokens[theme][name]?.$value ?? tokens.paper[name]?.$value;
   if (!value) throw new Error(`no token ${name}`);
-  const alias = /^var\(--k-(.+)\)$/.exec(value);
+  const alias = /^var\(--lv-(.+)\)$/.exec(value);
   return alias ? hex(theme, alias[1]) : value;
 }
 
@@ -121,7 +121,7 @@ export type Color = string | undefined;
 export type Palette = {
   level: Level;
   theme: ThemeName;
-  /** Whether KEI paints its own surfaces (card, table, buttons). Only when values are known. */
+  /** Whether lievre paints its own surfaces (card, table, buttons). Only when values are known. */
   paints: boolean;
   bg: Color;
   surface: Color;

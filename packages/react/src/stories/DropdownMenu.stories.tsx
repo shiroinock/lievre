@@ -21,7 +21,7 @@ const meta = {
       parts: [
         {
           name: '開くボタン',
-          selector: '.k-button',
+          selector: '.lv-button',
           checks: [
             'inset-x',
             'inset-y',
@@ -33,23 +33,23 @@ const meta = {
         },
         {
           name: 'アイコンだけの開くボタン',
-          selector: '.k-icon-button',
+          selector: '.lv-icon-button',
           checks: ['inset-x', 'inset-y', 'control-height', 'square'],
         },
         {
           name: 'メニュー',
-          selector: '.k-menu',
+          selector: '.lv-menu',
           checks: [
             'padding-equal',
             'fits',
-            { textEdge: 'start', of: '.k-menu-label, .k-menu-heading' },
-            { textEdge: 'end', of: '.k-menu-shortcut' },
+            { textEdge: 'start', of: '.lv-menu-label, .lv-menu-heading' },
+            { textEdge: 'end', of: '.lv-menu-shortcut' },
           ],
         },
         {
           name: 'メニューの項目',
-          selector: '.k-menu-item',
-          checks: ['inset-y', 'control-height', { icon: '.k-menu-lead', text: '.k-menu-label' }],
+          selector: '.lv-menu-item',
+          checks: ['inset-y', 'control-height', { icon: '.lv-menu-lead', text: '.lv-menu-label' }],
         },
       ],
     } satisfies LayoutGate,

@@ -1,4 +1,4 @@
-// kei/dialog-close: `open` without `onOpenChange`, and a footer Button that does nothing.
+// lievre/dialog-close: `open` without `onOpenChange`, and a footer Button that does nothing.
 language js(typescript, jsx);
 
 or {
@@ -9,7 +9,7 @@ or {
     $attributes <: contains JsxAttribute(name = "open") as $open,
     $attributes <: not contains or { JsxAttribute(name = "onOpenChange"), JsxSpreadAttribute() },
     $element <: within JsModule() as $module,
-    $module <: contains `import $_ from "@kei-design/react"`,
+    $module <: contains `import $_ from "@lievre/react"`,
     or {
       and { $name <: "Dialog", register_diagnostic(span = $open, message = "Dialog に open だけを渡すと、Escape・閉じるボタン・外側を押しても閉じません。open と一緒に onOpenChange={setOpen} を渡してください。開閉を部品に任せるなら open を省きます。") },
       and { $name <: "ConfirmDialog", register_diagnostic(span = $open, message = "ConfirmDialog に open だけを渡すと、Escape・閉じるボタン・外側を押しても閉じません。open と一緒に onOpenChange={setOpen} を渡してください。開閉を部品に任せるなら open を省きます。") },
@@ -25,7 +25,7 @@ or {
     $footer <: within or { JsxOpeningElement(name = "Dialog"), JsxSelfClosingElement(name = "Dialog") },
     $button <: not within JsxElement(opening_element = JsxOpeningElement(name = "DialogClose")),
     $button <: within JsModule() as $module,
-    $module <: contains `import $_ from "@kei-design/react"`,
+    $module <: contains `import $_ from "@lievre/react"`,
     register_diagnostic(span = $button, message = "Dialog の footer の Button に onClick がなく、押しても何も起きません。閉じるだけのボタンは <DialogClose asChild><Button>キャンセル</Button></DialogClose> で包み、処理するボタンには onClick を渡してください。")
   }
 }

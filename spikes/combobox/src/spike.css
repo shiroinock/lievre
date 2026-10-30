@@ -1,12 +1,12 @@
-/* 試作の Combobox の見た目。kei.css の Select（.k-select-*）と同じ値を使う。本番では kei.css に入れる。 */
-.kei .k-combobox {
+/* 試作の Combobox の見た目。lievre.css の Select（.lv-select-*）と同じ値を使う。本番では lievre.css に入れる。 */
+.lievre .lv-combobox {
   position: relative;
   display: flex;
 }
-.kei .k-combobox-input {
-  padding-right: calc(var(--k-control-height) - 2px);
+.lievre .lv-combobox-input {
+  padding-right: calc(var(--lv-control-height) - 2px);
 }
-.kei .k-combobox-button {
+.lievre .lv-combobox-button {
   position: absolute;
   top: 1px;
   right: 1px;
@@ -14,14 +14,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(var(--k-control-height) - 4px);
+  width: calc(var(--lv-control-height) - 4px);
   padding: 0;
   border: 0;
-  border-radius: var(--k-radius-sm);
+  border-radius: var(--lv-radius-sm);
   background: transparent;
-  color: var(--k-muted);
+  color: var(--lv-muted);
 }
-.kei .k-combobox-popover {
+.lievre .lv-combobox-popover {
   /* Dialog（z-index 101）の中でも上に出す。Select（80）と Tooltip（90）の段は Dialog の中で埋もれる。 */
   z-index: 110;
   box-sizing: border-box;
@@ -30,56 +30,56 @@
   margin: 0;
   overflow: auto;
   padding: 4px;
-  border: 1px solid var(--k-border-strong);
-  border-radius: var(--k-radius-md);
-  background: var(--k-surface-raised);
-  color: var(--k-text);
+  border: 1px solid var(--lv-border-strong);
+  border-radius: var(--lv-radius-md);
+  background: var(--lv-surface-raised);
+  color: var(--lv-text);
   list-style: none;
 }
 /* Radix の Popover を枠にしたとき：外枠が線と面を持ち、中の一覧は素のまま。 */
-.kei .k-combobox-popover > .k-combobox-list {
+.lievre .lv-combobox-popover > .lv-combobox-list {
   margin: 0;
   padding: 0;
   list-style: none;
   outline: 0;
 }
-.kei .k-combobox-list {
+.lievre .lv-combobox-list {
   outline: 0;
 }
-.kei .k-combobox-item {
+.lievre .lv-combobox-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--k-space-6);
-  min-height: var(--k-control-height);
+  gap: var(--lv-space-6);
+  min-height: var(--lv-control-height);
   padding: 4px 8px;
-  border-radius: var(--k-radius-sm);
-  font-size: var(--k-text-md);
-  line-height: var(--k-line-tight);
+  border-radius: var(--lv-radius-sm);
+  font-size: var(--lv-text-md);
+  line-height: var(--lv-line-tight);
   outline: 0;
   cursor: pointer;
 }
 /* 土台ごとに「今の候補」の印の名前が違う：React Aria は data-focused、Ariakit は data-active-item、Downshift は自分で付けた data-highlighted。 */
-.kei .k-combobox-item:is([data-focused], [data-active-item], [data-highlighted]) {
-  background: var(--k-accent-soft);
+.lievre .lv-combobox-item:is([data-focused], [data-active-item], [data-highlighted]) {
+  background: var(--lv-accent-soft);
 }
-.kei .k-combobox-item:is([data-selected], [aria-selected='true']) {
-  color: var(--k-accent);
-  font-weight: var(--k-weight-bold);
+.lievre .lv-combobox-item:is([data-selected], [aria-selected='true']) {
+  color: var(--lv-accent);
+  font-weight: var(--lv-weight-bold);
 }
-.kei .k-combobox-item:is([data-disabled], [aria-disabled='true']) {
-  color: var(--k-subtle);
+.lievre .lv-combobox-item:is([data-disabled], [aria-disabled='true']) {
+  color: var(--lv-subtle);
   background: transparent;
   cursor: not-allowed;
 }
-.kei .k-combobox-check {
-  color: var(--k-accent);
+.lievre .lv-combobox-check {
+  color: var(--lv-accent);
 }
-.kei .k-combobox-empty {
+.lievre .lv-combobox-empty {
   padding: 8px;
-  color: var(--k-muted);
-  font-size: var(--k-text-sm);
+  color: var(--lv-muted);
+  font-size: var(--lv-text-sm);
 }
-.kei .k-combobox-input[aria-invalid='true'] {
-  border-color: var(--k-danger);
+.lievre .lv-combobox-input[aria-invalid='true'] {
+  border-color: var(--lv-danger);
 }

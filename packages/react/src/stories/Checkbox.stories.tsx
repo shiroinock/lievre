@@ -13,12 +13,12 @@ const meta = {
       parts: [
         {
           name: 'チェックボックスの欄',
-          selector: '.k-check-field',
-          checks: [{ icon: '.k-checkbox', text: '.k-check-label' }],
+          selector: '.lv-check-field',
+          checks: [{ icon: '.lv-checkbox', text: '.lv-check-label' }],
         },
         {
           name: 'チェックの箱',
-          selector: '.k-checkbox',
+          selector: '.lv-checkbox',
           checks: ['inset-x', 'inset-y', 'grid-height'],
         },
       ],

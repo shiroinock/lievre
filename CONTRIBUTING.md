@@ -4,8 +4,8 @@
 
 ## 1. 部品と Story
 
-1. `packages/react/src/components` に部品を書き、`packages/react/src/index.ts` から公開します。クラス名は `.k-` で始めます。
-2. スタイルは `packages/react/src/styles/kei.css` の `@layer kei.components` に書きます。高さ・余白・間隔はトークン（`--k-space-*`、`--k-control-height`）か 4px の倍数にします。トークンそのものは `packages/tokens/tokens.css` にあります。
+1. `packages/react/src/components` に部品を書き、`packages/react/src/index.ts` から公開します。クラス名は `.lv-` で始めます。
+2. スタイルは `packages/react/src/styles/lievre.css` の `@layer lievre.components` に書きます。高さ・余白・間隔はトークン（`--lv-space-*`、`--lv-control-height`）か 4px の倍数にします。トークンそのものは `packages/tokens/tokens.css` にあります。
 3. `packages/react/src/stories/部品名.stories.tsx` を作り、`meta.component` に部品を指定します。状態ごとに Story を分けます。開いた状態（ダイアログ・メニュー・ツールチップ）も、開いたまま終わる Story を1つ作ります。
 
 ## 2. 配置の宣言
@@ -23,7 +23,7 @@ const meta = {
       parts: [
         {
           name: 'ボタン', // 失敗のメッセージに出る名前
-          selector: '.k-button', // .k- で始める。ポータルの中も探す
+          selector: '.lv-button', // .lv- で始める。ポータルの中も探す
           checks: [
             'inset-x',
             'inset-y',

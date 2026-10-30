@@ -21,12 +21,12 @@ const meta = {
       parts: [
         {
           name: 'ページ送り',
-          selector: '.k-pagination',
-          checks: [{ sameHeight: '.k-button' }, { icon: '.k-button', text: ':scope > span' }],
+          selector: '.lv-pagination',
+          checks: [{ sameHeight: '.lv-button' }, { icon: '.lv-button', text: ':scope > span' }],
         },
         {
           name: 'ページ送りのボタン',
-          selector: '.k-pagination .k-button',
+          selector: '.lv-pagination .lv-button',
           checks: ['inset-x', 'inset-y', 'control-height'],
         },
       ],

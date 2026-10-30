@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import axe from 'axe-core';
 import {
-  KeiProvider,
+  LievreProvider,
   ToastProvider,
   Button,
   Checkbox,
@@ -25,9 +25,9 @@ import {
 import { OperationsExample, SettingsExample } from '../patterns/Operations';
 import { StrictMode, type ReactNode } from 'react';
 const wrap = (ui: ReactNode, theme: 'paper' | 'ink' = 'paper') => (
-  <KeiProvider theme={theme}>
+  <LievreProvider theme={theme}>
     <ToastProvider>{ui}</ToastProvider>
-  </KeiProvider>
+  </LievreProvider>
 );
 function setup(ui: ReactNode, theme: 'paper' | 'ink' = 'paper') {
   return render(wrap(ui, theme));
@@ -82,7 +82,7 @@ describe('Input and focus contracts', () => {
     trigger.focus();
     await userEvent.keyboard('{ArrowDown}');
     const list = await screen.findByRole('listbox');
-    expect(list.closest('.kei')).toHaveAttribute('data-theme', 'ink');
+    expect(list.closest('.lievre')).toHaveAttribute('data-theme', 'ink');
     await userEvent.keyboard('{End}{Enter}');
     expect(trigger).toHaveTextContent('省電力');
     await userEvent.click(trigger);
@@ -92,14 +92,14 @@ describe('Input and focus contracts', () => {
   });
   it('carries prototype theme and wear into portals', async () => {
     render(
-      <KeiProvider theme="ink" wear="baked">
+      <LievreProvider theme="ink" wear="baked">
         <Dialog trigger={<Button>開く</Button>} title="表示設定" description="表示を調整">
           <Button>保存</Button>
         </Dialog>
-      </KeiProvider>,
+      </LievreProvider>,
     );
     await userEvent.click(screen.getByRole('button', { name: '開く' }));
-    const scope = screen.getByRole('dialog', { name: '表示設定' }).closest('.kei');
+    const scope = screen.getByRole('dialog', { name: '表示設定' }).closest('.lievre');
     expect(scope).toHaveAttribute('data-theme', 'ink');
     expect(scope).toHaveAttribute('data-wear', 'baked');
   });
@@ -111,11 +111,11 @@ describe('Input and focus contracts', () => {
     await userEvent.tab();
     expect(await screen.findByRole('tooltip')).toHaveTextContent('行の操作');
     rerender(
-      <KeiProvider>
+      <LievreProvider>
         <ToastProvider>
           <IconButton label="行の操作" icon={<svg />} loading />
         </ToastProvider>
-      </KeiProvider>,
+      </LievreProvider>,
     );
     expect(screen.getByRole('button', { name: '行の操作' })).toBe(button);
     expect(button).toBeDisabled();
@@ -131,7 +131,7 @@ describe('Input and focus contracts', () => {
       </>,
     );
     expect(screen.getByRole('status')).toHaveTextContent('一覧を読み込み中');
-    expect(screen.getByText('一覧を読み込み中')).toHaveClass('k-sr-only');
+    expect(screen.getByText('一覧を読み込み中')).toHaveClass('lv-sr-only');
     expect(screen.getByRole('button')).toHaveAccessibleName(/詳細\s*（W-1024）/);
   });
   it('traps dialog focus and restores it to the trigger on Escape', async () => {
@@ -145,7 +145,7 @@ describe('Input and focus contracts', () => {
     const trigger = screen.getByRole('button', { name: '開く' });
     await userEvent.click(trigger);
     const dialog = screen.getByRole('dialog', { name: '表示設定' });
-    expect(dialog.closest('.kei')).toHaveAttribute('data-theme', 'ink');
+    expect(dialog.closest('.lievre')).toHaveAttribute('data-theme', 'ink');
     await userEvent.keyboard('{Shift>}{Tab}{/Shift}');
     expect(dialog).toContainElement(document.activeElement as HTMLElement);
     await userEvent.keyboard('{Tab}{Tab}{Tab}{Tab}');
@@ -225,8 +225,8 @@ describe('Tables and measures', () => {
       ['DT', 'DD'],
       ['DT', 'DD'],
     ]);
-    expect(screen.getByText('REQ-00481')).toHaveClass('k-mono');
-    expect(screen.getByText('計 花子')).not.toHaveClass('k-mono');
+    expect(screen.getByText('REQ-00481')).toHaveClass('lv-mono');
+    expect(screen.getByText('計 花子')).not.toHaveClass('lv-mono');
     const results = await axe.run(container);
     expect(results.violations.map((v) => v.id)).toEqual([]);
   });

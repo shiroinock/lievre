@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { LayoutGate } from '../test/layout/declare';
 import {
-  KeiProvider,
+  LievreProvider,
   Badge,
   Button,
   Divider,
@@ -93,7 +93,7 @@ function Grid({ wear, wearSeed }: { wear: Wear; wearSeed?: string }) {
       }}
     >
       {themes.map((t) => (
-        <KeiProvider
+        <LievreProvider
           key={t.theme}
           theme={t.theme}
           wear={wear}
@@ -101,7 +101,7 @@ function Grid({ wear, wearSeed }: { wear: Wear; wearSeed?: string }) {
           style={{ padding: 24 }}
         >
           <Sample name={t.name} note={t.note} />
-        </KeiProvider>
+        </LievreProvider>
       ))}
     </div>
   );
@@ -128,9 +128,9 @@ export const Levels: Story = {
     >
       {(['paper', 'ink'] as const).flatMap((theme) =>
         levels.map(({ wear, note }) => (
-          <KeiProvider key={theme + wear} theme={theme} wear={wear} style={{ padding: 24 }}>
+          <LievreProvider key={theme + wear} theme={theme} wear={wear} style={{ padding: 24 }}>
             <Sample name={theme === 'paper' ? 'Paper' : 'Ink'} note={note} />
-          </KeiProvider>
+          </LievreProvider>
         )),
       )}
     </div>
@@ -146,10 +146,16 @@ export const Seeds: Story = {
         gap: 16,
       }}
     >
-      {['kei', 'ash', 'rust-07'].map((seed) => (
-        <KeiProvider key={seed} theme="paper" wear="live" wearSeed={seed} style={{ padding: 24 }}>
+      {['lievre', 'ash', 'rust-07'].map((seed) => (
+        <LievreProvider
+          key={seed}
+          theme="paper"
+          wear="live"
+          wearSeed={seed}
+          style={{ padding: 24 }}
+        >
           <Sample name={seed} note={`wearSeed="${seed}"`} />
-        </KeiProvider>
+        </LievreProvider>
       ))}
     </div>
   ),
@@ -160,7 +166,7 @@ export const Reading: Story = {
     <div style={{ display: 'grid', gap: 16 }}>
       {levels.map(({ wear, note }) =>
         (['standard', 'interface'] as const).map((typography) => (
-          <KeiProvider
+          <LievreProvider
             key={wear + typography}
             theme="paper"
             wear={wear}
@@ -171,11 +177,11 @@ export const Reading: Story = {
               {note}・{typography === 'standard' ? '16px' : '14px'}
             </Text>
             <Text>
-              KEI
+              lievre
               は、日本語の業務画面を読みやすく組み立てるためのデザインシステムです。読み物・検索・申し込み・管理画面を、同じトークンと部品から作ります。鬱蒼、薔薇、魑魅魍魎のような画数の多い字と、ID
-              KEI-024、時刻 09:45、0.5% のような英数字を並べて確かめます。
+              lievre-024、時刻 09:45、0.5% のような英数字を並べて確かめます。
             </Text>
-          </KeiProvider>
+          </LievreProvider>
         )),
       )}
     </div>

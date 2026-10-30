@@ -1,4 +1,4 @@
-// The characters KEI draws with. A terminal app cannot ask which font the terminal uses, so the
+// The characters lievre draws with. A terminal app cannot ask which font the terminal uses, so the
 // set is chosen by the user: LIEVRE_GLYPHS=unicode (default) | lievre-term | ascii.
 //
 // Box drawing (U+2500–) and most block elements are East Asian Width "Ambiguous": a terminal set
@@ -22,7 +22,7 @@ export type Glyphs = {
   /** Focus ring around a button, in the focus color. */
   focusLeft: string;
   focusRight: string;
-  /** Left edge of a selected row (KEI draws an ultramarine line there on the web too). */
+  /** Left edge of a selected row (lievre draws an ultramarine line there on the web too). */
   selectedBar: string;
   /** Status marks: the word always follows, so the mark only repeats it. */
   ok: string;

@@ -13,7 +13,7 @@ const meta = {
   },
   parameters: {
     layoutGate: {
-      parts: [{ name: 'ラジオボタン', selector: '.k-radio-option', checks: [{ icon: 'input' }] }],
+      parts: [{ name: 'ラジオボタン', selector: '.lv-radio-option', checks: [{ icon: 'input' }] }],
     } satisfies LayoutGate,
   },
 } satisfies Meta<typeof RadioGroup>;

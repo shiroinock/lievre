@@ -1,5 +1,5 @@
 /*
- * KEI wear — prototype. <KeiProvider wear="off | baked | live" wearSeed="…">
+ * lievre wear — prototype. <LievreProvider wear="off | baked | live" wearSeed="…">
  *
  * Values come from wear.config.json (tune them with npm run wear:tune).
  * baked: textures and offsets written at build time (npm run wear → wear/baked.css), and worn
@@ -12,7 +12,7 @@
  * Never worn: focus outlines, controls (anything focusable), and status colours or symbols.
  * Nothing here changes the size or position of a box.
  *
- * Age (<KeiProvider age="none | light | heavy">) is a separate axis in wear/age.css: faded inks,
+ * Age (<LievreProvider age="none | light | heavy">) is a separate axis in wear/age.css: faded inks,
  * slipped fills, mottled faces, broken rules and chipped corners, handed to the parts listed in
  * src/wear/age.mjs (AGE_PLACES). It works with any wear setting, off included.
  */
@@ -20,24 +20,24 @@
 @import './wear/rules.css';
 @import './wear/age.css';
 
-@layer kei.components {
+@layer lievre.components {
   /* Wear is decoration: none of it applies when the reader asks for plainer or stronger
      rendering. The provider lowers the setting too; this covers pages without JavaScript. */
   @media (not (prefers-contrast: more)) and (not (forced-colors: active)) {
     /* Worn faces for the distorted kinds (wear/baked.css picks them). The faces come from
        `npm run wear:font`; until then these names fall through to the plain ones. */
-    .kei[data-wear='baked'] {
-      --k-wear-sans: 'KEI Worn Sans', 'IBM Plex Sans JP', system-ui, -apple-system, 'Hiragino Sans',
-        'Yu Gothic UI', sans-serif;
-      --k-wear-mono: 'KEI Worn Mono', 'KEI Mono', 'PlemolJP', 'IBM Plex Mono', 'KEI Worn Sans',
-        'IBM Plex Sans JP', ui-monospace, 'SF Mono', Menlo, monospace;
+    .lievre[data-wear='baked'] {
+      --lv-wear-sans: 'Lievre Worn Sans', 'IBM Plex Sans JP', system-ui, -apple-system,
+        'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+      --lv-wear-mono: 'Lievre Worn Mono', 'Lievre Mono', 'PlemolJP', 'IBM Plex Mono',
+        'Lievre Worn Sans', 'IBM Plex Sans JP', ui-monospace, 'SF Mono', Menlo, monospace;
     }
 
     /* Grain and stains sit on the working surface and on panels, as a background image over the
        flat colour. The darkest speckle is checked against text contrast in src/test. */
-    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal),
-    .kei:is([data-wear='baked'], [data-wear='live']) :is(.k-card, .k-metric) {
-      background-image: var(--k-wear-surface);
+    .lievre:is([data-wear='baked'], [data-wear='live']):not(.lievre-portal),
+    .lievre:is([data-wear='baked'], [data-wear='live']) :is(.lv-card, .lv-metric) {
+      background-image: var(--lv-wear-surface);
       background-size: 256px 256px;
     }
 
@@ -48,47 +48,47 @@
        viewport, they are composited once and not repainted while the page scrolls. The frame
        is cut into nine (border-image), so the corners keep their size on any screen; when the
        screen is narrower than two reaches, the browser shrinks all four edges alike. */
-    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal) {
+    .lievre:is([data-wear='baked'], [data-wear='live']):not(.lievre-portal) {
       isolation: isolate;
     }
-    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::before,
-    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::after {
+    .lievre:is([data-wear='baked'], [data-wear='live']):not(.lievre-portal)::before,
+    .lievre:is([data-wear='baked'], [data-wear='live']):not(.lievre-portal)::after {
       content: '';
       position: fixed;
       inset: 0;
       z-index: -1;
       pointer-events: none;
     }
-    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::before {
+    .lievre:is([data-wear='baked'], [data-wear='live']):not(.lievre-portal)::before {
       border-style: solid;
       border-width: 0;
       /* border-image (the slice is SHEET_SLICE) comes from wear/rules.css. */
     }
-    .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::after {
-      background-image: var(--k-wear-sure);
+    .lievre:is([data-wear='baked'], [data-wear='live']):not(.lievre-portal)::after {
+      background-image: var(--lv-wear-sure);
       background-size: 256px 256px;
-      mask: var(--k-wear-sure-mask);
+      mask: var(--lv-wear-sure-mask);
     }
     /* A root inside another root (a specimen on the tuning page) is a sheet of its own box.
        Position that root (relative) so the sheet stays inside it. */
-    .kei .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::before,
-    .kei .kei:is([data-wear='baked'], [data-wear='live']):not(.kei-portal)::after {
+    .lievre .lievre:is([data-wear='baked'], [data-wear='live']):not(.lievre-portal)::before,
+    .lievre .lievre:is([data-wear='baked'], [data-wear='live']):not(.lievre-portal)::after {
       position: absolute;
     }
     /* Cards and metrics are sheets laid on the page: they brown along their own edges, more
        weakly (yake.surfaces). */
-    .kei:is([data-wear='baked'], [data-wear='live']) :is(.k-card, .k-metric) {
-      box-shadow: var(--k-wear-rim);
+    .lievre:is([data-wear='baked'], [data-wear='live']) :is(.lv-card, .lv-metric) {
+      box-shadow: var(--lv-wear-rim);
     }
 
     /* Worn rules: decorative dividers and chart grids break up. Control outlines and table rules
        carry meaning, so they stay whole. */
-    .kei:is([data-wear='baked'], [data-wear='live']) .k-divider::before,
-    .kei:is([data-wear='baked'], [data-wear='live']) .k-divider::after {
-      mask: var(--k-wear-rule);
+    .lievre:is([data-wear='baked'], [data-wear='live']) .lv-divider::before,
+    .lievre:is([data-wear='baked'], [data-wear='live']) .lv-divider::after {
+      mask: var(--lv-wear-rule);
     }
-    .kei:is([data-wear='baked'], [data-wear='live']) .k-chart-grid {
-      stroke-dasharray: var(--k-wear-dash);
+    .lievre:is([data-wear='baked'], [data-wear='live']) .lv-chart-grid {
+      stroke-dasharray: var(--lv-wear-dash);
     }
   }
 }

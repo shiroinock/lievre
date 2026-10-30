@@ -1,4 +1,4 @@
-// Measures how evenly KEI parts sit in their boxes, from the rendered page.
+// Measures how evenly lievre parts sit in their boxes, from the rendered page.
 // In the browser (Storybook or the demo), run:
 //   const { measure } = await import('/scripts/measure-alignment.js');
 //   console.table(measure());
@@ -171,7 +171,7 @@ function inkInside(el) {
     else if (child.nodeType === Node.ELEMENT_NODE) {
       const s = getComputedStyle(child);
       if (s.display === 'none' || s.visibility === 'hidden' || s.position === 'absolute') continue;
-      if (child.classList.contains('k-sr-only')) continue;
+      if (child.classList.contains('lv-sr-only')) continue;
       if (drawn(child)) {
         const r = svgInk(child) ?? child.getBoundingClientRect();
         if (r.width && r.height) ink = union(ink, r);
@@ -230,33 +230,33 @@ export function iconOffset(icon, textEl) {
 }
 
 export const PARTS = [
-  '.k-button',
-  '.k-icon-button',
-  '.k-badge',
-  '.k-input',
-  '.k-select-trigger',
-  '.k-select-item',
-  '.k-tab',
-  '.k-tab-count',
-  '.k-kbd',
-  '.k-avatar',
-  '.k-tooltip',
-  '.k-alert',
-  '.k-toast',
-  '.k-checkbox',
-  '.k-switch',
-  '.k-table th',
-  '.k-table td',
-  '.k-table-detail',
-  '.k-pagination button',
-  '.k-card',
-  '.k-dialog',
-  '.k-dialog-footer',
-  '.k-select-content',
-  '.k-table-sort',
-  '.k-empty',
-  '.k-metric',
-  '.k-dialog-footer',
+  '.lv-button',
+  '.lv-icon-button',
+  '.lv-badge',
+  '.lv-input',
+  '.lv-select-trigger',
+  '.lv-select-item',
+  '.lv-tab',
+  '.lv-tab-count',
+  '.lv-kbd',
+  '.lv-avatar',
+  '.lv-tooltip',
+  '.lv-alert',
+  '.lv-toast',
+  '.lv-checkbox',
+  '.lv-switch',
+  '.lv-table th',
+  '.lv-table td',
+  '.lv-table-detail',
+  '.lv-pagination button',
+  '.lv-card',
+  '.lv-dialog',
+  '.lv-dialog-footer',
+  '.lv-select-content',
+  '.lv-table-sort',
+  '.lv-empty',
+  '.lv-metric',
+  '.lv-dialog-footer',
   '.main-nav button',
   '.theme-segment button',
 ];
@@ -283,21 +283,21 @@ export function measure(selectors = PARTS, root = document) {
 export function measureIcons(root = document) {
   const rows = [];
   const pairs = [
-    ['.k-button', 'svg'],
-    ['.k-alert', ':scope > svg'],
-    ['.k-toast', ':scope > svg'],
-    ['.k-tab', 'svg'],
-    ['.k-select-trigger', ':scope > svg'],
-    ['.k-select-item', 'svg'],
-    ['.k-badge', '.k-status-dot'],
-    ['.k-check-field', '.k-checkbox'],
-    ['.k-radio-option', 'input'],
-    ['.k-metric-change', 'svg'],
-    ['.k-table-sort', 'svg'],
-    ['.k-table-detail', 'svg'],
+    ['.lv-button', 'svg'],
+    ['.lv-alert', ':scope > svg'],
+    ['.lv-toast', ':scope > svg'],
+    ['.lv-tab', 'svg'],
+    ['.lv-select-trigger', ':scope > svg'],
+    ['.lv-select-item', 'svg'],
+    ['.lv-badge', '.lv-status-dot'],
+    ['.lv-check-field', '.lv-checkbox'],
+    ['.lv-radio-option', 'input'],
+    ['.lv-metric-change', 'svg'],
+    ['.lv-table-sort', 'svg'],
+    ['.lv-table-detail', 'svg'],
     ['.main-nav button', 'svg'],
     ['.theme-segment button', 'svg'],
-    ['.k-empty', '.k-empty-icon'],
+    ['.lv-empty', '.lv-empty-icon'],
   ];
   for (const [host, iconSel] of pairs) {
     const el = [...root.querySelectorAll(host)].find(
@@ -329,7 +329,7 @@ const selectorOf = (el) =>
 export function audit(root = document, tolerance = 2) {
   const rows = [];
   const seen = new Set();
-  for (const el of root.querySelectorAll('.kei *')) {
+  for (const el of root.querySelectorAll('.lievre *')) {
     if (el instanceof SVGElement || !el.getClientRects().length || !drawn(el)) continue;
     const r = el.getBoundingClientRect();
     if (r.height > 160 || r.height < 12) continue;

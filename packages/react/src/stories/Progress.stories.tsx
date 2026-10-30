@@ -11,10 +11,10 @@ const meta = {
   parameters: {
     layoutGate: {
       parts: [
-        { name: '進み具合', selector: '.k-progress-wrap', checks: ['fits'] },
+        { name: '進み具合', selector: '.lv-progress-wrap', checks: ['fits'] },
         {
           name: '進み具合の見出し',
-          selector: '.k-progress-label',
+          selector: '.lv-progress-label',
           checks: [{ baseline: ':scope > *' }, 'line-grid'],
         },
       ],

@@ -12,11 +12,11 @@ body {
   top: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--k-space-3, 12px);
+  gap: var(--lv-space-3, 12px);
   height: 100vh;
   padding: 20px;
   overflow-y: auto;
-  border-right: 1px solid var(--k-border);
+  border-right: 1px solid var(--lv-border);
   box-sizing: border-box;
 }
 .tune-presets {
@@ -36,19 +36,19 @@ body {
 }
 .tune-slider input[type='range'] {
   width: 100%;
-  accent-color: var(--k-accent);
+  accent-color: var(--lv-accent);
 }
 .tune-slider small {
-  color: var(--k-muted);
-  font-size: var(--k-text-xs);
+  color: var(--lv-muted);
+  font-size: var(--lv-text-xs);
 }
 .tune-slider output {
   float: right;
-  font-family: var(--k-font-mono);
+  font-family: var(--lv-font-mono);
 }
 .tune-kinds {
   border-collapse: collapse;
-  font-size: var(--k-text-sm);
+  font-size: var(--lv-text-sm);
 }
 .tune-kinds caption {
   text-align: left;
@@ -60,7 +60,7 @@ body {
 }
 .tune-kinds input[type='range'] {
   width: 80px;
-  accent-color: var(--k-accent);
+  accent-color: var(--lv-accent);
 }
 .tune-save {
   display: grid;
@@ -69,7 +69,7 @@ body {
 .tune-status pre {
   max-height: 160px;
   overflow: auto;
-  font-size: var(--k-text-xs);
+  font-size: var(--lv-text-xs);
   white-space: pre-wrap;
 }
 .tune-main {
@@ -107,7 +107,7 @@ body {
   display: grid;
   gap: 16px;
   padding: 20px;
-  border: 1px solid var(--k-border);
+  border: 1px solid var(--lv-border);
   overflow: hidden;
 }
 .tune-tones {
@@ -136,7 +136,7 @@ body {
 .tune-sheet {
   position: relative;
   min-height: 560px;
-  border: 1px solid var(--k-border);
+  border: 1px solid var(--lv-border);
   overflow: hidden;
 }
 .tune-sheet-layout {
@@ -180,7 +180,7 @@ body {
   gap: 4px;
   font-size: 32px;
   line-height: 1.4;
-  background: repeating-linear-gradient(90deg, var(--k-border) 0 1px, transparent 1px 16px);
+  background: repeating-linear-gradient(90deg, var(--lv-border) 0 1px, transparent 1px 16px);
 }
 @media (width < 900px) {
   .tune {
@@ -190,6 +190,6 @@ body {
     position: static;
     height: auto;
     border-right: 0;
-    border-bottom: 1px solid var(--k-border);
+    border-bottom: 1px solid var(--lv-border);
   }
 }

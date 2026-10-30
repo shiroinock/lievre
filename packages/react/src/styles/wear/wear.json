@@ -1,7 +1,7 @@
 {
   "config": {
     "preset": "custom",
-    "salt": "kei",
+    "salt": "lievre",
     "outline": {
       "rough": 3.5,
       "roughScale": 20,
@@ -71,27 +71,27 @@
     }
   },
   "pixels": {
-    "surface": "24cbd0f38917608c",
-    "kasure": "2366133b09102344",
-    "yake": "023e5f76f94559b9",
-    "sure": "89342154ecf77cc3",
-    "mottle": "31002734a21815fc"
+    "surface": "5761053a6b5325d2",
+    "kasure": "16bf0b57f21fbbe5",
+    "yake": "a3ed4cd6adec1cb5",
+    "sure": "5c915e2d613e1144",
+    "mottle": "6774fddb6cf8b49c"
   },
   "bytes": {
-    "yake-paper.png": 6718,
-    "sure-paper.png": 3043,
-    "surface-paper.png": 16771,
-    "yake-ink.png": 6718,
-    "sure-ink.png": 3043,
-    "surface-ink.png": 16771,
-    "kasure.png": 4872,
-    "age-mottle-paper-light.png": 3133,
-    "age-mottle-paper-heavy.png": 3133,
-    "age-mottle-ink-light.png": 3133,
-    "age-mottle-ink-heavy.png": 3133,
-    "age-chip-tl.png": 195,
-    "age-chip-tr.png": 200,
-    "age-chip-br.png": 200,
+    "yake-paper.png": 6187,
+    "sure-paper.png": 1980,
+    "surface-paper.png": 16503,
+    "yake-ink.png": 6187,
+    "sure-ink.png": 1980,
+    "surface-ink.png": 16503,
+    "kasure.png": 5054,
+    "age-mottle-paper-light.png": 3329,
+    "age-mottle-paper-heavy.png": 3329,
+    "age-mottle-ink-light.png": 3329,
+    "age-mottle-ink-heavy.png": 3329,
+    "age-chip-tl.png": 201,
+    "age-chip-tr.png": 203,
+    "age-chip-br.png": 197,
     "age-chip-bl.png": 202
   }
 }

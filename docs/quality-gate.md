@@ -3,7 +3,7 @@
 部品を追加・変更するときに満たす、配置の基準です。どれも数値で測れる形にしてあり、CI で検査します。
 
 - **実際の描画で測るもの**：`npm run test:layout`（`packages/react/src/test/layout`）。Vitest のブラウザモードと Playwright の Chromium で、すべての Story を描画して測ります。
-- **CSS から静的に分かるもの**：`npm run lint`（`packages/react/scripts/stylelint-kei.mjs`）。
+- **CSS から静的に分かるもの**：`npm run lint`（`packages/react/scripts/stylelint-lievre.mjs`）。
 
 基準の値は `packages/react/src/test/layout/declare.ts` の `CRITERIA` が正です。この文書と食い違ったら、どちらかを直してください。
 
@@ -41,11 +41,11 @@
 
 ### 行の箱を 4px に乗せる
 
-line-height は `--k-line-body` / `--k-line-tight` で 4px の倍数にしていますが、行の箱が 4px の倍数になるとは限りません。外れる原因は、これまでに次の3つがありました。
+line-height は `--lv-line-body` / `--lv-line-tight` で 4px の倍数にしていますが、行の箱が 4px の倍数になるとは限りません。外れる原因は、これまでに次の3つがありました。
 
-- **大きさの違う文字を混ぜる**：KEI Mono 36px の値に IBM Plex Sans JP 14px の単位を並べると、単位の文字も親の line-height（44px）を px のまま受け継ぎ、書体ごとのベースラインの位置の違いで行の箱が 51px に広がります。混ぜた側（単位）の `line-height` を `1` にして、行の箱を地の文字だけで決めます（Metric・Meter の単位）。同じ大きさの等幅の数字（表の `<span className="k-mono">` など）は、行の箱を広げません。
-- **line-height そのものが 4px に乗っていない**：`1.2` などの倍率は `round(1.2em, 4px)` にします。受け継いだ倍率（本文14px のときの 24 / 14）を 14.4px の等幅の文字に当てると 24.69px になり、ブラウザが半行送りを整数に丸めて中心がずれます。`--k-line-tight` などのトークンを当てます（Pagination のページ番号）。
-- **表の罫線を `border-collapse: collapse` で引く**：罫線が隣り合う行に 0.5px ずつ割り振られ、行の高さが 48.5px・49px になります。KEI の表は `border-collapse: separate; border-spacing: 0` で、各セルが自分の罫線をまるごと持ちます。
+- **大きさの違う文字を混ぜる**：Lievre Mono 36px の値に IBM Plex Sans JP 14px の単位を並べると、単位の文字も親の line-height（44px）を px のまま受け継ぎ、書体ごとのベースラインの位置の違いで行の箱が 51px に広がります。混ぜた側（単位）の `line-height` を `1` にして、行の箱を地の文字だけで決めます（Metric・Meter の単位）。同じ大きさの等幅の数字（表の `<span className="lv-mono">` など）は、行の箱を広げません。
+- **line-height そのものが 4px に乗っていない**：`1.2` などの倍率は `round(1.2em, 4px)` にします。受け継いだ倍率（本文14px のときの 24 / 14）を 14.4px の等幅の文字に当てると 24.69px になり、ブラウザが半行送りを整数に丸めて中心がずれます。`--lv-line-tight` などのトークンを当てます（Pagination のページ番号）。
+- **表の罫線を `border-collapse: collapse` で引く**：罫線が隣り合う行に 0.5px ずつ割り振られ、行の高さが 48.5px・49px になります。lievre の表は `border-collapse: separate; border-spacing: 0` で、各セルが自分の罫線をまるごと持ちます。
 
 行高を上書きする点検用の Story（`parameters.layoutStress`）では、この検査は見ません。
 
@@ -63,19 +63,19 @@ line-height は `--k-line-body` / `--k-line-tight` で 4px の倍数にしてい
 
 ### CSS で静的に検査する
 
-| ルール                 | 基準                                                                                                            |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `kei/spacing-grid`     | 余白の px は 4px の倍数（0 と ±1px、`calc()`・`var()` は対象外）。                                              |
-| `kei/padding-symmetry` | `kei.components` / `kei.utilities` の部品で、左右の padding が違う値なら理由のコメントを必須にする。            |
-| `kei/height-grid`      | `height` / `min-height` / `max-height` の px は 4px の倍数。罫線と目印の 1px・2px、`calc()`・`var()` は対象外。 |
-| 説明のない無効化       | `stylelint-disable` には必ず `-- 理由` を書く（`reportDescriptionlessDisables`）。                              |
+| ルール                    | 基準                                                                                                            |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `lievre/spacing-grid`     | 余白の px は 4px の倍数（0 と ±1px、`calc()`・`var()` は対象外）。                                              |
+| `lievre/padding-symmetry` | `lievre.components` / `lievre.utilities` の部品で、左右の padding が違う値なら理由のコメントを必須にする。      |
+| `lievre/height-grid`      | `height` / `min-height` / `max-height` の px は 4px の倍数。罫線と目印の 1px・2px、`calc()`・`var()` は対象外。 |
+| 説明のない無効化          | `stylelint-disable` には必ず `-- 理由` を書く（`reportDescriptionlessDisables`）。                              |
 
-余白（padding・margin・gap と、名前に padding・gap・space を含むカスタムプロパティ）は `kei/spacing-grid` で 4px の格子に乗せます（0 と ±1px は許可）。
+余白（padding・margin・gap と、名前に padding・gap・space を含むカスタムプロパティ）は `lievre/spacing-grid` で 4px の格子に乗せます（0 と ±1px は許可）。
 
 わざと基準を外すときは、その行の直前に理由を書きます。
 
 ```css
-/* stylelint-disable-next-line kei/padding-symmetry -- 左の検索アイコンの分を空ける */
+/* stylelint-disable-next-line lievre/padding-symmetry -- 左の検索アイコンの分を空ける */
 padding: 0 12px 0 36px;
 ```
 
@@ -84,7 +84,7 @@ padding: 0 12px 0 36px;
 `npm run test:layout` は、配置そのものに加えて次のことも検査します。
 
 1. `packages/react/src/stories` のすべての Story ファイルが、meta の `parameters.layoutGate` に「測る部品」か「測らない理由」を書いている。
-2. `packages/react/src/index.ts` から公開している部品（大文字で始まるもの）ごとに、`meta.component` にその部品を指定し、部品を測る Story がある。入れ物だけのもの（`KeiProvider` など）は `packages/react/src/test/layout/baseline.ts` の `NOT_A_PART` に理由付きで書く。
+2. `packages/react/src/index.ts` から公開している部品（大文字で始まるもの）ごとに、`meta.component` にその部品を指定し、部品を測る Story がある。入れ物だけのもの（`LievreProvider` など）は `packages/react/src/test/layout/baseline.ts` の `NOT_A_PART` に理由付きで書く。
 3. 描画したボタン・入力・タブなどの操作の要素が、どれかの部品の宣言に入っている。
 4. 宣言した部品が、どれかの Story で実際に描画されている（selector の書き間違いを防ぐ）。
 
@@ -93,7 +93,7 @@ padding: 0 12px 0 36px;
 検査を入れた時点で基準を満たしていなかった箇所は、理由を付けて一覧にしています。一覧にある間は CI が通り、消すとその箇所に基準が効きます。
 
 - 描画で測るもの：`packages/react/src/test/layout/baseline.ts` の `BASELINE`
-- `kei/height-grid`：`packages/react/scripts/stylelint-baseline.mjs`
+- `lievre/height-grid`：`packages/react/scripts/stylelint-baseline.mjs`
 
 例外は Story の title・部品の名前・検査の名前で照合し、`example`（Story の名前）と `element`（メッセージに出る要素の一部、`「整える」` など）でさらに絞れます。画面の例外は、ずれる要素か Story に絞ってください。部品ごとに外すと、同じ画面で新しく起きたずれも見逃します。
 
@@ -104,7 +104,7 @@ padding: 0 12px 0 36px;
 失敗すると、どの Story・どの組み合わせで、どの部品の、どの部分が、何 px ずれているか、基準は何かを日本語で出します。
 
 ```text
-[Components/Feedback/Badge › Success｜Paper・標準の密度・本文16px] バッジ（span.k-badge.k-tone-success「稼働中」）の高さの格子：高さが 21.2px です。基準：4px の倍数（近いのは 20px か 24px）。
+[Components/Feedback/Badge › Success｜Paper・標準の密度・本文16px] バッジ（span.lv-badge.lv-tone-success「稼働中」）の高さの格子：高さが 21.2px です。基準：4px の倍数（近いのは 20px か 24px）。
 ```
 
 部品の名前は `layoutGate.parts` の `name`、括弧の中は実際の要素とその文字です。

@@ -1,8 +1,8 @@
 import type { Preview } from '@storybook/react-vite';
-import { KeiProvider } from '../src/components/system';
+import { LievreProvider } from '../src/components/system';
 import '../src/styles/fonts.css';
-import '../src/styles/kei.css';
-import '../src/styles/kei-wear.css';
+import '../src/styles/lievre.css';
+import '../src/styles/lievre-wear.css';
 // Worn glyphs exist only after `npm run wear:font`; without them baked keeps the plain faces.
 import.meta.glob('../wear-fonts/fonts.css', { eager: true });
 import '../src/styles/demo.css';
@@ -40,7 +40,7 @@ const preview: Preview = {
         title: 'ソルト',
         icon: 'transfer',
         items: [
-          { value: 'kei', title: 'kei' },
+          { value: 'lievre', title: 'lievre' },
           { value: 'ash', title: 'ash' },
           { value: 'soot-07', title: 'soot-07' },
         ],
@@ -90,22 +90,24 @@ const preview: Preview = {
     density: 'comfortable',
     typography: 'standard',
     wear: 'off',
-    wearSeed: 'kei',
+    wearSeed: 'lievre',
     age: 'none',
   },
   decorators: [
     (Story, context) => (
-      <KeiProvider
+      <LievreProvider
         theme={context.globals.theme}
         density={context.globals.density}
         typography={context.globals.typography}
         wear={context.globals.wear}
         wearSeed={context.globals.wearSeed}
         age={context.globals.age}
-        className={context.parameters.layout === 'fullscreen' ? 'kei-story-full' : 'kei-story'}
+        className={
+          context.parameters.layout === 'fullscreen' ? 'lievre-story-full' : 'lievre-story'
+        }
       >
         <Story />
-      </KeiProvider>
+      </LievreProvider>
     ),
   ],
   parameters: {

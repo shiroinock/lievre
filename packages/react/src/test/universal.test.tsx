@@ -2,20 +2,20 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { expect, it } from 'vitest';
 import axe from 'axe-core';
-import { ActionLink, Button, Dialog, EmptyState, KeiProvider, RadioGroup, Text } from '../index';
+import { ActionLink, Button, Dialog, EmptyState, LievreProvider, RadioGroup, Text } from '../index';
 import { RegistrationExample, ResourceLibrary, ArticleExample } from '../patterns/Everyday';
 it('inherits theme, density and typography independently through nested providers and portals', async () => {
   render(
-    <KeiProvider theme="ink" density="compact">
-      <KeiProvider typography="interface">
+    <LievreProvider theme="ink" density="compact">
+      <LievreProvider typography="interface">
         <Dialog trigger={<Button>開く</Button>} title="詳細" description="読み物の補足">
           <Text>説明</Text>
         </Dialog>
-      </KeiProvider>
-    </KeiProvider>,
+      </LievreProvider>
+    </LievreProvider>,
   );
   await userEvent.click(screen.getByRole('button', { name: '開く' }));
-  const scope = screen.getByRole('dialog').closest('.kei');
+  const scope = screen.getByRole('dialog').closest('.lievre');
   expect(scope).toHaveAttribute('data-theme', 'ink');
   expect(scope).toHaveAttribute('data-density', 'compact');
   expect(scope).toHaveAttribute('data-typography', 'interface');
@@ -23,7 +23,7 @@ it('inherits theme, density and typography independently through nested provider
 });
 it('keeps navigation links semantic and supports native radio keyboard selection', async () => {
   render(
-    <KeiProvider>
+    <LievreProvider>
       <ActionLink href="#destination">次へ</ActionLink>
       <RadioGroup
         label="形式"
@@ -33,7 +33,7 @@ it('keeps navigation links semantic and supports native radio keyboard selection
           { value: 'b', label: 'カード' },
         ]}
       />
-    </KeiProvider>,
+    </LievreProvider>,
   );
   expect(screen.getByRole('link', { name: '次へ' })).toHaveAttribute('href', '#destination');
   const first = screen.getByRole('radio', { name: '一覧' });
@@ -43,9 +43,9 @@ it('keeps navigation links semantic and supports native radio keyboard selection
 });
 it('does not force a database label into generic empty content', () => {
   render(
-    <KeiProvider>
+    <LievreProvider>
       <EmptyState title="まだ写真がありません" description="写真を追加しましょう。" />
-    </KeiProvider>,
+    </LievreProvider>,
   );
   expect(screen.queryByText('NO RECORDS')).not.toBeInTheDocument();
 });
@@ -57,9 +57,9 @@ for (const theme of ['paper', 'ink'] as const)
   ] as const) {
     it(`${theme} ${name}: no automatically detectable structural accessibility violations`, async () => {
       const { container } = render(
-        <KeiProvider theme={theme}>
+        <LievreProvider theme={theme}>
           <Example />
-        </KeiProvider>,
+        </LievreProvider>,
       );
       const result = await axe.run(container, { rules: { 'color-contrast': { enabled: false } } });
       expect(result.violations.map((v) => v.id)).toEqual([]);
@@ -69,9 +69,9 @@ for (const theme of ['paper', 'ink'] as const)
 it('focuses each failed registration field, including the acknowledgement, and returns to the originating article button', async () => {
   const u = userEvent.setup();
   const first = render(
-    <KeiProvider>
+    <LievreProvider>
       <RegistrationExample />
-    </KeiProvider>,
+    </LievreProvider>,
   );
   await u.click(screen.getByRole('button', { name: '入力内容を確認' }));
   expect(screen.getByRole('textbox', { name: 'お名前' })).toHaveFocus();
@@ -85,9 +85,9 @@ it('focuses each failed registration field, including the acknowledgement, and r
   expect(check).toHaveAccessibleDescription('確認チェックを入れてください。');
   first.unmount();
   render(
-    <KeiProvider>
+    <LievreProvider>
       <ResourceLibrary />
-    </KeiProvider>,
+    </LievreProvider>,
   );
   const open = screen.getByRole('button', { name: '記事を読む：小さく始める、日々の記録' });
   await u.click(open);

@@ -5,7 +5,7 @@ export function themeTokens(tokens, theme) {
 }
 export function resolve(set, key) {
   const value = set[key].$value;
-  const alias = value.match(/^var\(--k-(.+)\)$/);
+  const alias = value.match(/^var\(--lv-(.+)\)$/);
   return alias ? resolve(set, alias[1]) : value;
 }
 const channels = (hex) =>

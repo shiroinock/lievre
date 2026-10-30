@@ -1,0 +1,1715 @@
+/*
+ * lievre 0.2
+ * Wrap the app in .lievre (LievreProvider). Every rule lives in a cascade layer,
+ * so unlayered app styles override lievre without !important.
+ */
+@layer lievre.tokens, lievre.base, lievre.components, lievre.utilities;
+
+/* The tokens layer lives in @lievre/tokens; the build inlines it into styles.css. */
+@import '@lievre/tokens/tokens.css';
+
+/* -------------------------------------------------------------------- base */
+
+@layer lievre.base {
+  /* Plain .lv-mono text never drops below --lv-text-mono-min, so the narrowed Latin stays readable. */
+  .lv-mono {
+    font-size: max(1em, var(--lv-text-mono-min));
+  }
+  .lievre {
+    color: var(--lv-text);
+    background: var(--lv-bg);
+    font: var(--lv-weight-regular) var(--lv-body) / var(--lv-leading-body) var(--lv-font-sans);
+    color-scheme: light;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .lievre[data-theme='ink'] {
+    color-scheme: dark;
+  }
+  .lievre-portal {
+    background: transparent;
+  }
+  .lievre *,
+  .lievre *::before,
+  .lievre *::after {
+    box-sizing: border-box;
+  }
+  .lievre :where(button, input, textarea, select) {
+    font: inherit;
+    color: inherit;
+  }
+  .lievre :where(button) {
+    cursor: pointer;
+  }
+  .lievre :where(button, input, textarea, select):disabled {
+    cursor: not-allowed;
+  }
+  .lievre :where(a) {
+    color: inherit;
+    text-underline-offset: 0.2em;
+  }
+  .lievre :where(svg) {
+    flex-shrink: 0;
+  }
+  .lievre :where(button) svg {
+    pointer-events: none;
+  }
+  .lievre :where(button, input, textarea, select, a, [tabindex]):focus-visible {
+    outline: 2px solid var(--lv-focus);
+    outline-offset: 2px;
+  }
+  .lievre ::selection {
+    background: var(--lv-accent-soft);
+  }
+}
+
+/* -------------------------------------------------------------- components */
+
+@layer lievre.components {
+  /* Typography */
+  .lv-text {
+    margin: 0;
+    line-height: var(--lv-line-body);
+    overflow-wrap: anywhere;
+  }
+  .lv-text--body {
+    font-size: var(--lv-body);
+  }
+  .lv-text--small {
+    font-size: var(--lv-text-xs);
+  }
+  .lv-text--lead {
+    font-size: var(--lv-text-lg);
+    max-width: 38em;
+  }
+
+  .lv-heading {
+    margin: 0;
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+    letter-spacing: var(--lv-tracking-heading);
+    font-feature-settings: 'palt';
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+  .lv-heading--section {
+    font-size: var(--lv-text-xl);
+  }
+  .lv-heading--title {
+    font-size: clamp(var(--lv-text-2xl), 3vw, var(--lv-text-3xl));
+  }
+  .lv-heading--display {
+    font-size: clamp(var(--lv-text-3xl), 5vw, 3.25rem);
+    line-height: round(1.3em, 4px);
+  }
+
+  /* A short label above a title. Sans and sentence case; mono is reserved for data. */
+  .lv-eyebrow {
+    font-size: var(--lv-text-xs);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-body);
+    letter-spacing: 0.04em;
+    color: var(--lv-muted);
+  }
+
+  .lv-link {
+    color: var(--lv-accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+  }
+  .lv-link:hover {
+    color: var(--lv-accent-hover);
+  }
+
+  /* Layout */
+  .lv-container {
+    width: 100%;
+    min-width: 0;
+    margin-inline: auto;
+  }
+  .lv-container--reading {
+    max-width: 42rem;
+  }
+  .lv-container--wide {
+    max-width: 72rem;
+  }
+  .lv-container--full {
+    max-width: none;
+  }
+  .lv-stack,
+  .lv-grid,
+  .lv-stack > *,
+  .lv-grid > * {
+    min-width: 0;
+  }
+
+  /* Button */
+  .lv-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--lv-space-2);
+    min-width: 24px;
+    min-height: var(--lv-control-height);
+    padding: var(--lv-control-padding);
+    border: 1px solid transparent;
+    border-radius: var(--lv-radius-md);
+    font-size: var(--lv-text-md);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+    text-decoration: none;
+    white-space: normal;
+    transition:
+      background-color var(--lv-motion) var(--lv-ease),
+      border-color var(--lv-motion) var(--lv-ease),
+      color var(--lv-motion) var(--lv-ease);
+  }
+  .lv-button--primary {
+    background: var(--lv-accent);
+    color: var(--lv-on-accent);
+  }
+  .lv-button--primary:where(:hover, :active):not(:disabled) {
+    background: var(--lv-accent-hover);
+  }
+  .lv-button--secondary {
+    background: var(--lv-surface-raised);
+    border-color: var(--lv-border-strong);
+    color: var(--lv-text);
+  }
+  .lv-button--secondary:hover:not(:disabled) {
+    background: var(--lv-surface-sunken);
+  }
+  .lv-button--secondary:active:not(:disabled) {
+    background: var(--lv-accent-soft);
+    border-color: var(--lv-accent);
+  }
+  .lv-button--ghost {
+    background: transparent;
+    color: var(--lv-muted);
+  }
+  .lv-button--ghost:hover:not(:disabled) {
+    background: var(--lv-surface-sunken);
+    color: var(--lv-text);
+  }
+  .lv-button--ghost:active:not(:disabled) {
+    background: var(--lv-accent-soft);
+  }
+  .lv-button--danger {
+    background: var(--lv-danger);
+    color: var(--lv-on-danger);
+  }
+  .lv-button--danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--lv-danger) 86%, var(--lv-text));
+  }
+  .lv-button--sm {
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: var(--lv-text-sm);
+  }
+  .lv-button--lg {
+    min-height: 48px;
+    padding: 0 20px;
+    font-size: var(--lv-text-base);
+  }
+  .lv-button:disabled {
+    background: var(--lv-surface-sunken);
+    border-color: var(--lv-border);
+    color: var(--lv-muted);
+  }
+
+  /* A square: width = height = the control height of its size. The border is transparent
+     unless the variant draws one, so every variant has the same box. */
+  .lv-icon-button {
+    --icon-button-size: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--icon-button-size);
+    height: var(--icon-button-size);
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--lv-radius-md);
+    background: transparent;
+    color: var(--lv-muted);
+    transition:
+      background-color var(--lv-motion) var(--lv-ease),
+      border-color var(--lv-motion) var(--lv-ease),
+      color var(--lv-motion) var(--lv-ease);
+  }
+  .lv-icon-button:hover:not(:disabled) {
+    background: var(--lv-surface-sunken);
+    color: var(--lv-text);
+  }
+  .lv-icon-button--md {
+    --icon-button-size: var(--lv-control-height);
+  }
+  .lv-icon-button--lg {
+    --icon-button-size: 48px;
+  }
+  .lv-icon-button-icon {
+    display: flex;
+  }
+  .lv-icon-button-icon > svg {
+    width: 16px;
+    height: 16px;
+  }
+  .lv-icon-button--lg .lv-icon-button-icon > svg {
+    width: 20px;
+    height: 20px;
+  }
+  .lv-icon-button--secondary {
+    background: var(--lv-surface-raised);
+    border-color: var(--lv-border-strong);
+    color: var(--lv-text);
+  }
+  .lv-icon-button--secondary:active:not(:disabled) {
+    background: var(--lv-accent-soft);
+    border-color: var(--lv-accent);
+  }
+  .lv-icon-button--ghost:active:not(:disabled) {
+    background: var(--lv-accent-soft);
+  }
+  .lv-icon-button--primary {
+    background: var(--lv-accent);
+    color: var(--lv-on-accent);
+  }
+  .lv-icon-button--primary:where(:hover, :active):not(:disabled) {
+    background: var(--lv-accent-hover);
+    color: var(--lv-on-accent);
+  }
+  .lv-icon-button--danger {
+    background: var(--lv-danger);
+    color: var(--lv-on-danger);
+  }
+  .lv-icon-button--danger:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--lv-danger) 86%, var(--lv-text));
+    color: var(--lv-on-danger);
+  }
+  .lv-icon-button:disabled {
+    color: var(--lv-muted);
+    cursor: not-allowed;
+  }
+  .lv-icon-button:where(
+      .lv-icon-button--primary,
+      .lv-icon-button--secondary,
+      .lv-icon-button--danger
+    ):disabled {
+    background: var(--lv-surface-sunken);
+    border-color: var(--lv-border);
+  }
+
+  .lv-spin {
+    animation: lv-spin 0.9s linear infinite;
+  }
+  /* Spinner: it takes the size and line height of where it sits, and the icon is one line box
+     tall, so it stays on the centre of the text's first line, beside a label or in a sentence. */
+  .lv-spinner {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--lv-space-2);
+    color: var(--lv-muted);
+    vertical-align: top;
+  }
+  .lv-spinner > svg {
+    width: 16px;
+    height: 1lh;
+  }
+  .lv-spinner--md > svg {
+    width: 24px;
+  }
+  @keyframes lv-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Tone — shared by Badge and Alert */
+  .lv-tone-neutral {
+    --tone: var(--lv-muted);
+    --tone-bg: var(--lv-surface-sunken);
+  }
+  .lv-tone-success {
+    --tone: var(--lv-success);
+    --tone-bg: var(--lv-success-soft);
+  }
+  .lv-tone-warning {
+    --tone: var(--lv-warning);
+    --tone-bg: var(--lv-warning-soft);
+  }
+  .lv-tone-danger {
+    --tone: var(--lv-danger);
+    --tone-bg: var(--lv-danger-soft);
+  }
+  .lv-tone-info {
+    --tone: var(--lv-info);
+    --tone-bg: var(--lv-info-soft);
+  }
+
+  /* Sized to its content, so a flex or grid parent neither stretches nor shifts it. */
+  .lv-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: fit-content;
+    height: fit-content;
+    padding: 0 8px;
+    border-radius: var(--lv-radius-sm);
+    background: var(--tone-bg);
+    color: var(--tone);
+    font-size: var(--lv-text-xs);
+    font-weight: var(--lv-weight-bold);
+    line-height: 20px;
+    white-space: nowrap;
+  }
+  .lv-status-dot {
+    width: 6px;
+    /* stylelint-disable-next-line lievre/height-grid -- 状態の点。12px の文字に合わせた 6px の丸 */
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* Field */
+  .lv-field {
+    display: grid;
+    gap: var(--lv-space-2);
+    min-width: 0;
+  }
+  .lv-label {
+    font-size: var(--lv-text-sm);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-required {
+    color: var(--lv-danger);
+  }
+  .lv-field-hint {
+    margin: 0;
+    font-size: var(--lv-text-xs);
+    line-height: var(--lv-line-body);
+    color: var(--lv-muted);
+  }
+  .lv-field-error {
+    color: var(--lv-danger);
+  }
+
+  .lv-input,
+  .lv-select-trigger {
+    width: 100%;
+    min-height: var(--lv-control-height);
+    padding: var(--lv-input-padding);
+    border: 1px solid var(--lv-border-strong);
+    border-radius: var(--lv-radius-md);
+    background: var(--lv-surface-raised);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-tight);
+    transition: border-color var(--lv-motion) var(--lv-ease);
+  }
+  .lv-input::placeholder {
+    color: var(--lv-subtle);
+  }
+  .lv-input:hover:not(:disabled),
+  .lv-select-trigger:hover:not(:disabled) {
+    border-color: var(--lv-text);
+  }
+  .lv-input:focus-visible,
+  .lv-select-trigger:focus-visible {
+    border-color: var(--lv-accent);
+    outline-offset: 0;
+  }
+  .lv-input[aria-invalid='true'],
+  .lv-select-trigger[aria-invalid='true'] {
+    border-color: var(--lv-danger);
+  }
+  .lv-input:disabled,
+  .lv-select-trigger:disabled {
+    background: var(--lv-surface-sunken);
+    border-color: var(--lv-border);
+    color: var(--lv-muted);
+  }
+  .lv-control--lg {
+    min-height: 48px;
+    padding: 8px 16px;
+    font-size: var(--lv-text-base);
+  }
+  .lv-textarea {
+    min-height: 104px;
+    line-height: var(--lv-line-body);
+    resize: vertical;
+  }
+
+  /* Select */
+  .lv-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lv-space-4);
+    text-align: left;
+  }
+  .lv-select-trigger[data-placeholder] {
+    color: var(--lv-subtle);
+  }
+  /* Radix wraps the icons in spans; as flex boxes they sit on the centre line, not a baseline. */
+  .lv-select-icon,
+  .lv-select-indicator {
+    display: flex;
+  }
+  .lv-select-icon {
+    color: var(--lv-muted);
+  }
+  /* Floating layers share one z-index above dialogs (101) and below toasts (120), so the one
+     opened last, appended last to the body, sits on top: a select inside a popover or dialog. */
+  .lv-select-content {
+    z-index: 110;
+    min-width: var(--radix-select-trigger-width);
+    max-height: var(--radix-select-content-available-height);
+    padding: 4px;
+    border: 1px solid var(--lv-border-strong);
+    border-radius: var(--lv-radius-md);
+    background: var(--lv-surface-raised);
+  }
+  .lv-select-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lv-space-6);
+    min-height: var(--lv-control-height);
+    /* 4px list padding + 8px = the trigger's 12px, so the text lines up with the trigger. */
+    padding: 4px 8px;
+    border-radius: var(--lv-radius-sm);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-tight);
+    outline: 0;
+    cursor: pointer;
+  }
+  .lv-select-item[data-highlighted] {
+    background: var(--lv-accent-soft);
+  }
+  .lv-select-item[data-state='checked'] {
+    color: var(--lv-accent);
+    font-weight: var(--lv-weight-bold);
+  }
+  .lv-select-item[data-disabled] {
+    color: var(--lv-subtle);
+    background: transparent;
+    cursor: not-allowed;
+  }
+
+  /* Checkbox, Switch, Radio — "on" is always the accent, never a status color. */
+  /* Controls beside text sit on the centre of its first line: (1lh − size) / 2 from the top. */
+  .lv-check-field {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-body);
+  }
+  .lv-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: calc((1lh - 20px) / 2);
+    padding: 0;
+    border: 1px solid var(--lv-border-strong);
+    border-radius: var(--lv-radius-sm);
+    background: var(--lv-surface-raised);
+    color: var(--lv-on-accent);
+  }
+  .lv-checkbox > span {
+    display: flex;
+  }
+  .lv-checkbox:hover:not(:disabled) {
+    border-color: var(--lv-text);
+  }
+  .lv-checkbox[data-state='checked'],
+  .lv-checkbox[data-state='indeterminate'] {
+    background: var(--lv-accent);
+    border-color: var(--lv-accent);
+  }
+  .lv-checkbox[aria-invalid='true'] {
+    border-color: var(--lv-danger);
+  }
+  .lv-check-label {
+    cursor: pointer;
+  }
+  .lv-check-field:has(button:disabled) label,
+  .lv-switch-field:has(button:disabled) label {
+    color: var(--lv-muted);
+    cursor: not-allowed;
+  }
+
+  .lv-switch-field {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    line-height: var(--lv-line-body);
+  }
+  .lv-switch {
+    flex-shrink: 0;
+    width: 40px;
+    height: 24px;
+    margin-top: calc((1lh - 24px) / 2);
+    /* stylelint-disable-next-line lievre/spacing-grid -- 24 − 2 × (1px border + 2px) = an 18px thumb */
+    padding: 2px;
+    border: 1px solid var(--lv-border-strong);
+    border-radius: var(--lv-radius-full);
+    background: var(--lv-surface-sunken);
+    transition: background-color var(--lv-motion) var(--lv-ease);
+  }
+  .lv-switch[data-state='checked'] {
+    background: var(--lv-accent);
+    border-color: var(--lv-accent);
+  }
+  .lv-switch-thumb {
+    display: block;
+    width: 18px;
+    /* stylelint-disable-next-line lievre/height-grid -- 高さ 24px から罫線 1px と padding 2px を上下で引いた 18px */
+    height: 18px;
+    border-radius: 50%;
+    background: var(--lv-border-strong);
+    transition: transform var(--lv-motion) var(--lv-ease);
+  }
+  .lv-switch[data-state='checked'] .lv-switch-thumb {
+    background: var(--lv-on-accent);
+    transform: translateX(16px);
+  }
+  .lv-switch:disabled {
+    background: var(--lv-surface-sunken);
+    border-color: var(--lv-border);
+  }
+
+  .lv-radio-group {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .lv-radio-group legend {
+    margin-bottom: var(--lv-space-3);
+  }
+  .lv-radio-option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--lv-space-3);
+    font-size: var(--lv-body);
+    line-height: var(--lv-line-body);
+    cursor: pointer;
+  }
+  .lv-radio-option input {
+    appearance: none;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    margin: calc((1lh - 20px) / 2) 0 0;
+    border: 1px solid var(--lv-border-strong);
+    border-radius: 50%;
+    background: var(--lv-surface-raised);
+    transition: border-width var(--lv-motion) var(--lv-ease);
+  }
+  .lv-radio-option input:checked {
+    border: 6px solid var(--lv-accent);
+  }
+  .lv-radio-option small {
+    display: block;
+    font-size: var(--lv-text-xs);
+    line-height: var(--lv-line-body);
+    color: var(--lv-muted);
+  }
+  .lv-radio-option:has(input:disabled) {
+    color: var(--lv-muted);
+    cursor: not-allowed;
+  }
+
+  /* Card */
+  .lv-card {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--lv-border);
+    border-radius: var(--lv-radius-lg);
+    background: var(--lv-surface);
+  }
+  /* The action sits on the centre of the heading block, with or without an eyebrow. */
+  .lv-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lv-space-4);
+    padding: var(--lv-panel-padding) var(--lv-panel-padding) 0;
+  }
+  .lv-card-title {
+    margin: 0;
+    font-size: var(--lv-text-base);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+    letter-spacing: 0.02em;
+  }
+  .lv-card-body {
+    padding: var(--lv-panel-padding);
+  }
+  /* A panel's padding alone sets its inner space: the margins of its first and last
+     children (a <p>'s default 1em, say) would make one side deeper than the other. */
+  :is(.lv-card-body, .lv-dialog-body, .lv-tab-content, .lv-alert-description, .lv-popover-body)
+    > :where(:first-child) {
+    margin-top: 0;
+  }
+  :is(.lv-card-body, .lv-dialog-body, .lv-tab-content, .lv-alert-description, .lv-popover-body)
+    > :where(:last-child) {
+    margin-bottom: 0;
+  }
+
+  /* Alert */
+  .lv-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--lv-space-2);
+    padding: var(--lv-space-4);
+    border: 1px solid color-mix(in srgb, var(--tone) 28%, transparent);
+    border-radius: var(--lv-radius-md);
+    background: var(--tone-bg);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-body);
+  }
+  /* One line tall: the icon is drawn centred on the first line of text. */
+  .lv-alert > svg {
+    height: 1lh;
+    color: var(--tone);
+  }
+  .lv-alert strong {
+    color: var(--tone);
+    font-weight: var(--lv-weight-bold);
+  }
+  .lv-alert-description {
+    color: var(--lv-text);
+  }
+
+  /* Tabs */
+  .lv-tabs-list {
+    display: flex;
+    gap: var(--lv-space-6);
+    /* overflow-x: auto also clips vertically, so the baseline is painted inside the
+       box (not as a border) and the active indicator sits on top of it. */
+    overflow: auto hidden;
+    background: linear-gradient(var(--lv-border), var(--lv-border)) bottom / 100% 1px no-repeat;
+  }
+  .lv-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--lv-space-2);
+    min-height: 40px;
+    padding: 8px 4px;
+    border: 0;
+    background: transparent;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-tight);
+    white-space: nowrap;
+  }
+  .lv-tab:hover:not(:disabled) {
+    color: var(--lv-text);
+  }
+  .lv-tab::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: transparent;
+  }
+  .lv-tab[data-state='active'] {
+    color: var(--lv-text);
+    font-weight: var(--lv-weight-bold);
+  }
+  .lv-tab[data-state='active']::after {
+    background: var(--lv-accent);
+  }
+  .lv-tab:disabled {
+    color: var(--lv-subtle);
+    cursor: not-allowed;
+  }
+  .lv-tab:focus-visible {
+    outline-offset: -2px;
+  }
+  .lv-tab-count {
+    min-width: 16px;
+    padding: 0 4px;
+    border-radius: var(--lv-radius-full);
+    background: var(--lv-surface-sunken);
+    font-size: var(--lv-text-mono-min);
+    font-family: var(--lv-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--lv-weight-medium);
+    line-height: 16px;
+    text-align: center;
+  }
+  .lv-tab-content {
+    padding: var(--lv-space-6) 0 0;
+    outline-offset: 4px;
+  }
+
+  /* Tooltip */
+  .lv-tooltip {
+    z-index: 110;
+    max-width: 260px;
+    padding: 4px 8px;
+    border-radius: var(--lv-radius-sm);
+    background: var(--lv-text);
+    color: var(--lv-bg);
+    font-size: var(--lv-text-xs);
+    line-height: var(--lv-line-body);
+  }
+  .lv-tooltip-arrow {
+    fill: var(--lv-text);
+  }
+
+  /* DescriptionList: row puts every label in one fixed column and lets the value wrap below
+     it when the row is too narrow; stack sets label over value in up to N columns. */
+  .lv-dl {
+    --dl-label-width: 8em;
+    display: grid;
+    gap: var(--lv-space-3) var(--lv-space-6);
+    margin: 0;
+  }
+  .lievre[data-density='compact'] .lv-dl {
+    row-gap: var(--lv-space-2);
+  }
+  .lv-dl-item {
+    min-width: 0;
+  }
+  .lv-dl-label {
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-dl-value {
+    min-width: 0;
+    margin: 0;
+    line-height: var(--lv-line-body);
+    overflow-wrap: anywhere;
+  }
+  /* Baselines line up even when a monospaced value sits beside a Japanese label. */
+  .lv-dl[data-layout='row'] .lv-dl-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--lv-space-4);
+  }
+  .lv-dl[data-layout='row'] .lv-dl-label {
+    flex: 0 0 var(--dl-label-width);
+  }
+  .lv-dl[data-layout='row'] .lv-dl-value {
+    flex: 1 1 16rem;
+  }
+  .lv-dl[data-layout='stack'] {
+    /* At most --dl-columns columns, fewer once a column would drop below 12rem. */
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(
+        max(12rem, calc((100% - (var(--dl-columns) - 1) * var(--lv-space-6)) / var(--dl-columns))),
+        1fr
+      )
+    );
+  }
+  .lv-dl[data-layout='stack'] .lv-dl-label {
+    margin-bottom: var(--lv-space-1);
+  }
+  .lv-dl-item[data-wide] {
+    grid-column: 1 / -1;
+  }
+
+  /* Popover and menu float on a 1px line and the raised surface, never a shadow. */
+  .lv-popover,
+  .lv-menu {
+    z-index: 110;
+    border: 1px solid var(--lv-border-strong);
+    border-radius: var(--lv-radius-md);
+    background: var(--lv-surface-raised);
+    color: var(--lv-text);
+    animation: lv-fade 120ms ease-out;
+  }
+  /* The same padding as a panel; the width keeps a form readable and shrinks at the edge. */
+  .lv-popover {
+    width: 320px;
+    max-width: var(--radix-popover-content-available-width);
+    max-height: var(--radix-popover-content-available-height);
+    overflow: auto;
+    padding: var(--lv-panel-padding);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-body);
+  }
+  .lv-popover:focus-visible {
+    outline-offset: -2px;
+  }
+  .lv-popover-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--lv-space-2);
+  }
+  .lv-popover-title {
+    margin: 0 0 var(--lv-space-3);
+    font-size: var(--lv-text-base);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+  }
+
+  /* Menu: 4px around the list and 4px above and below a separator, like the select list. */
+  .lv-menu {
+    min-width: max(180px, var(--radix-dropdown-menu-trigger-width));
+    max-width: var(--radix-dropdown-menu-content-available-width);
+    max-height: var(--radix-dropdown-menu-content-available-height);
+    overflow: auto;
+    padding: 4px;
+  }
+  .lv-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--lv-space-2);
+    min-height: var(--lv-control-height);
+    /* 4px list padding + 8px = the 12px a select or input leaves before its text. */
+    padding: 4px 8px;
+    border-radius: var(--lv-radius-sm);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-tight);
+    outline: 0;
+    cursor: pointer;
+  }
+  .lv-menu-item[data-highlighted] {
+    background: var(--lv-accent-soft);
+  }
+  .lv-menu-item[data-tone='danger'] {
+    color: var(--lv-danger);
+  }
+  .lv-menu-item[data-tone='danger'][data-highlighted] {
+    background: var(--lv-danger-soft);
+  }
+  .lv-menu-item[data-disabled] {
+    color: var(--lv-subtle);
+    background: transparent;
+    cursor: not-allowed;
+  }
+  .lv-menu-item[data-state='checked'] {
+    color: var(--lv-accent);
+    font-weight: var(--lv-weight-bold);
+  }
+  /* A fixed 16px column for icons and check marks, empty on rows without one. */
+  .lv-menu-lead,
+  .lv-menu-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+  }
+  .lv-menu-lead svg {
+    width: 16px;
+    height: 16px;
+  }
+  .lv-menu-item:not([data-tone='danger']):not([data-state='checked']) .lv-menu-lead {
+    color: var(--lv-muted);
+  }
+  .lv-menu-label {
+    flex: 1;
+    min-width: 0;
+  }
+  .lv-menu-shortcut {
+    margin-inline-start: var(--lv-space-4);
+    color: var(--lv-muted);
+    font: var(--lv-weight-regular) var(--lv-text-mono-min) / var(--lv-line-tight)
+      var(--lv-font-mono);
+  }
+  .lv-menu-heading {
+    padding: 4px 8px;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-xs);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-menu[data-lead] .lv-menu-heading {
+    /* stylelint-disable-next-line lievre/padding-symmetry -- アイコンの列（16px）と間（8px）の分だけ空けて、見出しを項目の文字と同じ位置から始める */
+    padding-inline-start: calc(8px + 16px + var(--lv-space-2));
+  }
+  .lv-menu-separator {
+    height: 1px;
+    margin: 4px 0;
+    background: var(--lv-border);
+  }
+
+  /* Progress */
+  /* The value mixes Lievre Mono (14.4px) with a sans %; baseline keeps it level with the label. */
+  .lv-progress-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--lv-space-3);
+    margin-bottom: var(--lv-space-2);
+    font-size: var(--lv-text-sm);
+    line-height: var(--lv-line-tight);
+  }
+  /* Only the value is muted; without showValue the label is the last child. */
+  .lv-progress-label > :last-child:not(:first-child) {
+    color: var(--lv-muted);
+  }
+  .lv-progress {
+    position: relative;
+    /* stylelint-disable-next-line lievre/height-grid -- 進み具合の棒。罫線を含めて 6px */
+    height: 6px;
+    overflow: hidden;
+    border-radius: var(--lv-radius-full);
+    background: var(--lv-surface-sunken);
+    box-shadow: inset 0 0 0 1px var(--lv-border);
+  }
+  .lv-progress-indicator {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--lv-accent);
+    transition: transform 0.4s var(--lv-ease);
+  }
+
+  /* Skeleton */
+  .lv-skeleton {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: middle;
+    border-radius: var(--lv-radius-sm);
+    background: var(--lv-skeleton);
+    animation: lv-pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes lv-pulse {
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Empty state */
+  .lv-empty {
+    padding: 40px 16px;
+    text-align: center;
+    color: var(--lv-muted);
+  }
+  .lv-empty-icon {
+    display: inline-flex;
+    margin-bottom: var(--lv-space-3);
+  }
+  .lv-empty h3 {
+    margin: 0 0 var(--lv-space-1);
+    color: var(--lv-text);
+    font-size: var(--lv-text-base);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-empty p {
+    max-width: 22rem;
+    margin: 0 auto var(--lv-space-4);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-body);
+  }
+  .lv-empty > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* Divider */
+  .lv-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--lv-space-3);
+    margin: 20px 0;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-xs);
+  }
+  .lv-divider::before,
+  .lv-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--lv-border);
+  }
+  .lv-divider:not(:has(span))::after {
+    display: none;
+  }
+
+  /* Kbd */
+  .lv-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 4px;
+    border: 1px solid var(--lv-border);
+    border-radius: var(--lv-radius-sm);
+    background: var(--lv-surface-raised);
+    color: var(--lv-muted);
+    font: var(--lv-text-mono-min) / 1 var(--lv-font-mono);
+  }
+
+  /* Avatar */
+  .lv-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--lv-accent-soft);
+    color: var(--lv-accent);
+    font-size: var(--lv-text-xs);
+    font-weight: var(--lv-weight-bold);
+  }
+  .lv-avatar--sm {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Breadcrumb */
+  .lv-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--lv-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--lv-text-sm);
+    color: var(--lv-muted);
+  }
+  .lv-breadcrumb li {
+    display: flex;
+    gap: var(--lv-space-2);
+  }
+  .lv-breadcrumb li > span[aria-hidden] {
+    color: var(--lv-subtle);
+  }
+  .lv-breadcrumb a:hover {
+    color: var(--lv-text);
+  }
+  .lv-breadcrumb [aria-current] {
+    color: var(--lv-text);
+  }
+
+  /* Pagination */
+  .lv-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--lv-space-2);
+    font-size: var(--lv-text-sm);
+  }
+  /* A whole-pixel line: at the inherited 1.714 × 14.4px the browser rounds the half-leading
+     and the figures drift 0.8px off the buttons' centre. */
+  .lv-pagination > span {
+    margin-right: var(--lv-space-2);
+    color: var(--lv-muted);
+    font-size: var(--lv-text-mono-min);
+    font-family: var(--lv-font-mono);
+    line-height: var(--lv-line-tight);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Dialog */
+  .lv-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: var(--lv-overlay);
+    animation: lv-fade 120ms ease-out;
+  }
+  .lv-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 101;
+    width: min(520px, calc(100vw - 32px));
+    max-height: calc(100dvh - 40px);
+    overflow: auto;
+    border: 1px solid var(--lv-border-strong);
+    border-radius: var(--lv-radius-lg);
+    background: var(--lv-surface-raised);
+    transform: translate(-50%, -50%);
+    animation: lv-rise 160ms var(--lv-ease);
+  }
+  .lv-dialog-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--lv-space-3);
+    padding: 24px 24px 0;
+  }
+  .lv-dialog-header > div {
+    flex: 1;
+    min-width: 0;
+  }
+  .lv-dialog-title {
+    margin: 0 0 var(--lv-space-1);
+    font-size: var(--lv-text-xl);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+    letter-spacing: var(--lv-tracking-heading);
+    font-feature-settings: 'palt';
+  }
+  .lv-dialog-description {
+    margin: 0;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-body);
+  }
+  /* The close button's icon, not its 32px hit area, lines up with the 24px padding. */
+  .lv-dialog-header > .lv-icon-button {
+    margin-right: -8px;
+  }
+  .lv-dialog-body {
+    padding: 24px;
+  }
+  /* An action band, not a panel: 16px above and below, and the body's 24px at the sides. */
+  .lv-dialog-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--lv-space-2);
+    padding: 16px 24px;
+    border-top: 1px solid var(--lv-border);
+  }
+  /* A confirmation is one short panel: the title, the text and the buttons share one padding,
+     and a narrower box keeps the line length short. */
+  .lv-dialog--confirm {
+    width: min(440px, calc(100vw - 32px));
+  }
+  .lv-dialog--confirm .lv-dialog-body {
+    display: grid;
+    gap: var(--lv-space-3);
+    padding: 24px;
+  }
+  .lv-dialog--confirm .lv-dialog-header {
+    flex-wrap: nowrap;
+    padding: 0;
+  }
+  .lv-dialog--confirm .lv-dialog-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+  }
+  .lv-dialog--confirm .lv-dialog-description {
+    color: var(--lv-text);
+  }
+  .lv-confirm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--lv-space-2);
+    margin-top: var(--lv-space-3);
+  }
+  @keyframes lv-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes lv-rise {
+    from {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% + 6px));
+    }
+  }
+
+  /* Toast */
+  .lv-toast-viewport {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 120;
+    display: flex;
+    flex-direction: column;
+    gap: var(--lv-space-2);
+    width: 380px;
+    max-width: calc(100vw - 32px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    outline: none;
+  }
+  .lv-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--lv-space-2);
+    padding: var(--lv-space-4);
+    border: 1px solid var(--lv-border-strong);
+    border-radius: var(--lv-radius-lg);
+    background: var(--lv-surface-raised);
+    color: var(--lv-text);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-body);
+    animation: lv-fade 160ms ease-out;
+  }
+  .lv-toast > svg {
+    height: 1lh;
+    color: var(--lv-success);
+  }
+  /* The 32px close button takes one line of height and its icon meets the 16px padding. */
+  .lv-toast > .lv-icon-button {
+    margin: -4px -8px -4px 0;
+  }
+  .lv-toast[data-tone='error'] > svg {
+    color: var(--lv-danger);
+  }
+  .lv-toast > div {
+    flex: 1;
+  }
+  .lv-toast-title {
+    font-size: var(--lv-text-md);
+    font-weight: var(--lv-weight-bold);
+  }
+  .lv-toast-description {
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+  }
+  .lv-toast[data-swipe='move'] {
+    transform: translateX(var(--radix-toast-swipe-move-x));
+  }
+
+  /* Metric */
+  .lv-metric {
+    position: relative;
+    min-width: 0;
+    padding: var(--lv-panel-padding);
+    border: 1px solid var(--lv-border);
+    border-radius: var(--lv-radius-lg);
+    background: var(--lv-surface);
+  }
+  .lv-metric-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lv-space-2);
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-metric-code {
+    color: var(--lv-subtle);
+    font: var(--lv-text-mono-min) / var(--lv-line-tight) var(--lv-font-mono);
+  }
+  .lv-metric-value {
+    margin: 8px 0 4px;
+    font-size: var(--lv-text-3xl);
+    font-family: var(--lv-font-mono);
+    font-weight: var(--lv-weight-regular);
+    font-variant-numeric: tabular-nums;
+    line-height: round(1.2em, 4px);
+    letter-spacing: -0.01em;
+  }
+  /* Units are words, not data: the sans face keeps % the same size as 件 or 秒.
+     line-height: 1 keeps the smaller sans box inside the figure's line. */
+  .lv-metric-value > span {
+    margin-left: 4px;
+    line-height: 1;
+    color: var(--lv-muted);
+    font-family: var(--lv-font-sans);
+    font-size: var(--lv-text-md);
+    font-weight: var(--lv-weight-regular);
+    letter-spacing: 0;
+  }
+  .lv-metric-change {
+    display: flex;
+    align-items: center;
+    gap: var(--lv-space-1);
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+    line-height: var(--lv-line-tight);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Sparkline */
+  .lv-sparkline {
+    display: block;
+    width: 100%;
+    height: 40px;
+    margin-top: var(--lv-space-3);
+    color: var(--lv-accent);
+  }
+  .lv-sparkline--success {
+    color: var(--lv-success);
+  }
+  .lv-sparkline--muted {
+    color: var(--lv-muted);
+  }
+  .lv-chart-grid {
+    fill: none;
+    stroke: var(--lv-border);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* Meter — a dial for one value against a fixed range. */
+  .lv-meter {
+    position: relative;
+    width: 200px;
+    min-height: 192px;
+    text-align: center;
+  }
+  .lv-meter-face {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    /* Centred even when the meter is narrower than the face (auto margins would align it left). */
+    margin-inline: calc((100% - 180px) / 2);
+  }
+  .lv-meter-ticks {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: repeating-conic-gradient(
+      from -135deg,
+      var(--lv-border-strong) 0deg 1deg,
+      transparent 1deg 9deg
+    );
+    mask: radial-gradient(circle, transparent 62%, #000 63% 68%, transparent 69%);
+    /* Hide the 90° below the hand's −135°…135° sweep, keeping the end ticks whole. */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 48%, 0 100%);
+  }
+  .lv-meter-hand {
+    position: absolute;
+    top: 27px;
+    left: calc(50% - 1px);
+    width: 2px;
+    /* stylelint-disable-next-line lievre/height-grid -- 針の長さ。目盛りの内側の半径（180px の 35%）に合わせた 63px */
+    height: 63px;
+    background: var(--lv-accent);
+    transform-origin: 50% 100%;
+    transition: transform 0.5s var(--lv-ease);
+  }
+  .lv-meter-hub {
+    position: absolute;
+    top: 85px;
+    left: calc(50% - 5px);
+    width: 10px;
+    /* stylelint-disable-next-line lievre/height-grid -- 針の軸。罫線 2px を含めて 10px の丸 */
+    height: 10px;
+    border: 2px solid var(--lv-surface);
+    border-radius: 50%;
+    background: var(--lv-accent);
+  }
+  .lv-meter-reading {
+    position: absolute;
+    top: 116px;
+    display: grid;
+    gap: 0;
+    width: 100%;
+  }
+  .lv-meter-reading strong {
+    font-size: var(--lv-text-2xl);
+    font-family: var(--lv-font-mono);
+    font-weight: var(--lv-weight-regular);
+    font-variant-numeric: tabular-nums;
+    line-height: round(1.2em, 4px);
+  }
+  .lv-meter-reading small {
+    margin-left: 4px;
+    line-height: 1;
+    color: var(--lv-muted);
+    font-family: var(--lv-font-sans);
+    font-size: var(--lv-text-md);
+    font-weight: var(--lv-weight-regular);
+  }
+  .lv-meter-reading > span {
+    color: var(--lv-muted);
+    font-size: var(--lv-text-xs);
+  }
+
+  /* Table */
+  .lv-table-wrap {
+    max-width: 100%;
+    min-width: 0;
+    overflow: auto;
+  }
+  /* Separate borders: each cell keeps its whole 1px rule, where collapse would split it into
+     half-pixel row heights and cells whose box no longer matches their border width. */
+  .lv-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--lv-text-md);
+    white-space: nowrap;
+  }
+  .lv-table th {
+    padding: var(--lv-cell-padding);
+    line-height: var(--lv-line-tight);
+    border-bottom: 1px solid var(--lv-border-strong);
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+    font-weight: var(--lv-weight-bold);
+    text-align: left;
+  }
+  .lv-table td {
+    padding: var(--lv-cell-padding);
+    border-bottom: 1px solid var(--lv-border);
+    line-height: var(--lv-line-body);
+    vertical-align: middle;
+  }
+  /* A badge alone in a cell sits on the middle of the line, not on its baseline (1.5px low). */
+  .lv-table td > .lv-badge {
+    vertical-align: middle;
+  }
+  .lv-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  /* Pages drawn by DataTable itself: the count and the buttons line up with the cells' padding. */
+  .lv-table-pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lv-space-3);
+    padding: var(--lv-cell-padding);
+    border-top: 1px solid var(--lv-border);
+  }
+  .lv-table-count {
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-table tbody tr:hover {
+    background: color-mix(in srgb, var(--lv-surface-sunken) 60%, transparent);
+  }
+  .lv-table tbody tr[data-selected],
+  .lv-table tbody tr[data-selected]:hover {
+    background: var(--lv-selected);
+  }
+  /* A selected row also carries the accent edge used by the active tab, so it never relies on the fill alone. */
+  .lv-table tbody tr[data-selected] > :first-child {
+    background-image: linear-gradient(var(--lv-accent), var(--lv-accent));
+    background-repeat: no-repeat;
+    background-size: 4px 100%;
+  }
+  /* The same 20px as the Checkbox component. */
+  .lv-table input[type='checkbox'] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    vertical-align: middle;
+    accent-color: var(--lv-accent);
+    cursor: pointer;
+  }
+  .lv-table-select {
+    width: 40px;
+  }
+  .lv-table-sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 24px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  .lv-table-sort:hover {
+    color: var(--lv-text);
+  }
+  .lv-table-detail {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lv-space-1);
+    min-width: 24px;
+    min-height: 24px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--lv-accent);
+    font-size: var(--lv-text-sm);
+    font-weight: var(--lv-weight-bold);
+  }
+  .lv-table-detail:hover {
+    text-decoration: underline;
+  }
+  /* A borderless button gives its side padding back to the cell, so its content starts on
+     the same line as the column heading. */
+  .lv-table td > .lv-button--ghost.lv-button--sm:first-child {
+    margin-inline-start: -12px;
+  }
+
+  @media (max-width: 600px) {
+    .lv-card-header {
+      padding: 16px 16px 0;
+    }
+    .lv-card-body,
+    .lv-metric {
+      padding: 16px;
+    }
+    .lv-metric-value {
+      font-size: var(--lv-text-2xl);
+    }
+    .lv-dialog-header {
+      padding: 20px 20px 0;
+    }
+    .lv-dialog-body {
+      padding: 20px;
+    }
+    .lv-dialog-footer {
+      padding: 16px 20px;
+    }
+    .lv-dialog--confirm .lv-dialog-body {
+      padding: 20px;
+    }
+    .lv-toast-viewport {
+      right: 16px;
+      bottom: 16px;
+    }
+    .lv-table th {
+      padding-inline: 12px;
+    }
+  }
+
+  @media (pointer: coarse) {
+    .lv-button,
+    .lv-select-trigger,
+    .lv-tab,
+    .lv-select-item,
+    .lv-menu-item {
+      min-height: 44px;
+    }
+    .lv-icon-button {
+      min-width: 44px;
+      min-height: 44px;
+    }
+    /* The 44px close buttons keep their 16px icon on the padding line and centred on the
+       title's line (32px in a dialog, 24px in a toast). */
+    .lv-dialog-header > .lv-icon-button {
+      margin: calc((32px - 44px) / 2) calc((16px - 44px) / 2) calc((32px - 44px) / 2) 0;
+    }
+    .lv-toast > .lv-icon-button {
+      margin: calc((24px - 44px) / 2) calc((16px - 44px) / 2) calc((24px - 44px) / 2) 0;
+    }
+  }
+}
+
+/* --------------------------------------------------------------- utilities */
+
+@layer lievre.utilities {
+  /* For data: figures, times, IDs and code. Japanese units fall back to the sans face.
+     The size floor lives in lievre.base so a component's own font-size still wins. */
+  .lv-mono {
+    font-family: var(--lv-font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  /* For figures inside running text: keeps the sans face, equalises digits. */
+  .lv-tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .lv-muted {
+    color: var(--lv-muted);
+  }
+  .lv-text-success {
+    color: var(--lv-success);
+  }
+  .lv-text-danger {
+    color: var(--lv-danger);
+  }
+  .lv-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lievre *,
+    .lievre *::before,
+    .lievre *::after {
+      animation: none !important;
+      transition: none !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .lv-button,
+    .lv-badge,
+    .lv-input,
+    .lv-card,
+    .lv-checkbox,
+    .lv-switch,
+    .lv-tab {
+      border: 1px solid ButtonText;
+    }
+    .lv-progress-indicator,
+    .lv-status-dot,
+    .lv-meter-hand {
+      background: Highlight;
+    }
+    /* Shapes drawn only with a background vanish once the browser forces colours,
+       so paint them with system colours instead. */
+    .lv-checkbox[data-state='checked'],
+    .lv-checkbox[data-state='indeterminate'],
+    .lv-switch,
+    .lv-tab::after,
+    .lv-select-item[data-highlighted],
+    .lv-menu-item[data-highlighted],
+    .lv-menu-item[data-tone='danger'][data-highlighted] {
+      forced-color-adjust: none;
+    }
+    /* Opting out also keeps the brand focus colour, so give focus a system colour back. */
+    .lievre :focus-visible {
+      outline-color: Highlight;
+    }
+    .lv-checkbox[data-state='checked'],
+    .lv-checkbox[data-state='indeterminate'] {
+      background: Highlight;
+      border-color: Highlight;
+      color: HighlightText;
+    }
+    .lv-checkbox:disabled {
+      border-color: GrayText;
+    }
+    .lv-checkbox:disabled[data-state='checked'],
+    .lv-checkbox:disabled[data-state='indeterminate'] {
+      background: GrayText;
+      color: Canvas;
+    }
+    .lv-select-item[data-highlighted],
+    .lv-menu-item[data-highlighted],
+    .lv-menu-item[data-tone='danger'][data-highlighted] {
+      background: Highlight;
+      color: HighlightText;
+    }
+    /* Rows keep forced colours for their contents; the selection becomes an outline. */
+    .lv-table tbody tr[data-selected],
+    .lv-table tbody tr[data-selected]:hover {
+      outline: 2px solid Highlight;
+      outline-offset: -2px;
+    }
+    .lv-switch {
+      background: Canvas;
+    }
+    .lv-switch-thumb {
+      background: ButtonText;
+    }
+    .lv-switch[data-state='checked'] {
+      background: Highlight;
+      border-color: Highlight;
+    }
+    .lv-switch[data-state='checked'] .lv-switch-thumb {
+      background: HighlightText;
+    }
+    .lv-switch:disabled {
+      background: Canvas;
+      border-color: GrayText;
+    }
+    .lv-switch:disabled .lv-switch-thumb {
+      background: GrayText;
+    }
+    .lv-tab[data-state='active']::after {
+      background: Highlight;
+    }
+  }
+}

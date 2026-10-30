@@ -1,18 +1,18 @@
 /*
  * IBM Plex for the docs site and Storybook. The package itself does not ship fonts:
- * apps load these (or their own) and the --k-font-* stacks pick them up.
+ * apps load these (or their own) and the --lv-font-* stacks pick them up.
  */
 @import '@fontsource/ibm-plex-sans-jp/400.css';
 @import '@fontsource/ibm-plex-sans-jp/500.css';
 @import '@fontsource/ibm-plex-sans-jp/600.css';
 
 /*
- * KEI Mono: IBM Plex Mono scaled from 0.6em to 0.5em wide, so one Latin character is
+ * Lievre Mono: IBM Plex Mono scaled from 0.6em to 0.5em wide, so one Latin character is
  * exactly half of a Japanese one (the same 1:2 grid as PlemolJP). Japanese falls
  * through to IBM Plex Sans JP, whose kana and kanji are 1em wide.
  */
 @font-face {
-  font-family: 'KEI Mono';
+  font-family: 'Lievre Mono';
   font-style: normal;
   font-display: swap;
   font-weight: 400;
@@ -24,7 +24,7 @@
 }
 
 @font-face {
-  font-family: 'KEI Mono';
+  font-family: 'Lievre Mono';
   font-style: normal;
   font-display: swap;
   font-weight: 500;
@@ -36,7 +36,7 @@
 }
 
 @font-face {
-  font-family: 'KEI Mono';
+  font-family: 'Lievre Mono';
   font-style: normal;
   font-display: swap;
   font-weight: 600;

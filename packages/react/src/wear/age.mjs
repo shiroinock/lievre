@@ -1,4 +1,4 @@
-// Age: a fourth axis beside theme, density and typography (<KeiProvider age="light">). Parts are
+// Age: a fourth axis beside theme, density and typography (<LievreProvider age="light">). Parts are
 // never aged one by one. A few materials are made here, as tokens and custom properties, and each
 // part takes them through the tokens it already uses or the selectors in AGE_PLACES:
 //   fade    every colour token loses colour toward an old-paper yellow grey (OKLab, at its own
@@ -70,30 +70,30 @@ export const FADED = Object.values(FADE_GROUPS).flatMap((g) => g.names);
 /** Inks a state mark keeps fresh. */
 export const STATE_INKS = FADE_GROUPS.inks.names;
 /**
- * Marks drawn with the fresh inks inside an aged scope: the focus outline (through --k-focus), the
+ * Marks drawn with the fresh inks inside an aged scope: the focus outline (through --lv-focus), the
  * selected row's leading edge and its checkbox, the active tab's underline, and error marks.
  */
 export const AGE_STATES = [
   'tr[data-selected] > :first-child',
   "[role='tab'][data-state='active']",
   "[aria-invalid='true']",
-  '.k-field-error',
+  '.lv-field-error',
   "[data-tone='error']",
 ];
 
 /**
  * Where each material goes, and how strongly (a share of the level's value). Headings, meters,
  * empty states and cards can take a lot; tables and inputs at 13–14px take little. A new part
- * joins by adding its selector here, or by carrying one of the k-age-* classes.
+ * joins by adding its selector here, or by carrying one of the lv-age-* classes.
  */
 export const AGE_PLACES = {
-  card: { selectors: ['.k-card', '.k-age-sheet'], rules: 1, chips: 1 },
+  card: { selectors: ['.lv-card', '.lv-age-sheet'], rules: 1, chips: 1 },
   fill: {
-    selectors: ['.k-button--primary', '.k-button--danger', '.k-age-fill'],
+    selectors: ['.lv-button--primary', '.lv-button--danger', '.lv-age-fill'],
     mottle: 1,
   },
-  control: { selectors: ['.k-button', '.k-age-corner'], chips: 0.35 },
-  table: { selectors: ['.k-table tbody tr:not(:last-child) td', '.k-age-rule'], rules: 0.7 },
+  control: { selectors: ['.lv-button', '.lv-age-corner'], chips: 0.35 },
+  table: { selectors: ['.lv-table tbody tr:not(:last-child) td', '.lv-age-rule'], rules: 0.7 },
 };
 
 /** The mottle is smooth, so it is stored at half the tile and drawn at the full tile. */
@@ -419,11 +419,11 @@ function ringMask(seed, amount, radius) {
 export function ageInkVars(config, tokens, theme, level, url) {
   const { colours } = agedTokens(config, tokens, theme, level);
   const vars = {};
-  for (const [name, { aged }] of Object.entries(colours)) vars[`--k-${name}`] = aged;
-  for (const name of STATE_INKS) vars[`--k-age-fresh-${name}`] = colours[name].fresh;
+  for (const [name, { aged }] of Object.entries(colours)) vars[`--lv-${name}`] = aged;
+  for (const name of STATE_INKS) vars[`--lv-age-fresh-${name}`] = colours[name].fresh;
   // Focus is a state: it keeps the fresh accent, whatever the accent does.
-  vars['--k-focus'] = colours.accent.fresh;
-  vars['--k-age-mottle'] = url(`age-mottle-${theme}-${level}.png`);
+  vars['--lv-focus'] = colours.accent.fresh;
+  vars['--lv-age-mottle'] = url(`age-mottle-${theme}-${level}.png`);
   return vars;
 }
 
@@ -436,7 +436,7 @@ export function ageShapeVars(config, level, url) {
     // Two draws went to the misregistration, now dropped; spending them keeps the rest in place.
     next();
     next();
-    vars[`--k-age-mottle-pos-${n}`] =
+    vars[`--lv-age-mottle-pos-${n}`] =
       `${Math.floor(next() * TILE)}px ${Math.floor(next() * TILE)}px`;
     // One or two corners, never the same pair for every part.
     const first = CORNERS[Math.floor(next() * 4)];
@@ -444,12 +444,12 @@ export function ageShapeVars(config, level, url) {
     const corners = next() < 0.5 ? [first] : [first, second];
     for (const place of ['card', 'control']) {
       const size = CHIP * amountFor(config, level, 'chips', AGE_PLACES[place].chips);
-      vars[`--k-age-chips-${place}-${n}`] = chipMask(corners, size, chipUrl);
+      vars[`--lv-age-chips-${place}-${n}`] = chipMask(corners, size, chipUrl);
     }
-    vars[`--k-age-ring-${n}`] = ringMask(
+    vars[`--lv-age-ring-${n}`] = ringMask(
       seedFor(config.salt, 'ring', n),
       amountFor(config, level, 'rules', AGE_PLACES.card.rules),
-      'var(--k-radius-lg)',
+      'var(--lv-radius-lg)',
     );
   }
   const stops = ruleStops(
@@ -457,10 +457,10 @@ export function ageShapeVars(config, level, url) {
     amountFor(config, level, 'rules', AGE_PLACES.table.rules),
     (opacity) =>
       opacity >= 1
-        ? 'var(--k-border)'
-        : `color-mix(in srgb, var(--k-border) ${Math.round(opacity * 100)}%, transparent)`,
+        ? 'var(--lv-border)'
+        : `color-mix(in srgb, var(--lv-border) ${Math.round(opacity * 100)}%, transparent)`,
   );
-  vars['--k-age-rule'] = stops ? `repeating-linear-gradient(90deg, ${stops})` : 'none';
+  vars['--lv-age-rule'] = stops ? `repeating-linear-gradient(90deg, ${stops})` : 'none';
   return vars;
 }
 
@@ -480,12 +480,12 @@ const nth = (n) => (n ? `:nth-of-type(${VARIANTS}n + ${n + 1})` : '');
  * They read only custom properties, so the live provider can set those inline.
  */
 export function ageRules() {
-  const aged = ".kei:is([data-age='light'], [data-age='heavy'])";
+  const aged = ".lievre:is([data-age='light'], [data-age='heavy'])";
   const any = (selectors) => (selectors.length > 1 ? `:is(${selectors.join(', ')})` : selectors[0]);
   const rules = [
     block(`${aged} ${any(AGE_STATES)}`, {
       ...Object.fromEntries(
-        STATE_INKS.map((name) => [`--k-${name}`, `var(--k-age-fresh-${name})`]),
+        STATE_INKS.map((name) => [`--lv-${name}`, `var(--lv-age-fresh-${name})`]),
       ),
     }),
   ];
@@ -502,49 +502,51 @@ export function ageRules() {
       content: "''",
       position: 'absolute',
       inset: '0',
-      border: '1px solid var(--k-border)',
-      'border-radius': 'calc(var(--k-radius-lg) - 1px)',
+      border: '1px solid var(--lv-border)',
+      'border-radius': 'calc(var(--lv-radius-lg) - 1px)',
       'pointer-events': 'none',
-      mask: 'var(--k-age-ring-0)',
+      mask: 'var(--lv-age-ring-0)',
     }),
   );
   for (let n = 0; n < VARIANTS; n++) {
     rules.push(
       // A mask clips what is inside too, so a card holding focus is drawn whole.
       block(`${aged} ${any(card.selectors)}:not(:focus-within)${nth(n)}`, {
-        mask: `var(--k-age-chips-card-${n})`,
+        mask: `var(--lv-age-chips-card-${n})`,
       }),
     );
     if (n)
       rules.push(
-        block(`${aged} ${any(card.selectors)}${nth(n)}::after`, { mask: `var(--k-age-ring-${n})` }),
+        block(`${aged} ${any(card.selectors)}${nth(n)}::after`, {
+          mask: `var(--lv-age-ring-${n})`,
+        }),
       );
     // Filled controls: the paper shows through the fill in blotches. The box, its outline, its
     // edges and the label are left as they are.
     rules.push(
       block(`${aged} ${any(fill.selectors)}:not(:disabled)${nth(n)}`, {
-        'background-image': 'var(--k-age-mottle)',
-        'background-position': `var(--k-age-mottle-pos-${n})`,
+        'background-image': 'var(--lv-age-mottle)',
+        'background-position': `var(--lv-age-mottle-pos-${n})`,
         'background-size': `${TILE}px ${TILE}px`,
       }),
       // A mask would also cut off the focus ring, so a focused control is drawn whole.
       block(`${aged} ${any(control.selectors)}:not(:disabled, :focus-visible)${nth(n)}`, {
-        mask: `var(--k-age-chips-control-${n})`,
+        mask: `var(--lv-age-chips-control-${n})`,
       }),
     );
   }
   rules.push(
     block(`${aged} ${any(table.selectors)}`, {
       'border-bottom-color': 'transparent',
-      'background-image': 'var(--k-age-rule)',
+      'background-image': 'var(--lv-age-rule)',
       'background-position': 'left bottom',
       'background-size': '100% 1px',
       'background-repeat': 'no-repeat',
     }),
     // The worn rule shares the cell's background with the selected row's leading edge: draw both,
     // so the selection never falls back to the fill alone.
-    block(`${aged} .k-table tbody tr[data-selected]:not(:last-child) > :first-child`, {
-      'background-image': 'linear-gradient(var(--k-accent), var(--k-accent)), var(--k-age-rule)',
+    block(`${aged} .lv-table tbody tr[data-selected]:not(:last-child) > :first-child`, {
+      'background-image': 'linear-gradient(var(--lv-accent), var(--lv-accent)), var(--lv-age-rule)',
       'background-position': 'left top, left bottom',
       'background-size': '4px 100%, 100% 1px',
     }),

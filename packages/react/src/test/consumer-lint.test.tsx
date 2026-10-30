@@ -1,4 +1,4 @@
-// The lint rules for apps that use KEI (lint/). Every case runs through ESLint, Oxlint and Biome,
+// The lint rules for apps that use lievre (lint/). Every case runs through ESLint, Oxlint and Biome,
 // and the same code must give the same result in each.
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -7,17 +7,17 @@ import { basename, join, resolve } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ESLint } from 'eslint';
 import tseslint from 'typescript-eslint';
-import kei from '../../lint/index.js';
+import lievre from '../../lint/index.js';
 
 type Case =
   | string
   | { code: string; errors?: number; biome?: false; settings?: Record<string, unknown> };
-type RuleName = keyof typeof kei.rules;
+type RuleName = keyof typeof lievre.rules;
 
 const imports = `import {
   Button, IconButton, Metric, Dialog, DialogClose, ConfirmDialog,
   DropdownMenu, Popover, DataTable, Pagination,
-} from '@kei-design/react';
+} from '@lievre/react';
 import { Download, MoreHorizontal, Trash2 } from 'lucide-react';
 declare const all: { id: string }[];
 declare const setOpen: (open: boolean) => void;
@@ -123,35 +123,35 @@ const cases: Record<RuleName, { valid: Case[]; invalid: Case[] }> = {
       `<Button><Download />書き出す</Button>`,
       `<IconButton label="書き出す" icon={<Download />} />`,
       // Not surely an icon: these may render the button's text.
-      `import { Button } from '@kei-design/react';
+      `import { Button } from '@lievre/react';
 import { FormattedMessage } from 'react-intl';
 export const Case = () => <Button><FormattedMessage id="save" /></Button>;
 `,
-      `import { Button } from '@kei-design/react';
+      `import { Button } from '@lievre/react';
 declare const SaveLabel: () => null;
 export const Case = () => <Button><SaveLabel /></Button>;
 `,
-      `import { Button } from '@kei-design/react';
+      `import { Button } from '@lievre/react';
 import { Save } from 'my-icons';
 export const Case = () => <Button><Save /></Button>;
 `,
     ],
     invalid: [
       `<Button><Trash2 /></Button>`,
-      `import { Button } from '@kei-design/react';
+      `import { Button } from '@lievre/react';
 import { TrashIcon as Bin } from '@heroicons/react/24/outline';
 export const Case = () => <Button><Bin /></Button>;
 `,
-      `import { Button } from '@kei-design/react';
+      `import { Button } from '@lievre/react';
 declare const CloseIcon: () => null;
 export const Case = () => <Button><CloseIcon /></Button>;
 `,
       {
-        code: `import { Button } from '@kei-design/react';
+        code: `import { Button } from '@lievre/react';
 import { Save } from 'my-icons';
 export const Case = () => <Button><Save /></Button>;
 `,
-        settings: { kei: { iconSources: ['my-icons'] } },
+        settings: { lievre: { iconSources: ['my-icons'] } },
         biome: false,
       },
       `<Button icon={<Trash2 />} />`,
@@ -165,7 +165,7 @@ export const Case = () => <Button><Save /></Button>;
     valid: [
       {
         // From the review: a small table and a card list paged by Pagination are two components.
-        code: `import { DataTable, Pagination, type Column } from '@kei-design/react';
+        code: `import { DataTable, Pagination, type Column } from '@lievre/react';
 import { useState } from 'react';
 type Row = { id: string; amount: number };
 declare const all: Row[];
@@ -188,7 +188,7 @@ export const Cards = () => {
       },
       {
         // The nearest function around the DataTable is the inner component, not the outer one.
-        code: `import { DataTable, Pagination } from '@kei-design/react';
+        code: `import { DataTable, Pagination } from '@lievre/react';
 declare const all: { id: string }[];
 declare const page: number;
 declare const setPage: (page: number) => void;
@@ -207,7 +207,7 @@ export function Outer() {
       },
       {
         // Accepted miss: a Pagination moved out to a footer component is in another function.
-        code: `import { DataTable, Pagination } from '@kei-design/react';
+        code: `import { DataTable, Pagination } from '@lievre/react';
 declare const all: { id: string }[];
 declare const page: number;
 declare const setPage: (page: number) => void;
@@ -229,8 +229,8 @@ export const Case = () => (
       `<DataTable rows={all.slice(0, 5)} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="最新の5件" />`,
       `<><DataTable {...{ pageSize: 10 }} rows={all} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" /><Pagination page={page} totalPages={3} onPageChange={setPage} /></>`,
       {
-        // A Pagination from another library is not KEI's. Biome cannot tie a name to its import.
-        code: `import { DataTable } from '@kei-design/react';
+        // A Pagination from another library is not lievre's. Biome cannot tie a name to its import.
+        code: `import { DataTable } from '@lievre/react';
 import { Pagination } from 'other-ui';
 declare const all: { id: string }[];
 export const Case = () => (
@@ -244,7 +244,7 @@ export const Case = () => (
       },
       {
         // ESLint follows each table's columns; Biome only sees that the file has a sortValue.
-        code: `import { DataTable, Pagination, type Column } from '@kei-design/react';
+        code: `import { DataTable, Pagination, type Column } from '@lievre/react';
 type Row = { id: string };
 declare const all: Row[];
 declare const page: number;
@@ -264,7 +264,7 @@ export const Case = () => (
     ],
     invalid: [
       // Outside any function, the whole file is the component.
-      `import { DataTable, Pagination } from '@kei-design/react';
+      `import { DataTable, Pagination } from '@lievre/react';
 declare const all: { id: string }[];
 export const page = (
   <>
@@ -276,7 +276,7 @@ export const page = (
       `<><DataTable rows={all.slice((page - 1) * 10, page * 10)} columns={[{ key: 'id', header: 'ID', render: (r) => r.id, sortValue: (r) => r.id }]} getRowId={(r) => r.id} caption="一覧" /><Pagination page={page} totalPages={3} onPageChange={setPage} /></>`,
       // How the rows are made is not looked at: a helper is the same as slice.
       `import { useMemo, useState } from 'react';
-import { DataTable, Pagination, type Column } from '@kei-design/react';
+import { DataTable, Pagination, type Column } from '@lievre/react';
 type Row = { id: string; amount: number };
 declare const all: Row[];
 declare function pageOf<T>(rows: T[], page: number): T[];
@@ -300,7 +300,7 @@ export function Invoices() {
 }
 `,
       {
-        code: `import * as K from '@kei-design/react';
+        code: `import * as K from '@lievre/react';
 declare const all: { id: string }[];
 declare const page: number;
 declare const setPage: (page: number) => void;
@@ -316,15 +316,29 @@ export const Case = () => (
     ],
   },
   'unit-outside-mono': {
-    valid: [`<span><span className="k-mono">{12}</span>%</span>`],
+    valid: [`<span><span className="lv-mono">{12}</span>%</span>`],
     invalid: [
-      `<span className="k-mono">{12}%</span>`,
-      `<span className="tag k-mono">1,200円</span>`,
+      `<span className="lv-mono">{12}%</span>`,
+      `<span className="tag lv-mono">1,200円</span>`,
+    ],
+  },
+  'no-legacy-prefix': {
+    valid: [
+      `<span className="lv-mono">{12}</span>`,
+      `<div className="desk-top">本文</div>`,
+      `<div style={{ gap: 'var(--lv-space-2)' }}>本文</div>`,
+    ],
+    invalid: [
+      `<span className="k-mono">{12}</span>`,
+      `<div className={'tag k-card'}>本文</div>`,
+      `<div style={{ gap: 'var(--k-space-2)' }}>本文</div>`,
+      `<div style={{ padding: \`var(--k-space-4)\` }}>本文</div>`,
+      { code: `<div style={{ '--k-gap': 'var(--k-space-2)' }}>本文</div>`, errors: 2 },
     ],
   },
 };
 
-// Settings and imports: only components imported from KEI are checked.
+// Settings and imports: only components imported from lievre are checked.
 const extra: { name: string; rule: RuleName; case: Case; errors: number; biome?: false }[] = [
   {
     name: '別のライブラリの Button は見ない',
@@ -335,16 +349,16 @@ const extra: { name: string; rule: RuleName; case: Case; errors: number; biome?:
   {
     name: '別名で読み込んでも見つける',
     rule: 'button-type-in-form',
-    case: `import { Button as KButton } from '@kei-design/react';\nexport const Case = () => <form><KButton>保存</KButton></form>;\n`,
+    case: `import { Button as KButton } from '@lievre/react';\nexport const Case = () => <form><KButton>保存</KButton></form>;\n`,
     errors: 1,
     biome: false,
   },
   {
-    name: 'settings.kei.importSources で読み込み元を足せる',
+    name: 'settings.lievre.importSources で読み込み元を足せる',
     rule: 'button-type-in-form',
     case: {
       code: `import { Button } from '@/ui';\nexport const Case = () => <form><Button>保存</Button></form>;\n`,
-      settings: { kei: { importSources: ['@/ui'] } },
+      settings: { lievre: { importSources: ['@/ui'] } },
     },
     errors: 1,
     biome: false,
@@ -386,12 +400,12 @@ const root = resolve(import.meta.dirname, '../..');
 const bin = (name: string) => join(root, '../../node_modules/.bin', name);
 const grit = readdirSync(join(root, 'lint/biome')).filter((f) => f.endsWith('.grit'));
 const biomeRules = new Set(grit.map((f) => basename(f, '.grit')));
-const ruleNames = Object.keys(kei.rules) as RuleName[];
+const ruleNames = Object.keys(lievre.rules) as RuleName[];
 
 // Every message a rule can give, with `{{name}}` filled in, to tell Biome's diagnostics apart.
 const messageRule = new Map<string, RuleName>();
 for (const rule of ruleNames)
-  for (const message of Object.values(kei.rules[rule].meta.messages) as string[])
+  for (const message of Object.values(lievre.rules[rule].meta.messages) as string[])
     for (const name of ['Dialog', 'ConfirmDialog', 'Popover'])
       messageRule.set(message.replaceAll('{{name}}', name), rule);
 
@@ -405,7 +419,7 @@ const fileOf = (i: number) => join(dir, `case-${i}.tsx`);
 let biomeErrors: string[] = [];
 
 beforeAll(async () => {
-  dir = mkdtempSync(join(tmpdir(), 'kei-lint-'));
+  dir = mkdtempSync(join(tmpdir(), 'lievre-lint-'));
   runs.forEach((r, i) => writeFileSync(fileOf(i), r.code));
 
   // ESLint: one run per settings, since settings are per config.
@@ -417,7 +431,7 @@ beforeAll(async () => {
         {
           files: ['**/*.tsx'],
           languageOptions: { parser: tseslint.parser },
-          ...kei.configs.recommended,
+          ...lievre.configs.recommended,
           settings: r.settings ?? {},
         },
       ],
@@ -425,7 +439,7 @@ beforeAll(async () => {
     const [result] = await eslint.lintFiles([fileOf(i)]);
     found.eslint.set(
       fileOf(i),
-      result.messages.map((m) => m.ruleId!.replace('kei/', '') as RuleName),
+      result.messages.map((m) => m.ruleId!.replace('lievre/', '') as RuleName),
     );
   }
 
@@ -438,7 +452,7 @@ beforeAll(async () => {
         jsPlugins: [join(root, 'lint/index.js')],
         categories: { correctness: 'off' },
         settings,
-        rules: kei.configs.recommended.rules,
+        rules: lievre.configs.recommended.rules,
       }),
     );
     const out = spawnSync(bin('oxlint'), ['-c', config, '-f', 'json', ...files], {
@@ -451,7 +465,7 @@ beforeAll(async () => {
     for (const d of diagnostics)
       found.oxlint
         .get(resolve(dir, d.filename))!
-        .push(d.code.replace(/^kei\((.*)\)$/, '$1') as RuleName);
+        .push(d.code.replace(/^lievre\((.*)\)$/, '$1') as RuleName);
   };
   oxlint(runs.flatMap((r, i) => (r.settings ? [] : [fileOf(i)])));
   for (const [i, r] of runs.entries()) if (r.settings) oxlint([fileOf(i)], r.settings);
@@ -493,7 +507,7 @@ afterAll(() => rmSync(dir, { recursive: true, force: true }));
 const count = (rules: RuleName[] | undefined, rule: RuleName) =>
   (rules ?? []).filter((r) => r === rule).length;
 
-describe('lint rules for apps that use KEI', () => {
+describe('lint rules for apps that use lievre', () => {
   it.each(runs.map((r, i) => [r.name, i] as const))('%s', (_, i) => {
     const r = runs[i];
     const f = fileOf(i);
@@ -521,17 +535,17 @@ describe('lint rules for apps that use KEI', () => {
 
   it('every message says how to fix it with an example or a prop', () => {
     for (const rule of ruleNames)
-      for (const message of Object.values(kei.rules[rule].meta.messages) as string[])
+      for (const message of Object.values(lievre.rules[rule].meta.messages) as string[])
         expect(message, rule).toMatch(/ください/);
   });
 
-  it('is shipped as @kei-design/react/lint, with the package version', () => {
+  it('is shipped as @lievre/react/lint, with the package version', () => {
     const out = spawnSync(
       process.execPath,
       [
         '--input-type=module',
         '-e',
-        "import('@kei-design/react/lint').then((m) => console.log(m.default.meta.version))",
+        "import('@lievre/react/lint').then((m) => console.log(m.default.meta.version))",
       ],
       { cwd: root, encoding: 'utf8' },
     );
@@ -548,7 +562,7 @@ describe('lint rules for apps that use KEI', () => {
         {
           files: ['**/*.tsx'],
           languageOptions: { parser: tseslint.parser },
-          ...kei.configs.recommended,
+          ...lievre.configs.recommended,
         },
       ],
     });

@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import '../styles/fonts.css';
-import '../styles/kei.css';
-import '../styles/kei-wear.css';
+import '../styles/lievre.css';
+import '../styles/lievre-wear.css';
 import './tune.css';
 import { Tune } from './Tune';
 // Worn faces from `npm run wear:font`, to compare with the plain ones; absent until it has run.

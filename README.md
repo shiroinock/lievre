@@ -1,14 +1,16 @@
-# KEI（計）
+# Lièvre
 
 日本語の画面を読みやすく組み立てるためのデザインシステムです。作者個人の実験的なデザインシステムで、特定の用途に絞らず、質感や経年のような表現も試しています。どの試みでも、WCAG 2.x AA などの Web 標準の基準は守ります。設計の考え方は [DESIGN.md](DESIGN.md) にまとめています。
 
 このリポジトリは npm のワークスペースで、同じデザイン言語のパッケージを3つ持っています。
 
-| パッケージ                              | 場所              | 内容                                                                     |
-| --------------------------------------- | ----------------- | ------------------------------------------------------------------------ |
-| [`@kei-design/tokens`](packages/tokens) | `packages/tokens` | トークンの正（`tokens.css`）と、そこから書き出す交換用の `tokens.json`   |
-| [`@kei-design/react`](packages/react)   | `packages/react`  | React の部品、`styles.css`、利用者向けの lint、`llms.txt`                |
-| [`@kei-design/tui`](packages/tui)       | `packages/tui`    | 端末（TUI）の部品。Ink 8 で描く。色と字の組を決める中核は Ink に依らない |
+| パッケージ                          | 場所              | 内容                                                                     |
+| ----------------------------------- | ----------------- | ------------------------------------------------------------------------ |
+| [`@lievre/tokens`](packages/tokens) | `packages/tokens` | トークンの正（`tokens.css`）と、そこから書き出す交換用の `tokens.json`   |
+| [`@lievre/react`](packages/react)   | `packages/react`  | React の部品、`styles.css`、利用者向けの lint、`llms.txt`                |
+| [`@lievre/tui`](packages/tui)       | `packages/tui`    | 端末（TUI）の部品。Ink 8 で描く。色と字の組を決める中核は Ink に依らない |
+
+名前を lievre に改めました（読みはフランス語の lièvre、野うさぎ）。改名の前の名前から移る手順は [MIGRATION.md](MIGRATION.md) にあります。
 
 使い方（別のプロジェクトへの取り込み、lint の設定）は [packages/react/README.md](packages/react/README.md) にあります。AI のコーディングエージェントで使うときは、まず [llms.txt](packages/react/llms.txt) を読ませてください。
 
@@ -26,28 +28,28 @@ npm run dev         # 概要のデモ http://127.0.0.1:5173
 
 ## 構成
 
-| 場所                            | 内容                                                            |
-| ------------------------------- | --------------------------------------------------------------- |
-| `packages/tokens/tokens.css`    | トークン（トークンの正）                                        |
-| `packages/tokens/tokens.json`   | `tokens.css` から生成した交換用のトークン                       |
-| `packages/react/src/components` | React コンポーネントと型                                        |
-| `packages/react/src/styles`     | 部品のスタイル（`kei.css`）。トークンの層は tokens から読み込む |
-| `packages/react/src/stories`    | 各部品の Story（Controls・Autodocs・Accessibility・play 関数）  |
-| `packages/react/src/docs`       | 導入、設計原則、配色・文字・余白                                |
-| `packages/react/src/patterns`   | 画面例：探す・読む・申し込む・管理する                          |
-| `packages/react/llms.txt`       | エージェント向けの使い方と全部品の API（型から生成）            |
-| `packages/react/lint`           | 使う側のアプリ向けの lint ルール（ESLint・Oxlint・Biome）       |
-| `packages/react/bench/agent`    | エージェント向けのベンチマーク                                  |
-| `packages/tui/src`              | 端末の部品（`core` と `ink`）                                   |
-| `references`                    | 参考にした81件のピンと一覧ビューア                              |
-| `docs`                          | 設計の判断と比較の記録                                          |
-| `spikes`                        | 試作（ワークスペースに入れない）                                |
+| 場所                            | 内容                                                               |
+| ------------------------------- | ------------------------------------------------------------------ |
+| `packages/tokens/tokens.css`    | トークン（トークンの正）                                           |
+| `packages/tokens/tokens.json`   | `tokens.css` から生成した交換用のトークン                          |
+| `packages/react/src/components` | React コンポーネントと型                                           |
+| `packages/react/src/styles`     | 部品のスタイル（`lievre.css`）。トークンの層は tokens から読み込む |
+| `packages/react/src/stories`    | 各部品の Story（Controls・Autodocs・Accessibility・play 関数）     |
+| `packages/react/src/docs`       | 導入、設計原則、配色・文字・余白                                   |
+| `packages/react/src/patterns`   | 画面例：探す・読む・申し込む・管理する                             |
+| `packages/react/llms.txt`       | エージェント向けの使い方と全部品の API（型から生成）               |
+| `packages/react/lint`           | 使う側のアプリ向けの lint ルール（ESLint・Oxlint・Biome）          |
+| `packages/react/bench/agent`    | エージェント向けのベンチマーク                                     |
+| `packages/tui/src`              | 端末の部品（`core` と `ink`）                                      |
+| `references`                    | 参考にした81件のピンと一覧ビューア                                 |
+| `docs`                          | 設計の判断と比較の記録                                             |
+| `spikes`                        | 試作（ワークスペースに入れない）                                   |
 
 ## 開発
 
 ```sh
 npm run typecheck   # 各パッケージの tsc
-npm run lint        # stylelint の KEI 独自ルール（packages/react/scripts/stylelint-kei.mjs）と、使う側向けのルール（lint/）を Story と画面例に
+npm run lint        # stylelint の lievre 独自ルール（packages/react/scripts/stylelint-lievre.mjs）と、使う側向けのルール（lint/）を Story と画面例に
 npm test            # tokens の同期、react の部品・画面フロー・axe・コントラスト、tui の描画とコントラスト
 npm run test:layout # 配置の基準をブラウザで測る（docs/quality-gate.md、初回は npx playwright install chromium）
 npm run tokens      # tokens.css を変更したら tokens.json を書き出す
@@ -75,9 +77,9 @@ jsdom では色のコントラストを測れないため、トークンの組�
 
 まだ npm には公開していません（どのパッケージも `private: true`）。公開するときは次の順にします。依存を増やさないため、changesets などの道具は入れません。
 
-1. 公開するパッケージの `private: true` を外す。`@kei-design/react` は `styles.css` と `tokens.json` にトークンを焼き込んでいるので、`@kei-design/tokens` を入れなくても使える。`@kei-design/tui` は `@kei-design/tokens` に依存するので、tokens も一緒に公開する。
+1. 公開するパッケージの `private: true` を外す。`@lievre/react` は `styles.css` と `tokens.json` にトークンを焼き込んでいるので、`@lievre/tokens` を入れなくても使える。`@lievre/tui` は `@lievre/tokens` に依存するので、tokens も一緒に公開する。
 2. 3つの版を揃えて上げる：`npm version <版> -w packages/tokens -w packages/react -w packages/tui`。`packages/react/lint/index.js` の `meta.version` も同じ値にする（テストが止める）。
 3. 中身を確かめる：`npm run build`、`npm run check:pack -w packages/react`。`npm pack -w packages/react` で作った物を、別のプロジェクトに入れて試す。
 4. 公開する：`npm publish -w packages/tokens -w packages/react -w packages/tui --access public`。
 
-`DESIGN.md` はリポジトリの直下にあり、`@kei-design/react` の `prepack` がパッケージへ写し、`postpack` が消します。
+`DESIGN.md` はリポジトリの直下にあり、`@lievre/react` の `prepack` がパッケージへ写し、`postpack` が消します。

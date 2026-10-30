@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import tokens from '@kei-design/tokens/tokens.json';
+import tokens from '@lievre/tokens/tokens.json';
 import { buildWear, readConfig } from '../../scripts/build-wear.mjs';
 import { seedFor, mulberry32, noise2 } from '../wear/seed.mjs';
 import { KASURE_FLOOR, SURFACE_MAX } from '../wear/params.mjs';
@@ -19,7 +19,7 @@ import {
 import { SHEET, SHEET_SLICE } from '../wear/presets.mjs';
 import { contrastGauge, outlineGauge, gauges } from '../wear/gauges.mjs';
 import { liveWearStyle } from '../wear/live';
-import { KeiProvider, Dialog, Button } from '../index';
+import { LievreProvider, Dialog, Button } from '../index';
 
 describe('Wear: seeded and reproducible', () => {
   const config = readConfig();
@@ -52,8 +52,8 @@ describe('Wear: seeded and reproducible', () => {
     expect(buildWear({ ...config, salt: 'ash' }, tokens).meta.pixels).not.toEqual(
       buildWear(config, tokens).meta.pixels,
     );
-    expect(seedFor('kei', 'card', 2)).toBe(seedFor('kei', 'card', 2));
-    expect(seedFor('kei', 'card', 2)).not.toBe(seedFor('kei', 'card', 3));
+    expect(seedFor('lievre', 'card', 2)).toBe(seedFor('lievre', 'card', 2));
+    expect(seedFor('lievre', 'card', 2)).not.toBe(seedFor('lievre', 'card', 3));
     const [a, b] = [mulberry32(7), mulberry32(7)];
     expect([a(), a(), a()]).toEqual([b(), b(), b()]);
     // Four builds of every texture, the 512px yake frame among them.
@@ -96,10 +96,10 @@ describe('Wear: seeded and reproducible', () => {
     const live = liveWearStyle('t', config, 'paper') as Record<string, string>;
     const shared = wearVars(config, 'KASURE');
     for (const [name, value] of Object.entries(shared))
-      if (name !== '--k-wear-kasure') expect(live[name]).toBe(value);
+      if (name !== '--lv-wear-kasure') expect(live[name]).toBe(value);
     for (const [name, value] of Object.entries(sheetVars(config))) expect(live[name]).toBe(value);
-    expect(live['--k-wear-rim']).toBe(
-      sheetThemeVars(config, 'paper', { yake: '', sure: '' }, tokens)['--k-wear-rim'],
+    expect(live['--lv-wear-rim']).toBe(
+      sheetThemeVars(config, 'paper', { yake: '', sure: '' }, tokens)['--lv-wear-rim'],
     );
     // The same pixels, stored rather than compressed.
     const stored = textures(config, tokens);
@@ -127,21 +127,21 @@ describe('Wear: presets and gauges', () => {
 });
 
 describe('Wear: what it may touch', () => {
-  const css = ['kei-wear.css', 'wear/rules.css', 'wear/baked.css']
+  const css = ['lievre-wear.css', 'wear/rules.css', 'wear/baked.css']
     .map((file) => readFileSync(`src/styles/${file}`, 'utf8'))
     .join('\n');
   it('leaves focus, controls and status marks alone', () => {
     for (const untouched of [
       ':focus',
-      '.k-button',
-      '.k-input',
-      '.k-select',
-      '.k-badge',
-      '.k-status-dot',
-      '.k-alert',
-      '.k-tone-',
-      '.k-switch',
-      '.k-checkbox',
+      '.lv-button',
+      '.lv-input',
+      '.lv-select',
+      '.lv-badge',
+      '.lv-status-dot',
+      '.lv-alert',
+      '.lv-tone-',
+      '.lv-switch',
+      '.lv-checkbox',
     ])
       expect(css).not.toContain(untouched);
   });
@@ -166,7 +166,7 @@ describe('Wear: what it may touch', () => {
       'clip-path',
       // Worn faces keep every advance width (checked by npm run wear:font), so text does not move.
       'font-family',
-      '--k-font-mono',
+      '--lv-font-mono',
       // The sheet: the root's ::before and ::after are fixed (or absolute) behind the content, and
       // its own stacking context keeps them there. The border is 0 wide; only its image is drawn.
       'isolation',
@@ -176,7 +176,7 @@ describe('Wear: what it may touch', () => {
       'border-width',
       'border-image',
       // Control outlines darken with the worn paper to keep 3:1 (a colour, not a size).
-      '--k-border-strong',
+      '--lv-border-strong',
       // Cards and metrics brown along their edges with an inset shadow, which takes no room.
       'box-shadow',
     ]);
@@ -185,7 +185,7 @@ describe('Wear: what it may touch', () => {
     expect(
       declarations
         .map((d) => d.trim())
-        .filter((d) => !allowed.has(d) && !d.startsWith('--k-wear-')),
+        .filter((d) => !allowed.has(d) && !d.startsWith('--lv-wear-')),
     ).toEqual([]);
   });
 });
@@ -220,17 +220,17 @@ describe('Wear: provider', () => {
     }));
 
   it('defaults to off', () => {
-    render(<KeiProvider data-testid="scope" />);
+    render(<LievreProvider data-testid="scope" />);
     expect(screen.getByTestId('scope')).toHaveAttribute('data-wear', 'off');
   });
 
   it('turns wear off for more contrast and forced colours, and live into baked for less motion', () => {
     media(['(prefers-contrast: more)']);
-    const { unmount } = render(<KeiProvider data-testid="scope" wear="live" />);
+    const { unmount } = render(<LievreProvider data-testid="scope" wear="live" />);
     expect(screen.getByTestId('scope')).toHaveAttribute('data-wear', 'off');
     unmount();
     media(['(prefers-reduced-motion: reduce)']);
-    render(<KeiProvider data-testid="scope" wear="live" />);
+    render(<LievreProvider data-testid="scope" wear="live" />);
     expect(screen.getByTestId('scope')).toHaveAttribute('data-wear', 'baked');
   });
 
@@ -249,7 +249,7 @@ describe('Wear: provider', () => {
         if (!on.delete(query)) on.add(query);
         listeners.forEach((listener) => listener());
       });
-    render(<KeiProvider data-testid="scope" wear="live" age="heavy" />);
+    render(<LievreProvider data-testid="scope" wear="live" age="heavy" />);
     const scope = screen.getByTestId('scope');
     // Every query keeps its hook whichever matches first, so the provider never throws.
     flip('(prefers-contrast: more)');
@@ -265,23 +265,25 @@ describe('Wear: provider', () => {
 
   it('writes seeded live filters and carries them into portals', async () => {
     const { container } = render(
-      <KeiProvider wear="live" wearSeed="ash" theme="ink">
+      <LievreProvider wear="live" wearSeed="ash" theme="ink">
         <Dialog trigger={<Button>開く</Button>} title="表示設定" description="表示を調整">
           <Button>保存</Button>
         </Dialog>
-      </KeiProvider>,
+      </LievreProvider>,
     );
-    const scope = container.querySelector('.kei') as HTMLElement;
-    const filter = scope.style.getPropertyValue('--k-wear-heading-0');
+    const scope = container.querySelector('.lievre') as HTMLElement;
+    const filter = scope.style.getPropertyValue('--lv-wear-heading-0');
     const id = filter.match(/url\(#(.+)\)/)![1];
     const turbulence = scope.querySelector(`#${id} feTurbulence`)!;
     expect(turbulence.getAttribute('seed')).toBe(String(seedFor('ash', 'heading', 0) % 100000));
-    expect(scope.style.getPropertyValue('--k-wear-surface')).toMatch(
+    expect(scope.style.getPropertyValue('--lv-wear-surface')).toMatch(
       /^url\((blob:|data:image\/png)/,
     );
     await userEvent.click(screen.getByRole('button', { name: '開く' }));
-    const portal = screen.getByRole('dialog', { name: '表示設定' }).closest('.kei') as HTMLElement;
+    const portal = screen
+      .getByRole('dialog', { name: '表示設定' })
+      .closest('.lievre') as HTMLElement;
     expect(portal).toHaveAttribute('data-wear', 'live');
-    expect(portal.style.getPropertyValue('--k-wear-heading-0')).toBe(filter);
+    expect(portal.style.getPropertyValue('--lv-wear-heading-0')).toBe(filter);
   });
 });

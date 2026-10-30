@@ -1,5 +1,5 @@
 // Which layer catches each likely mistake, and whether its message says how to fix it.
-// Cases are compiled as a consumer app would see KEI: through the built package (lib/).
+// Cases are compiled as a consumer app would see lievre: through the built package (lib/).
 //   npm run build:lib && node bench/agent/misuse.mjs [--root <checkout>] [--json out.json]
 // --root measures another checkout (for example main, after `npm run build:lib` there).
 import { mkdirSync, rmSync, symlinkSync, writeFileSync, existsSync } from 'node:fs';
@@ -25,12 +25,12 @@ const modules = [join(root, 'node_modules'), join(root, '../../node_modules')].f
   existsSync(join(dir, 'react')),
 );
 
-// A throwaway consumer app whose only view of KEI is the published entry points.
-const app = join(tmpdir(), `kei-agent-bench-${process.pid}`);
+// A throwaway consumer app whose only view of lievre is the published entry points.
+const app = join(tmpdir(), `lievre-agent-bench-${process.pid}`);
 rmSync(app, { recursive: true, force: true });
-mkdirSync(join(app, 'node_modules/@kei-design'), { recursive: true });
+mkdirSync(join(app, 'node_modules/@lievre-design'), { recursive: true });
 mkdirSync(join(app, 'node_modules/@types'), { recursive: true });
-symlinkSync(root, join(app, 'node_modules/@kei-design/react'));
+symlinkSync(root, join(app, 'node_modules/@lievre/react'));
 for (const dep of ['react', 'react-dom']) {
   symlinkSync(join(modules, dep), join(app, 'node_modules', dep));
   symlinkSync(join(modules, '@types', dep), join(app, 'node_modules/@types', dep));
@@ -58,7 +58,7 @@ const typeMessages = (file) =>
     .getPreEmitDiagnostics(program, program.getSourceFile(file))
     .map((d) => ts.flattenDiagnosticMessageText(d.messageText, '\n'));
 
-// The lint rules shipped to apps (`@kei-design/react/lint`), configured as an app would. A
+// The lint rules shipped to apps (`@lievre/react/lint`), configured as an app would. A
 // checkout from before they were shipped only has the rules for code inside the repository.
 const shippedLint = existsSync(join(root, 'lint/index.js'));
 const eslint = shippedLint
@@ -86,7 +86,7 @@ const lintMessages = async (c) => {
   return result.messages.map((m) => m.message);
 };
 
-// Render in jsdom and collect what React, Radix and KEI print or throw.
+// Render in jsdom and collect what React, Radix and lievre print or throw.
 const dom = new JSDOM('<!doctype html><body></body>', {
   pretendToBeVisual: true,
   url: 'http://localhost/',
@@ -106,8 +106,8 @@ globalThis.ResizeObserver ??= class {
 };
 const React = await import('react');
 const { createRoot } = await import('react-dom/client');
-const keiUrl = pathToFileURL(join(root, 'lib/kei.js')).href;
-const kei = await import(keiUrl);
+const lievreUrl = pathToFileURL(join(root, 'lib/lievre.js')).href;
+const lievre = await import(lievreUrl);
 
 async function runtimeMessages(c) {
   const js = ts.transpileModule(c.code, {
@@ -118,7 +118,7 @@ async function runtimeMessages(c) {
     },
   }).outputText;
   const file = join(app, `${c.id}.mjs`);
-  writeFileSync(file, js.replaceAll("'@kei-design/react'", JSON.stringify(keiUrl)));
+  writeFileSync(file, js.replaceAll("'@lievre/react'", JSON.stringify(lievreUrl)));
   const messages = [];
   const original = { error: console.error, warn: console.warn };
   console.error = console.warn = (...args) => messages.push(args.map(String).join(' ').trim());
@@ -136,9 +136,9 @@ async function runtimeMessages(c) {
         c.bare
           ? tree
           : React.createElement(
-              kei.KeiProvider,
+              lievre.LievreProvider,
               null,
-              React.createElement(kei.ToastProvider, null, tree),
+              React.createElement(lievre.ToastProvider, null, tree),
             ),
       ),
     );

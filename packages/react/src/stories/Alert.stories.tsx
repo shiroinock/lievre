@@ -13,7 +13,7 @@ const meta = {
       parts: [
         {
           name: 'お知らせ',
-          selector: '.k-alert',
+          selector: '.lv-alert',
           checks: ['padding-equal', { icon: ':scope > svg' }],
         },
       ],

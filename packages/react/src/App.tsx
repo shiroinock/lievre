@@ -18,7 +18,7 @@ import {
   Badge,
   Button,
   Card,
-  KeiProvider,
+  LievreProvider,
   Meter,
   Metric,
   Progress,
@@ -77,10 +77,10 @@ function Mark() {
     </svg>
   );
 }
-/** The overview's sample panel: real components on the ultramarine instrument face. */
+/** The overview's sample panel: real components on the ultramarine panel. */
 function InstrumentPanel() {
   return (
-    <section className="instrument-panel" aria-label="計器表示のサンプル">
+    <section className="instrument-panel" aria-label="メーター表示のサンプル">
       <header>
         <h2>計測ラボ</h2>
         <Badge tone="success" dot>
@@ -171,7 +171,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   return (
-    <KeiProvider theme={theme} density={density} wear={wear} age={age} className="kei-app">
+    <LievreProvider theme={theme} density={density} wear={wear} age={age} className="lievre-app">
       <ToastProvider>
         <a href="#main" className="skip-link">
           本文へスキップ
@@ -189,7 +189,7 @@ export default function App() {
               <Mark />
             </span>
             <div>
-              <strong>KEI</strong>
+              <strong>Lièvre</strong>
               <small>デザインシステム</small>
             </div>
             <IconButton
@@ -291,7 +291,7 @@ export default function App() {
                   <div className="hero-copy">
                     <h1>日本語の画面を、読みやすく組み立てる。</h1>
                     <p>
-                      KEI は、日本語の画面を基準に設計した React のコンポーネントと CSS
+                      lievre は、日本語の画面を基準に設計した React のコンポーネントと CSS
                       トークンです。操作の色はウルトラマリン一色。影を使わず、面の明るさと1pxの線で階層をつくります。
                     </p>
                     <div className="button-row">
@@ -351,12 +351,12 @@ export default function App() {
                   <div>
                     <h2 id="start-title">使い始める</h2>
                     <p>
-                      アプリのルートを <code>KeiProvider</code>{' '}
+                      アプリのルートを <code>LievreProvider</code>{' '}
                       で包み、スタイルシートを1つ読み込みます。
                     </p>
                   </div>
                   <pre>
-                    <code>{`import { KeiProvider, Button } from '@kei-design/react';\nimport '@kei-design/react/styles.css';\n\n<KeiProvider theme="paper">\n  <Button variant="primary">作業を追加</Button>\n</KeiProvider>`}</code>
+                    <code>{`import { LievreProvider, Button } from '@lievre/react';\nimport '@lievre/react/styles.css';\n\n<LievreProvider theme="paper">\n  <Button variant="primary">作業を追加</Button>\n</LievreProvider>`}</code>
                   </pre>
                 </section>
               </>
@@ -425,12 +425,12 @@ export default function App() {
               </>
             )}
             <footer className="app-footer">
-              <span>KEI v{version}</span>
+              <span>lievre v{version}</span>
               <span>画面例のデータはサンプルです。再読み込みで元に戻ります。</span>
             </footer>
           </main>
         </div>
       </ToastProvider>
-    </KeiProvider>
+    </LievreProvider>
   );
 }

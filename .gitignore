@@ -17,3 +17,4 @@ wear-fonts/
 
 # Copied from the repository root by prepack (packages/react)
 packages/react/DESIGN.md
+packages/react/MIGRATION.md

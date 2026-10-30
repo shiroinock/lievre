@@ -18,6 +18,8 @@ const required = [
   'package.json',
   'README.md',
   'DESIGN.md',
+  'MIGRATION.md',
+  ...Object.values(pkg.bin ?? {}).map((path) => path.replace(/^\.\//, '')),
   ...Object.values(pkg.exports)
     .flatMap(targets)
     .filter((path) => !path.includes('*'))

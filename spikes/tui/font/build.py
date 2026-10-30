@@ -1,4 +1,4 @@
-"""Builds the trial "Lievre Term" font: IBM Plex Mono (Latin) with ten KEI glyphs in the private use area.
+"""Builds the trial "Lievre Term" font: IBM Plex Mono (Latin) with ten lievre glyphs in the private use area.
 
 The added glyphs fill one terminal cell each (600 units wide, from the descender -275 to the
 ascender 1025) so lines meet the next cell:
@@ -141,7 +141,7 @@ def rounded_half(pen, left):
 
 def bracket(pen, left):
     """Focus ring: a thin bracket whose stroke sits 175 units before the cap (about 3px at 16px,
-    KEI's outline-offset), its ends turning toward the button and stopping at the cell edge."""
+    lievre's outline-offset), its ends turning toward the button and stopping at the cell edge."""
     r = 50
     h = STROKE / 2
     xc = W - r if left else r

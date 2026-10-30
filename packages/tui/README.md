@@ -1,13 +1,13 @@
-# @kei-design/tui
+# @lievre/tui
 
-KEI のデザイン言語を端末に広げる部品です。描画には Ink 8 を使います。比較と判断は [docs/tui-foundation.md](../../docs/tui-foundation.md) にあります。
+lievre のデザイン言語を端末に広げる部品です。描画には Ink 8 を使います。比較と判断は [docs/tui-foundation.md](../../docs/tui-foundation.md) にあります。
 
-| 場所                     | 内容                                                                                                            |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| `src/core/palette.ts`    | `@kei-design/tokens` の `tokens.json` から端末の色を作る。色の段階の判定、256色への落とし方、コントラストの計算 |
-| `src/core/glyphs.ts`     | 字の組（標準の文字・Lievre Term・ASCII）                                                                        |
-| `src/ink/components.tsx` | Card・Button・Table・Status                                                                                     |
-| `src/ink/screen.tsx`     | 見本の画面                                                                                                      |
+| 場所                     | 内容                                                                                                        |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `src/core/palette.ts`    | `@lievre/tokens` の `tokens.json` から端末の色を作る。色の段階の判定、256色への落とし方、コントラストの計算 |
+| `src/core/glyphs.ts`     | 字の組（標準の文字・Lievre Term・ASCII）                                                                    |
+| `src/ink/components.tsx` | Card・Button・Table・Status                                                                                 |
+| `src/ink/screen.tsx`     | 見本の画面                                                                                                  |
 
 `src/core` は Ink に依りません。描画の道具を替えるときは `src/ink` だけを書き直します。
 

@@ -60,9 +60,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       type={type}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
-      className={cx('k-button', `k-button--${variant}`, `k-button--${size}`, className)}
+      className={cx('lv-button', `lv-button--${variant}`, `lv-button--${size}`, className)}
     >
-      {loading ? <Loader2 className="k-spin" size={16} aria-hidden /> : icon}
+      {loading ? <Loader2 className="lv-spin" size={16} aria-hidden /> : icon}
       {children}
     </button>
   );
@@ -110,14 +110,14 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cx(
-        'k-icon-button',
-        `k-icon-button--${variant}`,
-        `k-icon-button--${size}`,
+        'lv-icon-button',
+        `lv-icon-button--${variant}`,
+        `lv-icon-button--${size}`,
         className,
       )}
     >
-      <span className="k-icon-button-icon" aria-hidden>
-        {loading ? <Loader2 className="k-spin" /> : icon}
+      <span className="lv-icon-button-icon" aria-hidden>
+        {loading ? <Loader2 className="lv-spin" /> : icon}
       </span>
     </button>
   );
@@ -140,8 +140,8 @@ export function Badge({
   children: ReactNode;
 }) {
   return (
-    <span {...props} className={cx('k-badge', `k-tone-${tone}`, className)}>
-      {dot && <span className="k-status-dot" aria-hidden />}
+    <span {...props} className={cx('lv-badge', `lv-tone-${tone}`, className)}>
+      {dot && <span className="lv-status-dot" aria-hidden />}
       {children}
     </span>
   );
@@ -163,11 +163,11 @@ function FieldFrame({
   children: ReactNode;
 }) {
   return (
-    <div className="k-field">
-      <label className="k-label" htmlFor={id}>
+    <div className="lv-field">
+      <label className="lv-label" htmlFor={id}>
         {label}
         {required && (
-          <span aria-hidden className="k-required">
+          <span aria-hidden className="lv-required">
             {' '}
             *
           </span>
@@ -175,7 +175,7 @@ function FieldFrame({
       </label>
       {children}
       {(error || hint) && (
-        <p id={`${id}-description`} className={cx('k-field-hint', error && 'k-field-error')}>
+        <p id={`${id}-description`} className={cx('lv-field-hint', error && 'lv-field-error')}>
           {error || hint}
         </p>
       )}
@@ -205,7 +205,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
         ref={ref}
         id={id}
         required={required}
-        className={cx('k-input', controlSize === 'lg' && 'k-control--lg', className)}
+        className={cx('lv-input', controlSize === 'lg' && 'lv-control--lg', className)}
         aria-invalid={!!error || undefined}
         aria-describedby={hint || error ? `${id}-description` : props['aria-describedby']}
       />
@@ -230,7 +230,7 @@ export function Textarea({
         {...props}
         id={id}
         required={required}
-        className={cx('k-input', 'k-textarea', className)}
+        className={cx('lv-input', 'lv-textarea', className)}
         aria-invalid={!!error || undefined}
         aria-describedby={hint || error ? `${id}-description` : props['aria-describedby']}
       />
@@ -256,11 +256,11 @@ export function Checkbox({ label, hint, error, id: givenId, ...props }: Checkbox
   const uid = useId();
   const id = givenId ?? uid;
   return (
-    <div className="k-check-field">
+    <div className="lv-check-field">
       <CheckboxPrimitive.Root
         {...props}
         id={id}
-        className="k-checkbox"
+        className="lv-checkbox"
         aria-invalid={!!error || undefined}
         aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
       >
@@ -273,16 +273,16 @@ export function Checkbox({ label, hint, error, id: givenId, ...props }: Checkbox
         </CheckboxPrimitive.Indicator>
       </CheckboxPrimitive.Root>
       <div>
-        <label htmlFor={id} className="k-check-label">
+        <label htmlFor={id} className="lv-check-label">
           {label}
         </label>
         {hint && (
-          <p className="k-field-hint" id={`${id}-hint`}>
+          <p className="lv-field-hint" id={`${id}-hint`}>
             {hint}
           </p>
         )}
         {error && (
-          <p className="k-field-hint k-field-error" id={`${id}-error`}>
+          <p className="lv-field-hint lv-field-error" id={`${id}-error`}>
             {error}
           </p>
         )}
@@ -304,13 +304,13 @@ export type SwitchProps = {
 export function Switch({ label, hint, ...props }: SwitchProps) {
   const id = useId();
   return (
-    <div className="k-switch-field">
+    <div className="lv-switch-field">
       <div>
-        <label className="k-check-label" htmlFor={id}>
+        <label className="lv-check-label" htmlFor={id}>
           {label}
         </label>
         {hint && (
-          <p className="k-field-hint" id={`${id}-hint`}>
+          <p className="lv-field-hint" id={`${id}-hint`}>
             {hint}
           </p>
         )}
@@ -318,10 +318,10 @@ export function Switch({ label, hint, ...props }: SwitchProps) {
       <SwitchPrimitive.Root
         {...props}
         id={id}
-        className="k-switch"
+        className="lv-switch"
         aria-describedby={hint ? `${id}-hint` : undefined}
       >
-        <SwitchPrimitive.Thumb className="k-switch-thumb" />
+        <SwitchPrimitive.Thumb className="lv-switch-thumb" />
       </SwitchPrimitive.Root>
     </div>
   );
@@ -359,28 +359,28 @@ export function Select({
       <SelectPrimitive.Root {...props}>
         <SelectPrimitive.Trigger
           id={id}
-          className="k-select-trigger"
+          className="lv-select-trigger"
           aria-invalid={!!error || undefined}
           aria-describedby={hint || error ? `${id}-description` : undefined}
         >
           <SelectPrimitive.Value placeholder={placeholder} />
-          <SelectPrimitive.Icon className="k-select-icon">
+          <SelectPrimitive.Icon className="lv-select-icon">
             <ChevronDown size={16} />
           </SelectPrimitive.Icon>
         </SelectPrimitive.Trigger>
         <SelectPrimitive.Portal>
           <PortalSurface>
-            <SelectPrimitive.Content position="popper" sideOffset={5} className="k-select-content">
+            <SelectPrimitive.Content position="popper" sideOffset={5} className="lv-select-content">
               <SelectPrimitive.Viewport>
                 {options.map((option) => (
                   <SelectPrimitive.Item
                     key={option.value}
                     value={option.value}
                     disabled={option.disabled}
-                    className="k-select-item"
+                    className="lv-select-item"
                   >
                     <SelectPrimitive.ItemText>{option.label}</SelectPrimitive.ItemText>
-                    <SelectPrimitive.ItemIndicator className="k-select-indicator">
+                    <SelectPrimitive.ItemIndicator className="lv-select-indicator">
                       <Check size={14} />
                     </SelectPrimitive.ItemIndicator>
                   </SelectPrimitive.Item>
@@ -403,17 +403,17 @@ export function Card({
   ...props
 }: HTMLAttributes<HTMLElement> & { title?: string; eyebrow?: string; action?: ReactNode }) {
   return (
-    <section {...props} className={cx('k-card', className)}>
+    <section {...props} className={cx('lv-card', className)}>
       {(title || eyebrow || action) && (
-        <header className="k-card-header">
+        <header className="lv-card-header">
           <div>
-            {eyebrow && <div className="k-eyebrow">{eyebrow}</div>}
-            {title && <h2 className="k-card-title">{title}</h2>}
+            {eyebrow && <div className="lv-eyebrow">{eyebrow}</div>}
+            {title && <h2 className="lv-card-title">{title}</h2>}
           </div>
           {action}
         </header>
       )}
-      <div className="k-card-body">{children}</div>
+      <div className="lv-card-body">{children}</div>
     </section>
   );
 }
@@ -435,13 +435,13 @@ export function Alert({
   return (
     <div
       {...props}
-      className={cx('k-alert', `k-tone-${tone}`, className)}
+      className={cx('lv-alert', `lv-tone-${tone}`, className)}
       role={tone === 'danger' ? 'alert' : 'status'}
     >
       <Icon size={20} aria-hidden />
       <div>
         <strong>{title}</strong>
-        {children && <div className="k-alert-description">{children}</div>}
+        {children && <div className="lv-alert-description">{children}</div>}
       </div>
     </div>
   );
@@ -474,21 +474,21 @@ export function Tabs({
       value={value}
       onValueChange={onValueChange}
     >
-      <TabsPrimitive.List className="k-tabs-list" aria-label={label}>
+      <TabsPrimitive.List className="lv-tabs-list" aria-label={label}>
         {items.map((item) => (
           <TabsPrimitive.Trigger
-            className="k-tab"
+            className="lv-tab"
             key={item.value}
             value={item.value}
             disabled={item.disabled}
           >
             {item.label}
-            {item.count !== undefined && <span className="k-tab-count">{item.count}</span>}
+            {item.count !== undefined && <span className="lv-tab-count">{item.count}</span>}
           </TabsPrimitive.Trigger>
         ))}
       </TabsPrimitive.List>
       {items.map((item) => (
-        <TabsPrimitive.Content className="k-tab-content" key={item.value} value={item.value}>
+        <TabsPrimitive.Content className="lv-tab-content" key={item.value} value={item.value}>
           {item.content}
         </TabsPrimitive.Content>
       ))}
@@ -502,9 +502,9 @@ export function Tooltip({ content, children }: { content: string; children: Reac
         <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Portal>
           <PortalSurface>
-            <TooltipPrimitive.Content className="k-tooltip" sideOffset={7}>
+            <TooltipPrimitive.Content className="lv-tooltip" sideOffset={7}>
               {content}
-              <TooltipPrimitive.Arrow className="k-tooltip-arrow" />
+              <TooltipPrimitive.Arrow className="lv-tooltip-arrow" />
             </TooltipPrimitive.Content>
           </PortalSurface>
         </TooltipPrimitive.Portal>
@@ -525,18 +525,18 @@ export function Progress({
 }) {
   const safe = Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0));
   return (
-    <div className="k-progress-wrap">
-      <div className="k-progress-label">
+    <div className="lv-progress-wrap">
+      <div className="lv-progress-label">
         <span>{label}</span>
         {showValue && (
           <span>
-            <span className="k-mono">{safe}</span>%
+            <span className="lv-mono">{safe}</span>%
           </span>
         )}
       </div>
-      <ProgressPrimitive.Root className="k-progress" value={safe} aria-label={label}>
+      <ProgressPrimitive.Root className="lv-progress" value={safe} aria-label={label}>
         <ProgressPrimitive.Indicator
-          className="k-progress-indicator"
+          className="lv-progress-indicator"
           style={{ transform: `translateX(-${100 - safe}%)` }}
         />
       </ProgressPrimitive.Root>
@@ -552,14 +552,16 @@ export function Skeleton({
   height?: string | number;
   label?: string;
 }) {
-  return <span className="k-skeleton" role="status" aria-label={label} style={{ width, height }} />;
+  return (
+    <span className="lv-skeleton" role="status" aria-label={label} style={{ width, height }} />
+  );
 }
 /** 画面には出さず、読み上げにだけ伝える文字。表の行の「詳細」ボタンに「（W-1024）」を足すときなどに使います。配置には影響しません。 */
 export function VisuallyHidden({
   className,
   ...props
 }: HTMLAttributes<HTMLSpanElement> & { children: ReactNode }) {
-  return <span {...props} className={cx('k-sr-only', className)} />;
+  return <span {...props} className={cx('lv-sr-only', className)} />;
 }
 /** 読み込み中の印。label を読み上げ（role="status"）、動きを減らす設定では回転を止めます。ボタンの中は Button の loading、表や一覧の形が分かるときは Skeleton を使います。 */
 export function Spinner({
@@ -575,8 +577,8 @@ export function Spinner({
   size?: 'sm' | 'md';
 }) {
   return (
-    <span className={cx('k-spinner', `k-spinner--${size}`)} role="status">
-      <Loader2 className="k-spin" aria-hidden />
+    <span className={cx('lv-spinner', `lv-spinner--${size}`)} role="status">
+      <Loader2 className="lv-spin" aria-hidden />
       {showLabel ? <span>{label}</span> : <VisuallyHidden>{label}</VisuallyHidden>}
     </span>
   );
@@ -595,13 +597,13 @@ export function EmptyState({
   eyebrow?: string;
 }) {
   return (
-    <div className="k-empty">
+    <div className="lv-empty">
       {icon && (
-        <span className="k-empty-icon" aria-hidden>
+        <span className="lv-empty-icon" aria-hidden>
           {icon}
         </span>
       )}
-      {eyebrow && <div className="k-eyebrow">{eyebrow}</div>}
+      {eyebrow && <div className="lv-eyebrow">{eyebrow}</div>}
       <h3>{title}</h3>
       <p>{description}</p>
       {action}
@@ -610,17 +612,21 @@ export function EmptyState({
 }
 export function Divider({ label }: { label?: string }) {
   return (
-    <div className="k-divider" role="separator">
+    <div className="lv-divider" role="separator">
       {label && <span>{label}</span>}
     </div>
   );
 }
 export function Kbd({ children }: { children: ReactNode }) {
-  return <kbd className="k-kbd">{children}</kbd>;
+  return <kbd className="lv-kbd">{children}</kbd>;
 }
 export function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' }) {
   return (
-    <span className={cx('k-avatar', size === 'sm' && 'k-avatar--sm')} role="img" aria-label={name}>
+    <span
+      className={cx('lv-avatar', size === 'sm' && 'lv-avatar--sm')}
+      role="img"
+      aria-label={name}
+    >
       {Array.from(name)
         .slice(0, size === 'sm' ? 1 : 2)
         .join('')}
@@ -630,7 +636,7 @@ export function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md'
 export function Breadcrumb({ items }: { items: { label: string; href?: string }[] }) {
   return (
     <nav aria-label="パンくず">
-      <ol className="k-breadcrumb">
+      <ol className="lv-breadcrumb">
         {items.map((item, i) => (
           <li key={i}>
             {i > 0 && <span aria-hidden>/</span>}
@@ -673,7 +679,7 @@ export function Pagination({
       to.current?.focus();
   }, [current, total]);
   return (
-    <nav className="k-pagination" aria-label="ページ切り替え">
+    <nav className="lv-pagination" aria-label="ページ切り替え">
       <span role="status">
         <span aria-hidden>
           {current} / {total}

@@ -1,7 +1,7 @@
 // The tuning page's save check. The dev server's Python lookup resolves a path from its own file
 // URL, which the test environment does not give, and is not used here.
 import { describe, it, expect, vi } from 'vitest';
-import tokens from '@kei-design/tokens/tokens.json';
+import tokens from '@lievre/tokens/tokens.json';
 import { normaliseConfig, PRESETS, type WearConfig } from '../wear/presets.mjs';
 import { validate } from '../../scripts/wear/tune-server.mjs';
 

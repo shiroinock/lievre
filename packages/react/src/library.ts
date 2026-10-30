@@ -1,3 +1,3 @@
-import './styles/kei.css';
-import './styles/kei-wear.css';
+import './styles/lievre.css';
+import './styles/lievre-wear.css';
 export * from './index';

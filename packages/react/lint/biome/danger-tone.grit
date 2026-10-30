@@ -1,4 +1,4 @@
-// kei/danger-tone: 「削除」 in a ConfirmDialog or a menu item needs the danger tone.
+// lievre/danger-tone: 「削除」 in a ConfirmDialog or a menu item needs the danger tone.
 language js(typescript, jsx);
 
 or {
@@ -10,7 +10,7 @@ or {
     $label <: r".*(?:削除|破棄|消去|解約|退会|初期化|取り消せません).*",
     $attributes <: not contains or { JsxAttribute(name = "tone"), JsxSpreadAttribute() },
     $element <: within JsModule() as $module,
-    $module <: contains `import $_ from "@kei-design/react"`,
+    $module <: contains `import $_ from "@lievre/react"`,
     register_diagnostic(span = $attribute, message = "confirmLabel が「削除」など取り消せない操作なのに tone='danger' がありません。ConfirmDialog に tone='danger' を付けて、実行のボタンを赤にしてください。")
   },
   JsObjectExpression(members = $members) as $item where {
@@ -20,7 +20,7 @@ or {
     $item <: within JsxAttribute(name = "items") as $items,
     $items <: within JsxSelfClosingElement(name = "DropdownMenu"),
     $item <: within JsModule() as $module,
-    $module <: contains `import $_ from "@kei-design/react"`,
+    $module <: contains `import $_ from "@lievre/react"`,
     register_diagnostic(span = $item, message = "「削除」など取り消せない操作のメニューの項目に tone: 'danger' がありません。項目に tone: 'danger' を付けて、赤の文字にしてください。")
   }
 }
