@@ -38,8 +38,18 @@ from fontTools.ttLib.tables import ttProgram
 from fontTools.ttLib.tables._g_l_y_f import GlyphCoordinates
 
 MASK = 0xFFFFFFFF
-SANS = Path('node_modules/@fontsource/ibm-plex-sans-jp')
-MONO = Path('node_modules/@fontsource/ibm-plex-mono')
+
+def installed(name):
+    """A package from the nearest node_modules: npm's workspaces install at the repository root."""
+    for folder in [Path('.'), *Path.cwd().parents]:
+        path = folder / 'node_modules' / name
+        if path.is_dir():
+            return path
+    return Path('node_modules') / name
+
+
+SANS = installed('@fontsource/ibm-plex-sans-jp')
+MONO = installed('@fontsource/ibm-plex-mono')
 
 # Font units (1000 per em); scripts/build-wear-font.mjs passes the values in wear.config.json.
 def value(name, default):
