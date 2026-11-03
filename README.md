@@ -1,6 +1,9 @@
 # Lièvre
 
-<img src="logo/lievre-web.svg" alt="" width="160" />
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="logo/lievre-web-dark.svg" />
+  <img src="logo/lievre-web-light.svg" alt="" width="160" />
+</picture>
 
 日本語の画面を読みやすく組み立てるためのデザインシステムです。作者個人の実験的なデザインシステムで、特定の用途に絞らず、質感や経年のような表現も試しています。どの試みでも、WCAG 2.x AA などの Web 標準の基準は守ります。設計の考え方は [DESIGN.md](DESIGN.md) にまとめています。
 
@@ -90,10 +93,11 @@ jsdom では色のコントラストを測れないため、トークンの組�
 
 ロゴは [logo](logo) にあります。うさぎと窓の外形は共通で、窓の中身と使う場面で分けています。
 
-| ファイル                                            | 使う場面                                           |
-| --------------------------------------------------- | -------------------------------------------------- |
-| [`lievre-web.svg`](logo/lievre-web.svg)             | Web 向けのパッケージ。窓の中身は `</>`             |
-| [`lievre-tui.svg`](logo/lievre-tui.svg)             | TUI 向けのパッケージ。窓の中身は `>_`              |
-| [`lievre-web-small.svg`](logo/lievre-web-small.svg) | 24px 以下とファビコン。線を太くし、窓の中身は `<>` |
+| ファイル                                                                                               | 使う場面                                                                                  |
+| ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| [`lievre-web.svg`](logo/lievre-web.svg)                                                                | Web 向けのパッケージ。窓の中身は `</>`                                                    |
+| [`lievre-tui.svg`](logo/lievre-tui.svg)                                                                | TUI 向けのパッケージ。窓の中身は `>_`                                                     |
+| [`lievre-web-small.svg`](logo/lievre-web-small.svg)                                                    | 24px 以下とファビコン。線を太くし、窓の中身は `<>`                                        |
+| [`lievre-web-light.svg`](logo/lievre-web-light.svg)／[`lievre-web-dark.svg`](logo/lievre-web-dark.svg) | README の先頭。明暗の色を固定した版で、`<picture>` で GitHub のテーマに合わせて出し分ける |
 
-窓の塗りは強調色の `--lv-accent` と同じ色で、線と字形の色もトークンの値に合わせています。色は `prefers-color-scheme` で明暗が切り替わります。トークンの色を変えたら、ロゴの色も合わせて、窓と字形のコントラストが AA を満たすことを確かめてください。
+窓の塗りは強調色の `--lv-accent` と同じ色で、線と字形の色もトークンの値に合わせています。色は `prefers-color-scheme` で明暗が切り替わります。この切り替えは OS の設定に従い、GitHub のテーマには従いません。そのため README では、明暗を固定した2つを `<picture>` で出し分けています。トークンの色を変えたら、ロゴの色も合わせて、窓と字形のコントラストが AA を満たすことを確かめてください。
