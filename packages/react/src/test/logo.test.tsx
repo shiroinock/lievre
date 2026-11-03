@@ -17,8 +17,10 @@ const CLASS_TOKEN: Record<string, string> = {
   s: 'on-accent',
 };
 
-const hex = (value: string) =>
-  value.length === 4 ? `#${[...value.slice(1)].map((c) => c + c).join('')}` : value.toLowerCase();
+const hex = (value: string) => {
+  const lower = value.toLowerCase();
+  return lower.length === 4 ? `#${[...lower.slice(1)].map((c) => c + c).join('')}` : lower;
+};
 
 const colours = (rules: string) =>
   [...rules.matchAll(/\.(\w)\{([^}]*)\}/g)].flatMap(([, cls, body]) =>
