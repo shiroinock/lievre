@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { LayoutGate } from '../test/layout/declare';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Chip, ChipGroup } from '../index';
 import { Tag } from 'lucide-react';
 import { expect, userEvent, within } from 'storybook/test';
@@ -49,7 +49,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 export const WithIcon: Story = { args: { icon: <Tag /> } };
 export const Small: Story = { args: { size: 'sm' } };
-/** 外せる札。選んだ絞り込みの条件を並べ、押すと外します。 */
+/** 外せる札。選んだ絞り込みの条件を並べ、押すと外します。外したあとは次の札の外すボタンへ、最後の札なら前の札へフォーカスを移します。 */
 export const Removable: Story = {
   render: () => <RemovableDemo />,
   play: async ({ canvasElement }) => {
@@ -57,16 +57,37 @@ export const Removable: Story = {
     await userEvent.click(c.getByRole('button', { name: '東京を外す' }));
     await expect(c.queryByText('東京')).toBeNull();
     await expect(c.getByRole('group', { name: '絞り込みの条件' })).toHaveTextContent('大阪');
+    await expect(c.getByRole('button', { name: '大阪を外す' })).toHaveFocus();
+    await userEvent.click(c.getByRole('button', { name: '名古屋を外す' }));
+    await expect(c.getByRole('button', { name: '大阪を外す' })).toHaveFocus();
   },
 };
 function RemovableDemo() {
   const [values, setValues] = useState(['東京', '大阪', '名古屋']);
+  const group = useRef<HTMLDivElement>(null);
+  // The index of the chip to focus once the removed one is gone.
+  const [focusAt, setFocusAt] = useState<number | null>(null);
+  useEffect(() => {
+    if (focusAt === null) return;
+    const buttons = group.current?.querySelectorAll<HTMLButtonElement>('.lv-chip-remove');
+    buttons?.[Math.min(focusAt, buttons.length - 1)]?.focus();
+    setFocusAt(null);
+  }, [focusAt, values]);
   return (
-    <ChipGroup label="絞り込みの条件">
-      {values.map((v) => (
-        <Chip key={v} label={v} onRemove={() => setValues((all) => all.filter((x) => x !== v))} />
-      ))}
-    </ChipGroup>
+    <div ref={group}>
+      <ChipGroup label="絞り込みの条件">
+        {values.map((v, i) => (
+          <Chip
+            key={v}
+            label={v}
+            onRemove={() => {
+              setValues((all) => all.filter((x) => x !== v));
+              setFocusAt(i);
+            }}
+          />
+        ))}
+      </ChipGroup>
+    </div>
   );
 }
 export const RemovableSmall: Story = {
