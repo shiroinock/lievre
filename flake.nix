@@ -24,6 +24,7 @@
           ./.npmrc
           ./DESIGN.md
           ./MIGRATION.md
+          ./logo
           ./packages
         ];
       };
