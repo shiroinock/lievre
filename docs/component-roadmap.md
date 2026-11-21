@@ -597,7 +597,7 @@ Field で今の TextField・Select・RadioGroup を作り直すときは、配�
 #### 自動で進むものの止め方（PauseControl）
 
 - **理由**：スライドや自動の更新のように、時間で進む動きをどうしても使うときの共通の止め方（WCAG 2.2.2）。
-- **lievre での注意**：止める・戻す・再開を必ず付け、動きを減らす設定では最初から止めておく。DecisionQueue は時間で進まないので、これを使わない。
+- **lievre での注意**：止める・再開を必ず付け、内容が切り替わるものには前に戻る手段も付ける。動きを減らす設定では最初から止めておく。DecisionQueue は時間で進まないので、これを使わない。
 - **品質基準で見る点**：操作の高さと、状態の文字（「止めています」）の縦の中心。
 
 ### タイムライン型の段階1：1件ずつ判断する列の土台
@@ -619,6 +619,8 @@ Field で今の TextField・Select・RadioGroup を作り直すときは、配�
 
 ### タイムライン型の段階3：増えるものと時間で動くもの
 
-1. NewItemsNotice（新着の知らせ）
-2. PauseControl（自動で進むものの止め方）と、Toast の消えるまでの時間との関係の整理
-3. `@lievre/tui` に同じ列と進み具合（端末では Y / N / L / Z のキーが主な操作になる）
+作り終えました。Web の部品は `packages/react/src/components/stream.tsx`、端末の列は `packages/tui/src/core/queue.ts` と `packages/tui/src/ink/queue.tsx` にあります。
+
+1. NewItemsNotice（新着の知らせ）と `useNewItems`。押すまで列にも件数にも混ぜず、押したら「3 件を列に加えました」と残してフォーカスを受ける
+2. PauseControl（止める・再開する操作と、今の状態の言葉）と `useAutoAdvance`（動きを減らす設定では止めて始め、見えないタブでは進めない）。Toast の消えるまでの時間との関係は、DESIGN.md の「増えるものと時間で動くもの」に整理した（Toast は WCAG 2.2.1 の側で扱い、PauseControl は付けない）。前に戻る操作は、内容が切り替わる部品の側で足す
+3. `@lievre/tui` の `Queue`・`QueueProgress`・`useQueueInput`（Y / N / L / Z）。状態の決まりは `@lievre/react` に依らない写しで持ち、`queue-parity.test.tsx` で同じ答えになることを確かめる
