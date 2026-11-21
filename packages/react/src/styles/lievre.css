@@ -1784,6 +1784,7 @@
     .lv-select-trigger,
     .lv-tab,
     .lv-select-item,
+    .lv-select-content[data-size='sm'] .lv-select-item,
     .lv-menu-item {
       min-height: 44px;
     }
@@ -1856,6 +1857,10 @@
     .lv-switch,
     .lv-tab {
       border: 1px solid ButtonText;
+    }
+    /* The shorthand above resets the line to solid; read only keeps its dashed outline. */
+    .lv-input:read-only:not(:disabled) {
+      border-style: dashed;
     }
     /* The browser paints a backplate behind forced text as tall as the glyphs, which is taller
        than the small badge's 16px line, so it would cover the top and bottom border. Paint the

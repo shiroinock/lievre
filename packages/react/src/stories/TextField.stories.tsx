@@ -114,8 +114,22 @@ export const WithIcon: Story = {
   },
 };
 export const SmallWithIcon: Story = {
-  args: { label: '絞り込み', icon: <Search />, controlSize: 'sm', hint: undefined },
+  args: {
+    label: '絞り込み',
+    icon: <Search />,
+    controlSize: 'sm',
+    hint: undefined,
+    placeholder: '作業名・番号',
+  },
 };
 export const LargeWithIconAndSuffix: Story = {
-  args: { label: '数量', icon: <Plus />, suffix: '件', controlSize: 'lg', hint: undefined },
+  args: {
+    label: '数量',
+    icon: <Plus />,
+    suffix: '件',
+    controlSize: 'lg',
+    hint: undefined,
+    inputMode: 'numeric',
+    placeholder: '例：12',
+  },
 };
