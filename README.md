@@ -28,6 +28,27 @@ npm run dev         # 概要のデモ http://127.0.0.1:5173
 
 `.npmrc` の `legacy-peer-deps=true` は、npm が optional peer を解決するときに出る `edgesOut` エラーを避けるための設定です。
 
+### Nix で使う
+
+Nix（flakes を有効にしたもの）があれば、Node.js などを別に入れなくても始められます。nixpkgs は `nixos-26.05` を `flake.lock` で固定しています。
+
+```sh
+nix develop         # Node.js 22、npm、Chromium（Playwright 用）、fontTools と brotli 入りの Python
+npm ci
+```
+
+`nix develop` の中では、`npm run test:layout` は nixpkgs の Chromium（headless shell）を使うので、`npx playwright install` は要りません。経年の書体を焼く Python も用意されるので、`npm run wear:setup` も要りません。`.envrc` に `use flake` を書いてあるので、direnv を入れれば、フォルダに入ったときに自動で同じ環境になります。
+
+ビルドと `lievre-migrate`（[MIGRATION.md](MIGRATION.md)）は、手元に clone しなくても動かせます。`lievre-migrate` は引数のフォルダ（省くと今のフォルダ）を書き換えるので、先に `--dry-run` で確かめてください。
+
+```sh
+nix run github:shiroinock/lievre -- --dry-run src   # 直す予定のファイルを並べる
+nix run github:shiroinock/lievre -- src             # 書き換える
+nix build github:shiroinock/lievre                  # result/lib/node_modules/@lievre/{tokens,react,tui}
+nix build .#storybook                               # result/ に Storybook（.#demo は概要のデモ）
+nix fmt                                             # flake.nix を整える
+```
+
 ## 構成
 
 | 場所                            | 内容                                                               |
@@ -63,7 +84,7 @@ npm run build       # react の lib/・dist/・dist/storybook/ と tui の lib/
 
 1つのパッケージだけで流すときは、`npm test -w packages/tui` のように `-w` を付けます。
 
-質感の試作（[references/wear-prototype.md](references/wear-prototype.md)）の強さを調整するときは、はじめに一度だけ `npm run wear:setup` を実行します。`packages/react/.venv-wear/` に、フォントを焼くための fontTools と brotli を入れます。
+質感の試作（[references/wear-prototype.md](references/wear-prototype.md)）の強さを調整するときは、はじめに一度だけ `npm run wear:setup` を実行します（`nix develop` の中では要りません）。`packages/react/.venv-wear/` に、フォントを焼くための fontTools と brotli を入れます。
 
 ```sh
 npm run wear:setup  # .venv-wear/ を作る（uv があれば uv、なければ python3 -m venv と pip）
