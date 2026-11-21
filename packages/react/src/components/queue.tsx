@@ -465,8 +465,9 @@ export function DecisionQueue<T>({
   };
   // One shape for every result: 「名前」を「選択肢」にしました / 3件を「選択肢」にしました.
   const nameOf = (key: string) => {
+    // An item filtered out of the list keeps the same shape, named by its key.
     const item = byKey.get(key);
-    return item === undefined ? key : `「${getLabel(item)}」`;
+    return `「${item === undefined ? key : getLabel(item)}」`;
   };
   const what = (keys: readonly string[]) =>
     keys.length === 1 ? nameOf(keys[0]) : `${keys.length}件`;
