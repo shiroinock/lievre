@@ -1,4 +1,5 @@
 import {
+  Fragment,
   useEffect,
   useId,
   useMemo,
@@ -179,6 +180,18 @@ type DataTableBaseProps<T> = {
   loading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
+  /** 表の高さの上限（'24rem' など）。超えると表の中で縦にスクロールし、見出しの行を上に残します。 */
+  maxHeight?: string;
+  /** 行を広げて出す中身。渡すと各行の先頭に開閉のボタン（aria-expanded）を置き、押すとその行のすぐ下に中身を出します。 */
+  renderExpanded?: (row: T) => ReactNode;
+  /** 広げている行の id。渡すと外で持ちます。 */
+  expandedIds?: string[];
+  onExpandedChange?: (ids: string[]) => void;
+  /** 下のページ送りの形。'compact'（既定）は前後のボタンと「2 / 5」、'numbers' はページ番号を並べます。pageSize を渡したときだけ効きます。 */
+  paginationVariant?: 'compact' | 'numbers';
+  /** 選べる1ページの件数（[20, 50, 100]）。渡すと下のページ送りに「表示件数」を出します。pageSize は外で持ち、onPageSizeChange で変えます。変えると1ページ目に戻ります。 */
+  pageSizeOptions?: number[];
+  onPageSizeChange?: (pageSize: number) => void;
 };
 /** 並べ替えとページ分けを DataTable が手元で行う形（既定）。 */
 export type DataTableClientProps = {
@@ -228,7 +241,24 @@ export function DataTable<T>(props: DataTableProps<T>) {
     pageSize,
     page,
     onPageChange,
+    maxHeight,
+    renderExpanded,
+    expandedIds,
+    onExpandedChange,
+    paginationVariant = 'compact',
+    pageSizeOptions,
+    onPageSizeChange,
   } = props;
+  const tableId = useId();
+  const [internalExpanded, setInternalExpanded] = useState<string[]>([]);
+  const expanded = expandedIds ?? internalExpanded;
+  const toggleExpanded = (id: string) => {
+    const next = expanded.includes(id) ? expanded.filter((v) => v !== id) : [...expanded, id];
+    setInternalExpanded(next);
+    onExpandedChange?.(next);
+  };
+  const expandable = !!renderExpanded;
+  const span = columns.length + (selectable ? 1 : 0) + (onRowClick ? 1 : 0) + (expandable ? 1 : 0);
   const server = props.dataMode === 'server';
   const [internalSort, setInternalSort] = useState<TableSort>(null);
   const sort = sorting === undefined ? internalSort : sorting;
@@ -299,11 +329,18 @@ export function DataTable<T>(props: DataTableProps<T>) {
       role="region"
       aria-label={`${caption}（横スクロール対応）`}
       tabIndex={0}
+      data-sticky={maxHeight ? true : undefined}
+      style={maxHeight ? { maxHeight } : undefined}
     >
       <table className="lv-table">
         <caption className="lv-sr-only">{caption}</caption>
         <thead>
           <tr>
+            {expandable && (
+              <th scope="col" className="lv-table-expand">
+                <VisuallyHidden>開閉</VisuallyHidden>
+              </th>
+            )}
             {selectable && (
               <th scope="col" className="lv-table-select">
                 <input
@@ -377,6 +414,7 @@ export function DataTable<T>(props: DataTableProps<T>) {
           {loading ? (
             Array.from({ length: 4 }, (_, i) => (
               <tr key={i}>
+                {expandable && <td />}
                 {selectable && (
                   <td>
                     <Skeleton width={14} />
@@ -397,47 +435,73 @@ export function DataTable<T>(props: DataTableProps<T>) {
           ) : shown.length ? (
             shown.map((row) => {
               const id = getRowId(row);
+              const open = expanded.includes(id);
+              const detailId = `${tableId}-${id}-expanded`;
               return (
-                <tr key={id} data-selected={selection.includes(id) || undefined}>
-                  {selectable && (
-                    <td>
-                      <input
-                        type="checkbox"
-                        aria-label={`${id} を選択`}
-                        checked={selection.includes(id)}
-                        onChange={() =>
-                          select(
-                            selection.includes(id)
-                              ? selection.filter((v) => v !== id)
-                              : [...selection, id],
-                          )
-                        }
-                      />
-                    </td>
+                <Fragment key={id}>
+                  <tr
+                    data-selected={selection.includes(id) || undefined}
+                    data-expanded={open || undefined}
+                  >
+                    {expandable && (
+                      <td className="lv-table-expand">
+                        <button
+                          type="button"
+                          className="lv-table-toggle"
+                          aria-label={`${id} の中身`}
+                          aria-expanded={open}
+                          aria-controls={open ? detailId : undefined}
+                          onClick={() => toggleExpanded(id)}
+                        >
+                          <ChevronRight size={16} aria-hidden />
+                        </button>
+                      </td>
+                    )}
+                    {selectable && (
+                      <td>
+                        <input
+                          type="checkbox"
+                          aria-label={`${id} を選択`}
+                          checked={selection.includes(id)}
+                          onChange={() =>
+                            select(
+                              selection.includes(id)
+                                ? selection.filter((v) => v !== id)
+                                : [...selection, id],
+                            )
+                          }
+                        />
+                      </td>
+                    )}
+                    {columns.map((col) => (
+                      <td key={col.key} style={{ textAlign: col.align }}>
+                        {col.render(row)}
+                      </td>
+                    ))}
+                    {onRowClick && (
+                      <td>
+                        <button
+                          className="lv-table-detail"
+                          aria-label={`${id} の詳細を開く`}
+                          onClick={() => onRowClick(row)}
+                        >
+                          詳細
+                          <ChevronRight size={14} aria-hidden />
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                  {open && renderExpanded && (
+                    <tr className="lv-table-expanded" id={detailId}>
+                      <td colSpan={span}>{renderExpanded(row)}</td>
+                    </tr>
                   )}
-                  {columns.map((col) => (
-                    <td key={col.key} style={{ textAlign: col.align }}>
-                      {col.render(row)}
-                    </td>
-                  ))}
-                  {onRowClick && (
-                    <td>
-                      <button
-                        className="lv-table-detail"
-                        aria-label={`${id} の詳細を開く`}
-                        onClick={() => onRowClick(row)}
-                      >
-                        詳細
-                        <ChevronRight size={14} aria-hidden />
-                      </button>
-                    </td>
-                  )}
-                </tr>
+                </Fragment>
               );
             })
           ) : (
             <tr>
-              <td colSpan={columns.length + (selectable ? 1 : 0) + (onRowClick ? 1 : 0)}>
+              <td colSpan={span}>
                 <EmptyState title={emptyTitle} description={emptyDescription} />
               </td>
             </tr>
@@ -456,7 +520,18 @@ export function DataTable<T>(props: DataTableProps<T>) {
         <span className="lv-table-count lv-tabular">
           {total ? `${total}件中 ${first}〜${last}件目` : '0件'}
         </span>
-        <Pagination page={current} totalPages={totalPages} onPageChange={setPage} />
+        <Pagination
+          page={current}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          variant={paginationVariant}
+          pageSize={size}
+          pageSizeOptions={pageSizeOptions}
+          onPageSizeChange={(n) => {
+            onPageSizeChange?.(n);
+            if (current !== 1) setPage(1);
+          }}
+        />
       </div>
     </div>
   );

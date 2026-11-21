@@ -1105,3 +1105,69 @@ describe('Display variations', () => {
     expect(screen.queryAllByRole('button')).toHaveLength(0);
   });
 });
+
+describe('Table variations', () => {
+  type R = { id: string; name: string };
+  const cols: Column<R>[] = [{ key: 'name', header: '名前', render: (r) => r.name }];
+  const many = Array.from({ length: 12 }, (_, i) => ({ id: `r${i + 1}`, name: `行${i + 1}` }));
+  it('opens a row in place, tied to its toggle', async () => {
+    setup(
+      <DataTable
+        rows={many.slice(0, 2)}
+        columns={cols}
+        getRowId={(r) => r.id}
+        caption="一覧"
+        renderExpanded={(r) => <p>{r.name}の中身</p>}
+      />,
+    );
+    const toggle = screen.getByRole('button', { name: 'r1 の中身' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByText('行1の中身')).not.toBeInTheDocument();
+    await userEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    const detail = document.getElementById(toggle.getAttribute('aria-controls') as string);
+    expect(detail).toHaveTextContent('行1の中身');
+    // The opened row spans every column.
+    expect(detail?.querySelector('td')).toHaveAttribute('colspan', '2');
+  });
+  it('keeps the heading row up when the table scrolls inside its height', () => {
+    const { container } = setup(
+      <DataTable
+        rows={many}
+        columns={cols}
+        getRowId={(r) => r.id}
+        caption="一覧"
+        maxHeight="20rem"
+      />,
+    );
+    const wrap = container.querySelector('.lv-table-wrap') as HTMLElement;
+    expect(wrap).toHaveAttribute('data-sticky', 'true');
+    expect(wrap.style.maxHeight).toBe('20rem');
+  });
+  it('numbers the pages under the table, and goes back to page 1 when the page size changes', async () => {
+    const pageChange = vi.fn();
+    const sizeChange = vi.fn();
+    setup(
+      <DataTable
+        rows={many}
+        columns={cols}
+        getRowId={(r) => r.id}
+        caption="一覧"
+        pageSize={5}
+        page={2}
+        onPageChange={pageChange}
+        paginationVariant="numbers"
+        pageSizeOptions={[5, 10]}
+        onPageSizeChange={sizeChange}
+      />,
+    );
+    expect(screen.getByRole('button', { name: '2ページ目' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    await userEvent.click(screen.getByRole('combobox', { name: '表示件数' }));
+    await userEvent.click(await screen.findByRole('option', { name: '10件' }));
+    expect(sizeChange).toHaveBeenCalledWith(10);
+    expect(pageChange).toHaveBeenCalledWith(1);
+  });
+});
