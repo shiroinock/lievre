@@ -315,6 +315,14 @@ describe('Work queue example: both views share one state', () => {
     await userEvent.click(screen.getByRole('button', { name: '次のページ' }));
     expect(screen.getByRole('checkbox', { name: `${order[1].id} を選択` })).toBeChecked();
   });
+  it('moves focus to the view switch when the queue has ended', async () => {
+    setup(<OperationsExample compact />);
+    await userEvent.click(screen.getByRole('radio', { name: '順に見る' }));
+    await screen.findByRole('article', { name: new RegExp(order[0].name) });
+    for (let i = 0; i < order.length; i++) await userEvent.keyboard('n');
+    await userEvent.click(screen.getByRole('button', { name: '一覧で選んだ作業を見る' }));
+    await waitFor(() => expect(screen.getByRole('radio', { name: '一覧から選ぶ' })).toHaveFocus());
+  });
   it('opens the view named in the URL without moving focus', async () => {
     window.history.replaceState(null, '', '/?view=queue');
     setup(<OperationsExample compact />);

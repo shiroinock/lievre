@@ -317,6 +317,7 @@ function OperationsContent({ compact }: { compact: boolean }) {
   const [view, setView] = useViewParam('view', 'list', VIEWS);
   // Set when the person switches views, so the next view takes focus (not on the first load).
   const switched = useRef(false);
+  const viewRef = useRef<HTMLDivElement>(null);
   const toast = useToast();
   const filtered = rows.filter(
     (row) =>
@@ -339,7 +340,8 @@ function OperationsContent({ compact }: { compact: boolean }) {
     }
     setView(next);
   };
-  // In the list, focus goes to the current item's row so the place is not lost.
+  // In the list, focus goes to the current item's row so the place is not lost. With nothing left
+  // (the end's button is gone), it goes to the view switch rather than dropping to the page.
   useEffect(() => {
     if (!switched.current || view !== 'list') return;
     switched.current = false;
@@ -347,7 +349,7 @@ function OperationsContent({ compact }: { compact: boolean }) {
     const box = id
       ? document.querySelector<HTMLInputElement>(`input[aria-label="${CSS.escape(id)} を選択"]`)
       : null;
-    box?.focus();
+    (box ?? viewRef.current?.querySelector<HTMLElement>('[aria-checked="true"]'))?.focus();
   });
   const columns = useMemo<Column<WorkItem>[]>(
     () => [
@@ -496,7 +498,7 @@ function OperationsContent({ compact }: { compact: boolean }) {
             接続中（サンプル）
           </Badge>
         </div>
-        <div className="queue-view">
+        <div className="queue-view" ref={viewRef}>
           <ViewSwitch value={view} onValueChange={changeView} label="作業キューの見せ方" />
         </div>
         <div className="queue-tools">
