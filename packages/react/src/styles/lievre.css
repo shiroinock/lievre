@@ -2160,6 +2160,55 @@
   .lv-table-detail:hover {
     text-decoration: underline;
   }
+  /* maxHeight: the table scrolls inside its box and the heading row stays at the top, on an
+     opaque surface so the rows pass under it. */
+  .lv-table-wrap[data-sticky] thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--lv-surface);
+  }
+  /* Rows that open: a 24px toggle at the start, its arrow turning down while open. */
+  .lv-table-expand {
+    width: 40px;
+  }
+  .lv-table-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--lv-radius-sm);
+    background: transparent;
+    color: var(--lv-muted);
+    /* Top, not middle: a 24px box on the 24px line, so the row's line box stays 24px. */
+    vertical-align: top;
+    cursor: pointer;
+  }
+  .lv-table-toggle:hover {
+    background: var(--lv-surface-sunken);
+    color: var(--lv-text);
+  }
+  .lv-table-toggle > svg {
+    transition: transform var(--lv-motion) var(--lv-ease);
+  }
+  .lv-table-toggle[aria-expanded='true'] > svg {
+    transform: rotate(90deg);
+  }
+  /* The opened row and what it shows read as one: no rule between them, the content on the
+     sunken surface. */
+  .lv-table tbody tr[data-expanded] > td {
+    border-bottom-color: transparent;
+  }
+  .lv-table tbody tr.lv-table-expanded,
+  .lv-table tbody tr.lv-table-expanded:hover {
+    background: var(--lv-surface-sunken);
+  }
+  .lv-table tbody tr.lv-table-expanded > td {
+    white-space: normal;
+  }
   /* A borderless button gives its side padding back to the cell, so its content starts on
      the same line as the column heading. */
   .lv-table td > .lv-button--ghost.lv-button--sm:first-child {
