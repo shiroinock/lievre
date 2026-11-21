@@ -116,3 +116,4 @@ CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査�
 - ラベルを外しても、入った自動マージは残ります。取り消すときは `gh pr merge <番号> --disable-auto` も行います。
 - `.github/workflows` を変える PR とフォークからの PR は、自動では予約しません（ボットがコメントで知らせます）。検査が通ったら `gh pr merge <番号> --merge` で手でマージします。
 - 自動マージのコミットは CI を起こさないので、この workflow が `main` の CI を `workflow_dispatch` で走らせます。付け替わった PR は 10 分ごとの見回りで拾います。GitHub の schedule は混むと遅れるので、急ぐときは Actions の「マージ予約」を手で走らせます（Run workflow）。
+- Claude の workflow（`claude.yml`・`claude-code-review.yml`・`merge-reservation.yml`）の中身は、ほかのリポジトリと共通の [shiroinock/workflows](https://github.com/shiroinock/workflows) にあり、ここのファイルはそれを呼ぶだけです。シークレットを渡すので、`@main` ではなく読んで確かめたコミットの SHA で呼びます。共通側を新しくするときは、その版の差分を読んでから、3つのファイルの SHA（`merge-reservation.yml` は `workflows_ref` も）を同じ SHA に替える PR を出します。lievre に固有のレビューの観点は、`claude-code-review.yml` の `review_focus` に書きます。
