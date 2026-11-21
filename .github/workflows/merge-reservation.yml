@@ -49,5 +49,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          BASE_BRANCH: main
+          BASE_BRANCH: trial/rsv-root
         run: node scripts/merge-reservation.mjs
