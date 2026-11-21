@@ -26,3 +26,14 @@ export const Default: Story = {};
 export const Selected: Story = { args: { defaultValue: 'email' } };
 export const Disabled: Story = { args: { disabled: true } };
 export const Error: Story = { args: { error: '受け取り方法を選んでください。', required: true } };
+/** 横に並べる形。「はい・いいえ」など短い選択肢に使い、幅が足りないと折り返します。 */
+export const Horizontal: Story = {
+  args: {
+    label: '同じ住所に送りますか',
+    orientation: 'horizontal',
+    options: [
+      { value: 'yes', label: 'はい' },
+      { value: 'no', label: 'いいえ' },
+    ],
+  },
+};

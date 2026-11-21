@@ -432,7 +432,7 @@
   .lv-input::placeholder {
     color: var(--lv-subtle);
   }
-  .lv-input:hover:not(:disabled),
+  .lv-input:hover:not(:disabled, :read-only),
   .lv-select-trigger:hover:not(:disabled) {
     border-color: var(--lv-text);
   }
@@ -451,10 +451,65 @@
     border-color: var(--lv-border);
     color: var(--lv-muted);
   }
+  /* Read only: the value stays readable and focusable, and a dashed outline (not a colour)
+     tells it apart from an input you can change and from a disabled one. */
+  .lv-input:read-only:not(:disabled) {
+    border-style: dashed;
+    background: transparent;
+  }
+  .lv-control--sm {
+    min-height: 32px;
+    padding: 4px 8px;
+  }
   .lv-control--lg {
     min-height: 48px;
     padding: 8px 16px;
     font-size: var(--lv-text-base);
+  }
+  /* Words before and after the box (units, "https://") and an icon inside it. */
+  .lv-input-group {
+    display: flex;
+    align-items: center;
+    gap: var(--lv-space-2);
+  }
+  .lv-input-affix {
+    flex-shrink: 0;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-input-wrap {
+    --input-x: 12px;
+    position: relative;
+    display: flex;
+    flex: 1;
+    min-width: 0;
+  }
+  .lievre[data-density='compact'] .lv-input-wrap,
+  .lv-input-wrap:has(.lv-control--sm) {
+    --input-x: 8px;
+  }
+  /* Wins over the compact density: a large field keeps its 16px in every density. */
+  .lievre .lv-input-wrap:has(.lv-control--lg) {
+    --input-x: 16px;
+  }
+  .lv-input-icon {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--input-x);
+    display: flex;
+    align-items: center;
+    color: var(--lv-muted);
+    pointer-events: none;
+  }
+  .lv-input-icon > svg {
+    width: 16px;
+    height: 16px;
+  }
+  .lv-input.lv-input--icon {
+    /* stylelint-disable-next-line lievre/padding-symmetry -- 先頭のアイコン（16px）と間（8px）の分だけ空けて、文字をアイコンの後ろから始める */
+    padding-inline-start: calc(var(--input-x) + 16px + var(--lv-space-2));
   }
   .lv-textarea {
     min-height: 104px;
@@ -517,6 +572,39 @@
     color: var(--lv-subtle);
     background: transparent;
     cursor: not-allowed;
+  }
+  /* The list's 4px plus the item's padding meets the trigger's: 8px when the trigger has 8px. */
+  .lievre[data-density='compact'] .lv-select-item,
+  .lv-select-content[data-size='sm'] .lv-select-item {
+    padding: 4px;
+  }
+  .lv-select-content[data-size='sm'] .lv-select-item {
+    min-height: 32px;
+  }
+  .lv-select-content[data-size='lg'] .lv-select-item {
+    min-height: 48px;
+    padding: 4px 12px;
+    font-size: var(--lv-text-base);
+  }
+  .lv-select-group + .lv-select-group,
+  .lv-select-item + .lv-select-group {
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid var(--lv-border);
+  }
+  .lv-select-label {
+    padding: 4px 8px;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-xs);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+  }
+  .lievre[data-density='compact'] .lv-select-label,
+  .lv-select-content[data-size='sm'] .lv-select-label {
+    padding: 4px;
+  }
+  .lv-select-content[data-size='lg'] .lv-select-label {
+    padding: 4px 12px;
   }
 
   /* Checkbox, Switch, Radio — "on" is always the accent, never a status color. */

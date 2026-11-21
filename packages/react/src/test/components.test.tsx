@@ -669,3 +669,52 @@ describe('Form parts', () => {
     expect(screen.getByRole('textbox', { name: 'お名前' })).toHaveFocus();
   });
 });
+
+describe('Input variations', () => {
+  it('ties the words before and after a field to it, and keeps the icon out of reading', () => {
+    setup(
+      <TextField
+        label="金額"
+        prefix="¥"
+        suffix="円"
+        hint="税込み"
+        icon={<svg data-testid="icon" />}
+      />,
+    );
+    const field = screen.getByRole('textbox', { name: '金額' });
+    expect(field).toHaveAccessibleDescription('¥ 円 税込み');
+    expect(screen.getByTestId('icon').parentElement).toHaveAttribute('aria-hidden', 'true');
+  });
+  it('keeps a read-only field focusable, unlike a disabled one', async () => {
+    setup(<TextField label="番号" readOnly defaultValue="W-1024" />);
+    await userEvent.tab();
+    expect(screen.getByRole('textbox', { name: '番号' })).toHaveFocus();
+  });
+  it('sizes TextField and Select by the same steps', () => {
+    setup(
+      <>
+        <TextField label="名前" controlSize="sm" />
+        <Select label="種類" controlSize="lg" options={[{ value: 'a', label: 'A' }]} />
+      </>,
+    );
+    expect(screen.getByRole('textbox', { name: '名前' })).toHaveClass('lv-control--sm');
+    expect(screen.getByRole('combobox', { name: '種類' })).toHaveClass('lv-control--lg');
+  });
+  it('lays radios side by side and still moves with the arrow keys', async () => {
+    setup(
+      <RadioGroup
+        label="同じ住所"
+        orientation="horizontal"
+        defaultValue="yes"
+        options={[
+          { value: 'yes', label: 'はい' },
+          { value: 'no', label: 'いいえ' },
+        ]}
+      />,
+    );
+    await userEvent.tab();
+    expect(screen.getByRole('radio', { name: 'はい' })).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(screen.getByRole('radio', { name: 'いいえ' })).toBeChecked();
+  });
+});

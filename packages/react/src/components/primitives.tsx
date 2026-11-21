@@ -166,7 +166,7 @@ export function Badge({
   );
 }
 
-export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> & {
+export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id' | 'prefix'> & {
   /** 見える名前。input と結びます。placeholder の代わりにはしません。 */
   label: string;
   /** 補助文。入力の下に出し、aria-describedby で入力と結びます。 */
@@ -177,24 +177,78 @@ export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> &
   required?: boolean;
   /** input の id。省くと部品が作ります。ErrorSummary から移るときは、ここで決めた id を使います。 */
   id?: string;
-  controlSize?: 'md' | 'lg';
+  /** 'md'（既定）は密度の操作の高さ（40 / 32px）、'sm' は 32px、'lg' は 48px。'sm' は表の上の絞り込みなど、密度とは別に小さくしたいときに使います。 */
+  controlSize?: 'sm' | 'md' | 'lg';
+  /** 入力欄の中の先頭に置くアイコン（虫眼鏡など）。飾りなので読み上げません。意味はラベルに書きます。 */
+  icon?: ReactNode;
+  /** 入力欄の前に置く言葉（「https://」「¥」など）。入力と aria-describedby で結びます。 */
+  prefix?: string;
+  /** 入力欄の後ろに置く言葉。単位（「円」「件」「%」）はここに書き、値には含めません。入力と aria-describedby で結びます。 */
+  suffix?: string;
 };
-/** ラベル・補助文・エラーと入力を関連付けた標準入力。 */
+/** ラベル・補助文・エラーと入力を関連付けた標準入力。readOnly は値を読める見た目のまま、枠を破線にして直せないことを示します（disabled と違い、フォーカスが届き、送信にも含まれます）。 */
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function TextField(
-  { label, hint, error, controlSize = 'md', id, required, className, ...props },
+  {
+    label,
+    hint,
+    error,
+    controlSize = 'md',
+    id,
+    required,
+    icon,
+    prefix,
+    suffix,
+    className,
+    ...props
+  },
   ref,
 ) {
   return (
     <Field {...{ label, hint, error, id, required }}>
-      {(control) => (
-        <input
-          {...props}
-          {...control}
-          aria-describedby={joinIds(control['aria-describedby'], props['aria-describedby'])}
-          ref={ref}
-          className={cx('lv-input', controlSize === 'lg' && 'lv-control--lg', className)}
-        />
-      )}
+      {(control) => {
+        const input = (
+          <input
+            {...props}
+            {...control}
+            aria-describedby={joinIds(
+              prefix && `${control.id}-prefix`,
+              suffix && `${control.id}-suffix`,
+              control['aria-describedby'],
+              props['aria-describedby'],
+            )}
+            ref={ref}
+            className={cx(
+              'lv-input',
+              controlSize !== 'md' && `lv-control--${controlSize}`,
+              !!icon && 'lv-input--icon',
+              className,
+            )}
+          />
+        );
+        if (!icon && !prefix && !suffix) return input;
+        return (
+          <div className="lv-input-group">
+            {prefix && (
+              <span id={`${control.id}-prefix`} className="lv-input-affix">
+                {prefix}
+              </span>
+            )}
+            <div className="lv-input-wrap">
+              {icon && (
+                <span className="lv-input-icon" aria-hidden>
+                  {icon}
+                </span>
+              )}
+              {input}
+            </div>
+            {suffix && (
+              <span id={`${control.id}-suffix`} className="lv-input-affix">
+                {suffix}
+              </span>
+            )}
+          </div>
+        );
+      }}
     </Field>
   );
 });
@@ -318,10 +372,13 @@ export function Switch({ label, hint, ...props }: SwitchProps) {
   );
 }
 
+export type SelectOption = { value: string; label: string; disabled?: boolean };
+/** 選択肢のまとまり。label は一覧の中に見出しとして出し、中の選択肢の読み上げに添えます。 */
+export type SelectOptionGroup = { label: string; options: SelectOption[] };
 export type SelectProps = {
   label: string;
-  /** 選択肢。子要素（option）では渡しません。 */
-  options: { value: string; label: string; disabled?: boolean }[];
+  /** 選択肢。子要素（option）では渡しません。`{ label, options }` を混ぜると、見出しの付いたまとまりにします。 */
+  options: (SelectOption | SelectOptionGroup)[];
   placeholder?: string;
   /** 未選択は ''。 */
   value?: string;
@@ -338,7 +395,23 @@ export type SelectProps = {
   error?: string;
   /** 開くボタンの id。省くと部品が作ります。ErrorSummary から移るときは、ここで決めた id を使います。 */
   id?: string;
+  /** 高さは TextField と同じ段です。'md'（既定）は密度の操作の高さ、'sm' は 32px、'lg' は 48px。並べる TextField と同じ値にします。 */
+  controlSize?: 'sm' | 'md' | 'lg';
 };
+function SelectItem({ option }: { option: SelectOption }) {
+  return (
+    <SelectPrimitive.Item
+      value={option.value}
+      disabled={option.disabled}
+      className="lv-select-item"
+    >
+      <SelectPrimitive.ItemText>{option.label}</SelectPrimitive.ItemText>
+      <SelectPrimitive.ItemIndicator className="lv-select-indicator">
+        <Check size={14} />
+      </SelectPrimitive.ItemIndicator>
+    </SelectPrimitive.Item>
+  );
+}
 /** 矢印キー・文字検索・Escapeに対応した単一選択。 */
 export function Select({
   label,
@@ -347,13 +420,20 @@ export function Select({
   hint,
   error,
   id,
+  controlSize = 'md',
   ...props
 }: SelectProps) {
   return (
     <Field {...{ label, hint, error, id, required: props.required }}>
       {({ required: _required, ...control }) => (
         <SelectPrimitive.Root {...props}>
-          <SelectPrimitive.Trigger {...control} className="lv-select-trigger">
+          <SelectPrimitive.Trigger
+            {...control}
+            className={cx(
+              'lv-select-trigger',
+              controlSize !== 'md' && `lv-control--${controlSize}`,
+            )}
+          >
             <SelectPrimitive.Value placeholder={placeholder} />
             <SelectPrimitive.Icon className="lv-select-icon">
               <ChevronDown size={16} />
@@ -365,21 +445,23 @@ export function Select({
                 position="popper"
                 sideOffset={5}
                 className="lv-select-content"
+                data-size={controlSize}
               >
                 <SelectPrimitive.Viewport>
-                  {options.map((option) => (
-                    <SelectPrimitive.Item
-                      key={option.value}
-                      value={option.value}
-                      disabled={option.disabled}
-                      className="lv-select-item"
-                    >
-                      <SelectPrimitive.ItemText>{option.label}</SelectPrimitive.ItemText>
-                      <SelectPrimitive.ItemIndicator className="lv-select-indicator">
-                        <Check size={14} />
-                      </SelectPrimitive.ItemIndicator>
-                    </SelectPrimitive.Item>
-                  ))}
+                  {options.map((option, i) =>
+                    'options' in option ? (
+                      <SelectPrimitive.Group key={`group-${i}`} className="lv-select-group">
+                        <SelectPrimitive.Label className="lv-select-label">
+                          {option.label}
+                        </SelectPrimitive.Label>
+                        {option.options.map((item) => (
+                          <SelectItem key={item.value} option={item} />
+                        ))}
+                      </SelectPrimitive.Group>
+                    ) : (
+                      <SelectItem key={option.value} option={option} />
+                    ),
+                  )}
                 </SelectPrimitive.Viewport>
               </SelectPrimitive.Content>
             </PortalSurface>

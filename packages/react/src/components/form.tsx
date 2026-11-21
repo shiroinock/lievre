@@ -116,6 +116,7 @@ export function RadioGroup({
   error,
   required = false,
   id: givenId,
+  orientation = 'vertical',
 }: {
   /** まとまりの名前。fieldset の legend になります。 */
   label: string;
@@ -133,6 +134,8 @@ export function RadioGroup({
   required?: boolean;
   /** 最初の選択肢の id。ErrorSummary からこのまとまりへ移るときに使います。 */
   id?: string;
+  /** 'vertical'（既定）は縦に並べ、'horizontal' は横に並べます。「はい・いいえ」など短い選択肢に使い、幅が足りないと折り返します。矢印キーの動きはどちらも同じです。 */
+  orientation?: 'vertical' | 'horizontal';
 }) {
   const uid = useId();
   return (
@@ -144,7 +147,10 @@ export function RadioGroup({
       required={required}
       disabled={disabled}
     >
-      <Stack gap={3}>
+      <Stack
+        gap={orientation === 'horizontal' ? 6 : 3}
+        direction={orientation === 'horizontal' ? 'row' : 'column'}
+      >
         {options.map((o, i) => (
           <label className="lv-radio-option" key={o.value}>
             <input

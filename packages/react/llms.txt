@@ -159,7 +159,7 @@ baked はビルド時の値（npm run wear）で決まります。
 矢印キー・文字検索・Escapeに対応した単一選択。
 
 - `label: string`
-- `options: { value: string; label: string; disabled?: boolean | undefined; }[]` — 選択肢。子要素（option）では渡しません。
+- `options: (SelectOption | SelectOptionGroup)[]` — 選択肢。子要素（option）では渡しません。`{ label, options }` を混ぜると、見出しの付いたまとまりにします。
 - `placeholder?: string` — 既定 '選択してください'
 - `value?: string` — 未選択は ''。
 - `defaultValue?: string`
@@ -170,6 +170,7 @@ baked はビルド時の値（npm run wear）で決まります。
 - `hint?: string` — 補助文。選択の欄の下に出し、aria-describedby で結びます。
 - `error?: string` — エラー文。記号を添えて出し、aria-invalid と aria-describedby を付けます。
 - `id?: string` — 開くボタンの id。省くと部品が作ります。ErrorSummary から移るときは、ここで決めた id を使います。
+- `controlSize?: 'sm' | 'md' | 'lg'` — 既定 'md'。高さは TextField と同じ段です。'md'（既定）は密度の操作の高さ、'sm' は 32px、'lg' は 48px。並べる TextField と同じ値にします。
 
 ### Card
 
@@ -288,14 +289,17 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### TextField
 
-ラベル・補助文・エラーと入力を関連付けた標準入力。
+ラベル・補助文・エラーと入力を関連付けた標準入力。readOnly は値を読める見た目のまま、枠を破線にして直せないことを示します（disabled と違い、フォーカスが届き、送信にも含まれます）。
 
 - `required?: boolean` — ラベルの横に「必須」の文字を出し、input に required を付けます。
 - `label: string` — 見える名前。input と結びます。placeholder の代わりにはしません。
 - `hint?: string` — 補助文。入力の下に出し、aria-describedby で入力と結びます。
 - `error?: string` — エラー文。補助文の下に記号を添えて出し、aria-invalid と aria-describedby を付けます。補助文は消しません。
 - `id?: string` — input の id。省くと部品が作ります。ErrorSummary から移るときは、ここで決めた id を使います。
-- `controlSize?: 'md' | 'lg'` — 既定 'md'
+- `controlSize?: 'sm' | 'md' | 'lg'` — 既定 'md'。'md'（既定）は密度の操作の高さ（40 / 32px）、'sm' は 32px、'lg' は 48px。'sm' は表の上の絞り込みなど、密度とは別に小さくしたいときに使います。
+- `icon?: ReactNode` — 入力欄の中の先頭に置くアイコン（虫眼鏡など）。飾りなので読み上げません。意味はラベルに書きます。
+- `prefix?: string` — 入力欄の前に置く言葉（「https://」「¥」など）。入力と aria-describedby で結びます。
+- `suffix?: string` — 入力欄の後ろに置く言葉。単位（「円」「件」「%」）はここに書き、値には含めません。入力と aria-describedby で結びます。
 
 ### Dialog
 
@@ -471,6 +475,7 @@ baked はビルド時の値（npm run wear）で決まります。
 - `error?: string` — エラー文。記号を添えて出し、fieldset に aria-describedby で結びます。
 - `required?: boolean` — 既定 false。legend の横に「必須」の文字を出し、選択肢に required を付けます。
 - `id?: string` — 最初の選択肢の id。ErrorSummary からこのまとまりへ移るときに使います。
+- `orientation?: 'horizontal' | 'vertical'` — 既定 'vertical'。'vertical'（既定）は縦に並べ、'horizontal' は横に並べます。「はい・いいえ」など短い選択肢に使い、幅が足りないと折り返します。矢印キーの動きはどちらも同じです。
 
 ### CheckboxGroup
 
@@ -603,6 +608,8 @@ live は wearSeed から SVG のフィルタを作り、文字も歪ませる。
 altText には、通知の外で同じ操作ができる場所を書きます（「履歴の画面から元に戻せます」）。通知の操作ボタンへ移れない読み上げの利用者に、代わりとして読み上げます。
 押すと onClick を呼んでから通知を閉じます。
 - `type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';`
+- `type SelectOption = { value: string; label: string; disabled?: boolean };`
+- `type SelectOptionGroup = { label: string; options: SelectOption[] };` — 選択肢のまとまり。label は一覧の中に見出しとして出し、中の選択肢の読み上げに添えます。
 - `type TabItem = { value: string; label: string; content: ReactNode; disabled?: boolean; count?: number; };`
 - `type Column<T>`
   - `key: string`

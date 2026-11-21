@@ -494,10 +494,15 @@ lievre の △：Field は TextField・Select・RadioGroup がそれぞれラベ
 
 第2段階の後半（入力のバリエーション）：
 
-1. TextField：前後の飾り（単位・アイコン）、`readOnly` の見た目、大きさ sm、幅、等幅
-2. Select：大きさ sm / lg、選択肢のグループ
-3. RadioGroup：横に並べる、カードの形（RadioCards）
-4. Textarea・TextField：文字数と上限、Textarea の自動の高さ
+1. TextField：前後の言葉（`prefix`・`suffix`。単位は値に含めず `suffix` に）、先頭のアイコン（`icon`）、`readOnly` の見た目（破線の枠）、大きさ sm
+2. Select：大きさ sm / lg（TextField と同じ `controlSize`）、選択肢のまとまり。どの大きさと密度でも、選択肢の文字を開く前の文字と同じ左端から始める
+3. RadioGroup：横に並べる（`orientation`）
+
+第2段階の残り（後半のあとに、別の PR で）：
+
+1. TextField：幅（入る文字数に合わせる）、等幅の入力
+2. RadioGroup：カードの形（RadioCards）
+3. Textarea・TextField：文字数と上限、Textarea の自動の高さ
 
 Field で今の TextField・Select・RadioGroup を作り直すときは、配置の品質基準の CI（`npm run test:layout`）を通し、見た目が変わらないことを確かめます。
 
