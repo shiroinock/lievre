@@ -43,4 +43,11 @@ export const Relative: Story = {
   },
 };
 /** 表の日付の列のように、等幅で桁をそろえる形。 */
-export const Mono: Story = { args: { style: 'datetime', mono: true, timeZone: 'Asia/Tokyo' } };
+export const Mono: Story = {
+  args: {
+    value: '2026-11-22T09:05:00+09:00',
+    style: 'datetime',
+    mono: true,
+    timeZone: 'Asia/Tokyo',
+  },
+};
