@@ -806,7 +806,7 @@
   .lv-combobox--sm {
     --input-x: 8px;
   }
-  .lievre .lv-combobox--lg {
+  .lievre .lv-combobox.lv-combobox--lg {
     --input-x: 16px;
   }
   .lv-input.lv-combobox-input {
@@ -834,14 +834,17 @@
   .lv-combobox-button:disabled {
     cursor: not-allowed;
   }
+  /* The list scrolls itself, padding and all: it is Downshift's menu, so scrolling to the
+     highlighted option and pressing the scroll bar both stay inside it. */
   .lv-combobox-content {
     min-width: var(--radix-popover-trigger-width);
-    max-height: min(320px, var(--radix-popover-content-available-height));
-    overflow-y: auto;
+    padding: 0;
   }
   .lv-combobox-list {
+    max-height: min(320px, calc(var(--radix-popover-content-available-height) - 2px));
     margin: 0;
-    padding: 0;
+    padding: 4px;
+    overflow-y: auto;
     list-style: none;
   }
   .lv-combobox-empty {
@@ -853,6 +856,10 @@
   .lievre[data-density='compact'] .lv-combobox-empty,
   .lv-select-content[data-size='sm'] .lv-combobox-empty {
     padding: 4px;
+  }
+  .lv-select-content[data-size='lg'] .lv-combobox-empty {
+    padding: 4px 12px;
+    font-size: var(--lv-text-base);
   }
 
   /* Checkbox, Switch, Radio — "on" is always the accent, never a status color. */

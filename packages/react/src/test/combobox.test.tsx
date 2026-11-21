@@ -114,6 +114,66 @@ describe('Combobox', () => {
     await userEvent.click(screen.getByRole('button', { name: '変える' }));
     expect(input()).toHaveValue('ＡＢＣ物流');
   });
+  it('keeps the typed text when a parent with inline options draws again', async () => {
+    function Parent() {
+      const [tick, setTick] = useState(0);
+      return (
+        <>
+          <Combobox label="取引先" defaultValue="tokyo" options={options.map((o) => ({ ...o }))} />
+          <button onClick={() => setTick(tick + 1)}>描き直す{tick}</button>
+        </>
+      );
+    }
+    render(<Parent />);
+    await userEvent.clear(input());
+    await userEvent.type(input(), 'おお');
+    fireEvent.click(screen.getByRole('button', { name: /描き直す/ }));
+    expect(input()).toHaveValue('おお');
+  });
+  it('puts back the chosen name when leaving with edited text', async () => {
+    const onValueChange = vi.fn();
+    render(
+      <Combobox
+        label="取引先"
+        options={options}
+        defaultValue="tokyo"
+        onValueChange={onValueChange}
+      />,
+    );
+    await userEvent.type(input(), '{Backspace}{Backspace}');
+    await userEvent.keyboard('{Escape}');
+    await userEvent.tab();
+    expect(input()).toHaveValue('東京商事株式会社');
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+  it('clears text that matches nothing when leaving without a choice', async () => {
+    render(<Combobox label="取引先" options={options} />);
+    await userEvent.type(input(), 'ぞぞ');
+    await userEvent.tab();
+    expect(input()).toHaveValue('');
+  });
+  it('reports clearing once when Esc empties a chosen field', async () => {
+    const onValueChange = vi.fn();
+    render(
+      <Combobox
+        label="取引先"
+        options={options}
+        defaultValue="abc"
+        onValueChange={onValueChange}
+      />,
+    );
+    input().focus();
+    await userEvent.keyboard('{Escape}');
+    expect(input()).toHaveValue('');
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    expect(onValueChange).toHaveBeenCalledWith(null);
+  });
+  it('counts only options that can be chosen', async () => {
+    render(<Combobox label="取引先" options={options} />);
+    await userEvent.type(input(), 'しすてむ');
+    expect(names()).toEqual(['福岡システムズ']);
+    expect(screen.getByRole('status')).toHaveTextContent('一致する候補がありません');
+  });
   it('sends the chosen value with name', async () => {
     const { container } = render(
       <form>

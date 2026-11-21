@@ -72,7 +72,7 @@ export function filterOptions(options: ComboboxOption[], query: string) {
  * 候補を打って絞り込み、1つを選ぶ入力（取引先・担当者・品目など、Select では探しにくい数のとき）。
  * 絞り込みは全角と半角・カタカナとひらがな・大文字と小文字の違いを無視し、読み（kana）でも探せます。
  * 日本語の変換中は絞り込みも確定もしません。矢印キーで候補を移り、Enter で選び、Esc で一覧を閉じます（もう一度で文字を消します）。
- * 候補の数を読み上げます。props は Select と同じ形です。
+ * 選べる候補の数を読み上げます。離れたときに文字が選んだ候補と合わなければ、選んだ候補の名前に戻します。props の名前は Select と同じで、未選択は null です。
  */
 export function Combobox({
   label,
@@ -92,7 +92,13 @@ export function Combobox({
 }: ComboboxProps) {
   const [inner, setInner] = useState<string | null>(defaultValue);
   const current = value !== undefined ? value : inner;
+  // The value as of the last choice in this event: Downshift can report one clearing twice
+  // (the selected item and the emptied text), and only the first reaches the caller.
+  const latest = useRef(current);
+  latest.current = current;
   const choose = (next: string | null) => {
+    if (next === latest.current) return;
+    latest.current = next;
     if (value === undefined) setInner(next);
     onValueChange?.(next);
   };
@@ -120,7 +126,7 @@ export function Combobox({
           onQuery={(text) => {
             if (!composing.current) setQuery(text);
             // Emptying the field clears the choice.
-            if (text === '' && selected) choose(null);
+            if (text === '') choose(null);
           }}
           onSelect={(option) => choose(option?.value ?? null)}
         />
@@ -165,12 +171,22 @@ function ComboboxControl({
   onSelect,
 }: ControlProps) {
   const { id, required, ...described } = control;
+  const choosable = items.filter((o) => !o.disabled).length;
   const content = useRef<HTMLDivElement>(null);
   const cb = useCombobox<ComboboxOption>({
     items,
     itemToString: (o) => o?.label ?? '',
     isItemDisabled: (o) => !!o.disabled,
     selectedItem: selected,
+    // By value: options written inline are new objects on every render of the parent, and a new
+    // object would count as a new choice and overwrite the text being typed.
+    itemToKey: (o) => o?.value ?? null,
+    // Leaving without choosing puts back the chosen option's name, so the text never shows one
+    // thing while the field holds another.
+    stateReducer: (state, { type, changes }) =>
+      type === useCombobox.stateChangeTypes.InputBlur && changes.selectedItem === state.selectedItem
+        ? { ...changes, inputValue: state.selectedItem?.label ?? '' }
+        : changes,
     onSelectedItemChange: ({ selectedItem }) => onSelect(selectedItem ?? null),
     // Downshift keeps the text. Controlling it delays the write-back during conversion by one
     // render and breaks the IME's range (「ととうとうきょう東京」).
@@ -226,6 +242,12 @@ function ComboboxControl({
               composing.current = true;
             },
             onCompositionEnd,
+            // Leaving with the list closed: Downshift does nothing then, so put the chosen name
+            // back here. With the list open, Downshift's own blur (the reducer above) does it.
+            onBlur: () => {
+              const label = selected?.label ?? '';
+              if (!cb.isOpen && cb.inputValue !== label) cb.setInputValue(label);
+            },
             onKeyDown: (e) => {
               // Radix's layer closed the list on this Esc already; don't also clear the text.
               if (e.key === 'Escape' && e.nativeEvent.defaultPrevented)
@@ -247,7 +269,7 @@ function ComboboxControl({
       </div>
       {name && <input type="hidden" name={name} value={selected?.value ?? ''} />}
       <VisuallyHidden role="status" aria-live="polite">
-        {cb.isOpen ? (items.length ? `${items.length}件の候補があります` : emptyText) : ''}
+        {cb.isOpen ? (choosable ? `${choosable}件の候補があります` : emptyText) : ''}
       </VisuallyHidden>
       {/* Downshift wants the menu element on every render; while closed it is an empty list. */}
       {!cb.isOpen && <ul hidden {...cb.getMenuProps({}, { suppressRefError: true })} />}

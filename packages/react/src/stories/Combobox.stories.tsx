@@ -149,3 +149,19 @@ export const InDialog: Story = {
     await expect(body.getByRole('dialog')).toBeVisible();
   },
 };
+const many: ComboboxOption[] = Array.from({ length: 40 }, (_, i) => ({
+  value: `item-${i + 1}`,
+  label: `品目 ${String(i + 1).padStart(2, '0')}`,
+}));
+/** 候補が多く、一覧がスクロールする形。End で末尾の候補へ移ると、その候補が見える位置まで一覧が動きます。 */
+export const ManyOptions: Story = {
+  args: { label: '品目', options: many, placeholder: '品目を探す' },
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox', { name: '品目' });
+    await userEvent.click(input);
+    await userEvent.keyboard('{ArrowDown}{End}');
+    const body = within(canvasElement.ownerDocument.body);
+    const last = await body.findByRole('option', { name: '品目 40' });
+    await expect(input).toHaveAttribute('aria-activedescendant', last.id);
+  },
+};
