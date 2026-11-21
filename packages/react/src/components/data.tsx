@@ -2,6 +2,7 @@ import {
   Fragment,
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -258,6 +259,26 @@ export function DataTable<T>(props: DataTableProps<T>) {
     onExpandedChange?.(next);
   };
   const expandable = !!renderExpanded;
+  // With the heading row stuck to the top, keep it out of the area the browser scrolls a
+  // focused control into; otherwise Shift+Tab leaves the control under the headings
+  // (WCAG 2.4.11). The row's height follows density and the viewport, so measure it.
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLTableSectionElement>(null);
+  useLayoutEffect(() => {
+    const wrap = wrapRef.current;
+    const head = headRef.current;
+    if (!maxHeight || !wrap || !head) return;
+    const apply = () => {
+      wrap.style.scrollPaddingTop = `${head.getBoundingClientRect().height}px`;
+    };
+    apply();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(apply);
+    observer?.observe(head);
+    return () => {
+      observer?.disconnect();
+      wrap.style.scrollPaddingTop = '';
+    };
+  }, [maxHeight]);
   const span = columns.length + (selectable ? 1 : 0) + (onRowClick ? 1 : 0) + (expandable ? 1 : 0);
   const server = props.dataMode === 'server';
   const [internalSort, setInternalSort] = useState<TableSort>(null);
@@ -325,16 +346,17 @@ export function DataTable<T>(props: DataTableProps<T>) {
   const some = visibleIds.some((id) => selection.includes(id));
   const table = (
     <div
+      ref={wrapRef}
       className="lv-table-wrap"
       role="region"
-      aria-label={`${caption}（横スクロール対応）`}
+      aria-label={`${caption}（${maxHeight ? 'スクロール' : '横スクロール'}対応）`}
       tabIndex={0}
       data-sticky={maxHeight ? true : undefined}
       style={maxHeight ? { maxHeight } : undefined}
     >
       <table className="lv-table">
         <caption className="lv-sr-only">{caption}</caption>
-        <thead>
+        <thead ref={headRef}>
           <tr>
             {expandable && (
               <th scope="col" className="lv-table-expand">
