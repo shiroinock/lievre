@@ -92,6 +92,42 @@ describe('stylelint: lievre rules', () => {
     ).toEqual([]);
   });
 
+  it('rejects a decorative band down one side of a box', async () => {
+    const stripe = 'lievre/side-stripe';
+    expect(await cssRules('.card { border-left: 4px solid var(--lv-accent); }')).toContain(stripe);
+    expect(await cssRules('.card { border-inline-start-width: 3px; }')).toContain(stripe);
+    expect(await cssRules('.card { border-left: 0.25rem solid var(--lv-accent); }')).toContain(
+      stripe,
+    );
+    expect(await cssRules('.card { box-shadow: inset 4px 0 0 var(--lv-accent); }')).toContain(
+      stripe,
+    );
+    expect(
+      await cssRules(
+        '.card { background: var(--lv-surface) linear-gradient(var(--lv-accent), var(--lv-accent)) left / 4px 100% no-repeat; }',
+      ),
+    ).toContain(stripe);
+    expect(
+      await cssRules(
+        '.card { background-image: linear-gradient(var(--lv-accent), var(--lv-accent)); background-size: 4px 100%; }',
+      ),
+    ).toContain(stripe);
+    // Hairline dividers, whole borders, a state's edge and a meter drawn from several layers pass.
+    expect(
+      await cssRules(
+        [
+          '.a { border-top: 1px solid var(--lv-border); border: 2px solid var(--lv-border); }',
+          '.a { background: linear-gradient(var(--lv-border), var(--lv-border)) bottom / 100% 1px no-repeat; }',
+          '.t tr[data-selected] > :first-child { background-image: linear-gradient(var(--lv-accent), var(--lv-accent)); background-size: 4px 100%; }',
+          '.tab[aria-selected="true"] { border-bottom: 2px solid var(--lv-accent); }',
+          '.m { background: linear-gradient(var(--a), var(--a)) 0 100% / 3px 40% no-repeat, linear-gradient(var(--a), var(--a)) 100% 100% / 3px 100% no-repeat; }',
+          '.f { background: linear-gradient(var(--a), var(--b)); }',
+          '.r { box-shadow: inset 0 0 0 1px var(--lv-border); }',
+        ].join('\n'),
+      ),
+    ).toEqual([]);
+  });
+
   it('keeps surface tokens in the theme layer', async () => {
     expect(await cssRules('.panel { --lv-surface: #2424d8; }')).toContain('lievre/surface-tokens');
     expect(await cssRules('@layer lievre.components { .x { --lv-bg: red; } }')).toContain(
