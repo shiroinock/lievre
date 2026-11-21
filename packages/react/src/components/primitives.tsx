@@ -56,7 +56,7 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   iconEnd?: ReactNode;
   /** 幅を親いっぱいに広げます。狭い画面の申し込みの「次へ」など、1つだけ置く主要操作に使います。 */
   block?: boolean;
-  /** 押して入り切りするボタンにします（aria-pressed）。入っているときは選択の面と線と太い文字で示します。true / false のどちらかを渡したときだけ入り切りのボタンになり、省くとふつうのボタンです。'secondary' と 'ghost' で使います。 */
+  /** 押して入り切りするボタンにします（aria-pressed）。入っているときは選択の面と 2px の線で示します。true / false のどちらかを渡したときだけ入り切りのボタンになり、省くとふつうのボタンです。'secondary' と 'ghost' で使います。 */
   pressed?: boolean;
   /** 押せない理由。渡すと disabled の代わりに aria-disabled にして、フォーカスが届くようにし、理由をツールチップと読み上げで伝えます。押しても onClick は呼びません。「必須の項目を入力すると送れます」のように、どうすれば押せるかを書きます。 */
   disabledReason?: string;
@@ -156,7 +156,7 @@ export type IconButtonProps = Omit<
   tooltip?: boolean;
   /** 処理中の表示。押せなくなり、aria-busy が付きます。 */
   loading?: boolean;
-  /** 押して入り切りするボタンにします（aria-pressed）。太字・斜体の切り替えなど、道具の並びで使います。入っているときは選択の面と線で示します。 */
+  /** 押して入り切りするボタンにします（aria-pressed）。太字・斜体の切り替えなど、道具の並びで使います。入っているときは選択の面と 2px の線で示します。 */
   pressed?: boolean;
 };
 /** アイコンだけのボタン。label を読み上げとツールチップの両方に使うので、名前を付け忘れません。 */

@@ -2,7 +2,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
-import { LievreProvider, Sparkline } from '../../index';
+import { Button, ButtonGroup, IconButton, LievreProvider, Sparkline } from '../../index';
 import '../../styles/fonts.css';
 import '../../styles/lievre.css';
 import { inset } from '../../../scripts/measure-alignment.js';
@@ -238,5 +238,38 @@ describe('実際の部品で検出する', () => {
     root.unmount();
     // The fixture above shows the miss; the real part stretches its viewBox to the box.
     expect(violations.map((v) => v.message)).toEqual([]);
+  });
+
+  it('つなげたボタン：押した状態は線の太さでも示し、フォーカスは隣に隠れず、端の角は丸い', () => {
+    const root = createRoot(host);
+    flushSync(() =>
+      root.render(
+        <LievreProvider>
+          <ButtonGroup label="書式" attached>
+            <IconButton label="斜体" icon={<svg />} variant="secondary" pressed={false} />
+            <IconButton label="下線" icon={<svg />} variant="secondary" pressed />
+            <Button disabled disabledReason="選ぶと消せます">
+              消す
+            </Button>
+          </ButtonGroup>
+        </LievreProvider>,
+      ),
+    );
+    const [off, on] = [...host.querySelectorAll<HTMLElement>('.lv-icon-button')];
+    const last = host.querySelector<HTMLElement>('.lv-button')!;
+    // Buttons are always bold: the pressed one must differ by more than colour.
+    expect(getComputedStyle(on).boxShadow).toMatch(/inset/);
+    expect(getComputedStyle(off).boxShadow).toBe('none');
+    off.focus({ focusVisible: true } as FocusOptions);
+    const z = (el: HTMLElement) => Number(getComputedStyle(el).zIndex) || 0;
+    const focused = off.matches(':focus-visible');
+    const [zOff, zOn] = [z(off), z(on)];
+    // The hidden reason sits after the last button; its outer corners still round.
+    const radius = getComputedStyle(last).borderEndEndRadius;
+    root.unmount();
+    // A pressed neighbour later in the row must not paint over the focus ring.
+    expect(focused).toBe(true);
+    expect(zOff).toBeGreaterThan(zOn);
+    expect(radius).not.toBe('0px');
   });
 });
