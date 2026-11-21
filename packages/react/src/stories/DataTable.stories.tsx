@@ -1,7 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { LayoutGate } from '../test/layout/declare';
 import { useState } from 'react';
-import { DataTable, Badge, type Column, type TableSort } from '../index';
+import {
+  DataTable,
+  Badge,
+  DescriptionList,
+  LievreProvider,
+  type Column,
+  type TableSort,
+} from '../index';
 import { expect, userEvent, within } from 'storybook/test';
 type Row = { id: string; name: string; value: number; status: string };
 const rows: Row[] = [
@@ -51,7 +58,7 @@ const meta = {
         // held to the one-line centre. EmptyState is measured in its own story.
         {
           name: '表のセル',
-          selector: '.lv-table td:not(:has(.lv-empty))',
+          selector: '.lv-table td:not(:has(.lv-empty)):not(.lv-table-expanded > td)',
           checks: ['inset-y', 'line-grid'],
         },
         {
@@ -65,6 +72,22 @@ const meta = {
           ],
         },
         {
+          name: '行を広げるボタン',
+          selector: '.lv-table-toggle',
+          checks: ['inset-x', 'inset-y', 'grid-height', 'square'],
+        },
+        { name: '広げた行の中身', selector: '.lv-table-expanded > td', checks: ['fits'] },
+        {
+          name: 'ページ番号',
+          selector: '.lv-pagination-page',
+          checks: ['inset-x', 'inset-y', 'control-height'],
+        },
+        {
+          name: '表示件数の選択',
+          selector: '.lv-table-pager .lv-select-trigger',
+          checks: ['inset-y', 'control-height', { padding: 'input' }],
+        },
+        {
           name: '並べ替えのボタン',
           selector: '.lv-table-sort',
           checks: ['grid-height', { icon: 'svg' }],
@@ -74,7 +97,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'ネイティブtableの意味論を維持。sortValueのある列はソート可能。選択とソートは内部管理・外部制御の両方に対応。pageSizeを渡すと、全件を並べ替えてから区切り、表の下に件数とページ送りを描きます。並べ替えとページ分けをサーバーに任せるときは dataMode="server" と totalCount を渡します。',
+          'ネイティブtableの意味論を維持。sortValueのある列はソート可能。選択とソートは内部管理・外部制御の両方に対応。pageSizeを渡すと、全件を並べ替えてから区切り、表の下に件数とページ送りを描きます。並べ替えとページ分けをサーバーに任せるときは dataMode="server" と totalCount を渡します。maxHeight で表の中をスクロールさせ、見出しの行を上に残します。renderExpanded で行を広げて中身を出します。paginationVariant="numbers" と pageSizeOptions で、下のページ送りにページ番号と表示件数を出します。表だけを詰めたいときは、表を LievreProvider density="compact" で包みます。',
       },
     },
   },
@@ -157,3 +180,62 @@ function ServerDemo(args: React.ComponentProps<typeof DataTable<Row>>) {
     />
   );
 }
+const tall = Array.from({ length: 30 }, (_, i) => ({
+  id: `lievre-${String(i + 1).padStart(2, '0')}`,
+  name: `機材${i + 1}`,
+  value: (i * 37) % 100,
+  status: i % 4 === 0 ? '要確認' : '稼働中',
+}));
+/** 表の高さの上限。表の中でスクロールし、見出しの行は上に残ります。 */
+export const StickyHeader: Story = { args: { rows: tall, maxHeight: '20rem' } };
+/** 行を広げて中身を出す形。 */
+export const Expandable: Story = {
+  args: {
+    renderExpanded: (r: Row) => (
+      <DescriptionList
+        items={[
+          { label: '機材の番号', value: r.id, mono: true },
+          { label: '最後の点検', value: '2026年11月12日' },
+        ]}
+      />
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    const toggle = c.getByRole('button', { name: 'lievre-02 の中身' });
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(c.getByText('最後の点検')).toBeVisible();
+  },
+};
+function NumbersDemo(args: React.ComponentProps<typeof DataTable<Row>>) {
+  const [size, setSize] = useState(5);
+  return (
+    <DataTable
+      {...args}
+      rows={tall}
+      pageSize={size}
+      paginationVariant="numbers"
+      pageSizeOptions={[5, 10, 20]}
+      onPageSizeChange={setSize}
+    />
+  );
+}
+/** 下のページ送りに、ページ番号と表示件数を出す形。 */
+export const NumbersAndPageSize: Story = {
+  render: (args) => <NumbersDemo {...args} />,
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await userEvent.click(c.getByRole('button', { name: '2ページ目' }));
+    await expect(c.getByText('30件中 6〜10件目')).toBeVisible();
+  },
+};
+/** 画面はそのままで、表だけを詰める例。表を LievreProvider density="compact" で包みます。 */
+export const CompactTable: Story = {
+  render: (args) => (
+    <LievreProvider density="compact">
+      <DataTable {...args} rows={tall.slice(0, 8)} />
+    </LievreProvider>
+  ),
+};
