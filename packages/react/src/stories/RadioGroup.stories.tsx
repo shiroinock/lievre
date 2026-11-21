@@ -16,6 +16,11 @@ const meta = {
       parts: [
         { name: 'ラジオボタン', selector: '.lv-radio-option', checks: [{ icon: 'input' }] },
         { name: 'エラー文', selector: '.lv-field-error', checks: [{ icon: ':scope > svg' }] },
+        {
+          name: '選択肢のカード',
+          selector: '.lv-radio-card',
+          checks: ['grid-height', 'focus-room'],
+        },
       ],
     } satisfies LayoutGate,
   },
@@ -35,5 +40,24 @@ export const Horizontal: Story = {
       { value: 'yes', label: 'はい' },
       { value: 'no', label: 'いいえ' },
     ],
+  },
+};
+const plans = [
+  { value: 'light', label: 'ライト', description: '月 500 円。1人で使う。' },
+  { value: 'team', label: 'チーム', description: '月 3,000 円。10人まで。' },
+  { value: 'org', label: '組織', description: '見積もり。人数の上限なし。' },
+];
+/** カードの形。選択肢ごとの説明を比べて選ぶときに使います。 */
+export const Cards: Story = {
+  args: { label: '料金の種類', variant: 'card', options: plans, defaultValue: 'team' },
+};
+/** カードを横に並べる形。幅に合わせて段に並べます。 */
+export const CardsHorizontal: Story = {
+  args: {
+    label: '料金の種類',
+    variant: 'card',
+    orientation: 'horizontal',
+    options: plans,
+    defaultValue: 'team',
   },
 };

@@ -27,6 +27,7 @@ import {
   CheckboxGroup,
   ErrorSummary,
   RadioGroup,
+  Textarea,
   type Column,
   type ToastMessage,
 } from '../index';
@@ -716,5 +717,51 @@ describe('Input variations', () => {
     expect(screen.getByRole('radio', { name: 'はい' })).toHaveFocus();
     await userEvent.keyboard('{ArrowRight}');
     expect(screen.getByRole('radio', { name: 'いいえ' })).toBeChecked();
+  });
+});
+
+describe('Counts, widths and cards', () => {
+  it('counts what a person sees as one character, or full-width as two', async () => {
+    const { countCharacters } = await import('../components/field-parts');
+    expect(countCharacters('👨‍👩‍👧 家族')).toBe(4);
+    expect(countCharacters('W-1 確認', 'width')).toBe(8);
+    expect(countCharacters('ｶﾅ', 'width')).toBe(2);
+  });
+  it('tells the limit once and the remainder after typing pauses, without blocking input', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      setup(<Textarea label="メモ" maxCount={5} />);
+      const field = screen.getByRole('textbox', { name: 'メモ' });
+      expect(field).toHaveAccessibleDescription('5文字まで入力できます');
+      await user.type(field, '確認しました');
+      expect(field).toHaveValue('確認しました');
+      vi.advanceTimersByTime(1200);
+      await waitFor(() => expect(screen.getByText('1文字多すぎます')).toBeInTheDocument());
+      expect(document.querySelector('.lv-field-count')).toHaveAttribute('data-over', 'true');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it('sizes a field by its characters and sets it in mono', () => {
+    setup(<TextField label="郵便番号" chars={8} mono />);
+    const field = screen.getByRole('textbox', { name: '郵便番号' });
+    expect(field).toHaveAttribute('data-chars', '8');
+    expect(field).toHaveClass('lv-mono');
+  });
+  it('keeps card radios as radios in one group', async () => {
+    setup(
+      <RadioGroup
+        label="料金"
+        variant="card"
+        options={[
+          { value: 'a', label: 'ライト', description: '1人' },
+          { value: 'b', label: 'チーム', description: '10人まで' },
+        ]}
+      />,
+    );
+    await userEvent.click(screen.getByText('10人まで'));
+    expect(screen.getByRole('radio', { name: 'チーム' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'チーム' })).toHaveAccessibleDescription('10人まで');
   });
 });

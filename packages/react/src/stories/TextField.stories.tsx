@@ -119,3 +119,29 @@ export const SmallWithIcon: Story = {
 export const LargeWithIconAndSuffix: Story = {
   args: { label: '数量', icon: <Plus />, suffix: '件', controlSize: 'lg', hint: undefined },
 };
+/** 入る文字の数に合わせた幅。郵便番号は8文字（ハイフンを含む）で、等幅にします。 */
+export const Chars: Story = {
+  args: {
+    label: '郵便番号',
+    chars: 8,
+    mono: true,
+    inputMode: 'numeric',
+    autoComplete: 'postal-code',
+    hint: undefined,
+    defaultValue: '100-0001',
+  },
+};
+export const CharsWithSuffix: Story = {
+  args: {
+    label: '数量',
+    chars: 6,
+    mono: true,
+    suffix: '件',
+    hint: undefined,
+    defaultValue: '1200',
+  },
+};
+/** 文字数と上限。 */
+export const WithCount: Story = {
+  args: { label: '件名', maxCount: 30, hint: undefined, defaultValue: '接続の確認' },
+};

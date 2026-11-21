@@ -3,6 +3,9 @@ import {
   useId,
   useLayoutEffect,
   useRef,
+  useState,
+  type ChangeEvent,
+  type CSSProperties,
   type ButtonHTMLAttributes,
   type HTMLAttributes,
   type InputHTMLAttributes,
@@ -32,7 +35,13 @@ import {
 } from 'lucide-react';
 import { cx, PortalSurface } from './system';
 import { Field } from './form';
-import { describedBy, FieldMessages, RequiredMark } from './field-parts';
+import {
+  CharacterCount,
+  countCharacters,
+  describedBy,
+  FieldMessages,
+  RequiredMark,
+} from './field-parts';
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -185,7 +194,38 @@ export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id' | 
   prefix?: string;
   /** 入力欄の後ろに置く言葉。単位（「円」「件」「%」）はここに書き、値には含めません。入力と aria-describedby で結びます。 */
   suffix?: string;
+} & CountProps & {
+    /** 入る文字の数（半角で数え、全角は2）。入力欄の幅をこの文字数に合わせます（郵便番号は 8、西暦の年は 4）。幅が足りない画面では親の幅に縮みます。省くと親の幅いっぱいです。 */
+    chars?: number;
+    /** 等幅の書体にします。番号・ID・コード・金額など、桁をそろえて読む値に使います。 */
+    mono?: boolean;
+  };
+type CountProps = {
+  /** 文字数の上限。入力の下に「12 / 100」を出し、上限を超えても入力は止めず、超えた数を言葉と記号で示します。読み上げでは上限を一度伝え、入力が止まってから残りの数を知らせます。送信を止めるかどうかは呼び出す側で決め、error で伝えます。 */
+  maxCount?: number;
+  /** 数え方。'grapheme'（既定）は見た目の1文字を1と数えます（絵文字の組み合わせも1）。'width' は全角を2、半角を1と数えます（全角換算の制度に合わせるとき）。 */
+  countBy?: 'grapheme' | 'width';
 };
+/** Tracks the value only when a count is shown, so the field stays uncontrolled otherwise. */
+function useCount<E extends HTMLInputElement | HTMLTextAreaElement>(
+  maxCount: number | undefined,
+  value: unknown,
+  defaultValue: unknown,
+  onChange: ((event: ChangeEvent<E>) => void) | undefined,
+) {
+  const [inner, setInner] = useState(String(defaultValue ?? ''));
+  const current = value !== undefined ? String(value) : inner;
+  return {
+    current,
+    onChange:
+      maxCount === undefined
+        ? onChange
+        : (event: ChangeEvent<E>) => {
+            setInner(event.target.value);
+            onChange?.(event);
+          },
+  };
+}
 /** ラベル・補助文・エラーと入力を関連付けた標準入力。readOnly は値を読める見た目のまま、枠を破線にして直せないことを示します（disabled と違い、フォーカスが届き、送信にも含まれます）。 */
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function TextField(
   {
@@ -198,29 +238,55 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     icon,
     prefix,
     suffix,
+    maxCount,
+    countBy = 'grapheme',
+    chars,
+    mono,
     className,
+    style,
     ...props
   },
   ref,
 ) {
+  const count = useCount(maxCount, props.value, props.defaultValue, props.onChange);
+  const uid = useId();
+  const fieldId = id ?? uid;
   return (
-    <Field {...{ label, hint, error, id, required }}>
+    <Field
+      {...{ label, hint, error, required }}
+      id={fieldId}
+      after={
+        maxCount !== undefined && (
+          <CharacterCount
+            id={fieldId}
+            count={countCharacters(count.current, countBy)}
+            limit={maxCount}
+            countBy={countBy}
+          />
+        )
+      }
+    >
       {(control) => {
         const input = (
           <input
             {...props}
             {...control}
+            onChange={count.onChange}
             aria-describedby={joinIds(
               prefix && `${control.id}-prefix`,
               suffix && `${control.id}-suffix`,
               control['aria-describedby'],
+              maxCount !== undefined ? `${control.id}-limit` : undefined,
               props['aria-describedby'],
             )}
             ref={ref}
+            data-chars={chars}
+            style={chars ? ({ ...style, '--chars': chars } as CSSProperties) : style}
             className={cx(
               'lv-input',
               controlSize !== 'md' && `lv-control--${controlSize}`,
               !!icon && 'lv-input--icon',
+              mono && 'lv-mono',
               className,
             )}
           />
@@ -252,35 +318,62 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     </Field>
   );
 });
-/** 複数行の入力。label・hint・error・required・id の扱いは TextField と同じです。 */
+/** 複数行の入力。label・hint・error・required・id・maxCount の扱いは TextField と同じです。 */
 export function Textarea({
   label,
   hint,
   error,
   id,
   required,
+  maxCount,
+  countBy = 'grapheme',
+  autoResize = false,
   className,
   ...props
-}: Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'id'> & {
-  /** 見える名前。textarea と結びます。 */
-  label: string;
-  /** 補助文。入力の下に出し、aria-describedby で結びます。 */
-  hint?: string;
-  /** エラー文。補助文の下に記号を添えて出し、aria-invalid を付けます。 */
-  error?: string;
-  /** ラベルの横に「必須」の文字を出し、required を付けます。 */
-  required?: boolean;
-  /** textarea の id。省くと部品が作ります。 */
-  id?: string;
-}) {
+}: Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'id'> &
+  CountProps & {
+    /** 見える名前。textarea と結びます。 */
+    label: string;
+    /** 補助文。入力の下に出し、aria-describedby で結びます。 */
+    hint?: string;
+    /** エラー文。補助文の下に記号を添えて出し、aria-invalid を付けます。 */
+    error?: string;
+    /** ラベルの横に「必須」の文字を出し、required を付けます。 */
+    required?: boolean;
+    /** textarea の id。省くと部品が作ります。 */
+    id?: string;
+    /** 書いた分だけ高さを伸ばします（4行分から12行分まで。それより長いとスクロール）。CSS の field-sizing に対応しないブラウザでは、今までどおり高さは決まったままで、手で広げられます。 */
+    autoResize?: boolean;
+  }) {
+  const count = useCount(maxCount, props.value, props.defaultValue, props.onChange);
+  const uid = useId();
+  const fieldId = id ?? uid;
   return (
-    <Field {...{ label, hint, error, id, required }}>
+    <Field
+      {...{ label, hint, error, required }}
+      id={fieldId}
+      after={
+        maxCount !== undefined && (
+          <CharacterCount
+            id={fieldId}
+            count={countCharacters(count.current, countBy)}
+            limit={maxCount}
+            countBy={countBy}
+          />
+        )
+      }
+    >
       {(control) => (
         <textarea
           {...props}
           {...control}
-          aria-describedby={joinIds(control['aria-describedby'], props['aria-describedby'])}
-          className={cx('lv-input', 'lv-textarea', className)}
+          onChange={count.onChange}
+          aria-describedby={joinIds(
+            control['aria-describedby'],
+            maxCount !== undefined ? `${control.id}-limit` : undefined,
+            props['aria-describedby'],
+          )}
+          className={cx('lv-input', 'lv-textarea', autoResize && 'lv-textarea--auto', className)}
         />
       )}
     </Field>

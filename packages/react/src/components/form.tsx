@@ -33,9 +33,11 @@ export type FieldProps = {
   id?: string;
   /** 入力を描く関数。受け取った属性（id・aria-describedby・aria-invalid・required）を、入力の要素にそのまま渡します。`{(control) => <input {...control} className="lv-input" />}` */
   children: (control: FieldControlProps) => ReactNode;
+  /** 入力のすぐ下の右端に置く表示（文字数など）。補助文とエラーはこの下に出します。 */
+  after?: ReactNode;
 };
 /** ラベル・補助文・エラー・必須の印と、入力を結ぶ入れ物。TextField・Textarea・Select はこれで組んでいます。lievre にない入力（日付や独自の入力）を同じ形にそろえるときに使います。 */
-export function Field({ label, hint, error, required, id: givenId, children }: FieldProps) {
+export function Field({ label, hint, error, required, id: givenId, children, after }: FieldProps) {
   const uid = useId();
   const id = givenId ?? uid;
   return (
@@ -50,6 +52,7 @@ export function Field({ label, hint, error, required, id: givenId, children }: F
         'aria-invalid': error ? true : undefined,
         required: required || undefined,
       })}
+      {after}
       <FieldMessages id={id} hint={hint} error={error} />
     </div>
   );
@@ -117,6 +120,7 @@ export function RadioGroup({
   required = false,
   id: givenId,
   orientation = 'vertical',
+  variant = 'list',
 }: {
   /** まとまりの名前。fieldset の legend になります。 */
   label: string;
@@ -136,6 +140,8 @@ export function RadioGroup({
   id?: string;
   /** 'vertical'（既定）は縦に並べ、'horizontal' は横に並べます。「はい・いいえ」など短い選択肢に使い、幅が足りないと折り返します。矢印キーの動きはどちらも同じです。 */
   orientation?: 'vertical' | 'horizontal';
+  /** 'list'（既定）は丸と文字を並べ、'card' は選択肢ごとに枠で囲みます。料金の種類のように、選択肢ごとの説明を比べて選ぶときに使います。枠全体が押せて、選んだ枠は線と面の両方で示します。'horizontal' と組み合わせると、幅に合わせて段に並べます。 */
+  variant?: 'list' | 'card';
 }) {
   const uid = useId();
   return (
@@ -148,11 +154,16 @@ export function RadioGroup({
       disabled={disabled}
     >
       <Stack
-        gap={orientation === 'horizontal' ? 6 : 3}
+        className={cx(variant === 'card' && 'lv-radio-cards')}
+        data-orientation={orientation}
+        gap={variant === 'card' ? 3 : orientation === 'horizontal' ? 6 : 3}
         direction={orientation === 'horizontal' ? 'row' : 'column'}
       >
         {options.map((o, i) => (
-          <label className="lv-radio-option" key={o.value}>
+          <label
+            className={cx('lv-radio-option', variant === 'card' && 'lv-radio-card')}
+            key={o.value}
+          >
             <input
               type="radio"
               id={i === 0 && givenId ? givenId : `${uid}-${i}-input`}
