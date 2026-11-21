@@ -43,7 +43,7 @@ const toHiragana = (s: string) =>
 
 /**
  * 探すときに比べる形に直します。全角と半角（NFKC）、カタカナとひらがな、大文字と小文字、空白の違いを無視します。
- * 候補と入力の両方をこの形にしてから比べます（Combobox の絞り込みと同じ）。表示には使いません。
+ * 候補の絞り込みなどで、候補と入力の両方をこの形にしてから比べます。表示には使いません。
  */
 export function toSearchKey(text: string) {
   return toHiragana(text.normalize('NFKC')).toLowerCase().replace(/\s+/g, '');
