@@ -2703,6 +2703,12 @@
       forced-color-adjust: none;
       background: GrayText;
     }
+    /* The joining lines are background images, which forced colours drop: draw them in a
+       system colour, keeping their position and size. */
+    .lv-step::after {
+      forced-color-adjust: none;
+      background-image: linear-gradient(GrayText, GrayText);
+    }
     .lv-step[data-state='current'] .lv-step-mark {
       forced-color-adjust: none;
       border-color: Highlight;
