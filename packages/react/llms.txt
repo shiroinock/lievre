@@ -561,6 +561,26 @@ baked はビルド時の値（npm run wear）で決まります。
 「残りの待機中のもの 3 件をまとめて見送る」のボタンを出します。押したあとも、1件ずつ決め直せます。
 - `autoFocus?: boolean` — 既定 false。true で、描いたときに今の項目（終わっていれば終わりの表示）へフォーカスを移します。一覧から「順に見る」へ切り替えたときに使います。
 
+### NewItemsNotice
+
+新しく増えた項目の知らせ。「新しく 3 件あります」と出し、利用者が押すまで列にも件数にも混ぜません。
+知らせは role="status" で、件数が変わったときだけ読み上げます。押したあとは「3 件を列に加えました」と残し、フォーカスをこの知らせへ移すので、フォーカスを見失いません。
+
+- `count: number` — まだ取り込んでいない件数。0 のときは何も見せません。
+- `onAccept: () => void` — 取り込むときに呼びます（useNewItems の accept）。
+- `actionLabel?: string` — 既定 '列に加える'。ボタンの言葉。
+
+### PauseControl
+
+時間で進む動きを止める・再開する操作。何が動いているかを label に書き、今の状態を言葉で示します（「自動で更新しています」「止めています」）。
+自動で流す・切り替える・更新するものには必ず添えます（WCAG 2.2.2）。DecisionQueue は時間で進まないので要りません。
+
+- `paused: boolean`
+- `onPausedChange: (paused: boolean) => void`
+- `label: string` — 何の動きか（「数値の自動更新」）。まとまりの名前として読み上げます。
+- `runningText?: string` — 既定 '自動で更新しています'。動いているときの言葉。
+- `pausedText?: string` — 既定 '止めています'。止めているときの言葉。
+
 ## フック
 
 ### useLievreTheme
@@ -591,6 +611,20 @@ ToastProviderの子孫で使用します。保存結果や一時的な通知向�
 `useDecisionQueue({ keys, state: controlled, defaultState, onStateChange, }: UseDecisionQueueOptions) => { state: DecisionState; snapshot: DecisionQueueSnapshot; decide: (key: string, value: string | undefined) => void; decideMany: (keys: readonly string[], value: string) => void; selected: (value?: string) => string[]; setSelected: (ids: readonly string[], value?: string) => void; defer: (key: string) => void; undo: () => void; reset: () => void; }`
 
 列の状態と操作。DecisionQueue と一覧（DataTable など）に同じ戻り値を渡すと、どちらで決めても両方に反映されます。
+
+### useNewItems
+
+`useNewItems<T>(items: readonly T[], getKey: (item: T) => string) => { items: T[]; newItems: T[]; accept: () => void; }`
+
+途中で増える項目を、利用者が取り込むまで列に混ぜないためのフック。描いた時点の項目を「見せる項目」にし、あとから増えた項目は newItems に分けておきます。
+accept() で取り込みます。消えた項目は、取り込みを待たずに見せる項目から外れます。
+
+### useAutoAdvance
+
+`useAutoAdvance({ interval, onTick, defaultPaused, }: { interval: number; onTick: () => void; defaultPaused?: boolean | undefined; }) => { paused: boolean; setPaused: Dispatch<SetStateAction<boolean>>; }`
+
+時間で進む動き（自動の更新・切り替え）のためのフック。interval ミリ秒ごとに onTick を呼びます。
+動きを減らす設定では、最初から止めた状態で始めます。画面が見えていないあいだ（別のタブ）は呼びません。止める操作は PauseControl に渡します。
 
 ## 型とその他
 
