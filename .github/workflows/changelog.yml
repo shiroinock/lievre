@@ -1,4 +1,5 @@
-# Stops PRs that change what apps receive without a line in CHANGELOG.md.
+# Stops PRs that change what apps receive without a fragment in changes/, and new lines in the
+# 「未公開」 of CHANGELOG.md (they go in a fragment).
 # It also runs when the description is edited, so adding the opt-out line reruns only this check.
 name: 変更履歴
 
@@ -29,7 +30,8 @@ jobs:
           node-version: 22
 
       # The body goes through env, never into the script text, so it cannot inject shell.
-      - name: CHANGELOG.md の書き忘れと書き方
+      # GitHub sets GITHUB_HEAD_REF to the PR's branch; the message names the fragment after it.
+      - name: 変更履歴の断片の書き忘れと書き方
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
         run: node scripts/check-changelog.mjs HEAD^1 HEAD

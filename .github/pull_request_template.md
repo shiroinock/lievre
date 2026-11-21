@@ -17,5 +17,6 @@
 
 <!--
 npm run typecheck && npm run lint && npm test など。
+利用する側に見える変更なら、changes/ に断片を足します（changes/README.md）。
 利用する側に見えない変更なら、「変更履歴：なし（理由）」で始まる1行をこのコメントの外に書きます。
 -->
