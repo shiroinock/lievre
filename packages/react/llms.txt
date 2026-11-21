@@ -202,6 +202,13 @@ baked はビルド時の値（npm run wear）で決まります。
 - `value?: string`
 - `onValueChange?: ((value: string) => void)`
 
+### TabNav
+
+タブの見た目のまま、ページを移るリンクを並べます。URL ごとに中身が変わる画面（設定の各ページなど）に使います。同じ画面の中で中身を切り替えるなら Tabs を使います。Tabs の矢印キーの操作はなく、リンクとして Tab で順に移ります。
+
+- `label: string` — 並びの名前。画面には出さず、nav の名前として読み上げます。
+- `items: TabNavItem[]`
+
 ### Tooltip
 
 - `content: string` — 出す言葉。短く1文で。操作できる中身は Popover に置きます。
@@ -262,15 +269,23 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### Breadcrumb
 
-- `items: { label: string; href?: string | undefined; }[]`
+今いる場所までの階層。最後の項目は今のページで、aria-current="page" を付けます。
+
+- `items: BreadcrumbItem[]` — 上の階層から順に。最後は今のページで、href は付けても使いません。
+- `maxItems?: number` — 出す数の上限。超えると、最初の1つと最後の (maxItems - 1) 個を残し、間を「…」のボタンにまとめます。押すと省いた階層をその場に出し、フォーカスを省いていた最初の階層へ移します。
 
 ### Pagination
 
-前後のページ送り。いまのページを「5ページ中2ページ目」と読み上げ、ページが変わると知らせます。端のページで押したボタンが無効になったら、フォーカスを反対のボタンへ移します。DataTable のページ送りには、これを横に置かずに DataTable の pageSize を使います。
+ページ送り。いまのページを「5ページ中2ページ目」と読み上げ、ページが変わると知らせます。端のページで押したボタンが無効になったら、フォーカスを反対のボタンへ移します。DataTable のページ送りには、これを横に置かずに DataTable の pageSize を使います。
 
 - `page: number` — 1 始まり。
 - `totalPages: number`
 - `onPageChange: (page: number) => void`
+- `variant?: 'compact' | 'numbers'` — 既定 'compact'。'compact'（既定）は前後のボタンと「2 / 5」。'numbers' はページ番号を並べます（端と今のページの前後だけを出し、間は「…」で省きます）。番号は等幅で、今のページは aria-current="page" と選択の面で示します。
+- `totalCount?: number` — 全体の件数。pageSize と一緒に渡すと、「128件中 21〜40件」と出します。
+- `pageSize?: number` — 1ページの件数。totalCount と一緒に渡すと件数の範囲を出し、pageSizeOptions を渡すと選べるようにします。
+- `pageSizeOptions?: number[]` — 選べる1ページの件数（[20, 50, 100]）。渡すと「表示件数」の選択を出します。
+- `onPageSizeChange?: ((pageSize: number) => void)` — 1ページの件数が変わったときに呼びます。ページを1ページ目に戻すのは呼び出す側です。
 
 ### Button
 
@@ -696,7 +711,20 @@ altText には、通知の外で同じ操作ができる場所を書きます（
 - `type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';`
 - `type SelectOption = { value: string; label: string; disabled?: boolean };`
 - `type SelectOptionGroup = { label: string; options: SelectOption[] };` — 選択肢のまとまり。label は一覧の中に見出しとして出し、中の選択肢の読み上げに添えます。
-- `type TabItem = { value: string; label: string; content: ReactNode; disabled?: boolean; count?: number; };`
+- `type TabItem`
+  - `value: string`
+  - `label: string`
+  - `content: ReactNode`
+  - `disabled?: boolean`
+  - `count?: number` — 件数。等幅で出し、言葉の後ろに読み上げます。
+  - `icon?: ReactNode` — 言葉の前のアイコン。飾りなので読み上げず、言葉は消しません。
+- `type TabNavItem`
+  - `href: string` — 移る先。
+  - `label: string`
+  - `current?: boolean` — 今のページなら true。aria-current="page" と下線で示します。
+  - `count?: number` — 件数。等幅で出し、言葉の後ろに読み上げます。
+  - `icon?: ReactNode` — 言葉の前のアイコン。飾りなので読み上げず、言葉は消しません。
+- `type BreadcrumbItem = { label: string; href?: string };`
 - `type Column<T>`
   - `key: string`
   - `header: string`

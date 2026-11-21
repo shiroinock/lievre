@@ -521,8 +521,10 @@ ViewSwitch を SegmentedControl の上に組み直して土台を1つにする�
 
 第3段階の2（移動）：
 
-1. Pagination：ページ番号を並べる形、件数の選択と表示
-2. Breadcrumb の省略、Tabs のアイコンと移動のタブ（TabNav）
+1. Pagination：ページ番号を並べる形（`variant="numbers"`。端と今のページの前後だけを出し、1ページだけの間は省かない）、件数の範囲（「128件中 21〜40件」）と1ページの件数の選択
+2. Breadcrumb の省略（`maxItems`。「…」を押すとその場に出し、フォーカスを移す）、Tabs のアイコンと移動のタブ（TabNav。リンクを並べ、今のページは aria-current="page"）
+
+DataTable の下のページ送りに番号と件数の選択を出すのは、DataTable の props を決めてから第4段階で行います。
 
 第3段階の3（メニューとツールチップ）：
 

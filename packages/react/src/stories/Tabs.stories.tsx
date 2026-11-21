@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { LayoutGate } from '../test/layout/declare';
 import { Tabs, Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
-import { Plus, Settings2, FolderOpen } from 'lucide-react';
+import { Plus, Settings2, FolderOpen, Inbox, User, CircleCheck } from 'lucide-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 const meta = {
@@ -17,6 +17,7 @@ const meta = {
           checks: ['inset-x', 'inset-y', 'control-height', 'fits'],
         },
         { name: 'タブの件数', selector: '.lv-tab-count', checks: ['inset-x', 'inset-y'] },
+        { name: 'タブのアイコン', selector: '.lv-tab', checks: [{ icon: '.lv-tab-icon' }] },
         { name: 'タブの並び', selector: '.lv-tabs-list', checks: [{ sameHeight: '.lv-tab' }] },
       ],
     } satisfies LayoutGate,
@@ -57,5 +58,27 @@ export const Interaction: Story = {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('tab', { name: '履歴' }));
     await expect(canvas.getByRole('tabpanel')).toHaveTextContent('変更履歴を表示しています。');
+  },
+};
+/** アイコンを添えても、言葉は消しません。 */
+export const WithIcons: Story = {
+  args: {
+    items: [
+      {
+        value: 'all',
+        label: 'すべて',
+        icon: <Inbox />,
+        count: 128,
+        content: <p>すべての作業です。</p>,
+      },
+      {
+        value: 'mine',
+        label: '自分の作業',
+        icon: <User />,
+        count: 12,
+        content: <p>自分の作業です。</p>,
+      },
+      { value: 'done', label: '完了', icon: <CircleCheck />, content: <p>完了した作業です。</p> },
+    ],
   },
 };

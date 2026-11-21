@@ -1068,11 +1068,13 @@
     height: 2px;
     background: transparent;
   }
-  .lv-tab[data-state='active'] {
+  .lv-tab[data-state='active'],
+  .lv-tab[aria-current='page'] {
     color: var(--lv-text);
     font-weight: var(--lv-weight-bold);
   }
-  .lv-tab[data-state='active']::after {
+  .lv-tab[data-state='active']::after,
+  .lv-tab[aria-current='page']::after {
     background: var(--lv-accent);
   }
   .lv-tab:disabled {
@@ -1093,6 +1095,25 @@
     font-weight: var(--lv-weight-medium);
     line-height: 16px;
     text-align: center;
+  }
+  .lv-tab-icon {
+    display: inline-flex;
+  }
+  .lv-tab-icon > svg {
+    width: 16px;
+    height: 16px;
+  }
+  /* TabNav: links in the tab shape. */
+  .lv-tab-nav {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lv-tab-nav > li {
+    display: flex;
+  }
+  .lv-tab-nav .lv-tab {
+    text-decoration: none;
   }
   .lv-tab-content {
     padding: var(--lv-space-6) 0 0;
@@ -1484,10 +1505,30 @@
   .lv-breadcrumb [aria-current] {
     color: var(--lv-text);
   }
+  /* The "…" that brings back the levels left out: a 24px target at least. */
+  .lv-breadcrumb-more {
+    min-width: 24px;
+    min-height: 24px;
+    padding: 0 4px;
+    border: 0;
+    border-radius: var(--lv-radius-sm);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    cursor: pointer;
+  }
+  .lv-breadcrumb-more:hover {
+    background: var(--lv-surface-sunken);
+    color: var(--lv-text);
+  }
 
   /* Pagination */
+  /* Wraps on a narrow screen: with justify-content: flex-end an overflowing row would push the
+     start (the page-size choice) out to the left, where it cannot be scrolled to. */
   .lv-pagination {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
     gap: var(--lv-space-2);
@@ -1502,6 +1543,68 @@
     font-family: var(--lv-font-mono);
     line-height: var(--lv-line-tight);
     font-variant-numeric: tabular-nums;
+  }
+
+  .lv-pagination > .lv-pagination-range {
+    font-family: var(--lv-font-sans);
+    font-size: var(--lv-text-sm);
+    white-space: nowrap;
+  }
+  /* The page-size choice sits at the start, its label beside it rather than above. */
+  .lv-pagination-size {
+    margin-inline-end: auto;
+  }
+  .lv-pagination-size .lv-field {
+    grid-auto-flow: column;
+    align-items: center;
+  }
+  /* The step buttons and the numbers wrap as one, so "previous" never sits alone on a line. */
+  .lv-pagination-steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--lv-space-1);
+  }
+  .lv-pagination-pages {
+    display: flex;
+    gap: var(--lv-space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lv-pagination-page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid transparent;
+    border-radius: var(--lv-radius-md);
+    background: transparent;
+    color: var(--lv-text);
+    font-size: var(--lv-text-mono-min);
+    line-height: var(--lv-line-tight);
+    cursor: pointer;
+  }
+  .lv-pagination-page:hover {
+    background: var(--lv-surface-sunken);
+  }
+  /* The current page: the selected surface, the accent outline and bold figures together. */
+  .lv-pagination-page[aria-current='page'] {
+    border-color: var(--lv-accent);
+    background: var(--lv-selected);
+    font-weight: var(--lv-weight-bold);
+    cursor: default;
+  }
+  .lv-pagination-gap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 32px;
+    color: var(--lv-subtle);
   }
 
   /* Dialog */
@@ -2133,8 +2236,15 @@
     .lv-switch:disabled .lv-switch-thumb {
       background: GrayText;
     }
-    .lv-tab[data-state='active']::after {
+    .lv-tab[data-state='active']::after,
+    .lv-tab[aria-current='page']::after {
       background: Highlight;
+    }
+    .lv-pagination-page[aria-current='page'] {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
     }
     /* aria-disabled is not :disabled, so the system does not grey it out by itself. */
     .lv-button[aria-disabled='true'] {
