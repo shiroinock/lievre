@@ -41,9 +41,7 @@ const OLD_NAMES: [RegExp, string][] = [
 const text = (file: string) => {
   const s = readFileSync(join(root, file), 'utf8');
   // The plan written before the rename keeps the old names on purpose.
-  const own = file === 'docs/tui-foundation.md' ? s.replace(/### 改名[\s\S]*?(?=\n## )/, '') : s;
-  // The GitHub repository keeps its name until the author renames it.
-  return own.replaceAll('shiroinock/kei-design-system', 'shiroinock/<repository>');
+  return file === 'docs/tui-foundation.md' ? s.replace(/### 改名[\s\S]*?(?=\n## )/, '') : s;
 };
 
 // Text files only: git grep -I skips binaries such as the fonts and screenshots. --untracked also
