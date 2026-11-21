@@ -257,7 +257,7 @@ lievre の △：Field は TextField・Select・RadioGroup がそれぞれラベ
 
 - **理由**：申し込み画面では、ラベル・補助文・エラー・必須の印を、どの入力でも同じ形にする必要がある。今は TextField・Select・RadioGroup がそれぞれ別に持っていて、日付やコンボボックスを足すたびに作り直すことになる。複数のチェックボックスをまとめる部品もない。
 - **参考**：Primer の FormControl、SmartHR UI の FormControl / Fieldset、Radix の `Label`。
-- **lievre での注意**：今の TextField などはこの Field を使って作り直し、見た目と API は変えない。必須は「必須」の文字で示し、`*` や色だけにしない。エラーは赤の線だけでなく、記号と文で示す。
+- **lievre での注意**：今の TextField などはこの Field を使って作り直し、API は変えない。見た目は、必須の印・補助文とエラーの並び・エラーの記号の3点だけが変わる。必須は「必須」の文字で示し、`*` や色だけにしない。エラーは赤の線だけでなく、記号と文で示す。
 - **品質基準で見る点**：ラベル・入力・補助文の縦の間隔が部品をまたいで同じ値であること。ラベルの左端と入力の左端が揃うこと。チェックボックスの四角と1行目の文字の縦の中心が揃うこと（2行に折り返したときも1行目に合わせる）。
 
 #### ErrorSummary（入力の誤りの一覧）
@@ -499,7 +499,7 @@ lievre の △：Field は TextField・Select・RadioGroup がそれぞれラベ
 3. RadioGroup：横に並べる、カードの形（RadioCards）
 4. Textarea・TextField：文字数と上限、Textarea の自動の高さ
 
-Field で今の TextField・Select・RadioGroup を作り直すときは、配置の品質基準の CI（`npm run test:layout`）を通し、見た目が変わらないことを確かめます。
+Field で今の TextField・Select・RadioGroup を作り直すときは、配置の品質基準の CI（`npm run test:layout`）を通し、上の3点のほかは見た目が変わらないことを確かめます。
 
 ### 第3段階：操作と移動のバリエーション
 

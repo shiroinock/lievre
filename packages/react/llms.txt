@@ -19,7 +19,9 @@ import '@lievre/react/styles.css';
 
 ## 約束
 
-- 入力（TextField・Textarea・Select・Checkbox・Switch・RadioGroup）には必ず `label` を渡します。部品が label・補助文・エラーを入力と結ぶので、`id`・外の `<label>`・`aria-*` は自分で書きません。エラーは部品の外に書かず `error` に渡します。
+- 入力（TextField・Textarea・Select・Checkbox・Switch・RadioGroup・CheckboxGroup）には必ず `label` を渡します。部品が label・補助文・エラーを入力と結ぶので、`id`・外の `<label>`・`aria-*` は自分で書きません。エラーは部品の外に書かず `error` に渡します。lievre にない入力は `Field` で包み、1つの問いに答える複数の入力は `Fieldset` でまとめます。
+- 必須は `required` で示します。部品が「必須」の文字を出すので、ラベルに `*` や「（必須）」を書き足しません。
+- 送信したあとの誤りは、入力ごとの `error` に加えて、フォームの先頭に `ErrorSummary` を置きます。`errors` の `id` には入力に渡した `id`（RadioGroup・CheckboxGroup では `id` に渡した最初の選択肢の id）を使い、`message` は入力の `error` と同じ言葉にします。
 - 値の変更は Radix と同じ名前です：Switch・Checkbox は `onCheckedChange`、Select・RadioGroup・Tabs は `onValueChange`。`onChange` を受けるのは TextField・Textarea（ネイティブの属性）だけです。
 - `Button` の `type` の既定は `'button'` です。フォームの送信には `type="submit"` を付けます。主要な操作（`variant="primary"`）は1つの作業領域に1つ。危険な操作は `variant="danger"`。画面の移動は `Link` / `ActionLink`。
 - 状態の名前：Badge・Alert の `tone` は `'neutral' | 'success' | 'warning' | 'danger' | 'info'`、Toast の `tone` は `'success' | 'error'`。
