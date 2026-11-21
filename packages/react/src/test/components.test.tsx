@@ -28,6 +28,9 @@ import {
   ErrorSummary,
   RadioGroup,
   Textarea,
+  SegmentedControl,
+  ButtonGroup,
+  SplitButton,
   type Column,
   type ToastMessage,
 } from '../index';
@@ -780,5 +783,84 @@ describe('Counts, widths and cards', () => {
     await userEvent.click(screen.getByText('10人まで'));
     expect(screen.getByRole('radio', { name: 'チーム' })).toBeChecked();
     expect(screen.getByRole('radio', { name: 'チーム' })).toHaveAccessibleDescription('10人まで');
+  });
+});
+
+describe('Action variations', () => {
+  it('keeps a button with a reason focusable, tells the reason and does not act', async () => {
+    const act = vi.fn();
+    setup(
+      <Button disabled disabledReason="必須の項目を入力すると送れます" onClick={act}>
+        送る
+      </Button>,
+    );
+    const button = screen.getByRole('button', { name: '送る' });
+    expect(button).not.toBeDisabled();
+    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).toHaveAccessibleDescription('必須の項目を入力すると送れます');
+    await userEvent.tab();
+    expect(button).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await userEvent.click(button);
+    expect(act).not.toHaveBeenCalled();
+  });
+  it('still disables a button outright without a reason', () => {
+    setup(<Button disabled>送る</Button>);
+    expect(screen.getByRole('button', { name: '送る' })).toBeDisabled();
+  });
+  it('exposes pressed state only when asked, and hides the end icon', () => {
+    setup(
+      <>
+        <Button pressed={false}>固定</Button>
+        <Button iconEnd={<svg data-testid="end" />}>並べ替え</Button>
+      </>,
+    );
+    expect(screen.getByRole('button', { name: '固定' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: '並べ替え' })).not.toHaveAttribute('aria-pressed');
+    expect(screen.getByTestId('end').parentElement).toHaveAttribute('aria-hidden', 'true');
+  });
+  it('keeps one segment chosen, even when the chosen one is pressed again', async () => {
+    const change = vi.fn();
+    setup(
+      <SegmentedControl
+        label="期間"
+        defaultValue="day"
+        onValueChange={change}
+        items={[
+          { value: 'day', label: '日' },
+          { value: 'week', label: '週' },
+        ]}
+      />,
+    );
+    const day = screen.getByRole('radio', { name: '日' });
+    await userEvent.click(day);
+    expect(day).toHaveAttribute('aria-checked', 'true');
+    expect(change).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole('radio', { name: '週' }));
+    expect(change).toHaveBeenCalledWith('week');
+  });
+  it('names a button group, and a split button opens its menu from its own button', async () => {
+    const save = vi.fn();
+    const draft = vi.fn();
+    setup(
+      <>
+        <ButtonGroup label="表示">
+          <Button>拡大</Button>
+        </ButtonGroup>
+        <SplitButton
+          onClick={save}
+          menuLabel="保存のほかの方法"
+          items={[{ label: '下書きとして保存', onSelect: draft }]}
+        >
+          保存
+        </SplitButton>
+      </>,
+    );
+    expect(screen.getByRole('group', { name: '表示' })).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: '保存' }));
+    expect(save).toHaveBeenCalledOnce();
+    await userEvent.click(screen.getByRole('button', { name: '保存のほかの方法' }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: '下書きとして保存' }));
+    await waitFor(() => expect(draft).toHaveBeenCalledOnce());
   });
 });

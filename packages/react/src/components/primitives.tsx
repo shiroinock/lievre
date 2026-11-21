@@ -48,7 +48,16 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: 'sm' | 'md' | 'lg';
   /** 処理中の表示。押せなくなり、aria-busy が付きます。 */
   loading?: boolean;
+  /** 文字の前のアイコン。 */
   icon?: ReactNode;
+  /** 文字の後ろのアイコン。開く（ChevronDown）・外へ移る（ArrowUpRight）など、押したあとに起きることを示します。 */
+  iconEnd?: ReactNode;
+  /** 幅を親いっぱいに広げます。狭い画面の申し込みの「次へ」など、1つだけ置く主要操作に使います。 */
+  block?: boolean;
+  /** 押して入り切りするボタンにします（aria-pressed）。入っているときは選択の面と 2px の線で示します。true / false のどちらかを渡したときだけ入り切りのボタンになり、省くとふつうのボタンです。'secondary' と 'ghost' で使います。 */
+  pressed?: boolean;
+  /** 押せない理由。渡すと disabled の代わりに aria-disabled にして、フォーカスが届くようにし、理由をツールチップと読み上げで伝えます。押しても onClick は呼びません。「必須の項目を入力すると送れます」のように、どうすれば押せるかを書きます。 */
+  disabledReason?: string;
 };
 /** 1つの作業領域に主要操作は原則1つ。loading時は再実行を防ぎます。`type` の既定は 'button' なので、フォームの送信には `type="submit"` を付けます。画面の移動には ActionLink を使います。 */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -60,23 +69,72 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     className,
     children,
     icon,
+    iconEnd,
+    block = false,
+    pressed,
+    disabledReason,
     type = 'button',
+    onClick,
     ...props
   },
   ref,
 ) {
-  return (
+  const reasonId = useId();
+  // While the tooltip is open, Radix describes the button by the tooltip itself; the hidden
+  // copy of the reason steps back then, so the reason is read once.
+  const [tipOpen, setTipOpen] = useState(false);
+  // With a reason, the button stays focusable so the reason can be reached; it only looks
+  // and acts disabled.
+  const soft = !!disabledReason && !!disabled && !loading;
+  const button = (
     <button
       {...props}
       ref={ref}
       type={type}
-      disabled={disabled || loading}
+      disabled={soft ? undefined : disabled || loading}
+      aria-disabled={soft || undefined}
+      aria-describedby={
+        soft && !tipOpen
+          ? [reasonId, props['aria-describedby']].filter(Boolean).join(' ')
+          : props['aria-describedby']
+      }
       aria-busy={loading || undefined}
-      className={cx('lv-button', `lv-button--${variant}`, `lv-button--${size}`, className)}
+      aria-pressed={pressed ?? props['aria-pressed']}
+      onClick={(event) => {
+        if (soft) {
+          event.preventDefault();
+          return;
+        }
+        onClick?.(event);
+      }}
+      className={cx(
+        'lv-button',
+        `lv-button--${variant}`,
+        `lv-button--${size}`,
+        block && 'lv-button--block',
+        className,
+      )}
     >
       {loading ? <Loader2 className="lv-spin" size={16} aria-hidden /> : icon}
       {children}
+      {iconEnd && (
+        <span className="lv-button-end" aria-hidden>
+          {iconEnd}
+        </span>
+      )}
     </button>
+  );
+  // The reason sits beside the button, not in it, so it describes the button without
+  // becoming part of its name.
+  return soft ? (
+    <>
+      <Tooltip content={disabledReason} onOpenChange={setTipOpen}>
+        {button}
+      </Tooltip>
+      <VisuallyHidden id={reasonId}>{disabledReason}</VisuallyHidden>
+    </>
+  ) : (
+    button
   );
 });
 
@@ -96,6 +154,8 @@ export type IconButtonProps = Omit<
   tooltip?: boolean;
   /** 処理中の表示。押せなくなり、aria-busy が付きます。 */
   loading?: boolean;
+  /** 押して入り切りするボタンにします（aria-pressed）。太字・斜体の切り替えなど、道具の並びで使います。入っているときは選択の面と 2px の線で示します。 */
+  pressed?: boolean;
 };
 /** アイコンだけのボタン。label を読み上げとツールチップの両方に使うので、名前を付け忘れません。 */
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
@@ -106,6 +166,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
     size = 'md',
     tooltip = true,
     loading = false,
+    pressed,
     disabled,
     className,
     type = 'button',
@@ -119,6 +180,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       ref={ref}
       type={type}
       aria-label={label}
+      aria-pressed={pressed ?? props['aria-pressed']}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cx(
@@ -692,10 +754,21 @@ export function Tabs({
     </TabsPrimitive.Root>
   );
 }
-export function Tooltip({ content, children }: { content: string; children: ReactNode }) {
+export function Tooltip({
+  content,
+  children,
+  onOpenChange,
+}: {
+  /** 出す言葉。短く1文で。操作できる中身は Popover に置きます。 */
+  content: string;
+  /** 1つの要素。ボタンなどフォーカスの届く要素を渡します。 */
+  children: ReactNode;
+  /** 開いた・閉じたときに呼びます。 */
+  onOpenChange?: (open: boolean) => void;
+}) {
   return (
     <TooltipPrimitive.Provider delayDuration={250}>
-      <TooltipPrimitive.Root>
+      <TooltipPrimitive.Root onOpenChange={onOpenChange}>
         <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Portal>
           <PortalSurface>

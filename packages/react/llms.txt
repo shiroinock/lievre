@@ -204,8 +204,9 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### Tooltip
 
-- `content: string`
-- `children: ReactNode`
+- `content: string` — 出す言葉。短く1文で。操作できる中身は Popover に置きます。
+- `children: ReactNode` — 1つの要素。ボタンなどフォーカスの届く要素を渡します。
+- `onOpenChange?: ((open: boolean) => void)` — 開いた・閉じたときに呼びます。
 
 ### Progress
 
@@ -278,7 +279,11 @@ baked はビルド時の値（npm run wear）で決まります。
 - `variant?: 'danger' | 'primary' | 'secondary' | 'ghost'` — 既定 'secondary'
 - `size?: 'sm' | 'md' | 'lg'` — 既定 'md'
 - `loading?: boolean` — 既定 false。処理中の表示。押せなくなり、aria-busy が付きます。
-- `icon?: ReactNode`
+- `icon?: ReactNode` — 文字の前のアイコン。
+- `iconEnd?: ReactNode` — 文字の後ろのアイコン。開く（ChevronDown）・外へ移る（ArrowUpRight）など、押したあとに起きることを示します。
+- `block?: boolean` — 既定 false。幅を親いっぱいに広げます。狭い画面の申し込みの「次へ」など、1つだけ置く主要操作に使います。
+- `pressed?: boolean` — 押して入り切りするボタンにします（aria-pressed）。入っているときは選択の面と 2px の線で示します。true / false のどちらかを渡したときだけ入り切りのボタンになり、省くとふつうのボタンです。'secondary' と 'ghost' で使います。
+- `disabledReason?: string` — 押せない理由。渡すと disabled の代わりに aria-disabled にして、フォーカスが届くようにし、理由をツールチップと読み上げで伝えます。押しても onClick は呼びません。「必須の項目を入力すると送れます」のように、どうすれば押せるかを書きます。
 - ほかに ButtonHTMLAttributes<HTMLButtonElement> の属性を受け取ります。
 
 ### IconButton
@@ -291,6 +296,7 @@ baked はビルド時の値（npm run wear）で決まります。
 - `size?: 'sm' | 'md' | 'lg'` — 既定 'md'。'md' は密度の操作の高さ（40 / 32px）、'sm' は 32px、'lg' は 48px の正方形。タッチの画面では 44px まで広げます。
 - `tooltip?: boolean` — 既定 true。false にするとツールチップを出しません。すぐ横に同じ言葉が書いてあるときだけ使います。
 - `loading?: boolean` — 既定 false。処理中の表示。押せなくなり、aria-busy が付きます。
+- `pressed?: boolean` — 押して入り切りするボタンにします（aria-pressed）。太字・斜体の切り替えなど、道具の並びで使います。入っているときは選択の面と 2px の線で示します。
 
 ### TextField
 
@@ -512,6 +518,38 @@ baked はビルド時の値（npm run wear）で決まります。
 - `errors: ErrorSummaryItem[]` — 誤りの一覧。入力の並び順に渡します。空なら何も描きません。
 - `autoFocus?: boolean` — 既定 true。誤りが0件から1件以上になったとき（送信のあと）、この一覧へフォーカスを移します。既定は true。
 
+### SegmentedControl
+
+同じ中身の表示の形を切り替える選択（一覧・カード、日・週・月）。中身の領域を切り替えるなら Tabs、フォームで値を選ぶなら RadioGroup を使います。見た目と操作は ViewSwitch と同じで、矢印キーで移り、選んだものは面と線と太い文字で示します。
+
+- `label: string` — まとまりの名前。画面には出さず、読み上げに使います（「表示の形」）。
+- `items: SegmentedItem[]`
+- `value?: string` — 選んでいる値。渡すと外で持ちます。
+- `defaultValue?: string`
+- `onValueChange?: ((value: string) => void)` — 選んだ値が変わったときに呼びます。選んでいるものをもう一度押しても、選択は外れません。
+- `size?: 'sm' | 'md'` — 既定 'md'。'md'（既定）は密度の操作の高さ、'sm' は 32px。
+- `disabled?: boolean`
+
+### ButtonGroup
+
+関係のあるボタンの並び。role="group" でまとまりの名前を読み上げます。Tab で1つずつ移ります。
+
+- `label: string` — まとまりの名前。画面には出さず、読み上げに使います（「書式」「行の操作」）。
+- `children: ReactNode` — 並べる Button・IconButton。
+- `attached?: boolean` — 既定 false。true でボタンを隙間なくつなげます。間の線は1本（1px）にし、端だけ角を丸めます。関係の強い操作（前へ・次へ、分割ボタン）に使います。
+
+### SplitButton
+
+主な操作と、そのほかの方法のメニューをつなげたボタン（「保存」と「下書きとして保存」など）。2つは別のボタンで、Tab で順に移ります。
+
+- `children: ReactNode` — 主な操作の言葉（「保存」）。
+- `onClick: () => void` — 主な操作。
+- `menuLabel: string` — 開く側のボタンの名前。「保存のほかの方法」のように、何の続きかを書きます。
+- `items: MenuItem[]` — 開く側のメニューの項目。DropdownMenu と同じ形です。
+- `variant?: 'primary' | 'secondary'` — 既定 'secondary'。'primary' は主要操作、'secondary'（既定）はふつうの操作。
+- `size?: 'sm' | 'md' | 'lg'` — 既定 'md'
+- `disabled?: boolean`
+
 ### Popover
 
 押すと開く、操作できる中身のパネル。Escape と外側を押すと閉じ、フォーカスを開いた元に戻します。影を使わず、1px の線と面で浮かせます。
@@ -682,6 +720,11 @@ altText には、通知の外で同じ操作ができる場所を書きます（
 - `type ErrorSummaryItem`
   - `id: string` — 誤りのある入力の id。Field・TextField などの id、RadioGroup・CheckboxGroup では最初の選択肢の id です。
   - `message: string` — 何をどう直すか（「メールアドレスを入力してください」）。入力の下のエラー文と同じ言葉にします。
+- `type SegmentedItem`
+  - `value: string`
+  - `label: string` — 選択肢の言葉。アイコンを添えても、言葉は消しません。
+  - `icon?: ReactNode` — 言葉の前のアイコン。飾りなので読み上げません。
+  - `disabled?: boolean`
 - `type MenuItem = | { type?: 'item'; label: string; onSelect: () => void; icon?: ReactNode; shortcut?: string; tone?: 'danger'; disabled?: boolean; } | { type: 'checkbox'; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; disabled?: boolean; } | { type: 'radio'; label: string; value: string; onValueChange: (value: string) => void; options: { value: string; label: string; disabled?: boolean }[]; } | { type: 'separator' };`
 - `type DecisionState` — 1件ずつ判断する列の状態。タイムラインと一覧の両方の見せ方が、この1つを共有します。
   - `decisions: Record<string, string>` — 項目のキー → 決めた値（choices の value）。入っていない項目は未決です。

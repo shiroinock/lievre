@@ -509,11 +509,25 @@ Field で今の TextField・Select・RadioGroup を作り直すときは、配�
 
 ### 第3段階：操作と移動のバリエーション
 
-1. Button：`iconEnd`、`block`、`pressed`（ToggleButton）、押せない理由
-2. SegmentedControl（`radix-ui` の ToggleGroup。ViewSwitch と土台を1つにする）、ButtonGroup・分割ボタン
-3. Pagination：ページ番号を並べる形、件数の選択と表示
-4. Breadcrumb の省略、Tabs のアイコンと移動のタブ（TabNav）
-5. DropdownMenu：入れ子、項目の説明文、グループ見出し、`side`。Tooltip の `side` / `align`
+大きいので、PR を3つに分けます。
+
+第3段階の1（ボタン）：
+
+1. Button：`iconEnd`、`block`、`pressed`（aria-pressed の入り切り。IconButton にも）、`disabledReason`（押せない理由。aria-disabled にしてフォーカスを届かせ、理由をツールチップと読み上げで伝える）
+2. SegmentedControl（`radix-ui` の ToggleGroup。見た目と操作は ViewSwitch と同じ）
+3. ButtonGroup（`attached` で隙間なくつなげ、間の線を1本にする）・SplitButton（Button と DropdownMenu をつなげる）
+
+ViewSwitch を SegmentedControl の上に組み直して土台を1つにするのは、タイムライン型の段階2（`queue.tsx` を触る）がマージされてから行います。
+
+第3段階の2（移動）：
+
+1. Pagination：ページ番号を並べる形、件数の選択と表示
+2. Breadcrumb の省略、Tabs のアイコンと移動のタブ（TabNav）
+
+第3段階の3（メニューとツールチップ）：
+
+1. DropdownMenu：入れ子、項目の説明文、グループ見出し、`side`
+2. Tooltip の `side` / `align`
 
 ### 第4段階：表示と表のバリエーション
 

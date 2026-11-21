@@ -4,6 +4,7 @@ export * from './components/dialog';
 export * from './components/data';
 export * from './components/foundation';
 export * from './components/form';
+export * from './components/actions';
 export * from './components/popover';
 export * from './components/queue';
 export * from './components/stream';
