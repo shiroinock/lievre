@@ -89,6 +89,10 @@
 - Card に `variant="plain"`（線のない凹んだ面）、`href`（見出しのリンクをカード全体に広げる）、`selection`（チェックボックスの当たり判定をカード全体に広げる選べるカード）。（#1）
 - DataTable に `maxHeight`（表の中でスクロールし、見出しの行を上に残す）、`renderExpanded`・`expandedIds`・`onExpandedChange`（行を広げて中身を出す。開閉のボタンは `aria-expanded`）、`paginationVariant`・`pageSizeOptions`・`onPageSizeChange`（下のページ送りにページ番号と表示件数。件数を変えると1ページ目に戻る）。（#2）
 - 分類や選んだ値を示す `Chip` と、その並び `ChipGroup`。何も渡さなければ表示だけの札（タグ）、`onRemove` で外せる札（外すボタンは「{label}を外す」と読み上げる）、`selected`・`onSelectedChange` で押して入り切りする絞り込みの札（`aria-pressed`。選んでいる間はチェックの印を添える）。`size` は md（32px）・sm（24px）。（#6）
+- Skeleton に `shape`（`text` は本文の行の高さで `lines` 行並べ、最後の行を短くする。`circle` は `width` を直径にした丸）。（#5）
+- EmptyState に `size="sm"`（小さなパネルや表の中に置く形。余白と文字を小さくし、絵は出さない）。（#5）
+- Divider に `orientation="vertical"`（並びの高さに伸びる縦の線。`aria-orientation="vertical"` を付ける）と `decorative`（読み上げに区切りを伝えない）。（#5）
+- 数を示す `Counter`。数字は等幅で、読み上げは `label` と `unit` を付けて「未読 12件」と伝える。`max` を超えると「99+」に縮める。`tone` は neutral・accent・danger。（#5）
 
 #### 直したもの
 
