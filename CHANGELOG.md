@@ -81,10 +81,10 @@
 - 表示の形を切り替える `SegmentedControl`、関係のあるボタンを並べる `ButtonGroup`（`attached` で隙間なくつなげる）、主な操作とほかの方法のメニューをつなげた `SplitButton`。（#36）
 - DropdownMenu に `{ type: 'submenu' }`（入れ子のメニュー。右矢印か Enter で開き、左矢印か Escape でその入れ子だけ閉じて親の項目へ戻る）、項目の `description`（項目の下の補足。`aria-describedby` で読み上げる）、`{ type: 'group' }`（見出しの付いたまとまり。見出しがまとまりの名前になる）、`side`（開く向き）。（#40）
 - Tooltip に `side`・`align`。画面の端で入らないときは反対側に回る。（#40）
-- Skeleton に `shape`（`text` は本文の行の高さで `lines` 行並べ、最後の行を短くする。`circle` は `width` を直径にした丸）。（#PR）
-- EmptyState に `size="sm"`（小さなパネルや表の中に置く形。余白と文字を小さくし、絵は出さない）。（#PR）
-- Divider に `orientation="vertical"`（並びの高さに伸びる縦の線。`aria-orientation="vertical"` を付ける）と `decorative`（読み上げに区切りを伝えない）。（#PR）
-- 数を示す `Counter`。数字は等幅で、読み上げは `label` と `unit` を付けて「未読 12件」と伝える。`max` を超えると「99+」に縮める。`tone` は neutral・accent・danger。（#PR）
+- Skeleton に `shape`（`text` は本文の行の高さで `lines` 行並べ、最後の行を短くする。`circle` は `width` を直径にした丸）。（#5）
+- EmptyState に `size="sm"`（小さなパネルや表の中に置く形。余白と文字を小さくし、絵は出さない）。（#5）
+- Divider に `orientation="vertical"`（並びの高さに伸びる縦の線。`aria-orientation="vertical"` を付ける）と `decorative`（読み上げに区切りを伝えない）。（#5）
+- 数を示す `Counter`。数字は等幅で、読み上げは `label` と `unit` を付けて「未読 12件」と伝える。`max` を超えると「99+」に縮める。`tone` は neutral・accent・danger。（#5）
 
 #### 直したもの
 
