@@ -27,7 +27,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .node-version
 
       # The body goes through env, never into the script text, so it cannot inject shell.
       # GitHub sets GITHUB_HEAD_REF to the PR's branch; the message names the fragment after it.
