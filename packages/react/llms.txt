@@ -462,6 +462,46 @@ baked はビルド時の値（npm run wear）で決まります。
 - `items: MenuItem[]` — 項目。並べた順に出します。区切りは `{ type: 'separator' }`。
 - `align?: 'start' | 'end'` — 既定 'start'。開いた元の部品とのそろえ方。表の行の端に置くときは 'end'。
 
+### QueueProgress
+
+終わりのある作業の進み具合。「5 / 12 件を確認」と件数で出し、線を添えます。割合だけにはしません。
+
+- `done: number` — 決めた件数。
+- `total: number` — 全体の件数。
+- `deferred?: number` — 既定 0。あとで回した件数。1件以上のときだけ横に出します。
+- `verb?: string` — 既定 '確認'。件数の後ろに付ける動詞。「5 / 12 件を確認」の「確認」。
+
+### ViewSwitch
+
+同じ項目の見せ方を切り替えます（既定は「順に見る」「一覧から選ぶ」）。中身を2つ持つ Tabs と違い、状態は1つのまま見せ方だけを変えます。矢印キーで移動します。
+
+- `value: string`
+- `onValueChange: (value: string) => void`
+- `label?: string` — 既定 '見せ方'。切り替えのまとまりの名前。画面には出さず、読み上げに使います。
+- `items?: ViewSwitchItem[]` — 既定 DEFAULT_VIEWS。選択肢。既定は queue「順に見る」と list「一覧から選ぶ」。言葉で書き、アイコンだけにしません。
+
+### DecisionQueue
+
+1件ずつ判断する列（タイムラインの見せ方）。次に見る項目を1件だけ大きく出し、件数と進み具合を常に見せ、すべて決めたら「すべて確認しました」で止まります。時間で次へ進むことはありません。
+判断はボタンが先で、近道のキー（既定は選択肢の shortcut、あとで L、1つ戻す Z）は列の中にフォーカスがあるときだけ効きます。入力欄の中・IME の変換中・修飾キー付きでは反応しません。決めたらフォーカスは次の項目へ移ります。
+
+- `items: readonly T[]` — 出す順（システムが決めた順）に並べた項目。
+- `getKey: (item: T) => string`
+- `getLabel: (item: T) => string` — 項目の短い名前。読み上げ・済みの積み・このあとの一覧に使います。
+- `renderItem: (item: T) => ReactNode` — 今の項目の中身。
+- `queue: { state: DecisionState; snapshot: DecisionQueueSnapshot; decide: (key: string, value: string | undefined) => void; defer: (key: string) => void; undo: () => void; reset: () => void; }` — useDecisionQueue の戻り値。一覧の見せ方にも同じものを渡します。
+- `choices: QueueChoice[]` — 判断の選択肢。2つか3つにします（「もらう」「もらわない」）。
+- `label: string` — 列の名前。読み上げに使います（「公開前の確認」）。
+- `order?: string` — 並び順の決め方。列の上に出します（「公開前に確かめるものから順に出します」）。
+- `reason?: ((item: T) => string | undefined)` — 今の項目が出てきた理由（「値に秘密が含まれています」）。カードの上に出します。
+- `deferLabel?: string` — 既定 'あとで'。「あとで」のボタンの言葉。
+- `deferShortcut?: string` — 既定 'L'。「あとで」の近道のキー。
+- `undoShortcut?: string` — 既定 'Z'。1つ戻すの近道のキー。
+- `previewCount?: number` — 既定 3。「このあと」に名前を出す件数。残りは「ほか8件」と数で示します。
+- `verb?: string` — 既定 '確認'。進み具合の動詞（「5 / 12 件を確認」の「確認」）。
+- `endTitle?: string` — 既定 'すべて確認しました'。終わりの見出し。
+- `endAction?: ReactNode` — 終わりに置く操作（「書き出す」など）。次の作業へは利用者が選んで移ります。
+
 ## フック
 
 ### useLievreTheme
@@ -486,6 +526,12 @@ The age actually drawn: none when the reader asks for more contrast or forced co
 `useToast() => (message: ToastMessage) => void`
 
 ToastProviderの子孫で使用します。保存結果や一時的な通知向け。`const toast = useToast(); toast({ title: '保存しました' })`
+
+### useDecisionQueue
+
+`useDecisionQueue({ keys, state: controlled, defaultState, onStateChange, }: UseDecisionQueueOptions) => { state: DecisionState; snapshot: DecisionQueueSnapshot; decide: (key: string, value: string | undefined) => void; defer: (key: string) => void; undo: () => void; reset: () => void; }`
+
+列の状態と操作。DecisionQueue と一覧（DataTable など）に同じ戻り値を渡すと、どちらで決めても両方に反映されます。
 
 ## 型とその他
 
@@ -520,5 +566,34 @@ altText には、通知の外で同じ操作ができる場所を書きます（
 - `type Space = 0 | 1 | 2 | 3 | 4 | 6 | 8 | 12;`
 - `type RadioOption = { value: string; label: string; description?: string; disabled?: boolean; };`
 - `type MenuItem = | { type?: 'item'; label: string; onSelect: () => void; icon?: ReactNode; shortcut?: string; tone?: 'danger'; disabled?: boolean; } | { type: 'checkbox'; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; disabled?: boolean; } | { type: 'radio'; label: string; value: string; onValueChange: (value: string) => void; options: { value: string; label: string; disabled?: boolean }[]; } | { type: 'separator' };`
+- `type DecisionState` — 1件ずつ判断する列の状態。タイムラインと一覧の両方の見せ方が、この1つを共有します。
+  - `decisions: Record<string, string>` — 項目のキー → 決めた値（choices の value）。入っていない項目は未決です。
+  - `log: string[]` — 決めた順の項目のキー。1つ戻す（undo）はこの最後から戻します。
+  - `deferred: string[]` — 「あとで」に回した順の項目のキー。未決のものは、列の最後にこの順で出ます。
+- `type DecisionQueueSnapshot` — 状態から組んだ、列の今の姿。
+  - `current: string | undefined` — いま見ている項目のキー。すべて決め終えたら undefined。
+  - `currentDeferred: boolean` — current があとで回した項目なら true。
+  - `upcoming: string[]` — これから出る項目（あとで回しを除く、出る順）。
+  - `deferred: string[]` — あとで回した未決の項目（current を除く、出る順）。
+  - `done: { key: string; value: string }[]` — 決めた項目。決めた順で、一覧で決めて log にないものは先頭に置きます。
+  - `total: number` — 列の全体の件数。
+- `type UseDecisionQueueOptions`
+  - `keys: readonly string[]` — 出す順に並べた項目のキー。
+  - `state?: DecisionState` — 状態を外で持つとき（制御）。onStateChange と組で渡します。
+  - `defaultState?: DecisionState` — 状態を部品に任せるとき（非制御）の初めの値。
+  - `onStateChange?: (state: DecisionState) => void`
+- `type DecisionQueueController = ReturnType<typeof useDecisionQueue>;`
+- `type ViewSwitchItem = { value: string; label: string };`
+- `type QueueChoice`
+  - `value: string` — DecisionState.decisions に入る値。
+  - `label: string` — ボタンの言葉（「もらう」）。済みの積みにも出ます。
+  - `shortcut?: string` — 近道のキー（1文字、「Y」）。列の中にフォーカスがあるときだけ効きます。
+  - `variant?: 'primary' | 'secondary' | 'danger'` — 既定は、最初の選択肢が 'primary'、ほかが 'secondary'。
 - `WearConfig`: `any`
 - `cx`: `(...values: (string | false | null | undefined)[]) => string`
+- `getQueueSnapshot`: `(keys: readonly string[], state: DecisionState) => DecisionQueueSnapshot` — 列の今の姿を組みます。keys は出す順（システムが決めた順）に並べて渡します。
+keys にないキーの決定は数えません。
+- `decideItem`: `(state: DecisionState, key: string, value: string | undefined) => DecisionState` — 項目を決めます。value を undefined にすると未決に戻し（決め直し）、列に戻します。
+- `deferItem`: `(state: DecisionState, key: string) => DecisionState` — 項目を「あとで」に回します。決めてあれば未決に戻してから回します。
+- `undoDecision`: `(state: DecisionState) => DecisionState` — 最後に決めた項目を未決に戻します。
+- `emptyDecisionState`: `DecisionState` — 何も決めていない状態。
