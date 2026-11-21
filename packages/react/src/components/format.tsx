@@ -30,6 +30,19 @@ export type DateFormatOptions = {
   timeZone?: string;
 };
 const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/;
+const DATE_HEAD = /^(\d{4})-(\d{2})-(\d{2})/;
+/** Whether the year, month and day written at the head of the text exist on the calendar:
+ * Date.UTC (and V8's own parsing) roll 2026-02-30 over to March and 2026-13-01 into the next year. */
+function writtenDayExists(text: string) {
+  const head = DATE_HEAD.exec(text);
+  if (!head) return true;
+  const [year, month, day] = head.slice(1).map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  date.setUTCFullYear(year);
+  return (
+    date.getUTCFullYear() === year && date.getUTCMonth() + 1 === month && date.getUTCDate() === day
+  );
+}
 /** A moment from the value, or null when it is not a date. 'YYYY-MM-DD' becomes midnight UTC
  * and is always written in UTC: it names a calendar day, not a moment, so no time zone moves it. */
 function read(value: Date | string) {
@@ -41,15 +54,8 @@ function read(value: Date | string) {
         ? new Date(Date.UTC(Number(day[1]), Number(day[2]) - 1, Number(day[3])))
         : new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  // Date.UTC rolls 2026-02-30 over to March and 2026-13-01 into the next year; a day that does
-  // not exist is not a date.
-  if (
-    day &&
-    (date.getUTCFullYear() !== Number(day[1]) ||
-      date.getUTCMonth() + 1 !== Number(day[2]) ||
-      date.getUTCDate() !== Number(day[3]))
-  )
-    return null;
+  // A day that does not exist is not a date, in a date-time as in a bare date.
+  if (typeof value === 'string' && !writtenDayExists(value)) return null;
   return { date, dayOnly: !!day };
 }
 /** 日付・日時を日本語の書式の文字にします。FormatDate と同じ書式を、文の中に使うときに。日付として読めない文字は、そのまま返します。 */
@@ -135,9 +141,12 @@ export function formatRelativeTime(
   // Calendar days, not elapsed hours: 39 hours ago late at night is still yesterday.
   const days = dayNumber(moment.date, moment.dayOnly ? 'UTC' : timeZone) - dayNumber(now, timeZone);
   if (Math.abs(days) < 7) return words.format(days, 'day');
-  if (Math.abs(days) < 30) return words.format(Math.round(days / 7), 'week');
-  if (Math.abs(days) < 365) return words.format(Math.round(days / 30), 'month');
-  return words.format(Math.round(days / 365), 'year');
+  // Weeks, months and years are rounded counts, so say the count (「1 か月前」), never a
+  // calendar word (「先月」) that may name the wrong month.
+  const counted = new Intl.RelativeTimeFormat('ja', { numeric: 'always' });
+  if (Math.abs(days) < 30) return counted.format(Math.round(days / 7), 'week');
+  if (Math.abs(days) < 365) return counted.format(Math.round(days / 30), 'month');
+  return counted.format(Math.round(days / 365), 'year');
 }
 
 /**
