@@ -11,6 +11,9 @@ test('部品・スタイル・トークン・端末の部品は、利用する�
     'packages/react/src/index.ts',
     'packages/tui/src/core/palette.ts',
     'packages/tokens/tokens.css',
+    'packages/react/bin/lievre-migrate.mjs',
+    'packages/react/lint/index.js',
+    'packages/react/lint/biome/no-legacy-prefix.grit',
   ]) {
     assert.equal(isUserFacing(file), true, file);
   }
@@ -28,6 +31,7 @@ test('テスト・Story・デモ・パッケージの外は、利用する側に
     'packages/react/src/styles/demo.css',
     'packages/tui/test/tui.test.tsx',
     'packages/tokens/tokens.json',
+    'packages/react/scripts/stylelint-lievre.mjs',
     'docs/component-roadmap.md',
     'DESIGN.md',
   ]) {
@@ -74,6 +78,7 @@ test('PR の説明の「変更履歴：なし」の1行で通る', () => {
     '変更履歴: なし',
     '- 変更履歴：なし（テストの土台）',
     '> 変更履歴：なし',
+    '```sh\nnpm test\n```\n\n変更履歴：なし（コードの塊のあと）',
   ]) {
     assert.equal(hasOptOut(body), true, body);
     assert.equal(checkMissing({ files, body }).ok, true, body);
@@ -85,6 +90,8 @@ test('文の途中や引用符の中の「変更履歴：なし」では通ら�
     'この PR は 変更履歴：なし ではありません',
     '`変更履歴：なし` で始まる1行を書くと通ります',
     '変更履歴：あり',
+    '書き方の例：\n\n```md\n変更履歴：なし（理由）\n```\n',
+    '- 変更履歴\n：なし',
   ]) {
     assert.equal(hasOptOut(body), false, body);
   }

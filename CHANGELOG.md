@@ -4,7 +4,7 @@
 
 ## 書き方
 
-- `packages/*/src` の部品・スタイル・端末の部品や `packages/tokens/tokens.css` を変える PR では、ここに1行足します。CI の「変更履歴」の検査が、書き忘れを止めます。
+- `packages/*/src` の部品・スタイル・端末の部品、`packages/react` の `bin`・`lint`、`packages/tokens/tokens.css` を変える PR では、ここに1行足します。CI の「変更履歴」の検査が、書き忘れを止めます。
 - 「未公開」の下の、パッケージ（`@lievre/tokens`・`@lievre/react`・`@lievre/tui`）の見出しに書きます。区分はこの順で、書くことのない区分は見出しごと省きます。
   - **見た目が変わる**：同じ使い方のまま、画面の見え方が変わるもの。
   - **振る舞いが変わる**：読み上げ・フォーカス・名前・API など、利用する側のコードやテストに響きうるもの。
@@ -62,6 +62,10 @@
 - TextField の `readOnly` は枠を破線にし、地を透明にする。値は読める色のまま、フォーカスも届く。（#33）
 - Select に `controlSize`（`sm`・`md`・`lg`）と、`{ label, options }` で見出しの付いたまとまり。（#33）
 - RadioGroup に `orientation="horizontal"`（横並び。幅が足りないと折り返す）。（#33）
+
+#### 直したもの
+
+- lint のルールの説明の URL が、リポジトリの改名のあと行き先のない見出しを指していた。`packages/react` の README の lint の節を指すようにした。（#26）
 
 ### @lievre/tui
 

@@ -28,13 +28,19 @@ const NOT_SHIPPED = [
 /** Whether a change to this file needs a line in CHANGELOG.md. */
 export function isUserFacing(file) {
   if (file === 'packages/tokens/tokens.css') return true;
+  // The migration command and the lint rules ship with @lievre/react too.
+  if (/^packages\/react\/(bin|lint)\//.test(file)) return true;
   if (!/^packages\/[^/]+\/src\//.test(file)) return false;
   return !NOT_SHIPPED.some((p) => p.test(file));
 }
 
-/** Whether the PR description has the opt-out line (an ASCII colon also counts). */
+/**
+ * Whether the PR description has the opt-out line (an ASCII colon also counts). A line inside a
+ * fenced code block is an example, not the opt-out.
+ */
 export function hasOptOut(body = '') {
-  return /^[\s>*-]*変更履歴\s*[：:]\s*なし/m.test(body);
+  const prose = (body ?? '').replace(/^ {0,3}(`{3,}|~{3,})[^\n]*\n[\s\S]*?^ {0,3}\1[^\n]*$/gm, '');
+  return /^[ \t>*-]*変更履歴[ \t]*[：:][ \t]*なし/m.test(prose);
 }
 
 /** Fails with the files and how to fix it when CHANGELOG.md was left out. */
