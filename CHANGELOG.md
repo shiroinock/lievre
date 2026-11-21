@@ -36,12 +36,15 @@
 - `hint` と `error` を両方渡すと、両方が出る。これまでは `error` が `hint` と置き換わっていた。（#32）
 - エラー文の前にアイコンが付く。（#32）
 - Select の一覧の選択肢の文字が、開く前の文字と同じ左端から始まる。compact の密度で 4px ずれていたのを直したので、一覧の見た目が少し変わる。（#33）
+- DecisionQueue の `bulk` のボタンの下に、押すと当たる項目（「対象：…」）を出し、ボタンの説明として読ませる。（#37）
 
 #### 振る舞いが変わる
 
 - lievre に改名した。パッケージ `@lievre/react`、`LievreProvider`・`useLievreTheme`、根のクラス `.lievre`・`.lievre-portal`、クラスの頭 `.lv-`、層 `lievre.*`、lint のルール `lievre/…`、書体 Lievre Mono など。移り方は [MIGRATION.md](MIGRATION.md) と `npx lievre-migrate` にある。（#23）
 - 1つの入力の「必須」の文字は読み上げから外し、`required` か `aria-required` で伝える。Fieldset・RadioGroup・CheckboxGroup の `legend` では、まとまりの名前と一緒に「必須」を読み上げる。（#32）
 - TextField・Textarea・Select・Checkbox を Field で、RadioGroup を Fieldset で組み直した。`hint` と `error` はどちらも `aria-describedby` で入力に結ぶ。書き出す名前と props は変わらない。（#32）
+- DecisionQueue は、操作の結果（「『項目A』を『もらう』にしました」「2件を未決に戻しました」など）を先に読み上げ、続けて今の位置を知らせる。（#37）
+- `decideItems` で2件以上を決めた操作は、`undoDecision` の1回で全部戻る。状態に省ける項目 `batches` を足した。1件ずつ決めた操作はこれまでどおり1件ずつ戻る。（#37）
 
 #### 足したもの
 
@@ -62,6 +65,12 @@
 - TextField の `readOnly` は枠を破線にし、地を透明にする。値は読める色のまま、フォーカスも届く。（#33）
 - Select に `controlSize`（`sm`・`md`・`lg`）と、`{ label, options }` で見出しの付いたまとまり。（#33）
 - RadioGroup に `orientation="horizontal"`（横並び。幅が足りないと折り返す）。（#33）
+- TextField に `chars`（入る文字の数に合わせた幅）と `mono`（等幅の書体）。（#35）
+- TextField・Textarea に `maxCount`（「12 / 100」の文字数。超えても入力は止めない）と `countBy`（`grapheme`・`width`）。（#35）
+- Textarea に `autoResize`（書いた分だけ4行分から12行分まで伸びる）。（#35）
+- RadioGroup に `variant="card"`（選択肢ごとに枠で囲む）。（#35）
+- Field に `after`（入力のすぐ下の右端の表示）。（#35）
+- 1つ戻すと戻る項目を返す `undoKeys`。（#37）
 
 #### 直したもの
 
