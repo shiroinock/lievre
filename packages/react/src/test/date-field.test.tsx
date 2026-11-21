@@ -111,6 +111,42 @@ describe('DateField', () => {
       '2',
     ]);
   });
+  it('rewrites partial typing when the value changes from outside, and keeps it on its own echo', async () => {
+    function Controlled() {
+      const [value, setValue] = useState<string | null>('2026-11-22');
+      return (
+        <>
+          <DateField label="届け出の日" value={value} onValueChange={setValue} />
+          <button onClick={() => setValue('2000-01-02')}>変える</button>
+        </>
+      );
+    }
+    render(<Controlled />);
+    await userEvent.clear(box('月'));
+    // Its own null came back as the value: the year and day stay.
+    expect(box('年')).toHaveValue('2026');
+    await userEvent.type(box('月'), '1');
+    await userEvent.clear(box('日'));
+    await userEvent.click(screen.getByRole('button', { name: '変える' }));
+    expect(box('日')).toHaveValue('2');
+  });
+  it('ignores bounds it cannot read and takes the date of a date-time', () => {
+    expect(checkDate({ year: '2026', month: '1', day: '1' }, { min: 'あした' }).kind).toBe('ok');
+    expect(
+      checkDate({ year: '2026', month: '1', day: '1' }, { min: '2026-06-01T09:00:00.000Z' }),
+    ).toEqual({ kind: 'before-min', min: '2026-06-01' });
+    render(<DateField label="希望日" min="未定" defaultValue="2026-01-01" />);
+    expect(box('年')).toHaveValue('2026');
+  });
+  it('does not send the date while disabled', () => {
+    const { container } = render(
+      <form>
+        <DateField label="生年月日" name="birthday" disabled defaultValue="1990-04-01" />
+      </form>,
+    );
+    const data = new FormData(container.querySelector('form')!);
+    expect(data.get('birthday')).toBeNull();
+  });
   it('marks the fields required and sends the date with name', () => {
     const { container } = render(
       <DateField label="生年月日" required name="birthday" defaultValue="1990-04-01" />,

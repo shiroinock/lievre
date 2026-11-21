@@ -1,6 +1,6 @@
 // Dates typed in as year, month and day (the GOV.UK date input pattern). The calendar arithmetic
 // is @internationalized/date's; the fields are lievre's own TextFields in a Fieldset.
-import { useRef, useState, type FocusEvent } from 'react';
+import { useState, type FocusEvent } from 'react';
 import { CalendarDate, parseDate } from '@internationalized/date';
 import { cx } from './system';
 import { Fieldset } from './form';
@@ -30,6 +30,17 @@ export type DateCheck =
   | { kind: 'after-max'; max: string }
   | { kind: 'ok'; value: string };
 
+/** A bound from 'YYYY-MM-DD' or the date part of an ISO date-time; anything else is ignored. */
+function readBound(text: string | undefined) {
+  const day = text && /^\d{4}-\d{2}-\d{2}/.exec(text)?.[0];
+  if (!day) return undefined;
+  try {
+    return parseDate(day);
+  } catch {
+    return undefined;
+  }
+}
+
 /** 年・月・日の文字を確かめ、ISO 8601 の日付（'2026-11-22'）にします。全角の数字も受けます。存在しない日（2月30日）や、min・max の外は、その理由を返します。 */
 export function checkDate(
   parts: { year: string; month: string; day: string },
@@ -46,10 +57,10 @@ export function checkDate(
   const date = new CalendarDate(year, month, day);
   if (month < 1 || date.month !== month || date.day !== day)
     return { kind: 'no-such-day', year, month, day };
-  if (range.min && date.compare(parseDate(range.min)) < 0)
-    return { kind: 'before-min', min: range.min };
-  if (range.max && date.compare(parseDate(range.max)) > 0)
-    return { kind: 'after-max', max: range.max };
+  const min = readBound(range.min);
+  const max = readBound(range.max);
+  if (min && date.compare(min) < 0) return { kind: 'before-min', min: min.toString() };
+  if (max && date.compare(max) > 0) return { kind: 'after-max', max: max.toString() };
   return { kind: 'ok', value: date.toString() };
 }
 
@@ -74,7 +85,7 @@ export function dateCheckMessage(check: DateCheck): string | undefined {
 export type DateFieldProps = {
   /** 問いの名前（「生年月日」）。年・月・日の3つの欄をまとめる legend になります。 */
   label: string;
-  /** 日付（ISO 8601、'2026-11-22'）。未入力や、確かめて通らないあいだは null。渡すと外で持ちます。 */
+  /** 日付（'2026-11-22' の形）。未入力や、確かめて通らないあいだは null。渡すと外で持ちます。打っている途中の欄を外から空にするときは、key を変えて作り直します（null から null では変わったことが分からないため）。 */
   value?: string | null;
   /** 外で持たないときの、はじめの日付。 */
   defaultValue?: string | null;
@@ -87,9 +98,9 @@ export type DateFieldProps = {
   /** ラベルの横に「必須」の文字を出し、3つの欄に aria-required を付けます。 */
   required?: boolean;
   disabled?: boolean;
-  /** これより前の日を通さない（ISO 8601）。 */
+  /** これより前の日を通さない（'2026-12-01' の形。日時の文字なら日付の部分を使い、読めない文字は無視します）。 */
   min?: string;
-  /** これより後の日を通さない（ISO 8601）。 */
+  /** これより後の日を通さない（'2026-12-31' の形。日時の文字なら日付の部分を使い、読めない文字は無視します）。 */
   max?: string;
   /** フォームで送るときの名前。確かめて通った日付を隠した入力で送ります。 */
   name?: string;
@@ -124,11 +135,18 @@ export function DateField({
     partsOf(value !== undefined ? value : defaultValue),
   );
   const [checked, setChecked] = useState(false);
-  // The last value this field reported, to tell a new value from outside apart from our own.
-  const reported = useRef<string | null>(value !== undefined ? value : defaultValue);
-  if (value !== undefined && value !== reported.current) {
-    reported.current = value;
-    setParts(partsOf(value));
+  // The value prop as last seen, and the value this field last reported: a new prop rewrites the
+  // fields, unless it is only our own report coming back.
+  const [seen, setSeen] = useState(value);
+  const [reported, setReported] = useState<string | null>(
+    value !== undefined ? value : defaultValue,
+  );
+  if (value !== seen) {
+    setSeen(value);
+    if (value !== undefined && value !== reported) {
+      setReported(value);
+      setParts(partsOf(value));
+    }
   }
   const check = checkDate(parts, { min, max });
   const shown = error ?? (checked ? dateCheckMessage(check) : undefined);
@@ -137,8 +155,8 @@ export function DateField({
     setParts(next);
     const result = checkDate(next, { min, max });
     const nextValue = result.kind === 'ok' ? result.value : null;
-    if (nextValue !== reported.current) {
-      reported.current = nextValue;
+    if (nextValue !== reported) {
+      setReported(nextValue);
       onValueChange?.(nextValue);
     }
   };
@@ -171,7 +189,14 @@ export function DateField({
           {field('day', '日', 2)}
         </div>
       </Fieldset>
-      {name && <input type="hidden" name={name} value={check.kind === 'ok' ? check.value : ''} />}
+      {name && (
+        <input
+          type="hidden"
+          name={name}
+          value={check.kind === 'ok' ? check.value : ''}
+          disabled={disabled}
+        />
+      )}
     </div>
   );
 }
