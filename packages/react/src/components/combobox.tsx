@@ -18,6 +18,7 @@ import { cx, PortalSurface } from './system';
 import { Field } from './form';
 import { VisuallyHidden } from './primitives';
 import { toSearchKey } from './normalize';
+import { fromIme } from './ime';
 
 export type ComboboxOption = {
   value: string;
@@ -53,11 +54,6 @@ export type ComboboxProps = {
   /** 一致する候補がないときの文。 */
   emptyText?: string;
 };
-
-/** Whether a key belongs to the IME: Chrome sends the committing Enter with isComposing,
- * Safari sends it after compositionend with keyCode 229. */
-const fromIme = (e: { isComposing?: boolean; keyCode?: number }) =>
-  !!e.isComposing || e.keyCode === 229;
 
 export function filterOptions(options: ComboboxOption[], query: string) {
   const q = toSearchKey(query);

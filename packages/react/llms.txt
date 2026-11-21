@@ -792,6 +792,24 @@ selected・onSelectedChange で押して入り切りする絞り込みの札に�
 - `controlSize?: 'sm' | 'md' | 'lg'` — 既定 'md'。高さは Select・TextField と同じ段です。
 - `emptyText?: string` — 既定 '一致する候補がありません'。一致する候補がないときの文。
 
+### CommandPalette
+
+キーの近道（既定は ⌘K / Ctrl+K）で開く、コマンドを探して実行するパレット。
+開くと入力欄にフォーカスし、打つと絞り込みます。↑↓ で項目を移り、Enter で実行し、Esc で閉じます。最初に選べる項目を選びかけにしておきます。
+入力欄は combobox、一覧は listbox で、まとまりは group と見出しで伝えます。項目の数を読み上げます。日本語の変換中は、絞り込みも実行も閉じもしません。
+閉じると、フォーカスは開く前にあった場所（なければ開くボタン）へ戻ります。枠は Dialog と同じです。
+
+- `items: CommandItem[]` — 並べる項目。group ごとにまとめ、絞り込んだ結果も同じ順で出します。
+- `label?: string` — 既定 'コマンド'。パレットの名前。ダイアログと入力欄の名前として読み上げます。
+- `placeholder?: string` — 既定 'コマンドを探す'。何も入れていないときの文字。
+- `hotkey?: false | CommandHotkey` — 既定 DEFAULT_COMMAND_HOTKEY。開くキー。既定は ⌘K（Mac）/ Ctrl+K（ほか）。document 全体で受け、もう一度押すと閉じます。false で付けません（trigger か open で開きます）。
+- `trigger?: ReactNode` — 開くボタン。省くと「コマンドを探す」とキーを見せるボタンを出し、aria-keyshortcuts を付けます。null で出しません。
+- `open?: boolean` — 開いているか。渡すと外で持ちます。
+- `defaultOpen?: boolean` — 既定 false。外で持たないときの、はじめの開き方。
+- `onOpenChange?: ((open: boolean) => void)` — 開いた・閉じたときに呼びます。
+- `onSelect?: ((value: string) => void)` — 項目を選んだときに、項目の onSelect のあとで呼びます。
+- `emptyText?: string` — 既定 '一致するコマンドがありません'。一致する項目がないときの文。
+
 ## フック
 
 ### useLievreTheme
@@ -953,6 +971,21 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `label: string`
   - `kana?: string` — 読み（ひらがな）。漢字の名前を、読みでも探せるようにします（「とうきょう」で「東京商事」）。
   - `disabled?: boolean`
+- `type CommandItem`
+  - `value: string` — 項目を見分ける値。重ならないようにします。パレットの onSelect に渡します。
+  - `label: string` — 一覧に出す名前。「新しい作業を作る」のように、何が起きるかを動詞で書きます。
+  - `kana?: string` — 読み（ひらがな）。漢字の名前を、読みでも探せるようにします（「せってい」で「設定を開く」）。
+  - `keywords?: string[]` — 名前に出ない探し言葉。英語の名前や略称（「settings」「新規」）を入れます。
+  - `group?: string` — まとまりの名前（「移動」「操作」）。同じ group の項目は、最初に出てきた順に見出しの下へまとめます。
+  - `description?: string` — 名前の下に出す補足（行き先・対象など）。読み上げでは名前に続けて読みます。
+  - `shortcut?: string` — 項目の右に出すキーの近道（「⌘S」）。見せるだけで、パレットはこのキーを受け付けません。
+  - `disabled?: boolean` — 選べないようにします。一覧には残し、矢印キーでは飛ばします。
+  - `onSelect?: () => void` — 選んだときに呼びます。パレットを閉じ、フォーカスを開く前の場所に戻してから呼ぶので、中でフォーカスを動かしたり画面を移ったりできます。
+- `type CommandHotkey`
+  - `key: string` — 文字のキー（e.key の値。大文字と小文字は区別しません）。既定のパレットは 'k'。
+  - `mod?: boolean` — Mac では ⌘、ほかでは Ctrl を押しながら。1文字のキーを document 全体で受けないように、mod か alt のどちらかは付けます。
+  - `shift?: boolean`
+  - `alt?: boolean`
 - `WearConfig`: `any`
 - `cx`: `(...values: (string | false | null | undefined)[]) => string`
 - `getQueueSnapshot`: `(keys: readonly string[], state: DecisionState) => DecisionQueueSnapshot` — 列の今の姿を組みます。keys は出す順（システムが決めた順）に並べて渡します。
@@ -976,3 +1009,8 @@ keys にないキーの決定は数えません。
 - `toSearchKey`: `(text: string) => string` — 探すときに比べる形に直します。全角と半角（NFKC）、カタカナとひらがな、大文字と小文字、空白の違いを無視します。
 候補の絞り込みなどで、候補と入力の両方をこの形にしてから比べます。表示には使いません。
 - `filterOptions`: `(options: ComboboxOption[], query: string) => ComboboxOption[]`
+- `describeHotkey`: `(hotkey: CommandHotkey, mac?: boolean) => { label: string; aria: string; }` — キーの近道を、見せる文字（「⌘K」「Ctrl+K」）と aria-keyshortcuts の値（「Meta+K」「Control+K」）にします。
+自前の開くボタンにキーを添えるときに使います。mac を省くと、いまの環境で決めます。
+- `filterCommands`: `(items: CommandItem[], query: string) => CommandItem[]` — 項目を探して実行する。group ごとの順を保ち、全角と半角・カタカナとひらがな・大文字と小文字の違いを無視して、
+名前・読み・探し言葉・補足で絞り込みます。
+- `DEFAULT_COMMAND_HOTKEY`: `CommandHotkey`
