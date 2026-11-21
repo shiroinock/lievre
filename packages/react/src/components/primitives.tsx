@@ -1210,9 +1210,12 @@ export function Pagination({
           </>
         ) : (
           <>
-            <span aria-hidden>
-              {current} / {total}
-            </span>
+            {/* With the numbers laid out, the current one shows where you are; "2 / 6" would repeat it. */}
+            {variant === 'compact' && (
+              <span aria-hidden>
+                {current} / {total}
+              </span>
+            )}
             <VisuallyHidden>
               {total}ページ中 {current}ページ目
             </VisuallyHidden>
