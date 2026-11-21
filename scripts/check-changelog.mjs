@@ -179,7 +179,7 @@ export function parseEntries(text, { needNumber = true } = {}) {
       entries.push(last);
       return;
     }
-    if (/^\s{2,}\S/.test(line) && last !== null) {
+    if (/^( {2,}|\t)\s*\S/.test(line) && last !== null) {
       last.text += `\n${line}`;
       return;
     }
@@ -248,9 +248,24 @@ export function unreleasedEntries(text) {
 export function checkUnreleased({ before = '', after, branch }) {
   const old = unreleasedEntries(before);
   const now = unreleasedEntries(after);
-  if (now.length <= old.length) return { ok: true };
-  const known = new Set(old.map((e) => `${e.pkg}\n${e.kind}\n${e.text}`));
-  const added = now.filter((e) => !known.has(`${e.pkg}\n${e.kind}\n${e.text}`));
+  const key = (e) => `${e.pkg}\n${e.kind}\n${e.text}`;
+  const known = new Set(old.map(key));
+  const kept = new Set(now.map(key));
+  // A changed item pairs with a removed one of the same PR number (rewording or moving it). The
+  // rest were added, even when the PR removed other items at the same time.
+  const removed = new Map();
+  for (const e of old.filter((o) => !kept.has(key(o)))) {
+    removed.set(numberOf(e), (removed.get(numberOf(e)) ?? 0) + 1);
+  }
+  const added = now
+    .filter((e) => !known.has(key(e)))
+    .filter((e) => {
+      const left = removed.get(numberOf(e)) ?? 0;
+      if (left === 0) return true;
+      removed.set(numberOf(e), left - 1);
+      return false;
+    });
+  if (added.length === 0) return { ok: true };
   const name = fragmentName(branch);
   const message = [
     `CHANGELOG.md の「${UNRELEASED}」に項目が足されています。変更履歴は ${FRAGMENTS}/ の断片に書きます（並行する PR が同じ行で食い違わないように）。`,

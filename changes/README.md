@@ -4,7 +4,7 @@
 
 ## 名前
 
-PR の枝の名前から `claude/` などを除き、`.md` を付けます（例：枝 `claude/component-chip` なら `changes/component-chip.md`）。ほかの PR と重ならない名前なら、内容を表す名前でもかまいません。1つの PR で1ファイルです。
+PR の枝の名前から `claude/` などを除き、`.md` を付けます（例：枝 `claude/component-chip` なら `changes/component-chip.md`）。ほかの PR と重ならない名前なら、内容を表す名前でもかまいません。`claude/` と `codex/` は同じように除くので、`claude/foo` と `codex/foo` のように残りが同じ枝が並ぶときは、片方の名前を変えます。1つの PR で1ファイルです。
 
 ## 中身
 

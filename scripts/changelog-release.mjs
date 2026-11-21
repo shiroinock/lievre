@@ -37,7 +37,11 @@ export function release({ changelog, fragments, version, date }) {
     throw new Error(`版「${version ?? ''}」は 0.3.0 の形で書く。`);
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    throw new Error(`日付「${date}」は 2026-12-01 の形で書く。`);
+    throw new Error(
+      date
+        ? `日付「${date}」は 2026-12-01 の形で書く。`
+        : '--date の後に日付（2026-12-01 の形）を書く。',
+    );
   }
   const heading = `## ${version}（${date}）`;
   if (changelog.split('\n').some((l) => l.startsWith(`## ${version}（`))) {
@@ -87,7 +91,7 @@ function main(args) {
   let date = today();
   let dryRun = false;
   for (let i = 0; i < args.length; i += 1) {
-    if (args[i] === '--date') date = args[(i += 1)];
+    if (args[i] === '--date') date = args[(i += 1)] ?? '';
     else if (args[i] === '--dry-run') dryRun = true;
     else version = args[i];
   }

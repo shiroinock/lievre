@@ -261,6 +261,14 @@ test('断片の誤りを、ファイルと行と直し方を付けて止める',
   }
 });
 
+test('続きの行はタブで下げても項目に付く', () => {
+  const { entries, problems } = parseEntries(
+    '### @lievre/react\n\n#### 足したもの\n\n- a\n\t続き（#1）\n',
+  );
+  assert.deepEqual(problems, []);
+  assert.equal(entries[0].text, '- a\n\t続き（#1）');
+});
+
 test('changes/ の断片は決まりどおり', () => {
   assert.deepEqual(checkFragments(readFragments()), []);
 });
@@ -289,6 +297,22 @@ test('「未公開」の項目を直す・消すだけなら通る', () => {
   ]) {
     assert.equal(checkUnreleased({ before: ok, after }).ok, true, after);
   }
+});
+
+test('「未公開」の項目を1つ消しても、別の PR の項目を足せば落ちる', () => {
+  const plus = ok.replace('- Field（#32）', '- Chip（#6）');
+  const result = checkUnreleased({ before: ok, after: plus });
+  assert.equal(result.ok, false);
+  assert.deepEqual(
+    result.added.map((e) => e.text),
+    ['- Chip（#6）'],
+  );
+  // Moving an item to another kind keeps its number, so it is not new.
+  const moved = ok.replace(
+    '#### 足したもの\n\n- Field（#32）',
+    '#### 直したもの\n\n- Field（#32）',
+  );
+  assert.equal(checkUnreleased({ before: ok, after: moved }).ok, true, moved);
 });
 
 test('「未公開」がなかったところに作って項目を足しても落ちる', () => {

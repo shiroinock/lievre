@@ -129,7 +129,7 @@ test('「未公開」がなくても、版の見出しのいちばん上にま�
 test('今の CHANGELOG.md の「未公開」は、まとめても中身が変わらない', () => {
   const now = readFileSync(new URL('../CHANGELOG.md', import.meta.url), 'utf8');
   const { body } = splitChangelog(now);
-  if (body === null) return;
+  if (body === null || body.trim() === '') return;
   const { text } = release({ changelog: now, fragments: [], version: '9.9.9', date: '2026-12-08' });
   const after = splitChangelog(text.replace('## 9.9.9（2026-12-08）', '## 未公開'));
   assert.equal(after.body.trim(), body.trim());
