@@ -89,7 +89,8 @@ CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査�
 - コードは直しません。指摘は作者が直して push します。push するとレビューが走り直し、前のレビューは止まります。
 - 直す必要のある指摘がなければ、ラベル「マージ予約」を付けます（次の節）。push すると、レビューの前にラベルと自動マージをいったん外し、走り直したレビューで指摘がなければ付け直します。
 - 走るのは、このリポジトリの枝からの PR だけです。フォークからの PR では走りません。
-- `.github/workflows` の Claude の workflow を変える PR では、レビューが失敗します（Claude の GitHub App が、既定の枝と同じ workflow でないと動かないため）。手でレビューします。
+- `.github/workflows` を変える PR では、Claude のレビューは走りません（Claude の GitHub App が、既定の枝と同じ workflow でないと動かないため）。レビューの検査は通った扱いになり、理由が PR にコメントされます。手でレビューしてマージします。共通の workflow の SHA を上げる Renovate の PR だけは、検査が通れば Renovate が自動でマージします。
+- PR の CI（`CI`）が落ちると、`.github/workflows/claude-fix-ci.yml` が Claude Code に直させ、直したら push します（CI とレビューが走り直します）。人が判断すべきものや、続けて2回直しても通らないものは、持ち主にメンションしてラベル「人の手が要る」を付けて止まります。直して push したら、ラベルを外してください。下書きの PR と、ボットの PR には手を出しません。
 - 持ち主が Issue や PR のコメントに `@claude` と書くと、`.github/workflows/claude.yml` が Claude Code を動かします。ほかの人の `@claude` では動かず、Claude が読むのも持ち主と Claude 自身のコメントだけです。
 
 利用する側に見える変更（`packages/*/src` の部品・スタイル、`packages/react` の `bin`・`lint`、`packages/tokens/tokens.css`）は、`changes/` に PR ごとの断片を1つ足します。ファイル名は枝の名前から `claude/` などを除いたもの（例：`changes/component-chip.md`）で、中身は CHANGELOG.md と同じ見出しの、パッケージ（`###`）と区分（`####`、見た目が変わる・振る舞いが変わる・足したもの・直したもの）と項目です。
@@ -116,4 +117,4 @@ CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査�
 - ラベルを外しても、入った自動マージは残ります。取り消すときは `gh pr merge <番号> --disable-auto` も行います。
 - `.github/workflows` を変える PR とフォークからの PR は、自動では予約しません（ボットがコメントで知らせます）。検査が通ったら `gh pr merge <番号> --merge` で手でマージします。
 - 自動マージのコミットは CI を起こさないので、この workflow が `main` の CI を `workflow_dispatch` で走らせます。付け替わった PR は 10 分ごとの見回りで拾います。GitHub の schedule は混むと遅れるので、急ぐときは Actions の「マージ予約」を手で走らせます（Run workflow）。
-- Claude の workflow（`claude.yml`・`claude-code-review.yml`・`merge-reservation.yml`）の中身は、ほかのリポジトリと共通の [shiroinock/workflows](https://github.com/shiroinock/workflows) にあり、ここのファイルはそれを呼ぶだけです。シークレットを渡すので、`@main` ではなく読んで確かめたコミットの SHA で呼びます。共通側を新しくするときは、その版の差分を読んでから、3つのファイルの SHA（`merge-reservation.yml` は `workflows_ref` も）を同じ SHA に替える PR を出します。lievre に固有のレビューの観点は、`claude-code-review.yml` の `review_focus` に書きます。
+- Claude の workflow（`claude.yml`・`claude-code-review.yml`・`claude-fix-ci.yml`・`merge-reservation.yml`）の中身は、ほかのリポジトリと共通の [shiroinock/workflows](https://github.com/shiroinock/workflows) にあり、ここのファイルはそれを呼ぶだけです。シークレットを渡すので、`@main` ではなく読んで確かめたコミットの SHA で呼びます。共通側の main が進むと、Renovate が4つのファイルの SHA（`merge-reservation.yml` は `workflows_ref` も）を同じ SHA に上げる PR を出します。共通側の変更は shiroinock/workflows の PR で読んでからマージします。lievre に固有のレビューの観点は、`claude-code-review.yml` の `review_focus` に書きます。
