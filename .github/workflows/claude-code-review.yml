@@ -19,11 +19,12 @@ permissions: {}
 jobs:
   # A push after the label must not ride on the earlier review: take the reservation back first,
   # and let the review below put it back. The PR's code is never checked out here.
+  # The labels are read now, not from the event: the run before this one may have added the label
+  # after this push was made, and the event would not show it.
   unreserve:
     if: >-
       github.event.pull_request.head.repo.full_name == github.repository &&
-      !github.event.pull_request.draft &&
-      contains(github.event.pull_request.labels.*.name, 'マージ予約')
+      !github.event.pull_request.draft
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -36,8 +37,12 @@ jobs:
           GH_REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
         run: |
-          gh pr edit "$PR" --remove-label マージ予約
-          gh pr merge "$PR" --disable-auto || echo "自動マージは入っていない"
+          if gh pr view "$PR" --json labels --jq '.labels[].name' | grep -qx マージ予約; then
+            gh pr edit "$PR" --remove-label マージ予約
+            gh pr merge "$PR" --disable-auto || echo "自動マージは入っていない"
+          else
+            echo "ラベル「マージ予約」は付いていない"
+          fi
 
   review:
     needs: unreserve
@@ -125,6 +130,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
+          REVIEWED: ${{ github.event.pull_request.head.sha }}
         run: |
+          # A push during the review: the newer run reviews it and decides.
+          head=$(gh pr view "$PR" --json headRefOid --jq .headRefOid)
+          if [ "$head" != "$REVIEWED" ]; then
+            echo "レビューのあとに push があった（$REVIEWED → $head）。ラベルは付けない"
+            exit 0
+          fi
           gh pr edit "$PR" --add-label マージ予約
           gh workflow run merge-reservation.yml --ref main

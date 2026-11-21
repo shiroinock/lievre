@@ -54,5 +54,8 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           allow_fork_prs: 'false'
+          # Only the owner's (and Claude's own) comments reach Claude: in a public repository anyone
+          # can comment on the thread the owner calls @claude in.
+          include_comments_by_actor: ${{ github.repository_owner }},claude[bot]
           additional_permissions: |
             actions: read

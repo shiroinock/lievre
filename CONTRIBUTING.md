@@ -90,7 +90,7 @@ CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査�
 - 直す必要のある指摘がなければ、ラベル「マージ予約」を付けます（次の節）。push すると、レビューの前にラベルと自動マージをいったん外し、走り直したレビューで指摘がなければ付け直します。
 - 走るのは、このリポジトリの枝からの PR だけです。フォークからの PR では走りません。
 - `.github/workflows` の Claude の workflow を変える PR では、レビューが失敗します（Claude の GitHub App が、既定の枝と同じ workflow でないと動かないため）。手でレビューします。
-- 持ち主が Issue や PR のコメントに `@claude` と書くと、`.github/workflows/claude.yml` が Claude Code を動かします。ほかの人の `@claude` では動きません。
+- 持ち主が Issue や PR のコメントに `@claude` と書くと、`.github/workflows/claude.yml` が Claude Code を動かします。ほかの人の `@claude` では動かず、Claude が読むのも持ち主と Claude 自身のコメントだけです。
 
 利用する側に見える変更（`packages/*/src` の部品・スタイル、`packages/react` の `bin`・`lint`、`packages/tokens/tokens.css`）は、[CHANGELOG.md](CHANGELOG.md) の「未公開」の、パッケージと区分（見た目が変わる・振る舞いが変わる・足したもの・直したもの）の下に1行足します。書き方は CHANGELOG.md の冒頭にあります。テストや内部の整理だけで利用する側に見えないときは、PR の説明に「変更履歴：なし（理由）」の1行を書きます。書き忘れは `.github/workflows/changelog.yml` が止めます。
 
