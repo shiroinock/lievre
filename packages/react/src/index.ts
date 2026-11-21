@@ -10,3 +10,4 @@ export * from './components/queue';
 export * from './components/stream';
 export * from './components/chip';
 export * from './components/disclosure';
+export * from './components/stepper';

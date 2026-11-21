@@ -741,6 +741,18 @@ selected・onSelectedChange で押して入り切りする絞り込みの札に�
 - `onOpenChange?: ((open: boolean) => void)` — 開閉が変わったときに呼びます。
 - `className?: string`
 
+### Stepper
+
+申し込みのように画面を分けた手順の、今どこにいるかを示す並び。`<ol>` で順番を伝え、今の段に aria-current="step" を付けます。
+済み・今・まだは色だけでなく、済みはチェックの印と「完了」、今は太い文字と塗った円で示し、読み上げでも「完了」「現在」を添えます。番号は等幅です。
+押して移る操作は持ちません（戻るボタンは画面の側に置きます）。
+
+- `label: string` — 並びの名前。画面には出さず、読み上げに使います（「申し込みの手順」）。
+- `steps: StepperStep[]`
+- `current: number` — 今の段の番号（0 から）。これより前の段は済み、後ろはまだです。steps の数を渡すと、すべて済みになります。
+- `orientation?: 'horizontal' | 'vertical'` — 既定 'horizontal'。'horizontal'（既定）は横に、'vertical' は縦に並べます。狭い画面や段の名前が長いときは縦に。
+- `className?: string`
+
 ## フック
 
 ### useLievreTheme
@@ -882,6 +894,8 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `title: string` — 見出し。押すと開閉するボタンの名前になります。
   - `content: ReactNode` — 開いたときの中身。見出しの名前の付いた領域（region）になります。
   - `disabled?: boolean`
+- `type StepperStep`
+  - `label: string` — 段の名前（「入力」「確認」「完了」）。
 - `WearConfig`: `any`
 - `cx`: `(...values: (string | false | null | undefined)[]) => string`
 - `getQueueSnapshot`: `(keys: readonly string[], state: DecisionState) => DecisionQueueSnapshot` — 列の今の姿を組みます。keys は出す順（システムが決めた順）に並べて渡します。

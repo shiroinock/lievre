@@ -796,6 +796,96 @@
     padding: 4px 12px;
   }
 
+  /* Stepper: numbered circles joined by a line through their centres. Each label sits on 24px
+     lines beside its circle, so a label that wraps keeps the circle on its first line. */
+  .lv-stepper {
+    display: flex;
+    gap: var(--lv-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lv-step {
+    display: flex;
+    flex: 1 1 0;
+    align-items: flex-start;
+    gap: var(--lv-space-2);
+    min-width: 0;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+    line-height: 24px;
+  }
+  /* The joining line: a 24px box with a 1px line through its middle, level with the circles. */
+  .lv-step::after {
+    content: '';
+    flex: 1 1 16px;
+    min-width: 16px;
+    height: 24px;
+    background: linear-gradient(var(--lv-border-strong), var(--lv-border-strong)) center / 100% 1px
+      no-repeat;
+  }
+  .lv-step:last-child::after {
+    display: none;
+  }
+  .lv-step-mark {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--lv-border-strong);
+    border-radius: 50%;
+    background: var(--lv-surface);
+    font-family: var(--lv-font-mono);
+    font-size: var(--lv-text-mono-min);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .lv-step-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .lv-step[data-state='done'] {
+    color: var(--lv-text);
+  }
+  .lv-step[data-state='done'] .lv-step-mark {
+    border-color: var(--lv-accent);
+    color: var(--lv-accent);
+  }
+  .lv-step[data-state='current'] {
+    color: var(--lv-text);
+    font-weight: var(--lv-weight-bold);
+  }
+  .lv-step[data-state='current'] .lv-step-mark {
+    border-color: var(--lv-accent);
+    background: var(--lv-accent);
+    color: var(--lv-on-accent);
+  }
+  .lv-stepper--vertical {
+    flex-direction: column;
+    gap: 0;
+  }
+  .lv-stepper--vertical .lv-step {
+    position: relative;
+    padding-bottom: var(--lv-space-4);
+  }
+  .lv-stepper--vertical .lv-step:last-child {
+    padding-bottom: 0;
+  }
+  /* Down from below the circle to the next one, through the circles' centre. */
+  .lv-stepper--vertical .lv-step::after {
+    position: absolute;
+    top: 28px;
+    bottom: 4px;
+    left: 0;
+    width: 24px;
+    min-width: 0;
+    height: auto;
+    background: linear-gradient(var(--lv-border-strong), var(--lv-border-strong)) center / 1px 100%
+      no-repeat;
+  }
+
   /* Checkbox, Switch, Radio — "on" is always the accent, never a status color. */
   /* Controls beside text sit on the centre of its first line: (1lh − size) / 2 from the top. */
   .lv-check-field {
@@ -2612,6 +2702,18 @@
     .lv-skeleton-line::before {
       forced-color-adjust: none;
       background: GrayText;
+    }
+    /* The joining lines are background images, which forced colours drop: draw them in a
+       system colour, keeping their position and size. */
+    .lv-step::after {
+      forced-color-adjust: none;
+      background-image: linear-gradient(GrayText, GrayText);
+    }
+    .lv-step[data-state='current'] .lv-step-mark {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
     }
     .lv-progress-indicator,
     .lv-status-dot,

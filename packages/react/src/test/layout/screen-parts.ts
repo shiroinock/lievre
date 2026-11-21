@@ -26,6 +26,11 @@ export const SCREEN_PARTS: LayoutPart[] = [
     checks: [{ icon: '.lv-checkbox', text: '.lv-check-label' }],
   },
   { name: 'メーター', selector: '.lv-meter', checks: ['inset-x', 'fits'] },
+  {
+    name: '手順の段',
+    selector: '.lv-step',
+    checks: ['line-grid', { icon: '.lv-step-mark', text: '.lv-step-label' }],
+  },
   { name: '指標の見出し', selector: '.lv-metric-top', checks: [{ baseline: ':scope > *' }] },
   { name: '折れ線', selector: '.lv-sparkline', checks: ['fills-x'] },
   {
