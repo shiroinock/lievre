@@ -18,13 +18,16 @@ export function touchesWorkflows(files = []) {
   return files.some((f) => /^\.github\/workflows\//.test(f.path ?? f));
 }
 
+export function hasLabel(pr, label = LABEL) {
+  return (pr.labels ?? []).some((l) => (l.name ?? l) === label);
+}
+
 /**
  * What to do with one PR. `enable` turns on auto-merge; `wait` and `skip` leave it alone, and
  * `manual` asks for a merge by hand. `reason` says why, and how to move on when it waits.
  */
 export function decide(pr, { base = 'main', label = LABEL } = {}) {
-  const labels = (pr.labels ?? []).map((l) => l.name ?? l);
-  if (!labels.includes(label)) return { action: 'skip', reason: `「${label}」が付いていない。` };
+  if (!hasLabel(pr, label)) return { action: 'skip', reason: `「${label}」が付いていない。` };
   if (pr.state && pr.state !== 'OPEN') return { action: 'skip', reason: '開いていない。' };
   if (pr.isCrossRepository) {
     return {
@@ -64,11 +67,11 @@ function defaultGh(args) {
  * event (GitHub sends none for what GITHUB_TOKEN merged) is picked up by the next one.
  */
 export function run({ gh = defaultGh, base = 'main', label = LABEL, log = console.log } = {}) {
-  const prs = JSON.parse(
-    gh(['pr', 'list', '--state', 'open', '--label', label, '--limit', '100', '--json', FIELDS]),
-  );
+  // `--label` goes through search, which can miss a label added a moment ago (the very event that
+  // started this run). List every open PR and pick the labelled ones here instead.
+  const prs = JSON.parse(gh(['pr', 'list', '--state', 'open', '--limit', '200', '--json', FIELDS]));
   const results = [];
-  for (const listed of prs) {
+  for (const listed of prs.filter((p) => hasLabel(p, label))) {
     // Read the PR again right before acting: the base may have changed since the list.
     const pr = JSON.parse(gh(['pr', 'view', String(listed.number), '--json', `${FIELDS},files`]));
     const { action, reason } = decide(pr, { base, label });

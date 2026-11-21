@@ -85,6 +85,21 @@ test('予約するのは main に向いた PR だけで、merge commit で入れ
   assert.deepEqual(merges, [['pr', 'merge', '1', '--auto', '--merge']]);
 });
 
+test('ラベルの付いていない PR は、読み直さない', () => {
+  const { gh, calls } = fakeGh([pr({ number: 5, labels: [] })]);
+  assert.deepEqual(run({ gh, log: quiet }), []);
+  assert.equal(
+    calls.some((c) => c[1] === 'view'),
+    false,
+  );
+  const list = calls.find((c) => c[1] === 'list');
+  assert.equal(
+    list.includes('--label'),
+    false,
+    '--label は search を通り、付けた直後のラベルを見落とす',
+  );
+});
+
 test('一覧のあとに向き先が変わっていたら、読み直した向き先で決める', () => {
   const listed = [pr({ number: 3 })];
   const { gh, calls } = fakeGh(listed);
