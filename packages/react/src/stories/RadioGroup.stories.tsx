@@ -13,7 +13,10 @@ const meta = {
   },
   parameters: {
     layoutGate: {
-      parts: [{ name: 'ラジオボタン', selector: '.lv-radio-option', checks: [{ icon: 'input' }] }],
+      parts: [
+        { name: 'ラジオボタン', selector: '.lv-radio-option', checks: [{ icon: 'input' }] },
+        { name: 'エラー文', selector: '.lv-field-error', checks: [{ icon: ':scope > svg' }] },
+      ],
     } satisfies LayoutGate,
   },
 } satisfies Meta<typeof RadioGroup>;

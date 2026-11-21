@@ -19,7 +19,9 @@ import '@lievre/react/styles.css';
 
 ## 約束
 
-- 入力（TextField・Textarea・Select・Checkbox・Switch・RadioGroup）には必ず `label` を渡します。部品が label・補助文・エラーを入力と結ぶので、`id`・外の `<label>`・`aria-*` は自分で書きません。エラーは部品の外に書かず `error` に渡します。
+- 入力（TextField・Textarea・Select・Checkbox・Switch・RadioGroup・CheckboxGroup）には必ず `label` を渡します。部品が label・補助文・エラーを入力と結ぶので、`id`・外の `<label>`・`aria-*` は自分で書きません。エラーは部品の外に書かず `error` に渡します。lievre にない入力は `Field` で包み、1つの問いに答える複数の入力は `Fieldset` でまとめます。
+- 必須は `required` で示します。部品が「必須」の文字を出すので、ラベルに `*` や「（必須）」を書き足しません。
+- 送信したあとの誤りは、入力ごとの `error` に加えて、フォームの先頭に `ErrorSummary` を置きます。`errors` の `id` には入力に渡した `id`（RadioGroup・CheckboxGroup では `id` に渡した最初の選択肢の id）を使い、`message` は入力の `error` と同じ言葉にします。
 - 値の変更は Radix と同じ名前です：Switch・Checkbox は `onCheckedChange`、Select・RadioGroup・Tabs は `onValueChange`。`onChange` を受けるのは TextField・Textarea（ネイティブの属性）だけです。
 - `Button` の `type` の既定は `'button'` です。フォームの送信には `type="submit"` を付けます。主要な操作（`variant="primary"`）は1つの作業領域に1つ。危険な操作は `variant="danger"`。画面の移動は `Link` / `ActionLink`。
 - 状態の名前：Badge・Alert の `tone` は `'neutral' | 'success' | 'warning' | 'danger' | 'info'`、Toast の `tone` は `'success' | 'error'`。
@@ -119,24 +121,27 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### Textarea
 
-複数行の入力。label・hint・error の扱いは TextField と同じです。
+複数行の入力。label・hint・error・required・id の扱いは TextField と同じです。
 
-- `label: string`
-- `hint?: string`
-- `error?: string`
-- ほかに TextareaHTMLAttributes<HTMLTextAreaElement> の属性を受け取ります。
+- `required?: boolean` — ラベルの横に「必須」の文字を出し、required を付けます。
+- `label: string` — 見える名前。textarea と結びます。
+- `hint?: string` — 補助文。入力の下に出し、aria-describedby で結びます。
+- `error?: string` — エラー文。補助文の下に記号を添えて出し、aria-invalid を付けます。
+- `id?: string` — textarea の id。省くと部品が作ります。
 
 ### Checkbox
 
+1つの入り切り。複数の選択肢をまとめるときは CheckboxGroup を使います。
+
 - `label: string`
-- `hint?: string`
-- `error?: string` — エラー文。aria-invalid と aria-describedby を付けます。
+- `hint?: string` — 補助文。ラベルの下に出し、aria-describedby で結びます。
+- `error?: string` — エラー文。記号を添えて出し、aria-invalid と aria-describedby を付けます。
 - `checked?: boolean | 'indeterminate'`
 - `defaultChecked?: boolean`
 - `onCheckedChange?: ((checked: boolean | 'indeterminate') => void)` — 'indeterminate' も来るため、boolean の state には `(c) => setX(c === true)` で渡します。
 - `disabled?: boolean`
 - `name?: string`
-- `required?: boolean`
+- `required?: boolean` — ラベルの横に「必須」の文字を出し、required を付けます（同意の確認など）。
 - `id?: string`
 
 ### Switch
@@ -162,10 +167,11 @@ baked はビルド時の値（npm run wear）で決まります。
 - `defaultValue?: string`
 - `onValueChange?: ((value: string) => void)` — onChange ではなくこちらを使います。
 - `disabled?: boolean`
-- `required?: boolean`
+- `required?: boolean` — ラベルの横に「必須」の文字を出し、required を付けます。
 - `name?: string`
-- `hint?: string`
-- `error?: string` — エラー文。aria-invalid と aria-describedby を付けます。
+- `hint?: string` — 補助文。選択の欄の下に出し、aria-describedby で結びます。
+- `error?: string` — エラー文。記号を添えて出し、aria-invalid と aria-describedby を付けます。
+- `id?: string` — 開くボタンの id。省くと部品が作ります。ErrorSummary から移るときは、ここで決めた id を使います。
 
 ### Card
 
@@ -286,11 +292,12 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ラベル・補助文・エラーと入力を関連付けた標準入力。
 
+- `required?: boolean` — ラベルの横に「必須」の文字を出し、input に required を付けます。
 - `label: string` — 見える名前。input と結びます。placeholder の代わりにはしません。
-- `hint?: string` — 補助文。aria-describedby で入力と結びます。
-- `error?: string` — エラー文。渡すと hint の代わりに表示し、aria-invalid と aria-describedby を付けます。
+- `hint?: string` — 補助文。入力の下に出し、aria-describedby で入力と結びます。
+- `error?: string` — エラー文。補助文の下に記号を添えて出し、aria-invalid と aria-describedby を付けます。補助文は消しません。
+- `id?: string` — input の id。省くと部品が作ります。ErrorSummary から移るときは、ここで決めた id を使います。
 - `controlSize?: 'md' | 'lg'` — 既定 'md'
-- ほかに InputHTMLAttributes<HTMLInputElement> の属性を受け取ります。
 
 ### Dialog
 
@@ -422,6 +429,35 @@ baked はビルド時の値（npm run wear）で決まります。
 - `gap?: Space` — 既定 6
 - ほかに HTMLAttributes<HTMLDivElement> の属性を受け取ります。
 
+### Heading
+
+- `level?: 1 | 2 | 3 | 4 | 6 | 5` — 既定 2
+- `size?: 'title' | 'section' | 'display'` — 既定 'section'
+- ほかに HTMLAttributes<HTMLHeadingElement> の属性を受け取ります。
+
+### Field
+
+ラベル・補助文・エラー・必須の印と、入力を結ぶ入れ物。TextField・Textarea・Select はこれで組んでいます。lievre にない入力（日付や独自の入力）を同じ形にそろえるときに使います。
+
+- `label: string` — 見える名前。入力と label で結びます。placeholder の代わりにはしません。
+- `hint?: string` — 補助文。入力の下に出し、aria-describedby で結びます。
+- `error?: string` — エラー文。補助文の下に記号を添えて出し、aria-invalid と aria-describedby を付けます。補助文は消しません。
+- `required?: boolean` — 必須の入力。ラベルの横に「必須」の文字を出し、入力に required を付けます。読み上げでは入力の required が「必須」と伝えるので、文字は重ねて読みません。
+- `id?: string` — 入力の id。省くと部品が作ります。ErrorSummary から入力へ移るときは、ここで決めた id を使います。
+- `children: (control: FieldControlProps) => ReactNode` — 入力を描く関数。受け取った属性（id・aria-describedby・aria-invalid・required）を、入力の要素にそのまま渡します。`{(control) => <input {...control} className="lv-input" />}`
+
+### Fieldset
+
+1つの問いに答える複数の入力のまとまり。`<fieldset>` と `<legend>` で、まとまりの名前を中の入力に添えて読み上げます。
+
+- `legend: string` — まとまりの名前。legend になり、中の入力すべての名前に先立って読み上げます。
+- `hint?: string` — 補助文。中身の下に出し、fieldset に aria-describedby で結びます。
+- `error?: string` — まとまり全体のエラー文（「1つ以上選んでください」）。記号を添えて出します。
+- `required?: boolean` — 必須のまとまり。legend の横に「必須」の文字を出し、まとまりの名前と一緒に読み上げます。中の入力の required は、それぞれに付けます。
+- `disabled?: boolean` — true で中の入力をすべて無効にします。
+- `children: ReactNode` — 中の入力。姓と名、郵便番号と住所のように、1つの問いに答える入力を入れます。
+- `className?: string`
+
 ### RadioGroup
 
 ネイティブradioの矢印キー操作・フォーム送信を保つ単一選択。
@@ -433,14 +469,34 @@ baked はビルド時の値（npm run wear）で決まります。
 - `onValueChange?: ((value: string) => void)`
 - `name?: string`
 - `disabled?: boolean` — 既定 false
-- `error?: string` — エラー文。fieldset に aria-describedby で結びます。
-- `required?: boolean` — 既定 false
+- `hint?: string` — 補助文。選択肢の下に出し、fieldset に aria-describedby で結びます。
+- `error?: string` — エラー文。記号を添えて出し、fieldset に aria-describedby で結びます。
+- `required?: boolean` — 既定 false。legend の横に「必須」の文字を出し、選択肢に required を付けます。
+- `id?: string` — 最初の選択肢の id。ErrorSummary からこのまとまりへ移るときに使います。
 
-### Heading
+### CheckboxGroup
 
-- `level?: 1 | 2 | 3 | 4 | 6 | 5` — 既定 2
-- `size?: 'title' | 'section' | 'display'` — 既定 'section'
-- ほかに HTMLAttributes<HTMLHeadingElement> の属性を受け取ります。
+複数を選べる選択肢のまとまり。1つだけの入り切りは Checkbox、1つを選ぶなら RadioGroup を使います。
+
+- `label: string` — まとまりの名前。fieldset の legend になります。
+- `options: CheckboxOption[]`
+- `value?: string[]` — 選んでいる値。渡すと外で持ちます。
+- `defaultValue?: string[]` — 既定 []
+- `onValueChange?: ((value: string[]) => void)` — 選んだ値が変わったときに、選択肢の並び順で呼びます。
+- `name?: string` — フォームで送るときの名前。選んだ選択肢ごとに、この名前で value を送ります。
+- `disabled?: boolean`
+- `hint?: string` — 補助文。選択肢の下に出し、fieldset に aria-describedby で結びます。
+- `error?: string` — まとまり全体のエラー文（「1つ以上選んでください」）。記号を添えて出し、選択肢に aria-invalid を付けます。
+- `required?: boolean` — legend の横に「必須」の文字を出します。「1つ以上」の検査は呼び出す側で行い、error で伝えます。
+- `id?: string` — 最初の選択肢の id。ErrorSummary からこのまとまりへ移るときに使います。
+
+### ErrorSummary
+
+送信したあとに、誤りをフォームの先頭でまとめて示す一覧。各項目のリンクで、誤りのある入力へフォーカスを移します。入力ごとのエラー文（error）も、あわせて出します。
+
+- `title?: string` — 既定 '入力の内容を確かめてください'。見出し。既定は「入力の内容を確かめてください」。
+- `errors: ErrorSummaryItem[]` — 誤りの一覧。入力の並び順に渡します。空なら何も描きません。
+- `autoFocus?: boolean` — 既定 true。誤りが0件から1件以上になったとき（送信のあと）、この一覧へフォーカスを移します。既定は true。
 
 ### Popover
 
@@ -565,6 +621,14 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `wide?: boolean` — layout="stack" で段を組むとき、行の幅いっぱいに広げます（メモなど長い値）。
 - `type Space = 0 | 1 | 2 | 3 | 4 | 6 | 8 | 12;`
 - `type RadioOption = { value: string; label: string; description?: string; disabled?: boolean; };`
+- `type CheckboxOption`
+  - `value: string`
+  - `label: string`
+  - `description?: string` — 選択肢の下に出す補足。選択肢に aria-describedby で結びます。
+  - `disabled?: boolean`
+- `type ErrorSummaryItem`
+  - `id: string` — 誤りのある入力の id。Field・TextField などの id、RadioGroup・CheckboxGroup では最初の選択肢の id です。
+  - `message: string` — 何をどう直すか（「メールアドレスを入力してください」）。入力の下のエラー文と同じ言葉にします。
 - `type MenuItem = | { type?: 'item'; label: string; onSelect: () => void; icon?: ReactNode; shortcut?: string; tone?: 'danger'; disabled?: boolean; } | { type: 'checkbox'; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; disabled?: boolean; } | { type: 'radio'; label: string; value: string; onValueChange: (value: string) => void; options: { value: string; label: string; disabled?: boolean }[]; } | { type: 'separator' };`
 - `type DecisionState` — 1件ずつ判断する列の状態。タイムラインと一覧の両方の見せ方が、この1つを共有します。
   - `decisions: Record<string, string>` — 項目のキー → 決めた値（choices の value）。入っていない項目は未決です。

@@ -22,6 +22,11 @@ import {
   VisuallyHidden,
   Alert,
   useToast,
+  Field,
+  Fieldset,
+  CheckboxGroup,
+  ErrorSummary,
+  RadioGroup,
   type Column,
   type ToastMessage,
 } from '../index';
@@ -566,5 +571,101 @@ describe('Feedback variations', () => {
     );
     await userEvent.click(screen.getByRole('button', { name: '開く' }));
     expect(screen.getByRole('dialog', { name: '詳細' })).toHaveAttribute('data-size', 'lg');
+  });
+});
+
+describe('Form parts', () => {
+  it('marks a required field in words, read out once by the control', () => {
+    setup(
+      <TextField
+        label="メールアドレス"
+        required
+        hint="会社のアドレス"
+        error="形を確かめてください"
+      />,
+    );
+    const field = screen.getByRole('textbox', { name: 'メールアドレス' });
+    expect(field).toBeRequired();
+    expect(screen.getByText('必須')).toHaveAttribute('aria-hidden', 'true');
+    // The hint stays when an error comes, and both describe the field.
+    expect(field).toHaveAccessibleDescription('会社のアドレス 形を確かめてください');
+  });
+  it('hands id, description, invalid and required to any control in a Field', () => {
+    setup(
+      <Field label="郵便番号" hint="7桁" error="数字で" required id="zip">
+        {(control) => <input {...control} />}
+      </Field>,
+    );
+    const input = screen.getByRole('textbox', { name: '郵便番号' });
+    expect(input).toHaveAttribute('id', 'zip');
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input).toBeRequired();
+    expect(input).toHaveAccessibleDescription('7桁 数字で');
+  });
+  it('reads a required fieldset by its legend and the word', () => {
+    setup(
+      <Fieldset legend="お名前" required error="両方を入力してください">
+        <TextField label="姓" />
+      </Fieldset>,
+    );
+    const group = screen.getByRole('group', { name: /^お名前\s*必須$/ });
+    expect(group).toHaveAccessibleDescription('両方を入力してください');
+  });
+  it('marks RadioGroup required with the same word', () => {
+    setup(
+      <RadioGroup
+        label="受け取り方法"
+        required
+        id="plan"
+        options={[
+          { value: 'a', label: 'メール' },
+          { value: 'b', label: '郵送' },
+        ]}
+      />,
+    );
+    expect(screen.getByRole('group', { name: /^受け取り方法\s*必須$/ })).toBeVisible();
+    expect(screen.getByRole('radio', { name: 'メール' })).toHaveAttribute('id', 'plan');
+  });
+  it('returns checkbox group values in option order', async () => {
+    const change = vi.fn();
+    setup(
+      <CheckboxGroup
+        label="連絡の方法"
+        error="1つ以上選んでください"
+        options={[
+          { value: 'email', label: 'メール' },
+          { value: 'sms', label: 'ショートメッセージ' },
+          { value: 'post', label: '郵送' },
+        ]}
+        onValueChange={change}
+      />,
+    );
+    expect(screen.getByRole('group', { name: '連絡の方法' })).toHaveAccessibleDescription(
+      '1つ以上選んでください',
+    );
+    await userEvent.click(screen.getByRole('checkbox', { name: '郵送' }));
+    await userEvent.click(screen.getByRole('checkbox', { name: 'メール' }));
+    expect(change).toHaveBeenLastCalledWith(['email', 'post']);
+    expect(screen.getByRole('checkbox', { name: 'メール' })).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    );
+  });
+  it('focuses the error summary when errors appear, and its links focus the fields', async () => {
+    const { rerender } = setup(<ErrorSummary errors={[]} />);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    const errors = [{ id: 'name', message: 'お名前を入力してください' }];
+    rerender(
+      <LievreProvider>
+        <ToastProvider>
+          <ErrorSummary errors={errors} />
+          <TextField id="name" label="お名前" error="お名前を入力してください" />
+        </ToastProvider>
+      </LievreProvider>,
+    );
+    const summary = screen.getByRole('alert', { name: '入力の内容を確かめてください' });
+    expect(summary).toHaveFocus();
+    await userEvent.click(within(summary).getByRole('link', { name: 'お名前を入力してください' }));
+    expect(screen.getByRole('textbox', { name: 'お名前' })).toHaveFocus();
   });
 });
