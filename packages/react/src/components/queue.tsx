@@ -101,6 +101,43 @@ export function deferItem(state: DecisionState, key: string): DecisionState {
   return { ...next, deferred: [...next.deferred.filter((k) => k !== key), key] };
 }
 
+/** 複数の項目を同じ値で決めます。1件ずつ決めたのと同じく、渡した順で記録に積むので、1つ戻すと最後の1件から戻ります。 */
+export function decideItems(
+  state: DecisionState,
+  keys: readonly string[],
+  value: string,
+): DecisionState {
+  return keys.reduce((acc, key) => decideItem(acc, key, value), state);
+}
+
+/** value で決めた項目のキー（一覧の行の選択として使う）。並びは決めた順です。 */
+export function selectionOf(state: DecisionState, value = 'in'): string[] {
+  const keys = Object.keys(state.decisions).filter((k) => state.decisions[k] === value);
+  const order = new Map(state.log.map((k, i) => [k, i]));
+  return keys.sort((a, b) => (order.get(a) ?? -1) - (order.get(b) ?? -1));
+}
+
+/**
+ * 一覧の行の選択を状態に写します。選んだ行は value で決め、選択を外した行のうち value で決めていたものは未決に戻します。
+ * ほかの値で決めた行（「見送る」など）は、選択を外しても変えません。
+ */
+export function applySelection(
+  state: DecisionState,
+  selected: readonly string[],
+  value = 'in',
+): DecisionState {
+  const chosen = new Set(selected);
+  const removed = Object.keys(state.decisions).filter(
+    (k) => state.decisions[k] === value && !chosen.has(k),
+  );
+  const added = selected.filter((k) => state.decisions[k] !== value);
+  return decideItems(
+    removed.reduce((acc, k) => decideItem(acc, k, undefined), state),
+    added,
+    value,
+  );
+}
+
 /** 最後に決めた項目を未決に戻します。 */
 export function undoDecision(state: DecisionState): DecisionState {
   const last = state.log[state.log.length - 1];
@@ -144,6 +181,18 @@ export function useDecisionQueue({
     /** 項目を決めます。value を undefined にすると未決に戻します。 */
     decide: useCallback(
       (key: string, value: string | undefined) => update((s) => decideItem(s, key, value)),
+      [update],
+    ),
+    /** 複数の項目を同じ値で決めます。 */
+    decideMany: useCallback(
+      (keys: readonly string[], value: string) => update((s) => decideItems(s, keys, value)),
+      [update],
+    ),
+    /** value で決めた項目のキー。DataTable の selectedIds に渡します。 */
+    selected: useCallback((value = 'in') => selectionOf(latest.current, value), []),
+    /** 一覧の選択を写します。DataTable の onSelectionChange に渡します。 */
+    setSelected: useCallback(
+      (ids: readonly string[], value = 'in') => update((s) => applySelection(s, ids, value)),
       [update],
     ),
     /** 項目をあとで回します。 */
@@ -296,6 +345,21 @@ export type DecisionQueueProps<T> = {
   endTitle?: string;
   /** 終わりに置く操作（「書き出す」など）。次の作業へは利用者が選んで移ります。 */
   endAction?: ReactNode;
+  /**
+   * まとめて決める近道。label は根拠を言葉で書きます（「待機中のもの」）。残りの未決のうち match に当たるものが2件以上あるとき、
+   * 「残りの待機中のもの 3 件をまとめて見送る」のボタンを出します。押したあとも、1件ずつ決め直せます。
+   */
+  bulk?: QueueBulk<T>;
+  /** true で、描いたときに今の項目（終わっていれば終わりの表示）へフォーカスを移します。一覧から「順に見る」へ切り替えたときに使います。 */
+  autoFocus?: boolean;
+};
+
+export type QueueBulk<T> = {
+  /** まとめる根拠。「残りの〇〇 3 件」の〇〇に入ります。 */
+  label: string;
+  match: (item: T) => boolean;
+  /** まとめて決める値（choices の value）。 */
+  value: string;
 };
 
 const typing = (target: EventTarget) =>
@@ -323,6 +387,8 @@ export function DecisionQueue<T>({
   verb = '確認',
   endTitle = 'すべて確認しました',
   endAction,
+  bulk,
+  autoFocus = false,
 }: DecisionQueueProps<T>) {
   const { snapshot, state } = queue;
   const byKey = useMemo(() => new Map(items.map((item) => [getKey(item), item])), [items, getKey]);
@@ -331,7 +397,7 @@ export function DecisionQueue<T>({
   const titleId = useId();
   const cardRef = useRef<HTMLElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
-  const moved = useRef(false);
+  const moved = useRef(autoFocus);
   const [announcement, setAnnouncement] = useState('');
   const doneCount = snapshot.done.length;
   const deferredCount = state.deferred.filter(
@@ -386,6 +452,14 @@ export function DecisionQueue<T>({
         <Kbd>{shortcut.toUpperCase()}</Kbd>
       </span>
     );
+  const remaining = snapshot.current === undefined ? [] : [snapshot.current, ...next];
+  const bulkKeys = bulk
+    ? remaining.filter((k) => {
+        const item = byKey.get(k);
+        return item !== undefined && bulk.match(item);
+      })
+    : [];
+  const bulkChoice = bulk && choiceOf(bulk.value);
   const counts = choices.map((c) => ({
     label: c.label,
     count: snapshot.done.filter((d) => d.value === c.value).length,
@@ -488,6 +562,15 @@ export function DecisionQueue<T>({
           </p>
           {endAction}
         </div>
+      )}
+
+      {bulk && bulkKeys.length > 1 && (
+        <p className="lv-queue-bulk">
+          <Button size="sm" onClick={() => act(() => queue.decideMany(bulkKeys, bulk.value))}>
+            残りの{bulk.label} <span className="lv-mono">{bulkKeys.length}</span> 件をまとめて
+            {bulkChoice?.label ?? bulk.value}
+          </Button>
+        </p>
       )}
 
       {current !== undefined && next.length > 0 && (

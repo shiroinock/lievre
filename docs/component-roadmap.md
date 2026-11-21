@@ -612,10 +612,12 @@ Field で今の TextField・Select・RadioGroup を作り直すときは、配�
 
 ### タイムライン型の段階2：画面例と一覧とのつなぎ
 
-1. `Operations.tsx` の作業キューに「順に見る」を足し、DataTable の行の選択と状態を共有する
-2. 一覧へ切り替えたら今の項目の行へ、戻ったら今の項目へフォーカスを移す
-3. 「残りの低いものをまとめて決める」の近道（根拠を言葉で示す）
-4. 見せ方を URL に残す例
+作り終えました。部品の側は `queue.tsx` に、画面例の側は `packages/react/src/patterns/Operations.tsx` にあります。
+
+1. `Operations.tsx` の作業キューに「順に見る」を足し、DataTable の行の選択と状態を共有する。一覧で選んだ行は「対応する」に、選択を外すと未決に戻る（`applySelection`、フックの `selected` / `setSelected`）。「見送る」にした行は、選択を外しても変えない
+2. 一覧へ切り替えたら今の項目の行のページへ移ってその行へ、戻ったら今の項目へフォーカスを移す（DecisionQueue の `autoFocus`）。最初に開いたときはフォーカスを動かさない
+3. 「残りの待機中の作業 2 件をまとめて見送る」の近道（DecisionQueue の `bulk`）。当たるものが2件以上のときだけ出し、1件ずつ記録に積むので1つ戻すで1件ずつ戻せる
+4. 見せ方を URL の `?view=queue` に残す例（画面例の `useViewParam`）。作業の状態は URL に入れず、`replaceState` で履歴を増やさない
 
 ### タイムライン型の段階3：増えるものと時間で動くもの
 

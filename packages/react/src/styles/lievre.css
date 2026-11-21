@@ -1961,6 +1961,11 @@
     margin-bottom: 0;
   }
 
+  /* The shortcut to decide the rest at once names its reason in the button itself. */
+  .lv-queue-bulk {
+    margin: 0;
+  }
+
   /* What comes next stays small and pale: a few names, then a count. */
   .lv-queue-next {
     color: var(--lv-muted);
