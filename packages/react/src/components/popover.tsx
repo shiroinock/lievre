@@ -1,6 +1,6 @@
 import { DropdownMenu as MenuPrimitive, Popover as PopoverPrimitive } from 'radix-ui';
-import { Check } from 'lucide-react';
-import { Fragment, useId, useRef, type ReactNode } from 'react';
+import { Check, ChevronRight } from 'lucide-react';
+import { Fragment, useId, useRef, useState, type ReactNode } from 'react';
 import { PortalSurface } from './system';
 
 export type PopoverProps = {
@@ -61,6 +61,8 @@ export type MenuItem =
       onSelect: () => void;
       /** 先頭のアイコン。どれか1つにあれば、全項目の文字の開始位置をアイコンの列の分だけそろえます。 */
       icon?: ReactNode;
+      /** 項目の下に出す補足（「選んだ3件を別の拠点へ移します」）。項目に aria-describedby で結びます。 */
+      description?: string;
       /** 右端に出すキーの組み合わせ（"⌘D"）。押したときの処理は利用する側で付けます。 */
       shortcut?: string;
       /** 'danger' は削除など取り消せない操作。赤の文字にするので、label にも「削除」など何が起きるかを書きます。 */
@@ -83,35 +85,210 @@ export type MenuItem =
       onValueChange: (value: string) => void;
       options: { value: string; label: string; disabled?: boolean }[];
     }
+  | {
+      /** 見出しの付いた項目のまとまり。label は見出しとして出し、中の項目の読み上げに添えます。 */
+      type: 'group';
+      label: string;
+      items: MenuItem[];
+    }
+  | {
+      /** 入れ子のメニュー。右矢印か Enter で開き、左矢印か Escape で戻ります。入れ子は1段までにします。 */
+      type: 'submenu';
+      label: string;
+      icon?: ReactNode;
+      items: MenuItem[];
+      disabled?: boolean;
+    }
   | { type: 'separator' };
 export type DropdownMenuProps = {
   /** 開くボタン。Button か IconButton を渡します。メニューの名前はこのボタンの名前になります。 */
   trigger: ReactNode;
-  /** 項目。並べた順に出します。区切りは `{ type: 'separator' }`。 */
+  /** 項目。並べた順に出します。区切りは `{ type: 'separator' }`、見出しの付いたまとまりは `{ type: 'group' }`、入れ子は `{ type: 'submenu' }`。 */
   items: MenuItem[];
   /** 開いた元の部品とのそろえ方。表の行の端に置くときは 'end'。 */
   align?: 'start' | 'end';
+  /** 開く向き。画面の端で入らないときは反対側に回ります。 */
+  side?: 'top' | 'right' | 'bottom' | 'left';
 };
+/** One icon column for every row of a list, so the text starts at the same place. */
+const needsLead = (items: MenuItem[]): boolean =>
+  items.some(
+    (item) =>
+      item.type === 'checkbox' ||
+      item.type === 'radio' ||
+      (item.type === 'group' && needsLead(item.items)) ||
+      ((!item.type || item.type === 'item' || item.type === 'submenu') && !!item.icon),
+  );
+/** A nested menu. Escape closes only this level and goes back to its row, as ArrowLeft does
+ * (Radix closes the whole menu on Escape; the APG menu pattern closes the one holding focus). */
+function MenuSub({
+  label,
+  lead,
+  disabled,
+  nestedLead,
+  children,
+}: {
+  label: string;
+  lead: ReactNode;
+  disabled?: boolean;
+  nestedLead: boolean;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const rowRef = useRef<HTMLDivElement>(null);
+  return (
+    <MenuPrimitive.Sub open={open} onOpenChange={setOpen}>
+      <MenuPrimitive.SubTrigger ref={rowRef} className="lv-menu-item" disabled={disabled}>
+        {lead}
+        <span className="lv-menu-label">{label}</span>
+        <ChevronRight className="lv-menu-sub-icon" aria-hidden />
+      </MenuPrimitive.SubTrigger>
+      <MenuPrimitive.Portal>
+        <PortalSurface>
+          <MenuPrimitive.SubContent
+            className="lv-menu"
+            sideOffset={4}
+            alignOffset={-5}
+            collisionPadding={8}
+            data-lead={nestedLead || undefined}
+            onEscapeKeyDown={(event) => {
+              event.preventDefault();
+              setOpen(false);
+              rowRef.current?.focus();
+            }}
+          >
+            {children}
+          </MenuPrimitive.SubContent>
+        </PortalSurface>
+      </MenuPrimitive.Portal>
+    </MenuPrimitive.Sub>
+  );
+}
 /** 押すと開く操作の一覧。矢印キー・Home / End・文字での選択・Escape に対応し、閉じるとフォーカスを開いた元に戻します。 */
-export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuProps) {
+export function DropdownMenu({
+  trigger,
+  items,
+  align = 'start',
+  side = 'bottom',
+}: DropdownMenuProps) {
   const id = useId();
   // Run the chosen action once the menu has given focus back to its trigger. A dialog opened
   // from the item then remembers the trigger, not the vanishing item, as where focus returns.
   const chosen = useRef<(() => void) | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  // One icon column for every row, so the text starts at the same place with or without an icon.
-  const lead = items.some(
-    (item) =>
-      item.type === 'checkbox' ||
-      item.type === 'radio' ||
-      ((!item.type || item.type === 'item') && !!item.icon),
-  );
-  const leadCell = (content?: ReactNode) =>
-    lead && (
-      <span className="lv-menu-lead" aria-hidden>
-        {content}
-      </span>
-    );
+  const renderList = (list: MenuItem[], path: string): ReactNode => {
+    const lead = needsLead(list);
+    const leadCell = (content?: ReactNode) =>
+      lead && (
+        <span className="lv-menu-lead" aria-hidden>
+          {content}
+        </span>
+      );
+    const renderItem = (item: MenuItem, key: string): ReactNode => {
+      if (item.type === 'separator')
+        return <MenuPrimitive.Separator key={key} className="lv-menu-separator" />;
+      if (item.type === 'checkbox')
+        return (
+          <MenuPrimitive.CheckboxItem
+            key={key}
+            className="lv-menu-item"
+            checked={item.checked}
+            onCheckedChange={item.onCheckedChange}
+            disabled={item.disabled}
+            onSelect={(e) => e.preventDefault()}
+          >
+            {leadCell(
+              <MenuPrimitive.ItemIndicator className="lv-menu-indicator">
+                <Check />
+              </MenuPrimitive.ItemIndicator>,
+            )}
+            <span className="lv-menu-label">{item.label}</span>
+          </MenuPrimitive.CheckboxItem>
+        );
+      if (item.type === 'radio')
+        return (
+          <Fragment key={key}>
+            <MenuPrimitive.Label id={`${id}-${key}`} className="lv-menu-heading">
+              {item.label}
+            </MenuPrimitive.Label>
+            <MenuPrimitive.RadioGroup
+              value={item.value}
+              onValueChange={item.onValueChange}
+              aria-labelledby={`${id}-${key}`}
+            >
+              {item.options.map((option) => (
+                <MenuPrimitive.RadioItem
+                  key={option.value}
+                  className="lv-menu-item"
+                  value={option.value}
+                  disabled={option.disabled}
+                >
+                  {leadCell(
+                    <MenuPrimitive.ItemIndicator className="lv-menu-indicator">
+                      <Check />
+                    </MenuPrimitive.ItemIndicator>,
+                  )}
+                  <span className="lv-menu-label">{option.label}</span>
+                </MenuPrimitive.RadioItem>
+              ))}
+            </MenuPrimitive.RadioGroup>
+          </Fragment>
+        );
+      if (item.type === 'group')
+        return (
+          <MenuPrimitive.Group key={key} aria-labelledby={`${id}-${key}`}>
+            <MenuPrimitive.Label id={`${id}-${key}`} className="lv-menu-heading">
+              {item.label}
+            </MenuPrimitive.Label>
+            {item.items.map((child, i) => renderItem(child, `${key}-${i}`))}
+          </MenuPrimitive.Group>
+        );
+      if (item.type === 'submenu')
+        return (
+          <MenuSub
+            key={key}
+            label={item.label}
+            lead={leadCell(item.icon)}
+            disabled={item.disabled}
+            nestedLead={needsLead(item.items)}
+          >
+            {renderList(item.items, `${key}-`)}
+          </MenuSub>
+        );
+      const describedId = item.description ? `${id}-${key}-description` : undefined;
+      return (
+        <MenuPrimitive.Item
+          key={key}
+          className="lv-menu-item"
+          onSelect={() => {
+            chosen.current = item.onSelect;
+          }}
+          disabled={item.disabled}
+          data-tone={item.tone}
+          data-described={item.description ? true : undefined}
+          // The note is inside the row; name the row by its label alone.
+          aria-labelledby={item.description ? `${id}-${key}-label` : undefined}
+          aria-describedby={describedId}
+        >
+          {leadCell(item.icon)}
+          {item.description ? (
+            <span className="lv-menu-text">
+              <span id={`${id}-${key}-label`} className="lv-menu-label">
+                {item.label}
+              </span>
+              <span id={describedId} className="lv-menu-description">
+                {item.description}
+              </span>
+            </span>
+          ) : (
+            <span className="lv-menu-label">{item.label}</span>
+          )}
+          {item.shortcut && <kbd className="lv-menu-shortcut">{item.shortcut}</kbd>}
+        </MenuPrimitive.Item>
+      );
+    };
+    return list.map((item, i) => renderItem(item, `${path}${i}`));
+  };
   return (
     <MenuPrimitive.Root>
       <MenuPrimitive.Trigger asChild ref={triggerRef}>
@@ -122,9 +299,10 @@ export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuPr
           <MenuPrimitive.Content
             className="lv-menu"
             align={align}
+            side={side}
             sideOffset={4}
             collisionPadding={8}
-            data-lead={lead || undefined}
+            data-lead={needsLead(items) || undefined}
             onCloseAutoFocus={(event) => {
               const run = chosen.current;
               if (!run) return;
@@ -135,72 +313,7 @@ export function DropdownMenu({ trigger, items, align = 'start' }: DropdownMenuPr
               run();
             }}
           >
-            {items.map((item, i) => {
-              if (item.type === 'separator')
-                return <MenuPrimitive.Separator key={i} className="lv-menu-separator" />;
-              if (item.type === 'checkbox')
-                return (
-                  <MenuPrimitive.CheckboxItem
-                    key={i}
-                    className="lv-menu-item"
-                    checked={item.checked}
-                    onCheckedChange={item.onCheckedChange}
-                    disabled={item.disabled}
-                    onSelect={(e) => e.preventDefault()}
-                  >
-                    {leadCell(
-                      <MenuPrimitive.ItemIndicator className="lv-menu-indicator">
-                        <Check />
-                      </MenuPrimitive.ItemIndicator>,
-                    )}
-                    <span className="lv-menu-label">{item.label}</span>
-                  </MenuPrimitive.CheckboxItem>
-                );
-              if (item.type === 'radio')
-                return (
-                  <Fragment key={i}>
-                    <MenuPrimitive.Label id={`${id}-${i}`} className="lv-menu-heading">
-                      {item.label}
-                    </MenuPrimitive.Label>
-                    <MenuPrimitive.RadioGroup
-                      value={item.value}
-                      onValueChange={item.onValueChange}
-                      aria-labelledby={`${id}-${i}`}
-                    >
-                      {item.options.map((option) => (
-                        <MenuPrimitive.RadioItem
-                          key={option.value}
-                          className="lv-menu-item"
-                          value={option.value}
-                          disabled={option.disabled}
-                        >
-                          {leadCell(
-                            <MenuPrimitive.ItemIndicator className="lv-menu-indicator">
-                              <Check />
-                            </MenuPrimitive.ItemIndicator>,
-                          )}
-                          <span className="lv-menu-label">{option.label}</span>
-                        </MenuPrimitive.RadioItem>
-                      ))}
-                    </MenuPrimitive.RadioGroup>
-                  </Fragment>
-                );
-              return (
-                <MenuPrimitive.Item
-                  key={i}
-                  className="lv-menu-item"
-                  onSelect={() => {
-                    chosen.current = item.onSelect;
-                  }}
-                  disabled={item.disabled}
-                  data-tone={item.tone}
-                >
-                  {leadCell(item.icon)}
-                  <span className="lv-menu-label">{item.label}</span>
-                  {item.shortcut && <kbd className="lv-menu-shortcut">{item.shortcut}</kbd>}
-                </MenuPrimitive.Item>
-              );
-            })}
+            {renderList(items, '')}
           </MenuPrimitive.Content>
         </PortalSurface>
       </MenuPrimitive.Portal>

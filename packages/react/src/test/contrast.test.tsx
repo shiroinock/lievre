@@ -74,6 +74,12 @@ describe('Semantic color contrast', () => {
         );
       });
     }
+    // Menu rows: the description (muted) stays readable on the highlighted row, including a
+    // danger row, and the submenu arrow on the open row.
+    for (const background of ['accent-soft', 'danger-soft'])
+      it(`${theme}: menu description muted / ${background} reaches 4.5:1`, () => {
+        expect(ratio(resolve(set, 'muted'), resolve(set, background))).toBeGreaterThanOrEqual(4.5);
+      });
     // A strong badge is filled with the status colour and lettered in the surface colour.
     for (const tone of ['muted', 'success', 'warning', 'danger', 'info'])
       it(`${theme}: strong badge text / ${tone} reaches 4.5:1`, () => {
@@ -216,5 +222,22 @@ describe('Forced colours', () => {
     expect(forced).toMatch(
       /\.lv-badge--sm \{[^}]*forced-color-adjust: none;[^}]*background: Canvas;/,
     );
+  });
+  // A highlighted menu row opts out of forced colours to paint Highlight; its muted parts would
+  // keep their grey on it unless they take HighlightText too.
+  it('letters every muted part of a highlighted menu row in HighlightText', () => {
+    const css = readFileSync('src/styles/lievre.css', 'utf8');
+    const forced = css.slice(css.indexOf('@media (forced-colors: active)'));
+    const rule = forced.match(
+      /\.lv-menu-item:is\(\[data-highlighted\], \[data-state='open'\]\)\s*:is\(([^)]*)\) \{\s*color: HighlightText;/,
+    );
+    expect(rule, 'ハイライトした行の中の muted の部品にも HighlightText を当てます').toBeTruthy();
+    for (const part of [
+      '.lv-menu-description',
+      '.lv-menu-lead',
+      '.lv-menu-sub-icon',
+      '.lv-menu-shortcut',
+    ])
+      expect(rule![1]).toContain(part);
   });
 });

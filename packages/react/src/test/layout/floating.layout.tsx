@@ -77,3 +77,49 @@ for (const { name, selector, render } of PANELS)
       expect(panel.right).toBeLessThanOrEqual(document.documentElement.clientWidth);
     });
   });
+
+// side は開く向きの希望で、入らない側では反対へ回ります。入れ子も同じです。
+describe('開く向き（side）', () => {
+  it("side='right' のメニューを画面の右端で開くと、左に回って画面の内側に収まる", async () => {
+    const { trigger, panel } = await open(
+      <DropdownMenu
+        side="right"
+        trigger={<Button>操作</Button>}
+        items={[{ label: '担当をほかの人に変える', onSelect: () => {} }]}
+      />,
+      'flex-end',
+      '.lv-menu',
+    );
+    expect(panel.right).toBeLessThanOrEqual(trigger.left);
+    expect(panel.left).toBeGreaterThanOrEqual(0);
+  });
+
+  it('画面の右端で入れ子を開くと、左に回って画面の内側に収まる', async () => {
+    const { trigger } = await open(
+      <DropdownMenu
+        align="end"
+        trigger={<Button>操作</Button>}
+        items={[
+          {
+            type: 'submenu',
+            label: '移す',
+            items: [{ label: 'ほかの拠点の倉庫へ移す', onSelect: () => {} }],
+          },
+        ]}
+      />,
+      'flex-end',
+      '.lv-menu',
+    );
+    const row = document.querySelector<HTMLElement>('.lv-menu-item')!;
+    row.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect.poll(() => document.querySelectorAll('.lv-menu').length).toBe(2);
+    await new Promise(requestAnimationFrame);
+    const [outer, inner] = [...document.querySelectorAll('.lv-menu')].map((el) =>
+      el.getBoundingClientRect(),
+    );
+    expect(inner.right).toBeLessThanOrEqual(outer.left + 1);
+    expect(inner.left).toBeGreaterThanOrEqual(0);
+    expect(trigger.right).toBeLessThanOrEqual(document.documentElement.clientWidth);
+  });
+});

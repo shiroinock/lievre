@@ -76,6 +76,11 @@
 - Breadcrumb に `maxItems`（間を「…」のボタンにまとめ、押すとその場に出してフォーカスを移す）。（#39）
 - Tabs の項目に `icon`（言葉の前。読み上げない）。（#39）
 - リンクをタブの見た目で並べる `TabNav`（`nav` と `aria-current="page"`）。（#39）
+- Button に `iconEnd`（文字の後ろのアイコン）、`block`（幅を親いっぱいに広げる）、`pressed`（押して入り切りするボタン。`aria-pressed`）、`disabledReason`（押せない理由。`aria-disabled` にしてフォーカスを届かせ、ツールチップと読み上げで伝える）。（#36）
+- IconButton に `pressed`。（#36）
+- 表示の形を切り替える `SegmentedControl`、関係のあるボタンを並べる `ButtonGroup`（`attached` で隙間なくつなげる）、主な操作とほかの方法のメニューをつなげた `SplitButton`。（#36）
+- DropdownMenu に `{ type: 'submenu' }`（入れ子のメニュー。右矢印か Enter で開き、左矢印か Escape でその入れ子だけ閉じて親の項目へ戻る）、項目の `description`（項目の下の補足。`aria-describedby` で読み上げる）、`{ type: 'group' }`（見出しの付いたまとまり。見出しがまとまりの名前になる）、`side`（開く向き）。（#40）
+- Tooltip に `side`・`align`。画面の端で入らないときは反対側に回る。（#40）
 
 #### 直したもの
 

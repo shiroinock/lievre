@@ -29,7 +29,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'ホバーとキーボードフォーカスで表示。無効ボタンを直接トリガーにしません。重要情報は本文にも書きます。',
+          'ホバーとキーボードフォーカスで表示。無効ボタンを直接トリガーにしません（押せない理由を出すときは Button の disabledReason を使います）。重要情報は本文にも書きます。side と align で出す向きを選べ、画面の端で入らないときは反対側に回ります。',
       },
     },
   },
@@ -51,6 +51,24 @@ export const LongText: Story = {
 };
 /** キーボードで表示した状態。配置の検査は、この Story でツールチップを測ります。 */
 export const Open: Story = {
+  play: async ({ canvasElement }) => {
+    await userEvent.tab();
+    await expect(
+      await within(canvasElement.ownerDocument.body).findByRole('tooltip'),
+    ).toBeInTheDocument();
+  },
+};
+/** 右に出す形。表の行の先頭の操作など、上に余白がないときに使います。 */
+export const SideRight: Story = {
+  args: { side: 'right' },
+  play: async ({ canvasElement }) => {
+    await userEvent.tab();
+    const tip = await within(canvasElement.ownerDocument.body).findByRole('tooltip');
+    await expect(tip).toBeInTheDocument();
+  },
+};
+export const SideBottomStart: Story = {
+  args: { side: 'bottom', align: 'start' },
   play: async ({ canvasElement }) => {
     await userEvent.tab();
     await expect(

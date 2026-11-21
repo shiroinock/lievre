@@ -34,6 +34,7 @@ import {
   Pagination,
   Breadcrumb,
   TabNav,
+  DropdownMenu,
   type Column,
   type ToastMessage,
 } from '../index';
@@ -945,5 +946,95 @@ describe('Navigation variations', () => {
     );
     expect(screen.getByRole('link', { name: '全般' })).toHaveAttribute('aria-current', 'page');
     expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+  });
+});
+
+describe('Menu variations', () => {
+  it('opens a submenu with the arrow keys and runs its item after giving focus back', async () => {
+    const move = vi.fn();
+    setup(
+      <DropdownMenu
+        trigger={<Button>操作</Button>}
+        items={[
+          { label: '編集', onSelect: () => {} },
+          { type: 'submenu', label: '移す', items: [{ label: '東京拠点', onSelect: move }] },
+        ]}
+      />,
+    );
+    const trigger = screen.getByRole('button', { name: '操作' });
+    trigger.focus();
+    await userEvent.keyboard('{Enter}');
+    await screen.findByRole('menuitem', { name: '編集' });
+    await userEvent.keyboard('{ArrowDown}{ArrowRight}');
+    expect(await screen.findByRole('menuitem', { name: '東京拠点' })).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(move).toHaveBeenCalledOnce());
+    expect(trigger).toHaveFocus();
+  });
+  it('closes a submenu with ArrowLeft or Escape and gives focus back to its row', async () => {
+    setup(
+      <DropdownMenu
+        trigger={<Button>操作</Button>}
+        items={[
+          { type: 'submenu', label: '移す', items: [{ label: '東京拠点', onSelect: () => {} }] },
+        ]}
+      />,
+    );
+    screen.getByRole('button', { name: '操作' }).focus();
+    await userEvent.keyboard('{Enter}');
+    const row = await screen.findByRole('menuitem', { name: '移す' });
+    for (const key of ['{ArrowLeft}', '{Escape}']) {
+      row.focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(await screen.findByRole('menuitem', { name: '東京拠点' })).toHaveFocus();
+      await userEvent.keyboard(key);
+      await waitFor(() =>
+        expect(screen.queryByRole('menuitem', { name: '東京拠点' })).not.toBeInTheDocument(),
+      );
+      expect(row).toHaveFocus();
+    }
+  });
+  it('keeps ids apart between a submenu and the rows after it', async () => {
+    const note = (n: number) => ({
+      label: `項目${n}`,
+      description: `補足${n}`,
+      onSelect: () => {},
+    });
+    setup(
+      <DropdownMenu
+        trigger={<Button>操作</Button>}
+        items={[
+          note(0),
+          { type: 'submenu', label: '移す', items: [note(100)] },
+          ...Array.from({ length: 9 }, (_, i) => note(i + 2)),
+        ]}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: '操作' }));
+    await userEvent.hover(await screen.findByRole('menuitem', { name: '移す' }));
+    await userEvent.keyboard('{ArrowRight}');
+    const inner = await screen.findByRole('menuitem', { name: '項目100' });
+    expect(inner).toHaveAccessibleDescription('補足100');
+    expect(screen.getByRole('menuitem', { name: '項目10' })).toHaveAccessibleDescription('補足10');
+    const ids = [...document.querySelectorAll('[id]')].map((el) => el.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+  it('names a group by its heading and describes an item by its note', async () => {
+    setup(
+      <DropdownMenu
+        trigger={<Button>書き出す</Button>}
+        items={[
+          {
+            type: 'group',
+            label: '表の形',
+            items: [{ label: 'CSV', description: '表計算ソフトで開けます', onSelect: () => {} }],
+          },
+        ]}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: '書き出す' }));
+    const csv = await screen.findByRole('menuitem', { name: 'CSV' });
+    expect(csv).toHaveAccessibleDescription('表計算ソフトで開けます');
+    expect(screen.getByRole('group', { name: '表の形' })).toContainElement(csv);
   });
 });

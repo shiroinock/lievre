@@ -1302,6 +1302,35 @@
     /* stylelint-disable-next-line lievre/padding-symmetry -- アイコンの列（16px）と間（8px）の分だけ空けて、見出しを項目の文字と同じ位置から始める */
     padding-inline-start: calc(8px + 16px + var(--lv-space-2));
   }
+  /* An item with a description: the icon and shortcut stay on the label's line. */
+  .lv-menu-item[data-described] {
+    align-items: flex-start;
+  }
+  .lv-menu-item[data-described] .lv-menu-lead {
+    height: 1lh;
+  }
+  .lv-menu-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .lv-menu-description {
+    color: var(--lv-muted);
+    font-size: var(--lv-text-xs);
+    font-weight: var(--lv-weight-regular);
+    line-height: var(--lv-line-tight);
+  }
+  /* The row that opened a submenu keeps the highlight while the submenu is open. */
+  .lv-menu-item[data-state='open'] {
+    background: var(--lv-accent-soft);
+  }
+  .lv-menu-sub-icon {
+    width: 16px;
+    height: 16px;
+    margin-inline-start: auto;
+    color: var(--lv-muted);
+  }
   .lv-menu-separator {
     height: 1px;
     margin: 4px 0;
@@ -2183,6 +2212,7 @@
     .lv-tab::after,
     .lv-select-item[data-highlighted],
     .lv-menu-item[data-highlighted],
+    .lv-menu-item[data-state='open'],
     .lv-menu-item[data-tone='danger'][data-highlighted] {
       forced-color-adjust: none;
     }
@@ -2206,8 +2236,15 @@
     }
     .lv-select-item[data-highlighted],
     .lv-menu-item[data-highlighted],
+    .lv-menu-item[data-state='open'],
     .lv-menu-item[data-tone='danger'][data-highlighted] {
       background: Highlight;
+      color: HighlightText;
+    }
+    /* Opting out keeps the muted grey of the note, icon, arrow and keys; on Highlight they
+       need the row's own HighlightText. */
+    .lv-menu-item:is([data-highlighted], [data-state='open'])
+      :is(.lv-menu-description, .lv-menu-lead, .lv-menu-sub-icon, .lv-menu-shortcut) {
       color: HighlightText;
     }
     /* Rows keep forced colours for their contents; the selection becomes an outline. */
