@@ -41,8 +41,15 @@ function read(value: Date | string) {
         ? new Date(Date.UTC(Number(day[1]), Number(day[2]) - 1, Number(day[3])))
         : new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  // Date.UTC rolls 2026-02-30 over to March; a day that does not exist is not a date.
-  if (day && date.getUTCDate() !== Number(day[3])) return null;
+  // Date.UTC rolls 2026-02-30 over to March and 2026-13-01 into the next year; a day that does
+  // not exist is not a date.
+  if (
+    day &&
+    (date.getUTCFullYear() !== Number(day[1]) ||
+      date.getUTCMonth() + 1 !== Number(day[2]) ||
+      date.getUTCDate() !== Number(day[3]))
+  )
+    return null;
   return { date, dayOnly: !!day };
 }
 /** 日付・日時を日本語の書式の文字にします。FormatDate と同じ書式を、文の中に使うときに。日付として読めない文字は、そのまま返します。 */
@@ -71,11 +78,12 @@ export function formatDate(value: Date | string, options: DateFormatOptions = {}
 }
 /** The machine-readable value for <time datetime>, in the same time zone as the text; none when
  * the value is not a date. */
-function machineValue(value: Date | string, options: DateFormatOptions) {
+function machineValue(value: Date | string, options: DateFormatOptions, exact: boolean) {
   const moment = read(value);
   if (!moment) return undefined;
   if (typeof value === 'string') return value;
-  if ((options.style ?? 'date') !== 'date') return value.toISOString();
+  // A relative time keeps the exact moment, whatever the style.
+  if (exact || (options.style ?? 'date') !== 'date') return value.toISOString();
   // en-CA writes YYYY-MM-DD.
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: options.timeZone,
@@ -88,15 +96,32 @@ function machineValue(value: Date | string, options: DateFormatOptions) {
 const DAY = 24 * 3600 * 1000;
 /** Days since the epoch of the calendar day a moment falls on: in UTC for a 'YYYY-MM-DD' day,
  * in the viewer's time zone otherwise. */
-const dayNumber = (date: Date, utc: boolean) =>
-  utc
-    ? Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / DAY
-    : Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / DAY;
+function dayNumber(date: Date, timeZone: string | undefined) {
+  const [year, month, day] = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+    .format(date)
+    .split('-')
+    .map(Number);
+  return Date.UTC(year, month - 1, day) / DAY;
+}
 /**
  * 今との差を言葉にします（3分前・昨日・2日後）。1日より近い時刻は時間・分・秒で、それより離れた日は暦の日の差（昨日・一昨日・3日前）で、
  * 1週より離れると週・月・年で丸めて言います。'YYYY-MM-DD' の文字は日付なので、今日・昨日・明日のように日の差だけで言います。
  */
-export function formatRelativeTime(value: Date | string, now: Date = new Date()) {
+export function formatRelativeTime(
+  value: Date | string,
+  options: {
+    /** 基準の「今」。省くと呼んだ時の時刻です。 */
+    now?: Date;
+    /** 暦の日（今日・昨日）を数える時間帯。省くと端末の時間帯です。サーバーとブラウザで同じ文字にしたいときに決めます。 */
+    timeZone?: string;
+  } = {},
+) {
+  const { now = new Date(), timeZone } = options;
   const moment = read(value);
   if (!moment) return value instanceof Date ? '' : value;
   const words = new Intl.RelativeTimeFormat('ja', { numeric: 'auto' });
@@ -108,7 +133,7 @@ export function formatRelativeTime(value: Date | string, now: Date = new Date())
     return words.format(Math.round(seconds), 'second');
   }
   // Calendar days, not elapsed hours: 39 hours ago late at night is still yesterday.
-  const days = dayNumber(moment.date, moment.dayOnly) - dayNumber(now, false);
+  const days = dayNumber(moment.date, moment.dayOnly ? 'UTC' : timeZone) - dayNumber(now, timeZone);
   if (Math.abs(days) < 7) return words.format(days, 'day');
   if (Math.abs(days) < 30) return words.format(Math.round(days / 7), 'week');
   if (Math.abs(days) < 365) return words.format(Math.round(days / 30), 'month');
@@ -134,10 +159,14 @@ export function FormatNumber({
   mono?: boolean;
   className?: string;
 }) {
+  // Units are words, not data: the percent sign and the unit sit outside the mono figures.
+  const text = formatNumber(value, options);
+  const figures = options.percent ? text.replace('%', '') : text;
+  const after = [options.percent ? '%' : '', unit ?? ''].join('');
   return (
-    <span className={cx('lv-format', mono ? 'lv-mono' : 'lv-tabular', className)}>
-      {formatNumber(value, options)}
-      {unit && <span className="lv-format-unit">{unit}</span>}
+    <span className={cx('lv-format', className)}>
+      <span className={mono ? 'lv-mono' : 'lv-tabular'}>{figures}</span>
+      {after && <span className="lv-format-unit">{after}</span>}
     </span>
   );
 }
@@ -156,7 +185,7 @@ export function FormatDate({
 }: DateFormatOptions & {
   /** Date か、ISO 8601 の文字（'2026-11-22'・'2026-11-22T09:05:00+09:00'）。 */
   value: Date | string;
-  /** 今との差で出す（3分前・昨日）。正確な日時は datetime の属性に残ります。 */
+  /** 今との差で出す（3分前・昨日）。正確な日時は datetime の属性に残ります。暦の日は timeZone で数えます。 */
   relative?: boolean;
   /** relative の基準の「今」。省くと描いた時の時刻です。 */
   now?: Date;
@@ -166,10 +195,12 @@ export function FormatDate({
 }) {
   return (
     <time
-      dateTime={machineValue(value, options)}
+      dateTime={machineValue(value, options, relative)}
       className={cx('lv-format', mono ? 'lv-mono' : 'lv-tabular', className)}
     >
-      {relative ? formatRelativeTime(value, now) : formatDate(value, options)}
+      {relative
+        ? formatRelativeTime(value, { now, timeZone: options.timeZone })
+        : formatDate(value, options)}
     </time>
   );
 }
