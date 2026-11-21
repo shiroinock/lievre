@@ -62,6 +62,20 @@ describe('Accordion', () => {
     expect(screen.getByRole('button', { name: '手数料' })).toHaveFocus();
     expect(screen.getByRole('button', { name: '窓口' })).toBeDisabled();
   });
+  it('moves to the first and last headings with Home and End', async () => {
+    render(<Accordion items={items} />);
+    screen.getByRole('button', { name: '手数料' }).focus();
+    await userEvent.keyboard('{End}');
+    expect(screen.getByRole('button', { name: '日数' })).toHaveFocus();
+    await userEvent.keyboard('{Home}');
+    expect(screen.getByRole('button', { name: '手数料' })).toHaveFocus();
+  });
+  it('removes closed content from reading and tab order', async () => {
+    render(<Accordion items={[{ value: 'a', title: '手数料', content: <a href="#x">表</a> }]} />);
+    expect(screen.queryByRole('link', { name: '表' })).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: '手数料' }));
+    expect(screen.getByRole('link', { name: '表' })).toBeVisible();
+  });
 });
 
 describe('Disclosure', () => {

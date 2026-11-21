@@ -14,7 +14,7 @@ export type AccordionItem = {
 };
 export type AccordionProps = {
   items: AccordionItem[];
-  /** 見出しのレベル（h2〜h6）。ページの見出しの並びに合わせます。既定は 3。 */
+  /** 見出しのレベル（h2〜h6）。ページの見出しの並びに合わせます。 */
   headingLevel?: 2 | 3 | 4 | 5 | 6;
   /** 同時に複数を開けるか。既定は1つだけで、別の項目を開くと前の項目は閉じます。 */
   multiple?: boolean;
