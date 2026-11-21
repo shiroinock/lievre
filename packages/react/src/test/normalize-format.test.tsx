@@ -1,0 +1,140 @@
+import { describe, it, expect, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
+import {
+  FormatDate,
+  FormatNumber,
+  TextField,
+  formatDate,
+  formatNumber,
+  formatRelativeTime,
+  toFullWidthKana,
+  toHalfWidth,
+  toSearchKey,
+} from '../index';
+
+describe('toHalfWidth', () => {
+  it('turns full-width digits, latin, symbols and space into half-width', () => {
+    expect(toHalfWidth('０１２３ ＡＢｃ　＠＃（）')).toBe('0123 ABc @#()');
+  });
+  it('leaves half-width katakana and enclosed characters alone, unlike NFKC', () => {
+    expect(toHalfWidth('ｶﾞﾝﾀﾞﾑ①㈱')).toBe('ｶﾞﾝﾀﾞﾑ①㈱');
+  });
+  it('picks what it straightens', () => {
+    expect(toHalfWidth('Ａ１！', { latin: false })).toBe('Ａ1!');
+    expect(toHalfWidth('Ａ１！', { digits: false, symbols: false })).toBe('A１！');
+    expect(toHalfWidth('　', { space: false })).toBe('　');
+  });
+  it('folds dashes only when asked, so a long vowel stays in words', () => {
+    expect(toHalfWidth('０９０ー１２３４－５６７８')).toBe('090ー1234-5678');
+    expect(toHalfWidth('０９０ー１２３４‐５６７８−', { dashes: true })).toBe('090-1234-5678-');
+  });
+});
+
+describe('toFullWidthKana', () => {
+  it('joins voiced marks and leaves other characters', () => {
+    expect(toFullWidthKana('ｶﾞﾝﾀﾞﾑ ﾊﾟﾝ ABC１')).toBe('ガンダム パン ABC１');
+  });
+});
+
+describe('toSearchKey', () => {
+  it('ignores width, kana, case and spaces', () => {
+    expect(toSearchKey('トウキョウ ＡＢＣ')).toBe(toSearchKey('とうきょうabc'));
+    expect(toSearchKey('ｶﾌﾞｼｷｶﾞｲｼｬ')).toBe('かぶしきがいしゃ');
+  });
+});
+
+describe('formatNumber', () => {
+  it('groups digits and fixes fraction digits', () => {
+    expect(formatNumber(1234567.891)).toBe('1,234,567.891');
+    expect(formatNumber(1.5, { fractionDigits: 2 })).toBe('1.50');
+  });
+  it('shows percent and sign', () => {
+    expect(formatNumber(0.1234, { percent: true })).toBe('12.3%');
+    expect(formatNumber(12, { sign: true })).toBe('+12');
+    expect(formatNumber(0, { sign: true })).toBe('0');
+  });
+});
+
+describe('formatDate', () => {
+  it('reads YYYY-MM-DD as that day, not midnight UTC', () => {
+    expect(formatDate('2026-11-22')).toBe('2026年11月22日');
+    expect(formatDate('2026-11-22', { weekday: true })).toBe('2026年11月22日(日)');
+  });
+  it('shows the Japanese era across its change', () => {
+    expect(formatDate('2019-04-30', { calendar: 'japanese' })).toBe('平成31年4月30日');
+    expect(formatDate('2019-05-01', { calendar: 'japanese' })).toBe('令和元年5月1日');
+  });
+  it('shows date and time in a given time zone', () => {
+    const at = '2026-11-22T00:05:00Z';
+    expect(formatDate(at, { style: 'datetime', timeZone: 'Asia/Tokyo' })).toBe('2026/11/22 9:05');
+    expect(formatDate(at, { style: 'time', timeZone: 'Asia/Tokyo' })).toBe('9:05');
+  });
+  it('says the difference from now', () => {
+    const now = new Date('2026-11-22T10:00:00+09:00');
+    expect(formatRelativeTime('2026-11-21T10:00:00+09:00', now)).toBe('昨日');
+    expect(formatRelativeTime('2026-11-22T09:57:00+09:00', now)).toBe('3 分前');
+    expect(formatRelativeTime('2026-11-24T10:00:00+09:00', now)).toBe('明後日');
+  });
+});
+
+describe('FormatNumber and FormatDate', () => {
+  it('draws mono figures with the unit apart', () => {
+    const { container } = render(<FormatNumber value={128000} unit="円" />);
+    const out = container.querySelector('.lv-format')!;
+    expect(out).toHaveClass('lv-mono');
+    expect(out).toHaveTextContent('128,000円');
+    expect(out.querySelector('.lv-format-unit')).toHaveTextContent('円');
+  });
+  it('uses tabular figures in the body face without mono', () => {
+    const { container } = render(<FormatNumber value={3} mono={false} />);
+    expect(container.querySelector('.lv-format')).toHaveClass('lv-tabular');
+  });
+  it('puts the machine value on <time>', () => {
+    render(<FormatDate value="2019-05-01" calendar="japanese" />);
+    expect(screen.getByText('令和元年5月1日')).toHaveAttribute('datetime', '2019-05-01');
+  });
+  it('keeps the exact moment when relative', () => {
+    render(
+      <FormatDate
+        value="2026-11-21T10:00:00+09:00"
+        relative
+        now={new Date('2026-11-22T10:00:00+09:00')}
+      />,
+    );
+    expect(screen.getByText('昨日')).toHaveAttribute('datetime', '2026-11-21T10:00:00+09:00');
+  });
+});
+
+describe('TextField halfWidth', () => {
+  it('straightens an uncontrolled value on blur, not while typing', async () => {
+    render(<TextField label="郵便番号" halfWidth={{ dashes: true }} />);
+    const input = screen.getByRole('textbox', { name: '郵便番号' });
+    await userEvent.type(input, '１２３ー４５６７');
+    expect(input).toHaveValue('１２３ー４５６７');
+    await userEvent.tab();
+    expect(input).toHaveValue('123-4567');
+  });
+  it('reports the straightened value to a controlled field and still calls onBlur', async () => {
+    const onBlur = vi.fn();
+    function Controlled() {
+      const [value, setValue] = useState('');
+      return (
+        <TextField
+          label="金額"
+          halfWidth
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={onBlur}
+        />
+      );
+    }
+    render(<Controlled />);
+    const input = screen.getByRole('textbox', { name: '金額' });
+    await userEvent.type(input, '１２，０００');
+    fireEvent.blur(input);
+    expect(input).toHaveValue('12,000');
+    expect(onBlur).toHaveBeenCalledOnce();
+  });
+});

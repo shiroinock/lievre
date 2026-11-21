@@ -362,6 +362,7 @@ baked はビルド時の値（npm run wear）で決まります。
 - `countBy?: 'grapheme' | 'width'` — 既定 'grapheme'。数え方。'grapheme'（既定）は見た目の1文字を1と数えます（絵文字の組み合わせも1）。'width' は全角を2、半角を1と数えます（全角換算の制度に合わせるとき）。
 - `chars?: number` — 入る文字の数（半角で数え、全角は2）。入力欄の幅をこの文字数に合わせます（郵便番号は 8、西暦の年は 4）。幅が足りない画面では親の幅に縮みます。省くと親の幅いっぱいです。
 - `mono?: boolean` — 等幅の書体にします。番号・ID・コード・金額など、桁をそろえて読む値に使います。
+- `halfWidth?: boolean | HalfWidthOptions` — 入力欄を離れたときに、全角の数字・英字・記号を半角に直します（toHalfWidth）。true か、直す範囲（dashes など）を渡します。変換中の文字は直しません。直すことは黙って行わず、hint に例を書きます（「全角で入れても半角に直します」）。
 
 ### Dialog
 
@@ -741,6 +742,34 @@ selected・onSelectedChange で押して入り切りする絞り込みの札に�
 - `onOpenChange?: ((open: boolean) => void)` — 開閉が変わったときに呼びます。
 - `className?: string`
 
+### FormatNumber
+
+数を、桁をそろえた書式で出します（桁区切り・小数の桁・割合・符号）。
+数字は等幅（Lievre Mono）で、単位（円・件）は数字の後ろに本文の書体で添えます。表の列では右揃えの列に置くと、桁と小数点の位置がそろいます。
+
+- `fractionDigits?: number` — 小数の桁。決めると、その桁で丸めて0も埋めます（1.5 → 1.50）。表の列で小数点の位置をそろえるときに。
+- `percent?: boolean` — 割合として出す（0.123 → 12.3%）。value は 1 を 100% として渡します。
+- `sign?: boolean` — 0 のほかは符号を付ける（+12・-3）。前との差を示すときに。
+- `value: number`
+- `unit?: string` — 数字の後ろに添える単位（「円」「件」）。割合は percent を使い、ここに「%」を書きません。
+- `mono?: boolean` — 既定 true。等幅の書体にする。既定は true。false では本文の書体のまま数字の幅だけをそろえます（文の中の数字）。
+- `className?: string`
+
+### FormatDate
+
+日付・日時を、日本語の書式で <time datetime> に出します。和暦（calendar="japanese"）にも、今との差（relative）にもできます。
+'YYYY-MM-DD' の文字は、その日（端末の時間帯の日付）として扱います。
+
+- `style?: 'time' | 'date' | 'datetime'` — 'date' は日付（2026年11月22日）、'datetime' は日時（2026/11/22 9:05）、'time' は時刻（9:05）。
+- `calendar?: 'gregory' | 'japanese'` — 'japanese' で和暦（令和8年11月22日）。年号の切り替わりの日も正しく出ます（令和元年5月1日）。日付だけに効きます。
+- `weekday?: boolean` — 曜日を添える（2026年11月22日(日)）。style="date" のときだけ。
+- `timeZone?: string` — 表示に使う時間帯（'Asia/Tokyo' など）。省くと見ている端末の時間帯です。サーバーとブラウザで同じ文字にしたいときに決めます。
+- `value: string | Date` — Date か、ISO 8601 の文字（'2026-11-22'・'2026-11-22T09:05:00+09:00'）。
+- `relative?: boolean` — 既定 false。今との差で出す（3分前・昨日）。正確な日時は datetime の属性に残ります。
+- `now?: Date` — relative の基準の「今」。省くと描いた時の時刻です。
+- `mono?: boolean` — 既定 false。等幅の書体にする（表の日付の列で桁をそろえるとき）。既定は false で、数字の幅だけをそろえます。
+- `className?: string`
+
 ## フック
 
 ### useLievreTheme
@@ -882,6 +911,21 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `title: string` — 見出し。押すと開閉するボタンの名前になります。
   - `content: ReactNode` — 開いたときの中身。見出しの名前の付いた領域（region）になります。
   - `disabled?: boolean`
+- `type NumberFormatOptions`
+  - `fractionDigits?: number` — 小数の桁。決めると、その桁で丸めて0も埋めます（1.5 → 1.50）。表の列で小数点の位置をそろえるときに。
+  - `percent?: boolean` — 割合として出す（0.123 → 12.3%）。value は 1 を 100% として渡します。
+  - `sign?: boolean` — 0 のほかは符号を付ける（+12・-3）。前との差を示すときに。
+- `type DateFormatOptions`
+  - `style?: 'date' | 'datetime' | 'time'` — 'date' は日付（2026年11月22日）、'datetime' は日時（2026/11/22 9:05）、'time' は時刻（9:05）。
+  - `calendar?: 'gregory' | 'japanese'` — 'japanese' で和暦（令和8年11月22日）。年号の切り替わりの日も正しく出ます（令和元年5月1日）。日付だけに効きます。
+  - `weekday?: boolean` — 曜日を添える（2026年11月22日(日)）。style="date" のときだけ。
+  - `timeZone?: string` — 表示に使う時間帯（'Asia/Tokyo' など）。省くと見ている端末の時間帯です。サーバーとブラウザで同じ文字にしたいときに決めます。
+- `type HalfWidthOptions`
+  - `digits?: boolean` — 全角の数字（０〜９）を半角に。既定は true。
+  - `latin?: boolean` — 全角の英字（Ａ〜Ｚ・ａ〜ｚ）を半角に。既定は true。
+  - `symbols?: boolean` — 全角の記号（！〜～のうち数字と英字のほか。＠・＃・（）など）を半角に。既定は true。
+  - `space?: boolean` — 全角の空白（U+3000）を半角の空白に。既定は true。
+  - `dashes?: boolean` — 横棒の仲間（‐ ‑ ‒ – — ― − ー ｰ －）をハイフンに。電話番号・郵便番号のように、数字の間の横棒だけを扱う欄で使います。言葉の長音（ー）も変わるので、既定は false。
 - `WearConfig`: `any`
 - `cx`: `(...values: (string | false | null | undefined)[]) => string`
 - `getQueueSnapshot`: `(keys: readonly string[], state: DecisionState) => DecisionQueueSnapshot` — 列の今の姿を組みます。keys は出す順（システムが決めた順）に並べて渡します。
@@ -895,3 +939,11 @@ keys にないキーの決定は数えません。
 - `undoKeys`: `(state: DecisionState) => string[]` — 1つ戻すで未決に戻る項目のキー。最後の操作が、まとめて決めたものならその全部、1件ずつなら最後の1件です。
 - `undoDecision`: `(state: DecisionState) => DecisionState` — 最後の操作を取り消します。まとめて決めた分は1回でまとめて、1件ずつ決めた分は1件ずつ戻ります。
 - `emptyDecisionState`: `DecisionState` — 何も決めていない状態。
+- `formatNumber`: `(value: number, options?: NumberFormatOptions) => string` — 数を日本語の書式（桁区切り）の文字にします。FormatNumber と同じ書式を、文の中や aria-label に使うときに。
+- `formatDate`: `(value: string | Date, options?: DateFormatOptions) => string` — 日付・日時を日本語の書式の文字にします。FormatDate と同じ書式を、文の中に使うときに。
+- `formatRelativeTime`: `(value: string | Date, now?: Date) => string` — 今との差を言葉にします（3分前・昨日・2日後）。差のいちばん大きい単位で丸めます。
+- `toHalfWidth`: `(text: string, options?: HalfWidthOptions) => string` — 全角の数字・英字・記号・空白を半角に直します。半角のカタカナ（ｶﾅ）や、①・㈱などは変えません。
+電話番号・郵便番号・金額・メールの欄で、確定した文字に使います（変換中の文字には使いません）。
+- `toFullWidthKana`: `(text: string) => string` — 半角のカタカナ（ｶﾞﾝﾀﾞﾑ）を全角（ガンダム）に直します。濁点・半濁点は前の字と合わせます。ほかの字は変えません。
+- `toSearchKey`: `(text: string) => string` — 探すときに比べる形に直します。全角と半角（NFKC）、カタカナとひらがな、大文字と小文字、空白の違いを無視します。
+候補と入力の両方をこの形にしてから比べます（Combobox の絞り込みと同じ）。表示には使いません。

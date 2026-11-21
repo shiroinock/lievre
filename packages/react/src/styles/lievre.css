@@ -1802,6 +1802,11 @@
     line-height: var(--lv-line-body);
   }
 
+  /* FormatNumber's unit follows the figures in the body face, at the figures' size. */
+  .lv-format-unit {
+    font-family: var(--lv-font-sans);
+  }
+
   /* Kbd */
   .lv-kbd {
     display: inline-flex;
