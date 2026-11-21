@@ -1,18 +1,19 @@
 # 変更履歴
 
-利用する側に見える変更を、パッケージごとに書き残します。npm にはまだ公開していないので、すべて「未公開」の下にあります。
+利用する側に見える変更を、パッケージごとに書き残します。npm にはまだ公開していないので、まだ版はありません。公開していない変更は、下の「未公開」と [`changes/`](changes/) の断片にあります。
 
 ## 書き方
 
-- `packages/*/src` の部品・スタイル・端末の部品、`packages/react` の `bin`・`lint`、`packages/tokens/tokens.css` を変える PR では、ここに1行足します。CI の「変更履歴」の検査が、書き忘れを止めます。
-- 「未公開」の下の、パッケージ（`@lievre/tokens`・`@lievre/react`・`@lievre/tui`）の見出しに書きます。区分はこの順で、書くことのない区分は見出しごと省きます。
+- `packages/*/src` の部品・スタイル・端末の部品、`packages/react` の `bin`・`lint`、`packages/tokens/tokens.css` を変える PR では、`changes/` に断片を1つ足します。このファイルには書きません（並行する PR が同じ行で食い違わないように）。CI の「変更履歴」の検査が、書き忘れと、ここの「未公開」に足した行を止めます。
+- 断片のファイル名は、PR の枝の名前から `claude/` などを除いたもの（例：`changes/component-chip.md`）。ほかの PR と重ならない名前なら、内容を表す名前でもかまいません。
+- 断片には、このファイルと同じ見出しで、パッケージ（`### @lievre/tokens`・`### @lievre/react`・`### @lievre/tui`）と区分（`####`）と項目を書きます。区分は次の4つで、書くことのない区分は見出しごと省きます。
   - **見た目が変わる**：同じ使い方のまま、画面の見え方が変わるもの。
   - **振る舞いが変わる**：読み上げ・フォーカス・名前・API など、利用する側のコードやテストに響きうるもの。
   - **足したもの**：新しい部品・props・トークン。今の使い方には響かないもの。
   - **直したもの**：意図と違っていたものを直したもの。
-- 1行に1つ、利用する側の言葉で書き、末尾に PR の番号を付けます（例：`（#32）`）。番号は PR を出してから足せば十分です。新しい行は区分の末尾に足します。
+- 項目は `- ` で始めて1つに1つ、利用する側の言葉で書き、末尾に PR の番号を付けます（例：`（#32）`）。続けて書くときは、次の行を2文字下げます。書き方は [`changes/README.md`](changes/README.md) にあります。
 - 利用する側に見えない変更（テスト・Story・内部の整理だけ）は書きません。検査に当たるときは、PR の説明に `変更履歴：なし` で始まる1行と、その理由を書きます。
-- 公開するときは「未公開」を版と日付（例：`## 0.3.0（2026-12-01）`）に改め、空の「未公開」を上に足します。
+- 公開するときは `npm run changelog:release -- 0.3.0` で、「未公開」と断片を版と日付（例：`## 0.3.0（2026-12-01）`）の見出しの下に、パッケージと区分の順でまとめ、断片を消します。`--dry-run` で書き込まずに中身を見られます。
 
 ## 未公開
 
@@ -88,6 +89,7 @@
 - Avatar に `src`（画像。読み込めないときは頭文字に戻す）、`size` に `lg`（40px）・`xl`（48px）、`shape="square"`（組織・取引先）。（#1）
 - Card に `variant="plain"`（線のない凹んだ面）、`href`（見出しのリンクをカード全体に広げる）、`selection`（チェックボックスの当たり判定をカード全体に広げる選べるカード）。（#1）
 - DataTable に `maxHeight`（表の中でスクロールし、見出しの行を上に残す）、`renderExpanded`・`expandedIds`・`onExpandedChange`（行を広げて中身を出す。開閉のボタンは `aria-expanded`）、`paginationVariant`・`pageSizeOptions`・`onPageSizeChange`（下のページ送りにページ番号と表示件数。件数を変えると1ページ目に戻る）。（#2）
+- 分類や選んだ値を示す `Chip` と、その並び `ChipGroup`。何も渡さなければ表示だけの札（タグ）、`onRemove` で外せる札（外すボタンは「{label}を外す」と読み上げる）、`selected`・`onSelectedChange` で押して入り切りする絞り込みの札（`aria-pressed`。選んでいる間はチェックの印を添える）。`size` は md（32px）・sm（24px）。（#6）
 - 見出しを押して中身を開閉する `Accordion`（`headingLevel` で見出しのレベル、`multiple` で同時に複数を開く。上下の矢印キーで見出しの間を移る）と、1つの補足を開閉する `Disclosure`。どちらも開閉を矢印の向きと `aria-expanded` で伝える。（#7）
 - Skeleton に `shape`（`text` は本文の行の高さで `lines` 行並べ、最後の行を短くする。`circle` は `width` を直径にした丸）。（#5）
 - EmptyState に `size="sm"`（小さなパネルや表の中に置く形。余白と文字を小さくし、絵は出さない）。（#5）
@@ -107,3 +109,5 @@
 - 1件ずつ判断する列：`Queue`・`QueueProgress`・`useQueueInput` と、列の状態とキーの決まり（`queueKey`）。決まりは `@lievre/react` の DecisionQueue と同じ答えを返す。（#34）
 - 字の組に進み具合の線（unicode は `━` `─`、ASCII は `#` `-`）。（#34）
 - 動きの中核 `core/motion`：`--lv-motion`・`--lv-ease` から決める長さと曲線（最低 `MIN_FRAMES` フレーム）、字と役割の名前で持つ絵 `Grid`、入り方（`reveal`・`sweep`・`dissolve`・`typewriter`）と光の帯 `shimmer`、明るさ・形・点字で字を選ぶ `shade`・`shapes`・`braille`、動かすかを決める `motionPolicy`（`LIEVRE_MOTION=full|reduced|off`）。（#3）
+- 動きの部品：起動のバナー `Banner`、読み込み中の `Loading`（終わったら `result` の1行）、入り方の `Animation`、絵を描く `Frame`、フレームを進める `useFrames`。入り方は Enter・Esc・空白で飛ばせ、動き続けるものは P・空白で止める・再開できる。動きを減らす設定では止めた絵、読み上げ・端末でない出力・CI では `label` の1行だけを出す。（#4）
+- エージェント向けの手引き `skills/tui-motion/SKILL.md` を配布物に入れた。（#4）

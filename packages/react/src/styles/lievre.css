@@ -1618,6 +1618,98 @@
     color: var(--lv-on-danger);
   }
 
+  /* Chip: a category or a chosen value. The remove button and the check sit inside the same
+     padding as the text, so both sides keep the same room. */
+  .lv-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lv-space-1);
+    max-width: 100%;
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--lv-border-strong);
+    border-radius: var(--lv-radius-full);
+    background: var(--lv-surface);
+    color: var(--lv-text);
+    font: inherit;
+    font-size: var(--lv-text-sm);
+    line-height: var(--lv-line-tight);
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .lv-chip--sm {
+    height: 24px;
+    padding: 0 8px;
+    font-size: var(--lv-text-xs);
+  }
+  .lv-chip-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .lv-chip-icon,
+  .lv-chip-mark {
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+  .lv-chip svg {
+    width: 16px;
+    height: 16px;
+  }
+  .lv-chip--sm svg {
+    width: 12px;
+    height: 12px;
+  }
+  .lv-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    margin-inline-end: -4px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--lv-radius-full);
+    background: transparent;
+    color: var(--lv-muted);
+    cursor: pointer;
+  }
+  .lv-chip--sm .lv-chip-remove {
+    width: 20px;
+    height: 20px;
+  }
+  .lv-chip-remove:hover:not(:disabled) {
+    background: var(--lv-surface-sunken);
+    color: var(--lv-text);
+  }
+  .lv-chip--selectable {
+    cursor: pointer;
+  }
+  .lv-chip--selectable:hover:not(:disabled) {
+    border-color: var(--lv-text);
+  }
+  /* Chosen: ultramarine line and the selected tint, with the check, never a green fill. */
+  .lv-chip--selectable[aria-pressed='true'] {
+    border-color: var(--lv-accent);
+    background: var(--lv-selected);
+  }
+  .lv-chip--selectable:disabled,
+  .lv-chip[data-disabled] {
+    border-color: var(--lv-border);
+    background: var(--lv-surface-sunken);
+    color: var(--lv-muted);
+    cursor: not-allowed;
+  }
+  .lv-chip-remove:disabled {
+    cursor: not-allowed;
+  }
+  .lv-chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--lv-space-2);
+  }
+
   /* Accordion: headings divided by 1px lines. The arrow sits on the first line of the heading,
      and the content starts at the heading's left edge. */
   .lv-accordion {
@@ -2503,6 +2595,12 @@
       forced-color-adjust: none;
       background: Canvas;
       color: CanvasText;
+    }
+    .lv-chip--selectable[aria-pressed='true'] {
+      border: 2px solid Highlight;
+    }
+    .lv-chip-remove:hover:not(:disabled) {
+      outline: 1px solid ButtonText;
     }
     /* The counter's tint is gone in forced colours; an inner outline keeps its edge. */
     .lv-counter {

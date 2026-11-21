@@ -77,7 +77,7 @@ npm run test:layout  # ブラウザ：配置の基準（初回は npx playwright
 
 ## プルリクエスト
 
-作業を始める前に、下書きの PR を開き、本文の「触るファイル」に変えるつもりのファイルを1行に1つ書きます（`.github/pull_request_template.md` に節があります）。そのあと `npm run check:overlap` を流すと、ほかの開いた PR の宣言と実際の変更に重なるファイルが出ます。重なったら、相手と分け方を決めるか、相手の枝に積みます。`--all` を付けると、開いた PR どうしの重なりをすべて出します。知らせるだけで、検査は落ちません。`llms.txt`・`tokens.json`・`CHANGELOG.md` は、重なっても書き出し直せば済むので、別に出します。
+作業を始める前に、下書きの PR を開き、本文の「触るファイル」に変えるつもりのファイルを1行に1つ書きます（`.github/pull_request_template.md` に節があります）。そのあと `npm run check:overlap` を流すと、ほかの開いた PR の宣言と実際の変更に重なるファイルが出ます。重なったら、相手と分け方を決めるか、相手の枝に積みます。`--all` を付けると、開いた PR どうしの重なりをすべて出します。知らせるだけで、検査は落ちません。`llms.txt`・`tokens.json`・`CHANGELOG.md` は、重なっても書き出し直せば済むので、別に出します。変更履歴の断片（`changes/`）は PR ごとのファイルなので、名前が重ならなければ食い違いません。
 
 CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査・build を走らせます。
 
@@ -92,7 +92,19 @@ CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査�
 - `.github/workflows` の Claude の workflow を変える PR では、レビューが失敗します（Claude の GitHub App が、既定の枝と同じ workflow でないと動かないため）。手でレビューします。
 - 持ち主が Issue や PR のコメントに `@claude` と書くと、`.github/workflows/claude.yml` が Claude Code を動かします。ほかの人の `@claude` では動かず、Claude が読むのも持ち主と Claude 自身のコメントだけです。
 
-利用する側に見える変更（`packages/*/src` の部品・スタイル、`packages/react` の `bin`・`lint`、`packages/tokens/tokens.css`）は、[CHANGELOG.md](CHANGELOG.md) の「未公開」の、パッケージと区分（見た目が変わる・振る舞いが変わる・足したもの・直したもの）の下に1行足します。書き方は CHANGELOG.md の冒頭にあります。テストや内部の整理だけで利用する側に見えないときは、PR の説明に「変更履歴：なし（理由）」の1行を書きます。書き忘れは `.github/workflows/changelog.yml` が止めます。
+利用する側に見える変更（`packages/*/src` の部品・スタイル、`packages/react` の `bin`・`lint`、`packages/tokens/tokens.css`）は、`changes/` に PR ごとの断片を1つ足します。ファイル名は枝の名前から `claude/` などを除いたもの（例：`changes/component-chip.md`）で、中身は CHANGELOG.md と同じ見出しの、パッケージ（`###`）と区分（`####`、見た目が変わる・振る舞いが変わる・足したもの・直したもの）と項目です。
+
+```md
+### @lievre/react
+
+#### 足したもの
+
+- 分類や選んだ値を示す `Chip` と `ChipGroup`。（#6）
+```
+
+書き方は [changes/README.md](changes/README.md) と CHANGELOG.md の冒頭にあります。CHANGELOG.md の「未公開」には書きません。どの PR も同じ区分の末尾に1行足すと、並行する PR がほぼ必ず食い違うからです。テストや内部の整理だけで利用する側に見えないときは、PR の説明に「変更履歴：なし（理由）」の1行を書きます。書き忘れと「未公開」に足した行は `.github/workflows/changelog.yml` が止め、落ちたときのメッセージに貼れる断片が出ます。
+
+公開するときは `npm run changelog:release -- 0.3.0` で、断片と「未公開」の行を CHANGELOG.md の版の見出しの下にまとめ、断片を消します。package.json の版、タグ、`npm publish` は手で行います。
 
 ### マージの予約
 
