@@ -629,21 +629,72 @@ export function Select({
   );
 }
 
+export type CardProps = HTMLAttributes<HTMLElement> & {
+  /** 見出し。h2 で出します。href や selection を使うときは必須で、カード全体の名前になります。 */
+  title?: string;
+  /** 見出しの上の短い言葉（分類など）。 */
+  eyebrow?: string;
+  /** 見出しの右に置く操作。href や selection のカードには置きません（カード全体が押せるため）。 */
+  action?: ReactNode;
+  /** 'outline'（既定）は線と面で囲み、'plain' は線のない凹んだ面だけにします。並べた中で控えめにしたいカードに使います。 */
+  variant?: 'outline' | 'plain';
+  /** 移る先。見出しをリンクにし、そのリンクの当たり判定をカード全体に広げます（中にボタンを入れ子にしません）。中にほかの操作を置かないでください。 */
+  href?: string;
+  /** 選べるカード。見出しの横にチェックボックスを出し、その当たり判定をカード全体に広げます。選んだカードは線と面とチェックの3つで示します。中にほかの操作を置かないでください。 */
+  selection?: { checked: boolean; onCheckedChange: (checked: boolean) => void; disabled?: boolean };
+};
+/** 1つのまとまりの入れ物。見出し・本文・見出しの右の操作を持ちます。 */
 export function Card({
   title,
   eyebrow,
   action,
+  variant = 'outline',
+  href,
+  selection,
   children,
   className,
   ...props
-}: HTMLAttributes<HTMLElement> & { title?: string; eyebrow?: string; action?: ReactNode }) {
+}: CardProps) {
+  const titleId = useId();
   return (
-    <section {...props} className={cx('lv-card', className)}>
-      {(title || eyebrow || action) && (
+    <section
+      {...props}
+      className={cx(
+        'lv-card',
+        variant === 'plain' && 'lv-card--plain',
+        (href || selection) && 'lv-card--interactive',
+        className,
+      )}
+      data-selected={selection?.checked || undefined}
+    >
+      {(title || eyebrow || action || selection) && (
         <header className="lv-card-header">
-          <div>
+          {selection && (
+            <CheckboxPrimitive.Root
+              className="lv-checkbox lv-card-check"
+              checked={selection.checked}
+              onCheckedChange={(c) => selection.onCheckedChange(c === true)}
+              disabled={selection.disabled}
+              aria-labelledby={titleId}
+            >
+              <CheckboxPrimitive.Indicator>
+                <Check size={14} strokeWidth={3} />
+              </CheckboxPrimitive.Indicator>
+            </CheckboxPrimitive.Root>
+          )}
+          <div className="lv-card-heading">
             {eyebrow && <div className="lv-eyebrow">{eyebrow}</div>}
-            {title && <h2 className="lv-card-title">{title}</h2>}
+            {title && (
+              <h2 id={titleId} className="lv-card-title">
+                {href ? (
+                  <a className="lv-card-link" href={href}>
+                    {title}
+                  </a>
+                ) : (
+                  title
+                )}
+              </h2>
+            )}
           </div>
           {action}
         </header>
@@ -985,16 +1036,38 @@ export function Divider({ label }: { label?: string }) {
 export function Kbd({ children }: { children: ReactNode }) {
   return <kbd className="lv-kbd">{children}</kbd>;
 }
-export function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' }) {
+export type AvatarProps = {
+  /** 人や組織の名前。読み上げの名前になり、画像がないときは頭文字を出します。 */
+  name: string;
+  /** 画像の URL。読み込めないときは頭文字に戻します。画像は飾りとして扱い、名前は name で読み上げます。 */
+  src?: string;
+  /** 'sm' 24px・'md' 32px（既定）・'lg' 40px・'xl' 48px。 */
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  /** 'circle'（既定）は人、'square' は組織・取引先・チーム。形で人と組織を見分けられるようにします。 */
+  shape?: 'circle' | 'square';
+};
+/** 人や組織の印。頭文字は sm で1文字、それより大きいと2文字です。 */
+export function Avatar({ name, src, size = 'md', shape = 'circle' }: AvatarProps) {
+  // Remember which picture broke, so a new src is tried again instead of staying on the initials.
+  const [failedSrc, setFailedSrc] = useState<string>();
+  const image = src && failedSrc !== src;
   return (
     <span
-      className={cx('lv-avatar', size === 'sm' && 'lv-avatar--sm')}
+      className={cx(
+        'lv-avatar',
+        size !== 'md' && `lv-avatar--${size}`,
+        shape === 'square' && 'lv-avatar--square',
+      )}
       role="img"
       aria-label={name}
     >
-      {Array.from(name)
-        .slice(0, size === 'sm' ? 1 : 2)
-        .join('')}
+      {image ? (
+        <img src={src} alt="" onError={() => setFailedSrc(src)} />
+      ) : (
+        Array.from(name)
+          .slice(0, size === 'sm' ? 1 : 2)
+          .join('')
+      )}
     </span>
   );
 }
@@ -1138,9 +1211,12 @@ export function Pagination({
           </>
         ) : (
           <>
-            <span aria-hidden>
-              {current} / {total}
-            </span>
+            {/* With the numbers laid out, the current one shows where you are; "2 / 6" would repeat it. */}
+            {variant === 'compact' && (
+              <span aria-hidden>
+                {current} / {total}
+              </span>
+            )}
             <VisuallyHidden>
               {total}ページ中 {current}ページ目
             </VisuallyHidden>

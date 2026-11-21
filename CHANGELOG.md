@@ -37,6 +37,7 @@
 - エラー文の前にアイコンが付く。（#32）
 - Select の一覧の選択肢の文字が、開く前の文字と同じ左端から始まる。compact の密度で 4px ずれていたのを直したので、一覧の見た目が少し変わる。（#33）
 - DecisionQueue の `bulk` のボタンの下に、押すと当たる項目（「対象：…」）を出し、ボタンの説明として読ませる。（#37）
+- Pagination の `variant="numbers"` で、ページ番号と重なる「2 / 6」を画面から外した（読み上げの「6ページ中 2ページ目」は残す）。（#2）
 
 #### 振る舞いが変わる
 
@@ -81,11 +82,18 @@
 - 表示の形を切り替える `SegmentedControl`、関係のあるボタンを並べる `ButtonGroup`（`attached` で隙間なくつなげる）、主な操作とほかの方法のメニューをつなげた `SplitButton`。（#36）
 - DropdownMenu に `{ type: 'submenu' }`（入れ子のメニュー。右矢印か Enter で開き、左矢印か Escape でその入れ子だけ閉じて親の項目へ戻る）、項目の `description`（項目の下の補足。`aria-describedby` で読み上げる）、`{ type: 'group' }`（見出しの付いたまとまり。見出しがまとまりの名前になる）、`side`（開く向き）。（#40）
 - Tooltip に `side`・`align`。画面の端で入らないときは反対側に回る。（#40）
+- Text に `maxLines`（その行数で切って「…」を出す）・`weight`（regular・medium・bold）。（#1）
+- Heading の `size` に `minor`（16px）・`subsection`（18px）。（#1）
+- Stack に `justify`（start・center・end・between）・`wrap`。（#1）
+- Avatar に `src`（画像。読み込めないときは頭文字に戻す）、`size` に `lg`（40px）・`xl`（48px）、`shape="square"`（組織・取引先）。（#1）
+- Card に `variant="plain"`（線のない凹んだ面）、`href`（見出しのリンクをカード全体に広げる）、`selection`（チェックボックスの当たり判定をカード全体に広げる選べるカード）。（#1）
+- DataTable に `maxHeight`（表の中でスクロールし、見出しの行を上に残す）、`renderExpanded`・`expandedIds`・`onExpandedChange`（行を広げて中身を出す。開閉のボタンは `aria-expanded`）、`paginationVariant`・`pageSizeOptions`・`onPageSizeChange`（下のページ送りにページ番号と表示件数。件数を変えると1ページ目に戻る）。（#2）
 - 見出しを押して中身を開閉する `Accordion`（`headingLevel` で見出しのレベル、`multiple` で同時に複数を開く。上下の矢印キーで見出しの間を移る）と、1つの補足を開閉する `Disclosure`。どちらも開閉を矢印の向きと `aria-expanded` で伝える。（#7）
 
 #### 直したもの
 
 - lint のルールの説明の URL が、リポジトリの改名のあと行き先のない見出しを指していた。`packages/react` の README の lint の節を指すようにした。（#26）
+- Avatar の頭文字が、置いた場所の行の高さを受け継いで、上下の中央から少しずれることがあった。行の高さを部品で決めるようにした。（#1）
 
 ### @lievre/tui
 

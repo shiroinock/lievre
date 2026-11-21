@@ -18,6 +18,11 @@ import {
   Sparkline,
   IconButton,
   DescriptionList,
+  Text,
+  Heading,
+  Stack,
+  Avatar,
+  Card,
   Spinner,
   VisuallyHidden,
   Alert,
@@ -1036,5 +1041,140 @@ describe('Menu variations', () => {
     const csv = await screen.findByRole('menuitem', { name: 'CSV' });
     expect(csv).toHaveAccessibleDescription('表計算ソフトで開けます');
     expect(screen.getByRole('group', { name: '表の形' })).toContainElement(csv);
+  });
+});
+
+describe('Display variations', () => {
+  it('clamps text by lines and sets weight by class', () => {
+    setup(
+      <Text maxLines={2} weight="bold">
+        長い件名
+      </Text>,
+    );
+    const text = screen.getByText('長い件名');
+    expect(text).toHaveClass('lv-text--clamp', 'lv-weight--bold');
+    expect(text.style.getPropertyValue('--lines')).toBe('2');
+  });
+  it('keeps the heading level apart from its size', () => {
+    setup(
+      <Heading level={4} size="minor">
+        小見出し
+      </Heading>,
+    );
+    expect(screen.getByRole('heading', { level: 4, name: '小見出し' })).toHaveClass(
+      'lv-heading--minor',
+    );
+  });
+  it('spreads a row to both ends', () => {
+    const { container } = setup(
+      <Stack direction="row" justify="between">
+        <span>左</span>
+      </Stack>,
+    );
+    expect((container.querySelector('.lv-stack') as HTMLElement).style.justifyContent).toBe(
+      'space-between',
+    );
+  });
+  it('names an avatar by name, with a picture or without, and falls back when it breaks', async () => {
+    const { container } = setup(
+      <Avatar name="計測 太郎" src="broken.png" shape="square" size="xl" />,
+    );
+    const avatar = screen.getByRole('img', { name: '計測 太郎' });
+    expect(avatar).toHaveClass('lv-avatar--square', 'lv-avatar--xl');
+    const img = container.querySelector('img') as HTMLImageElement;
+    expect(img).toHaveAttribute('alt', '');
+    img.dispatchEvent(new Event('error'));
+    await waitFor(() => expect(container.querySelector('img')).toBeNull());
+    expect(avatar).toHaveTextContent('計測');
+  });
+  it('tries a new avatar picture after the old one broke', async () => {
+    const { container, rerender } = setup(<Avatar name="計測 太郎" src="broken.png" />);
+    (container.querySelector('img') as HTMLImageElement).dispatchEvent(new Event('error'));
+    await waitFor(() => expect(container.querySelector('img')).toBeNull());
+    rerender(wrap(<Avatar name="計測 太郎" src="next.png" />, 'paper'));
+    expect(container.querySelector('img')).toHaveAttribute('src', 'next.png');
+  });
+  it('makes one control of a card you press or choose, named by its title', async () => {
+    const change = vi.fn();
+    setup(
+      <>
+        <Card title="作業 W-1024" href="#w1024">
+          本文
+        </Card>
+        <Card title="東京拠点" selection={{ checked: false, onCheckedChange: change }}>
+          本文
+        </Card>
+      </>,
+    );
+    expect(screen.getByRole('link', { name: '作業 W-1024' })).toHaveAttribute('href', '#w1024');
+    await userEvent.click(screen.getByRole('checkbox', { name: '東京拠点' }));
+    expect(change).toHaveBeenCalledWith(true);
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
+  });
+});
+
+describe('Table variations', () => {
+  type R = { id: string; name: string };
+  const cols: Column<R>[] = [{ key: 'name', header: '名前', render: (r) => r.name }];
+  const many = Array.from({ length: 12 }, (_, i) => ({ id: `r${i + 1}`, name: `行${i + 1}` }));
+  it('opens a row in place, tied to its toggle', async () => {
+    setup(
+      <DataTable
+        rows={many.slice(0, 2)}
+        columns={cols}
+        getRowId={(r) => r.id}
+        caption="一覧"
+        renderExpanded={(r) => <p>{r.name}の中身</p>}
+      />,
+    );
+    const toggle = screen.getByRole('button', { name: 'r1 の中身' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByText('行1の中身')).not.toBeInTheDocument();
+    await userEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    const detail = document.getElementById(toggle.getAttribute('aria-controls') as string);
+    expect(detail).toHaveTextContent('行1の中身');
+    // The opened row spans every column.
+    expect(detail?.querySelector('td')).toHaveAttribute('colspan', '2');
+  });
+  it('keeps the heading row up when the table scrolls inside its height', () => {
+    const { container } = setup(
+      <DataTable
+        rows={many}
+        columns={cols}
+        getRowId={(r) => r.id}
+        caption="一覧"
+        maxHeight="20rem"
+      />,
+    );
+    const wrap = container.querySelector('.lv-table-wrap') as HTMLElement;
+    expect(wrap).toHaveAttribute('data-sticky', 'true');
+    expect(wrap.style.maxHeight).toBe('20rem');
+  });
+  it('numbers the pages under the table, and goes back to page 1 when the page size changes', async () => {
+    const pageChange = vi.fn();
+    const sizeChange = vi.fn();
+    setup(
+      <DataTable
+        rows={many}
+        columns={cols}
+        getRowId={(r) => r.id}
+        caption="一覧"
+        pageSize={5}
+        page={2}
+        onPageChange={pageChange}
+        paginationVariant="numbers"
+        pageSizeOptions={[5, 10]}
+        onPageSizeChange={sizeChange}
+      />,
+    );
+    expect(screen.getByRole('button', { name: '2ページ目' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    await userEvent.click(screen.getByRole('combobox', { name: '表示件数' }));
+    await userEvent.click(await screen.findByRole('option', { name: '10件' }));
+    expect(sizeChange).toHaveBeenCalledWith(10);
+    expect(pageChange).toHaveBeenCalledWith(1);
   });
 });
