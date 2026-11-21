@@ -3,6 +3,8 @@ import { Box, Text } from 'ink';
 import { Button, Card, Lievre, Status, Table, type Column, type State } from './components.js';
 import type { Glyphs } from '../core/glyphs.js';
 import type { Palette } from '../core/palette.js';
+import type { DecisionState, QueueChoice } from '../core/queue.js';
+import { Queue } from './queue.js';
 
 type Job = { name: string; count: number; seconds: number; state: State };
 
@@ -70,3 +72,37 @@ export function Screen({
 }
 
 export const ROWS = JOBS.length;
+
+type Invoice = { id: string; vendor: string; amount: number; reason: string };
+const INVOICES: Invoice[] = [
+  { id: 'inv-1', vendor: '北山商事', amount: 128000, reason: '金額が先月の2倍です' },
+  { id: 'inv-2', vendor: '南工業', amount: 46200, reason: '初めての取引先です' },
+  { id: 'inv-3', vendor: '東物流', amount: 8800, reason: '支払日が近い請求書です' },
+  { id: 'inv-4', vendor: '西電気', amount: 15400, reason: '支払日が近い請求書です' },
+  { id: 'inv-5', vendor: '中央印刷', amount: 3300, reason: 'いつもの取引です' },
+];
+export const QUEUE_KEYS = INVOICES.map((i) => i.id);
+export const QUEUE_CHOICES: QueueChoice[] = [
+  { value: 'in', label: '支払う', key: 'y' },
+  { value: 'out', label: '保留する', key: 'n' },
+];
+
+/** The queue sample: invoices to pay, the ones to look at most carefully first. */
+export function QueueScreen({ p, g, state }: { p: Palette; g: Glyphs; state: DecisionState }) {
+  return (
+    <Lievre.Provider value={{ p, g }}>
+      <Box flexDirection="column" width={56}>
+        <Queue
+          items={INVOICES}
+          getKey={(i) => i.id}
+          getLabel={(i) => `${i.vendor}　${number.format(i.amount)} 円`}
+          reason={(i) => i.reason}
+          state={state}
+          choices={QUEUE_CHOICES}
+          label="支払いの確認"
+          order="いつもと違う請求書から順に出します。"
+        />
+      </Box>
+    </Lievre.Provider>
+  );
+}
