@@ -277,6 +277,8 @@ type CountProps = {
 };
 /** Rewrites the field's value the way typing would, so onChange fires for controlled fields too. */
 function straighten(input: HTMLInputElement, options: HalfWidthOptions) {
+  // A field the user cannot change is never changed for them.
+  if (input.readOnly || input.disabled) return;
   const next = toHalfWidth(input.value, options);
   if (next === input.value) return;
   Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(input, next);
