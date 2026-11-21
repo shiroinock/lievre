@@ -1,6 +1,6 @@
 // Ramps from empty to full, one per glyph set. Every character is East Asian Width N or Na, so
 // it takes 1 cell in every terminal: the block shades ░▒▓█ are Ambiguous and are never used.
-// test/motion.test.tsx checks that each character stays 1 cell even when ambiguous ones are wide.
+// test/motion-core.test.tsx checks that each character stays 1 cell even when ambiguous ones are wide.
 import type { GlyphSet } from '../glyphs.js';
 
 // Braille patterns by the number of raised dots, 0 to 8 (U+2800 block, width N).
