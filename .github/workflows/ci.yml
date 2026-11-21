@@ -4,6 +4,9 @@ on:
   pull_request:
   push:
     branches: [main]
+  # A merge made with GITHUB_TOKEN (merge-reservation.yml) starts no push run, so that workflow
+  # starts this one on main by hand.
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}

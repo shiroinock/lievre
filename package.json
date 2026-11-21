@@ -16,6 +16,7 @@
     "test:layout": "npm run test:layout -w packages/react",
     "build": "npm run build --workspaces --if-present",
     "check:changelog": "node scripts/check-changelog.mjs",
+    "check:overlap": "node scripts/check-overlap.mjs",
     "format": "prettier --write .",
     "tokens": "npm run tokens -w packages/tokens",
     "llms": "npm run llms -w packages/react",
