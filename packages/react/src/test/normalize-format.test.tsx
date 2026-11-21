@@ -92,6 +92,10 @@ describe('formatDate', () => {
       '2024年2月29日',
     );
   });
+  it('keeps the years 0 to 99 as written', () => {
+    expect(formatDate('0050-03-01')).toBe('50年3月1日');
+    expect(formatDate('0099-12-31')).not.toMatch(/1999/);
+  });
   it('counts weeks, months and years without calendar words that could be wrong', () => {
     const now = new Date(2027, 0, 1, 12);
     expect(formatRelativeTime(new Date(2025, 6, 5, 12), { now })).toBe('1 年前');

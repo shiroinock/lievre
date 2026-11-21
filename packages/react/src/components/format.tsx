@@ -30,6 +30,12 @@ export type DateFormatOptions = {
   timeZone?: string;
 };
 const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/;
+/** Midnight UTC of a written day. Not Date.UTC, which reads the years 0 to 99 as 1900 to 1999. */
+function utcDay(year: number, month: number, day: number) {
+  const date = new Date(0);
+  date.setUTCFullYear(year, month - 1, day);
+  return date;
+}
 const DATE_HEAD = /^(\d{4})-(\d{2})-(\d{2})/;
 /** Whether the year, month and day written at the head of the text exist on the calendar:
  * Date.UTC (and V8's own parsing) roll 2026-02-30 over to March and 2026-13-01 into the next year. */
@@ -37,8 +43,7 @@ function writtenDayExists(text: string) {
   const head = DATE_HEAD.exec(text);
   if (!head) return true;
   const [year, month, day] = head.slice(1).map(Number);
-  const date = new Date(Date.UTC(year, month - 1, day));
-  date.setUTCFullYear(year);
+  const date = utcDay(year, month, day);
   return (
     date.getUTCFullYear() === year && date.getUTCMonth() + 1 === month && date.getUTCDate() === day
   );
@@ -51,7 +56,7 @@ function read(value: Date | string) {
     value instanceof Date
       ? value
       : day
-        ? new Date(Date.UTC(Number(day[1]), Number(day[2]) - 1, Number(day[3])))
+        ? utcDay(Number(day[1]), Number(day[2]), Number(day[3]))
         : new Date(value);
   if (Number.isNaN(date.getTime())) return null;
   // A day that does not exist is not a date, in a date-time as in a bare date.
