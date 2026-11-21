@@ -171,8 +171,9 @@ const px = (word) => {
   if (word === 'thin') return 1;
   if (word === 'medium') return 3;
   if (word === 'thick') return 5;
-  const m = /^(\d*\.?\d+)(px)?$/.exec(word);
-  return m ? parseFloat(m[1]) : undefined;
+  const m = /^(-?\d*\.?\d+)(px|r?em)?$/.exec(word);
+  if (!m) return undefined;
+  return Math.abs(parseFloat(m[1])) * (m[2] ? (m[2] === 'px' ? 1 : 16) : 1);
 };
 const sideStripeMessage = (s, what) =>
   `「${s}」の ${what} は、片側だけの飾りの帯です。何を示すのかが曖昧で、色だけの合図になります（DESIGN.md）。今のもの・強調するものは、枠全体（border）、見出し、アイコンと文字で示してください。状態の印なら、セレクタに状態（[data-selected]・[aria-current] など）を書きます。区切り線は 1px にします。`;
@@ -189,6 +190,19 @@ const sideStripe = rule('side-stripe', '', (root, fail) => {
           .find((n) => n !== undefined);
         if (width !== undefined && width > 1)
           fail(decl, sideStripeMessage(name, `${decl.prop}: ${decl.value}`));
+        return;
+      }
+      // An inset shadow pushed to one side, with no blur or spread, draws the same band.
+      if (decl.prop === 'box-shadow') {
+        for (const layer of decl.value.split(/,(?![^(]*\))/)) {
+          const w = words(layer.trim());
+          if (!w.includes('inset')) continue;
+          const [x = 0, y = 0, blur = 0, spread = 0] = w.map(px).filter((n) => n !== undefined);
+          if (blur === 0 && spread === 0 && Math.max(x, y) > 1 && Math.min(x, y) === 0) {
+            fail(decl, sideStripeMessage(name, `box-shadow: ${decl.value}`));
+            return;
+          }
+        }
         return;
       }
       if (!/^background(-image)?$/.test(decl.prop)) return;

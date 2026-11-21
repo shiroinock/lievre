@@ -96,6 +96,12 @@ describe('stylelint: lievre rules', () => {
     const stripe = 'lievre/side-stripe';
     expect(await cssRules('.card { border-left: 4px solid var(--lv-accent); }')).toContain(stripe);
     expect(await cssRules('.card { border-inline-start-width: 3px; }')).toContain(stripe);
+    expect(await cssRules('.card { border-left: 0.25rem solid var(--lv-accent); }')).toContain(
+      stripe,
+    );
+    expect(await cssRules('.card { box-shadow: inset 4px 0 0 var(--lv-accent); }')).toContain(
+      stripe,
+    );
     expect(
       await cssRules(
         '.card { background: var(--lv-surface) linear-gradient(var(--lv-accent), var(--lv-accent)) left / 4px 100% no-repeat; }',
@@ -116,6 +122,7 @@ describe('stylelint: lievre rules', () => {
           '.tab[aria-selected="true"] { border-bottom: 2px solid var(--lv-accent); }',
           '.m { background: linear-gradient(var(--a), var(--a)) 0 100% / 3px 40% no-repeat, linear-gradient(var(--a), var(--a)) 100% 100% / 3px 100% no-repeat; }',
           '.f { background: linear-gradient(var(--a), var(--b)); }',
+          '.r { box-shadow: inset 0 0 0 1px var(--lv-border); }',
         ].join('\n'),
       ),
     ).toEqual([]);
