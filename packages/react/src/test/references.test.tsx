@@ -14,9 +14,9 @@ const tracked = execFileSync('git', ['ls-files', '--', 'references'], {
 
 describe('References', () => {
   it('keep no image of the pins', () => {
+    // Only our own records (JSON and notes) belong here, so any other kind of file is caught.
     const images = tracked.filter(
-      (file) =>
-        file.startsWith('references/pinterest/') && /\.(jpe?g|png|gif|webp|avif)$/i.test(file),
+      (file) => file.startsWith('references/pinterest/') && !/\.(json|md)$/.test(file),
     );
     expect(
       images,
@@ -42,6 +42,20 @@ describe('References', () => {
       expect(
         text.match(/pinterest\.com\/(?!pin\/)[\w.-]+\/[\w.-]+/g) ?? [],
         `${file}：Pinterest のボードやアカウントの URL は書かないでください（アカウント名が入ります）。ピンの URL（/pin/<番号>/）だけを残してください`,
+      ).toEqual([]);
+    }
+  });
+
+  it('copy no title of the pins', () => {
+    for (const file of tracked.filter((name) => name.endsWith('.json'))) {
+      const data = JSON.parse(readFileSync(join(root, file), 'utf8')) as { references?: unknown };
+      if (!Array.isArray(data.references)) continue;
+      const titled = (data.references as Record<string, unknown>[])
+        .filter((ref) => String(ref.id).startsWith('pin-') && 'title' in ref)
+        .map((ref) => String(ref.id));
+      expect(
+        titled,
+        `${file}：ピンの題名は投稿した人の文なので写さないでください。見分けには自分で付けた label を使います`,
       ).toEqual([]);
     }
   });
