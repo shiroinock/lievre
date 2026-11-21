@@ -82,6 +82,23 @@
     font-size: var(--lv-text-lg);
     max-width: 38em;
   }
+  /* maxLines: cut at that many lines with an ellipsis. */
+  .lv-text--clamp {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--lines);
+    line-clamp: var(--lines);
+    overflow: hidden;
+  }
+  .lv-weight--regular {
+    font-weight: var(--lv-weight-regular);
+  }
+  .lv-weight--medium {
+    font-weight: var(--lv-weight-medium);
+  }
+  .lv-weight--bold {
+    font-weight: var(--lv-weight-bold);
+  }
 
   .lv-heading {
     margin: 0;
@@ -91,6 +108,12 @@
     font-feature-settings: 'palt';
     text-wrap: balance;
     overflow-wrap: anywhere;
+  }
+  .lv-heading--minor {
+    font-size: var(--lv-text-base);
+  }
+  .lv-heading--subsection {
+    font-size: var(--lv-text-lg);
   }
   .lv-heading--section {
     font-size: var(--lv-text-xl);
@@ -953,6 +976,50 @@
     gap: var(--lv-space-4);
     padding: var(--lv-panel-padding) var(--lv-panel-padding) 0;
   }
+  .lv-card-heading {
+    flex: 1;
+    min-width: 0;
+  }
+  /* Plain: no line, only the sunken surface. */
+  .lv-card--plain {
+    border-color: transparent;
+    background: var(--lv-surface-sunken);
+  }
+  /* A card you press (href) or choose (selection): the title link or the checkbox reaches over
+     the whole card, so there is one control, not a button around a link. */
+  .lv-card--interactive {
+    position: relative;
+  }
+  .lv-card--interactive:hover:not(:has(:disabled)) {
+    border-color: var(--lv-border-strong);
+  }
+  .lv-card-link {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .lv-card-link::after,
+  .lv-card-check::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .lv-card-link:focus-visible,
+  .lv-card-check:focus-visible {
+    outline: none;
+  }
+  .lv-card--interactive:has(:focus-visible) {
+    outline: 2px solid var(--lv-focus);
+    outline-offset: 2px;
+  }
+  .lv-card-header > .lv-card-check {
+    margin-top: 0;
+  }
+  /* Chosen: the accent line, the selected surface and the check together. */
+  .lv-card[data-selected] {
+    border-color: var(--lv-accent);
+    background: var(--lv-selected);
+  }
   .lv-card-title {
     margin: 0;
     font-size: var(--lv-text-base);
@@ -1504,10 +1571,33 @@
     color: var(--lv-accent);
     font-size: var(--lv-text-xs);
     font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
   }
   .lv-avatar--sm {
     width: 24px;
     height: 24px;
+  }
+  .lv-avatar--lg {
+    width: 40px;
+    height: 40px;
+    font-size: var(--lv-text-sm);
+  }
+  .lv-avatar--xl {
+    width: 48px;
+    height: 48px;
+    font-size: var(--lv-text-md);
+  }
+  /* Square for organisations, so a person and an organisation differ by shape, not colour. */
+  .lv-avatar--square {
+    border-radius: var(--lv-radius-md);
+  }
+  .lv-avatar:has(> img) {
+    overflow: hidden;
+  }
+  .lv-avatar > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   /* Breadcrumb */
@@ -2070,6 +2160,55 @@
   .lv-table-detail:hover {
     text-decoration: underline;
   }
+  /* maxHeight: the table scrolls inside its box and the heading row stays at the top, on an
+     opaque surface so the rows pass under it. */
+  .lv-table-wrap[data-sticky] thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--lv-surface);
+  }
+  /* Rows that open: a 24px toggle at the start, its arrow turning down while open. */
+  .lv-table-expand {
+    width: 40px;
+  }
+  .lv-table-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--lv-radius-sm);
+    background: transparent;
+    color: var(--lv-muted);
+    /* Top, not middle: a 24px box on the 24px line, so the row's line box stays 24px. */
+    vertical-align: top;
+    cursor: pointer;
+  }
+  .lv-table-toggle:hover {
+    background: var(--lv-surface-sunken);
+    color: var(--lv-text);
+  }
+  .lv-table-toggle > svg {
+    transition: transform var(--lv-motion) var(--lv-ease);
+  }
+  .lv-table-toggle[aria-expanded='true'] > svg {
+    transform: rotate(90deg);
+  }
+  /* The opened row and what it shows read as one: no rule between them, the content on the
+     sunken surface. */
+  .lv-table tbody tr[data-expanded] > td {
+    border-bottom-color: transparent;
+  }
+  .lv-table tbody tr.lv-table-expanded,
+  .lv-table tbody tr.lv-table-expanded:hover {
+    background: var(--lv-surface-sunken);
+  }
+  .lv-table tbody tr.lv-table-expanded > td {
+    white-space: normal;
+  }
   /* A borderless button gives its side padding back to the cell, so its content starts on
      the same line as the column heading. */
   .lv-table td > .lv-button--ghost.lv-button--sm:first-child {
@@ -2272,6 +2411,15 @@
     }
     .lv-switch:disabled .lv-switch-thumb {
       background: GrayText;
+    }
+    .lv-card[data-selected] {
+      border-color: Highlight;
+      outline: 1px solid Highlight;
+    }
+    /* The chosen outline above must not swallow the focus ring (focus sits on the chosen card). */
+    .lv-card--interactive:has(:focus-visible) {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
     }
     .lv-tab[data-state='active']::after,
     .lv-tab[aria-current='page']::after {
