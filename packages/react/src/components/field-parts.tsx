@@ -1,5 +1,5 @@
 // Small pieces shared by the form parts. Not exported from the package.
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CircleAlert } from 'lucide-react';
 
 /**
@@ -74,20 +74,21 @@ export function CharacterCount({
   countBy: 'grapheme' | 'width';
 }) {
   const over = count > limit;
-  const unit = countBy === 'width' ? '文字（全角は2と数えます）' : '文字';
-  const left = over
-    ? `${count - limit}${unit}多すぎます`
-    : `あと${limit - count}${unit}入力できます`;
+  const left = over ? `${count - limit}文字多すぎます` : `あと${limit - count}文字入力できます`;
   const [spoken, setSpoken] = useState('');
+  // Nothing is said while the page loads; only a change the person made is announced.
+  const initial = useRef(left);
+  const changed = useRef(false);
   useEffect(() => {
+    if (!changed.current && left === initial.current) return;
+    changed.current = true;
     const timer = setTimeout(() => setSpoken(left), 1000);
     return () => clearTimeout(timer);
   }, [left]);
   return (
     <div className="lv-field-count" data-over={over || undefined}>
       <span id={`${id}-limit`} className="lv-sr-only">
-        {limit}
-        {unit}まで入力できます
+        {limit}文字まで入力できます{countBy === 'width' && '（全角は2文字と数えます）'}
       </span>
       <span aria-hidden>
         {over && <CircleAlert />}

@@ -743,6 +743,18 @@ describe('Counts, widths and cards', () => {
       vi.useRealTimers();
     }
   });
+  it('says nothing about the count until the person types', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      setup(<TextField label="件名" maxCount={20} countBy="width" />);
+      const field = screen.getByRole('textbox', { name: '件名' });
+      expect(field).toHaveAccessibleDescription('20文字まで入力できます（全角は2文字と数えます）');
+      vi.advanceTimersByTime(1200);
+      expect(screen.getByRole('status')).toHaveTextContent('');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
   it('sizes a field by its characters and sets it in mono', () => {
     setup(<TextField label="郵便番号" chars={8} mono />);
     const field = screen.getByRole('textbox', { name: '郵便番号' });
