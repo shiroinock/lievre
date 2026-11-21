@@ -796,6 +796,65 @@
     padding: 4px 12px;
   }
 
+  /* Combobox: a text field with Select's arrow and Select's list. The arrow is a 24px button
+     whose icon sits where Select's icon sits: the field's inner padding from the right edge. */
+  .lv-combobox {
+    --input-x: 12px;
+    position: relative;
+  }
+  .lievre[data-density='compact'] .lv-combobox,
+  .lv-combobox--sm {
+    --input-x: 8px;
+  }
+  .lievre .lv-combobox--lg {
+    --input-x: 16px;
+  }
+  .lv-input.lv-combobox-input {
+    /* stylelint-disable-next-line lievre/padding-symmetry -- 右端の開閉ボタンのアイコン（16px）と間（8px）の分だけ空けて、文字がボタンの下に入らないようにする */
+    padding-inline-end: calc(var(--input-x) + 16px + var(--lv-space-2));
+  }
+  .lv-combobox-button {
+    position: absolute;
+    top: 50%;
+    /* 1px border + the inner padding to the icon, less the button's 4px around the icon. */
+    right: calc(var(--input-x) + 1px - 4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--lv-radius-sm);
+    background: transparent;
+    color: var(--lv-muted);
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+  .lv-combobox-button:disabled {
+    cursor: not-allowed;
+  }
+  .lv-combobox-content {
+    min-width: var(--radix-popover-trigger-width);
+    max-height: min(320px, var(--radix-popover-content-available-height));
+    overflow-y: auto;
+  }
+  .lv-combobox-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lv-combobox-empty {
+    padding: 4px 8px;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-tight);
+  }
+  .lievre[data-density='compact'] .lv-combobox-empty,
+  .lv-select-content[data-size='sm'] .lv-combobox-empty {
+    padding: 4px;
+  }
+
   /* Checkbox, Switch, Radio — "on" is always the accent, never a status color. */
   /* Controls beside text sit on the centre of its first line: (1lh − size) / 2 from the top. */
   .lv-check-field {

@@ -42,7 +42,7 @@ export function Field({ label, hint, error, required, id: givenId, children, aft
   const id = givenId ?? uid;
   return (
     <div className="lv-field">
-      <label className="lv-label" htmlFor={id}>
+      <label className="lv-label" htmlFor={id} id={`${id}-label`}>
         {label}
         {required && <RequiredMark />}
       </label>
