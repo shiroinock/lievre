@@ -7,7 +7,7 @@ import type { Glyphs } from '../core/glyphs.js';
 import type { Palette } from '../core/palette.js';
 
 export const Lievre = createContext<{ p: Palette; g: Glyphs }>(null!);
-const useLievre = () => useContext(Lievre);
+export const useLievre = () => useContext(Lievre);
 
 export function Card({ title, children }: { title?: string; children: ReactNode }) {
   const { p, g } = useLievre();

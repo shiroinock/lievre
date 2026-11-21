@@ -28,3 +28,4 @@ npm run typecheck && npm run lint && npm test
 - レビューで見つかった誤りは、できるだけ lint やテストで次から止める。ルールのメッセージには直し方を書く。
 - 改名の前の名前は書かない（[MIGRATION.md](MIGRATION.md)）。残っていると `npm test` が止める。
 - 部品の props には `/** */` で説明を付ける。説明はそのまま `llms.txt` とエディタの補完に出る。
+- 利用する側に見える変更（`packages/*/src` の部品・スタイル、`packages/react` の `bin`・`lint`、`tokens.css`）は、[CHANGELOG.md](CHANGELOG.md) の「未公開」に1行足す。見えない変更なら PR の説明に「変更履歴：なし（理由）」と書く。書き忘れは CI の「変更履歴」が止める（`npm run check:changelog` で手元でも見られる）。
