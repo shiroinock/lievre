@@ -733,6 +733,11 @@ describe('Counts, widths and cards', () => {
     expect(countCharacters('👨‍👩‍👧 家族')).toBe(4);
     expect(countCharacters('W-1 確認', 'width')).toBe(8);
     expect(countCharacters('ｶﾅ', 'width')).toBe(2);
+    // A half-width voiced mark is one grapheme with its kana, but a cell of its own.
+    expect(countCharacters('ｶﾞﾊﾟ', 'width')).toBe(4);
+    expect(countCharacters('ｶﾞﾊﾟ')).toBe(2);
+    // A combining mark on full-width kana stays inside its one full-width cell.
+    expect(countCharacters('か\u3099', 'width')).toBe(2);
   });
   it('tells the limit once and the remainder after typing pauses, without blocking input', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
@@ -746,6 +751,18 @@ describe('Counts, widths and cards', () => {
       vi.advanceTimersByTime(1200);
       await waitFor(() => expect(screen.getByText('1文字多すぎます')).toBeInTheDocument());
       expect(document.querySelector('.lv-field-count')).toHaveAttribute('data-over', 'true');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it('says nothing about the count until the person types', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      setup(<TextField label="件名" maxCount={20} countBy="width" />);
+      const field = screen.getByRole('textbox', { name: '件名' });
+      expect(field).toHaveAccessibleDescription('20文字まで入力できます（全角は2文字と数えます）');
+      vi.advanceTimersByTime(1200);
+      expect(screen.getByRole('status')).toHaveTextContent('');
     } finally {
       vi.useRealTimers();
     }
@@ -901,6 +918,21 @@ describe('Navigation variations', () => {
     await userEvent.click(screen.getByRole('button', { name: '省いた2つの階層を出す' }));
     expect(screen.getByRole('link', { name: '組織' })).toHaveFocus();
     expect(screen.getByText('作業')).toHaveAttribute('aria-current', 'page');
+  });
+  it('moves the focus to the first level left out even when it has no link', async () => {
+    setup(
+      <Breadcrumb
+        maxItems={2}
+        items={[
+          { label: 'ホーム', href: '#' },
+          { label: '組織' },
+          { label: '拠点', href: '#' },
+          { label: '作業' },
+        ]}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: '省いた2つの階層を出す' }));
+    expect(screen.getByText('組織')).toHaveFocus();
   });
   it('lays links out as tabs, the current page marked', () => {
     setup(

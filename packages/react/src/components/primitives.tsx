@@ -56,7 +56,7 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   iconEnd?: ReactNode;
   /** 幅を親いっぱいに広げます。狭い画面の申し込みの「次へ」など、1つだけ置く主要操作に使います。 */
   block?: boolean;
-  /** 押して入り切りするボタンにします（aria-pressed）。入っているときは選択の面と線と太い文字で示します。true / false のどちらかを渡したときだけ入り切りのボタンになり、省くとふつうのボタンです。'secondary' と 'ghost' で使います。 */
+  /** 押して入り切りするボタンにします（aria-pressed）。入っているときは選択の面と 2px の線で示します。true / false のどちらかを渡したときだけ入り切りのボタンになり、省くとふつうのボタンです。'secondary' と 'ghost' で使います。 */
   pressed?: boolean;
   /** 押せない理由。渡すと disabled の代わりに aria-disabled にして、フォーカスが届くようにし、理由をツールチップと読み上げで伝えます。押しても onClick は呼びません。「必須の項目を入力すると送れます」のように、どうすれば押せるかを書きます。 */
   disabledReason?: string;
@@ -156,7 +156,7 @@ export type IconButtonProps = Omit<
   tooltip?: boolean;
   /** 処理中の表示。押せなくなり、aria-busy が付きます。 */
   loading?: boolean;
-  /** 押して入り切りするボタンにします（aria-pressed）。太字・斜体の切り替えなど、道具の並びで使います。入っているときは選択の面と線で示します。 */
+  /** 押して入り切りするボタンにします（aria-pressed）。太字・斜体の切り替えなど、道具の並びで使います。入っているときは選択の面と 2px の線で示します。 */
   pressed?: boolean;
 };
 /** アイコンだけのボタン。label を読み上げとツールチップの両方に使うので、名前を付け忘れません。 */
@@ -770,7 +770,9 @@ export type TabNavItem = {
   label: string;
   /** 今のページなら true。aria-current="page" と下線で示します。 */
   current?: boolean;
+  /** 件数。等幅で出し、言葉の後ろに読み上げます。 */
   count?: number;
+  /** 言葉の前のアイコン。飾りなので読み上げず、言葉は消しません。 */
   icon?: ReactNode;
 };
 /** タブの見た目のまま、ページを移るリンクを並べます。URL ごとに中身が変わる画面（設定の各ページなど）に使います。同じ画面の中で中身を切り替えるなら Tabs を使います。Tabs の矢印キーの操作はなく、リンクとして Tab で順に移ります。 */
@@ -1008,7 +1010,11 @@ export function Breadcrumb({
   maxItems?: number;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const firstHidden = useRef<HTMLAnchorElement>(null);
+  const firstHidden = useRef<HTMLElement | null>(null);
+  // The level that was left out first takes the focus, link or not, so it never drops to the body.
+  const takeFocus = (el: HTMLElement | null) => {
+    firstHidden.current = el;
+  };
   const collapse = !expanded && maxItems !== undefined && maxItems >= 2 && items.length > maxItems;
   const hiddenCount = collapse ? items.length - maxItems : 0;
   useLayoutEffect(() => {
@@ -1038,11 +1044,17 @@ export function Breadcrumb({
             <li>
               {i > 0 && <span aria-hidden>/</span>}
               {item.href && i < items.length - 1 ? (
-                <a href={item.href} ref={expanded && i === 1 && maxItems ? firstHidden : undefined}>
+                <a href={item.href} ref={expanded && i === 1 ? takeFocus : undefined}>
                   {item.label}
                 </a>
               ) : (
-                <span aria-current={i === items.length - 1 ? 'page' : undefined}>{item.label}</span>
+                <span
+                  aria-current={i === items.length - 1 ? 'page' : undefined}
+                  ref={expanded && i === 1 ? takeFocus : undefined}
+                  tabIndex={expanded && i === 1 ? -1 : undefined}
+                >
+                  {item.label}
+                </span>
               )}
             </li>
           </Fragment>
@@ -1135,53 +1147,55 @@ export function Pagination({
           </>
         )}
       </span>
-      <Button
-        ref={prev}
-        size="sm"
-        disabled={current === 1}
-        onClick={() => {
-          pressed.current = 'prev';
-          onPageChange(current - 1);
-        }}
-        aria-label="前のページ"
-      >
-        <ChevronLeft size={16} aria-hidden />
-      </Button>
-      {variant === 'numbers' && (
-        <ol className="lv-pagination-pages">
-          {pageItems(current, total).map((p, i) =>
-            p === null ? (
-              <li key={`gap-${i}`} className="lv-pagination-gap" aria-hidden>
-                …
-              </li>
-            ) : (
-              <li key={p}>
-                <button
-                  type="button"
-                  className="lv-pagination-page"
-                  aria-label={`${p}ページ目`}
-                  aria-current={p === current ? 'page' : undefined}
-                  onClick={() => p !== current && onPageChange(p)}
-                >
-                  <span className="lv-mono">{p}</span>
-                </button>
-              </li>
-            ),
-          )}
-        </ol>
-      )}
-      <Button
-        ref={next}
-        size="sm"
-        disabled={current === total}
-        onClick={() => {
-          pressed.current = 'next';
-          onPageChange(current + 1);
-        }}
-        aria-label="次のページ"
-      >
-        <ChevronRight size={16} aria-hidden />
-      </Button>
+      <div className="lv-pagination-steps">
+        <Button
+          ref={prev}
+          size="sm"
+          disabled={current === 1}
+          onClick={() => {
+            pressed.current = 'prev';
+            onPageChange(current - 1);
+          }}
+          aria-label="前のページ"
+        >
+          <ChevronLeft size={16} aria-hidden />
+        </Button>
+        {variant === 'numbers' && (
+          <ol className="lv-pagination-pages">
+            {pageItems(current, total).map((p, i) =>
+              p === null ? (
+                <li key={`gap-${i}`} className="lv-pagination-gap" aria-hidden>
+                  …
+                </li>
+              ) : (
+                <li key={p}>
+                  <button
+                    type="button"
+                    className="lv-pagination-page"
+                    aria-label={`${p}ページ目`}
+                    aria-current={p === current ? 'page' : undefined}
+                    onClick={() => p !== current && onPageChange(p)}
+                  >
+                    <span className="lv-mono">{p}</span>
+                  </button>
+                </li>
+              ),
+            )}
+          </ol>
+        )}
+        <Button
+          ref={next}
+          size="sm"
+          disabled={current === total}
+          onClick={() => {
+            pressed.current = 'next';
+            onPageChange(current + 1);
+          }}
+          aria-label="次のページ"
+        >
+          <ChevronRight size={16} aria-hidden />
+        </Button>
+      </div>
     </nav>
   );
 }

@@ -64,7 +64,7 @@ const renderItem = (s: Setting) => (
   />
 );
 
-function QueueOnly() {
+function QueueOnly({ bulk = false }: { bulk?: boolean }) {
   const queue = useDecisionQueue({ keys });
   return (
     <DecisionQueue
@@ -78,6 +78,11 @@ function QueueOnly() {
       order="公開前に確かめるもの（伏せ字・危険度の高いもの）から順に出します。"
       reason={(s) => s.reason}
       endAction={<Button variant="primary">投稿用に書き出す</Button>}
+      bulk={
+        bulk
+          ? { label: '危険度の低いもの', match: (s: Setting) => s.risk === '低', value: 'in' }
+          : undefined
+      }
     />
   );
 }
@@ -160,8 +165,13 @@ const meta = {
         },
         {
           name: '見せ方の切り替え',
-          selector: '.lv-view-switch-item',
+          selector: '.lv-segmented-item',
           checks: ['control-height', 'inset-x', 'inset-y', { padding: 'button' }],
+        },
+        {
+          name: 'まとめて決めるボタン',
+          selector: '.lv-queue-bulk .lv-button',
+          checks: ['control-height', 'inset-x', 'inset-y'],
         },
         {
           name: '判断のボタン',
@@ -234,4 +244,9 @@ export const SharedWithList: Story = {
     expect(canvas.getByText('件を確認', { exact: false })).toHaveTextContent('2 / 5 件を確認');
     expect(await canvas.findByRole('article', { name: /hooks/ })).toBeInTheDocument();
   },
+};
+
+/** 根拠を言葉で示した近道で、残りの危険度の低いものをまとめて決められます。押したあとも1件ずつ決め直せます（押したあとの動きは queue.test.tsx で確かめます）。 */
+export const Bulk: Story = {
+  render: () => <QueueOnly bulk />,
 };

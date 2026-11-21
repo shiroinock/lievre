@@ -26,7 +26,7 @@ export type SegmentedControlProps = {
   size?: 'sm' | 'md';
   disabled?: boolean;
 };
-/** 同じ中身の表示の形を切り替える選択（一覧・カード、日・週・月）。中身の領域を切り替えるなら Tabs、フォームで値を選ぶなら RadioGroup を使います。見た目と操作は ViewSwitch と同じで、矢印キーで移り、選んだものは面と線と太い文字で示します。 */
+/** 同じ中身の表示の形を切り替える選択（一覧・カード、日・週・月）。中身の領域を切り替えるなら Tabs、フォームで値を選ぶなら RadioGroup を使います。ViewSwitch もこの部品で組んでいます。矢印キーで移り、選んだものは面と線と太い文字で示します。 */
 export function SegmentedControl({
   label,
   items,

@@ -11,6 +11,8 @@ export default {
     'lievre/mono-unicode-range': true,
     'lievre/mono-weights': true,
     'lievre/forced-colors-state': true,
+    'lievre/coarse-target': true,
+    'lievre/forced-colors-border-style': true,
     'lievre/spacing-grid': true,
     'lievre/surface-tokens': true,
     'lievre/colour-tokens': true,
