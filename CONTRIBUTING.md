@@ -88,5 +88,6 @@ CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査�
 - 前の PR の枝に積んだ PR にも、レビューが済んだらすぐ付けてかまいません。向き先が `main` でないあいだは何もせず、前の PR がマージされて向き先が `main` に付け替わってから予約します。
 - 積んだ PR に `gh pr merge --auto` を手で入れないでください。前の枝には必須の検査がないので、その場で前の枝へマージされます。
 - 下書きの PR は、「Ready for review」にしてから予約します。
+- ラベルを外しても、入った自動マージは残ります。取り消すときは `gh pr merge <番号> --disable-auto` も行います。
 - `.github/workflows` を変える PR とフォークからの PR は、自動では予約しません（ボットがコメントで知らせます）。検査が通ったら `gh pr merge <番号> --merge` で手でマージします。
-- 自動マージのコミットは CI を起こさないので、この workflow が `main` の CI を `workflow_dispatch` で走らせます。付け替わった PR は 10 分ごとの見回りで拾うので、予約まで最大 10 分ほど待つことがあります。
+- 自動マージのコミットは CI を起こさないので、この workflow が `main` の CI を `workflow_dispatch` で走らせます。付け替わった PR は 10 分ごとの見回りで拾います。GitHub の schedule は混むと遅れるので、急ぐときは Actions の「マージ予約」を手で走らせます（Run workflow）。

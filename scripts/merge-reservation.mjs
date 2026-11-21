@@ -66,31 +66,43 @@ function defaultGh(args) {
  * Looks at every open PR with the label. Every trigger runs the same scan, so a PR missed by one
  * event (GitHub sends none for what GITHUB_TOKEN merged) is picked up by the next one.
  */
-export function run({ gh = defaultGh, base = 'main', label = LABEL, log = console.log } = {}) {
+export function run({
+  gh = defaultGh,
+  base = 'main',
+  label = LABEL,
+  log = console.log,
+  logError = console.error,
+} = {}) {
   // `--label` goes through search, which can miss a label added a moment ago (the very event that
   // started this run). List every open PR and pick the labelled ones here instead.
   const prs = JSON.parse(gh(['pr', 'list', '--state', 'open', '--limit', '200', '--json', FIELDS]));
   const results = [];
   for (const listed of prs.filter((p) => hasLabel(p, label))) {
-    // Read the PR again right before acting: the base may have changed since the list.
-    const pr = JSON.parse(gh(['pr', 'view', String(listed.number), '--json', `${FIELDS},files`]));
-    const { action, reason } = decide(pr, { base, label });
-    log(`#${pr.number} ${pr.title}：${reason}`);
-    if (action === 'enable') {
-      gh(['pr', 'merge', String(pr.number), '--auto', '--merge']);
-    } else if (action === 'manual') {
-      const comments = JSON.parse(gh(['pr', 'view', String(pr.number), '--json', 'comments']));
-      if (!comments.comments.some((c) => c.body.includes(MARKER))) {
-        gh([
-          'pr',
-          'comment',
-          String(pr.number),
-          '--body',
-          `${MARKER}\n「${label}」が付いていますが、自動マージは入れません：${reason}`,
-        ]);
+    // One PR that keeps failing (a conflict, say) must not hold back the others or CI on main.
+    try {
+      // Read the PR again right before acting: the base may have changed since the list.
+      const pr = JSON.parse(gh(['pr', 'view', String(listed.number), '--json', `${FIELDS},files`]));
+      const { action, reason } = decide(pr, { base, label });
+      log(`#${pr.number} ${pr.title}：${reason}`);
+      if (action === 'enable') {
+        gh(['pr', 'merge', String(pr.number), '--auto', '--merge']);
+      } else if (action === 'manual') {
+        const comments = JSON.parse(gh(['pr', 'view', String(pr.number), '--json', 'comments']));
+        if (!comments.comments.some((c) => c.body.includes(MARKER))) {
+          gh([
+            'pr',
+            'comment',
+            String(pr.number),
+            '--body',
+            `${MARKER}\n「${label}」が付いていますが、自動マージは入れません：${reason}`,
+          ]);
+        }
       }
+      results.push({ number: pr.number, action });
+    } catch (err) {
+      logError(`#${listed.number}：失敗した。次の PR へ進む。${err.message}`);
+      results.push({ number: listed.number, action: 'error' });
     }
-    results.push({ number: pr.number, action });
   }
   return results;
 }
@@ -124,6 +136,14 @@ export function ensureBaseCi({ gh = defaultGh, base = 'main', log = console.log 
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const base = process.env.BASE_BRANCH || 'main';
-  run({ base });
+  let failed = false;
+  try {
+    failed = run({ base }).some((r) => r.action === 'error');
+  } catch (err) {
+    console.error(err.message);
+    failed = true;
+  }
+  // Runs even when a PR failed above, so a merge GITHUB_TOKEN made still gets CI on main.
   ensureBaseCi({ base });
+  if (failed) process.exitCode = 1;
 }

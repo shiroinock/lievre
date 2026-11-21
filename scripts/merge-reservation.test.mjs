@@ -114,6 +114,20 @@ test('一覧のあとに向き先が変わっていたら、読み直した向�
   );
 });
 
+test('1本の PR が失敗しても、ほかの PR は予約する', () => {
+  const { gh, calls } = fakeGh([pr({ number: 6 }), pr({ number: 7 })]);
+  const failing = (args) => {
+    if (args[1] === 'merge' && args[2] === '6') throw new Error('Pull request is not mergeable');
+    return gh(args);
+  };
+  const results = run({ gh: failing, log: quiet, logError: quiet });
+  assert.deepEqual(
+    results.map((r) => r.action),
+    ['error', 'enable'],
+  );
+  assert.ok(calls.some((c) => c.join(' ') === 'pr merge 7 --auto --merge'));
+});
+
 test('手でマージする PR へのコメントは、1度だけ', () => {
   const manual = [pr({ number: 4, files: [{ path: '.github/workflows/ci.yml' }] })];
   const first = fakeGh(manual);
