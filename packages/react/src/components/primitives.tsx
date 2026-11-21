@@ -28,6 +28,7 @@ import {
   CircleX,
   ChevronLeft,
   ChevronRight,
+  X,
 } from 'lucide-react';
 import { cx, PortalSurface } from './system';
 
@@ -129,6 +130,8 @@ export type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 /** 色と文字を併用する状態ラベル。色だけでは状態を表さないため、children（「正常」などの文字）は必須です。 */
 export function Badge({
   tone = 'neutral',
+  emphasis = 'soft',
+  size = 'md',
   dot = false,
   children,
   className,
@@ -136,11 +139,25 @@ export function Badge({
 }: HTMLAttributes<HTMLSpanElement> & {
   /** 'neutral' | 'success' | 'warning' | 'danger' | 'info'。Toast の 'error' はここでは 'danger'。 */
   tone?: Tone;
+  /** 'soft'（既定）は淡い面に状態の色の文字。'strong' は状態の色で塗り、文字を面の色にします。一覧の中で特に目立たせたい1つだけに使います。 */
+  emphasis?: 'soft' | 'strong';
+  /** 'md'（既定）は高さ 20px、'sm' は 16px。文字はどちらも 12px で、sm は表のセルやタブの中など行の高さが詰まった場所に使います。 */
+  size?: 'sm' | 'md';
+  /** 状態を補う丸い印。稼働・接続など、続いている状態に付けます。 */
   dot?: boolean;
   children: ReactNode;
 }) {
   return (
-    <span {...props} className={cx('lv-badge', `lv-tone-${tone}`, className)}>
+    <span
+      {...props}
+      className={cx(
+        'lv-badge',
+        `lv-tone-${tone}`,
+        emphasis === 'strong' && 'lv-badge--strong',
+        size === 'sm' && 'lv-badge--sm',
+        className,
+      )}
+    >
       {dot && <span className="lv-status-dot" aria-hidden />}
       {children}
     </span>
@@ -417,13 +434,29 @@ export function Card({
     </section>
   );
 }
+export type AlertProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
+  /** 'info'（既定）| 'success' | 'warning' | 'danger' | 'neutral'。'danger' は role="alert"、それ以外は role="status" で伝えます。 */
+  tone?: Tone;
+  /** 何が起きたかを短く。状態の色とアイコンに加えて、言葉でも状態が分かるように書きます。 */
+  title: string;
+  /** 操作の場所。本文の下に並べます。「再読み込み」「詳細を見る」など、この知らせを受けてすることを Button の size="sm" で置きます。 */
+  action?: ReactNode;
+  /** 渡すと右上に閉じるボタンを出し、押したときに呼びます。Alert を消すのは呼び出す側です。閉じるボタンにあったフォーカスは消えるので、消したあとに続きの場所（見出しや次の操作）へフォーカスを移します。 */
+  onDismiss?: () => void;
+  /** 閉じるボタンの名前。既定は「閉じる」。画面に知らせが複数あるときは「同期のお知らせを閉じる」のように何を閉じるかを書きます。 */
+  dismissLabel?: string;
+};
+/** 画面に残しておく知らせ。状態の色・アイコン・見出しの言葉の3つで状態を示します。一時的な結果の通知は Toast を使います。 */
 export function Alert({
   tone = 'info',
   title,
+  action,
+  onDismiss,
+  dismissLabel = '閉じる',
   children,
   className,
   ...props
-}: HTMLAttributes<HTMLDivElement> & { tone?: Tone; title: string }) {
+}: AlertProps) {
   const Icon =
     tone === 'danger'
       ? CircleX
@@ -439,10 +472,20 @@ export function Alert({
       role={tone === 'danger' ? 'alert' : 'status'}
     >
       <Icon size={20} aria-hidden />
-      <div>
+      <div className="lv-alert-content">
         <strong>{title}</strong>
         {children && <div className="lv-alert-description">{children}</div>}
+        {action && <div className="lv-alert-actions">{action}</div>}
       </div>
+      {onDismiss && (
+        <IconButton
+          className="lv-alert-dismiss"
+          size="sm"
+          label={dismissLabel}
+          icon={<X />}
+          onClick={onDismiss}
+        />
+      )}
     </div>
   );
 }
@@ -513,31 +556,64 @@ export function Tooltip({ content, children }: { content: string; children: Reac
   );
 }
 
-/** 0〜100に丸め、色に加えて数値を併記します。 */
+export type ProgressProps = {
+  /** 0〜100。範囲の外は丸めます。省くと「値の分からない処理中」の形になり、数値の代わりに「処理中」と出します。 */
+  value?: number;
+  /** 何の進み具合か。画面に出し、読み上げの名前にも使います。 */
+  label: string;
+  /** 数値（%）を出すかどうか。既定は true。 */
+  showValue?: boolean;
+  /** 'default'（既定）は進行中。'success' は完了、'danger' は失敗で、棒の色に加えて見出しの横にアイコンと言葉（「完了」「失敗」）を出します。 */
+  tone?: 'default' | 'success' | 'danger';
+  /** tone の言葉を変えるとき。「3件が失敗」のように、何が起きたかを書けます。 */
+  statusLabel?: string;
+};
+/** 処理の進み具合。数値は0〜100に丸め、色に加えて数値か言葉を併記します。値の分からない処理は value を省きます。動きを減らす設定では、値の分からない形も動かさずに縞で示します。 */
 export function Progress({
   value,
   label,
   showValue = true,
-}: {
-  value: number;
-  label: string;
-  showValue?: boolean;
-}) {
-  const safe = Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0));
+  tone = 'default',
+  statusLabel,
+}: ProgressProps) {
+  const id = useId();
+  const indeterminate = value === undefined;
+  const safe = indeterminate ? 0 : Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0));
+  const status =
+    tone === 'default' ? undefined : (statusLabel ?? (tone === 'success' ? '完了' : '失敗'));
+  const StatusIcon = tone === 'success' ? CircleCheck : CircleX;
   return (
-    <div className="lv-progress-wrap">
+    <div className={cx('lv-progress-wrap', tone !== 'default' && `lv-progress--${tone}`)}>
       <div className="lv-progress-label">
         <span>{label}</span>
-        {showValue && (
-          <span>
-            <span className="lv-mono">{safe}</span>%
+        {(status || showValue) && (
+          <span className="lv-progress-value">
+            {status && (
+              <span className="lv-progress-status" id={`${id}-status`}>
+                <StatusIcon aria-hidden />
+                {status}
+              </span>
+            )}
+            {showValue &&
+              (indeterminate ? (
+                <span>処理中</span>
+              ) : (
+                <span>
+                  <span className="lv-mono">{safe}</span>%
+                </span>
+              ))}
           </span>
         )}
       </div>
-      <ProgressPrimitive.Root className="lv-progress" value={safe} aria-label={label}>
+      <ProgressPrimitive.Root
+        className="lv-progress"
+        value={indeterminate ? null : safe}
+        aria-label={label}
+        aria-describedby={status ? `${id}-status` : undefined}
+      >
         <ProgressPrimitive.Indicator
           className="lv-progress-indicator"
-          style={{ transform: `translateX(-${100 - safe}%)` }}
+          style={indeterminate ? undefined : { transform: `translateX(-${100 - safe}%)` }}
         />
       </ProgressPrimitive.Root>
     </div>

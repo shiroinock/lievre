@@ -1,12 +1,23 @@
 # 部品の追加計画
 
-lievre に足りない部品を、ほかのデザインシステムと比べて洗い出し、優先順位を付けたものです。ここでは部品を作りません。部品の配置の品質基準と CI（別の作業で準備中）ができてから、この順番で実装します。
+lievre に足りない部品と、今ある部品に足りないバリエーション（大きさ・強さ・状態・密度など）を、ほかのデザインシステムと比べて洗い出し、優先順位と段階を付けたものです。段階ごとに PR に分けて実装します。
 
-調べた時点：2026年10月。各システムの公開ドキュメントと、筆者の知っている範囲によります。細かい有無は各システムの版で変わるので、実装の前にもう一度確かめてください。
+調べた時点：2026年11月21日（初版は2026年10月）。比べた版は次のとおりです。各システムの公式の文書・公式の GitHub の型定義を読みました。細かい有無は版で変わるので、実装の前にもう一度確かめてください。
 
-## 1. lievre の今の部品
+| システム                | 版                                                         | 主な出どころ                                                                     |
+| ----------------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Material Design 3 / MUI | m3.material.io（2026-11-19 のデータ）、`@mui/material` 9.5 | https://m3.material.io/components 、https://github.com/mui/material-ui           |
+| Fluent 2                | `@fluentui/react-components` 9.75                          | https://fluent2.microsoft.design 、https://github.com/microsoft/fluentui         |
+| Carbon                  | `@carbon/react` 1.121                                      | https://carbondesignsystem.com 、https://github.com/carbon-design-system/carbon  |
+| Atlassian               | `@atlaskit/*`（button 25.8 ほか、パッケージごと）          | https://atlassian.design/components                                              |
+| Primer                  | `@primer/react` 38.46                                      | https://primer.style 、https://github.com/primer/react                           |
+| Ant Design              | antd 6.7                                                   | https://ant.design 、https://github.com/ant-design/ant-design                    |
+| Radix Themes            | `@radix-ui/themes` 3.3                                     | https://www.radix-ui.com/themes 、https://github.com/radix-ui/themes             |
+| SmartHR UI              | smarthr-ui 104.0                                           | https://smarthr.design/products/components/ 、https://github.com/kufu/smarthr-ui |
 
-`packages/react/src/index.ts` が書き出している部品と、`packages/react/src/stories` の Story から数えました。第1段階のうち IconButton・Popover・DropdownMenu・ConfirmDialog・DescriptionList・VisuallyHidden・Spinner は作り終え、この表に入れています（比較の表は調べた時点のままです）。
+## 1. lievre の今の部品とバリエーション
+
+`packages/react/src/index.ts` が書き出している部品と、`packages/react/src/stories` の Story から数えました。
 
 | まとまり             | 部品                                                                                  |
 | -------------------- | ------------------------------------------------------------------------------------- |
@@ -17,7 +28,46 @@ lievre に足りない部品を、ほかのデザインシステムと比べて�
 | 表示                 | Badge、Card、Avatar、Kbd、DescriptionList、VisuallyHidden                             |
 | 移動                 | Tabs、Breadcrumb、Pagination                                                          |
 | 重なり               | Dialog / DialogClose、ConfirmDialog、Popover、DropdownMenu                            |
-| データ               | DataTable（並べ替え・行の選択・空と読み込み中）、Metric、Meter、Sparkline             |
+| データ               | DataTable、Metric、Meter、Sparkline                                                   |
+
+全体に効く軸は3つで、どの部品も従います：テーマ（Paper / Ink）、密度（comfortable 40px / compact 32px、タッチの画面は44px）、文字（standard 本文16px / interface 本文14px）。
+
+部品ごとのバリエーション（props の名前と値）：
+
+| 部品            | 種類・強さ                                         | 大きさ                                         | 状態・そのほか                                                                                 |
+| --------------- | -------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Button          | `variant` primary / secondary / ghost / danger     | `size` sm 32 / md（密度）/ lg 48               | `loading`、`disabled`、先頭の `icon`                                                           |
+| ActionLink      | `variant` primary / secondary / ghost              | `size` sm / md / lg                            | —                                                                                              |
+| IconButton      | `variant` は Button と同じ（既定 ghost）           | `size` sm / md / lg（正方形）                  | `loading`、`disabled`、`tooltip`                                                               |
+| Link            | 1種                                                | —                                              | —                                                                                              |
+| Badge           | `tone` neutral / success / warning / danger / info | 1種                                            | `dot`                                                                                          |
+| Alert           | `tone` 5種（アイコンは4種）                        | 1種                                            | `title` は必須、本文は任意。閉じる・操作の場所はない                                           |
+| Toast           | `tone` success / error                             | 1種                                            | 5秒で消える。操作のボタンはない                                                                |
+| Tooltip         | 1種                                                | —                                              | 位置は上だけ（Radix の既定）                                                                   |
+| TextField       | 1種                                                | `controlSize` md / lg                          | `hint`、`error`、`required`（`*` の印）                                                        |
+| Textarea        | 1種                                                | —                                              | `hint`、`error`、`required`                                                                    |
+| Select          | 1種                                                | md だけ                                        | `hint`、`error`、`required`、選択肢の `disabled`                                               |
+| Checkbox        | 1種                                                | 1種                                            | `indeterminate`、`hint`、`error`                                                               |
+| RadioGroup      | 縦に並べるだけ                                     | 1種                                            | 選択肢ごとの `description`、`error`、`required`（「（必須）」の文字）                          |
+| Switch          | ラベルが左・つまみが右                             | 1種                                            | `hint`                                                                                         |
+| Tabs            | 下線の形                                           | 1種                                            | `count`、`disabled`                                                                            |
+| Progress        | 線の形                                             | 1種                                            | 値は必須（不確定の形はない）、`showValue`                                                      |
+| Spinner         | —                                                  | `size` sm 16 / md 24                           | `showLabel`                                                                                    |
+| Skeleton        | 四角だけ                                           | `width` / `height`                             | —                                                                                              |
+| Avatar          | 頭文字だけ（画像なし）                             | `size` sm / md                                 | —                                                                                              |
+| Card            | 枠と面の1種                                        | —                                              | `eyebrow`、`title`、`action`                                                                   |
+| Dialog          | 1種                                                | 幅は1種                                        | `eyebrow`、`footer`                                                                            |
+| ConfirmDialog   | `tone` default / danger                            | —                                              | 非同期の `onConfirm`                                                                           |
+| Popover         | 1種                                                | 幅は中身次第                                   | `side`、`align`                                                                                |
+| DropdownMenu    | 項目は item / checkbox / radio / separator         | 密度に従う                                     | `icon`、`shortcut`、`tone` danger。入れ子・説明文はない                                        |
+| Pagination      | 前後のボタンと「2 / 5」                            | sm                                             | ページ番号を並べる形・件数の選択はない                                                         |
+| Breadcrumb      | 1種                                                | —                                              | 省略はない                                                                                     |
+| DataTable       | 罫線の形1種                                        | 密度に従う                                     | 並べ替え、行の選択、ページ分け（手元・サーバー）、空・読み込み中。見出しの固定・行の展開はない |
+| DescriptionList | `layout` row / stack                               | `columns` 1〜3、`labelWidth`                   | 項目ごとの `mono`・`wide`                                                                      |
+| Text            | `tone` default / muted                             | `size` small / body / lead                     | 行数の切り詰めはない                                                                           |
+| Heading         | —                                                  | `size` section / title / display、`level` 1〜6 | —                                                                                              |
+| Divider         | 横だけ                                             | —                                              | `label`                                                                                        |
+| Stack / Grid    | `direction`、`align`                               | `gap`（4px の格子）、`minWidth`                | 主軸の揃え（justify）はない                                                                    |
 
 画面例（`packages/react/src/patterns`、`packages/react/src/App.tsx`）で部品にならずに手で組まれているもの：
 
@@ -26,53 +76,154 @@ lievre に足りない部品を、ほかのデザインシステムと比べて�
 - 表の上の検索と絞り込み（`Operations.tsx` の `queue-tools`）→ 表の操作バー
 - サイドバー（`App.tsx` の `app-sidebar`）→ AppShell
 
-## 2. ほかのシステムとの比較
+## 2. 部品の比較
 
-○＝ある、△＝近いものがある・別パッケージ・一部だけ、—＝ない。MUI は MUI X、Mantine は公式の拡張（`@mantine/dates` など）を含みます。
+○＝ある、△＝近いもの・別パッケージ・一部だけ、—＝公式の一覧や型定義に見当たらない。M3 の列は M3 の仕様か MUI のどちらかにあれば ○ です。
 
-| 部品                                    | lievre | MUI | Radix Themes | shadcn/ui | Mantine | Primer | Carbon | Atlassian | SmartHR UI | デジタル庁 |
-| --------------------------------------- | :----: | :-: | :----------: | :-------: | :-----: | :----: | :----: | :-------: | :--------: | :--------: |
-| アイコンだけのボタン（IconButton）      |   △    |  ○  |      ○       |     △     |    ○    |   ○    |   ○    |     ○     |     △      |     —      |
-| 入力のまとまり（Field / Fieldset）      |   △    |  ○  |      —       |     ○     |    ○    |   ○    |   ○    |     ○     |     ○      |     △      |
-| チェックボックスの組                    |   —    |  ○  |      ○       |     △     |    ○    |   ○    |   ○    |     ○     |     ○      |     ○      |
-| メニュー（DropdownMenu）                |   —    |  ○  |      ○       |     ○     |    ○    |   ○    |   ○    |     ○     |     ○      |     ○      |
-| ポップオーバー                          |   —    |  ○  |      ○       |     ○     |    ○    |   ○    |   ○    |     ○     |     △      |     —      |
-| 開閉（Accordion / Disclosure）          |   —    |  ○  |      —       |     ○     |    ○    |   △    |   ○    |     —     |     ○      |     ○      |
-| 確認ダイアログ（AlertDialog）           |   △    |  △  |      ○       |     ○     |    ○    |   ○    |   ○    |     △     |     ○      |     △      |
-| 説明リスト（DescriptionList）           |   —    |  —  |      ○       |     —     |    ○    |   —    |   △    |     —     |     ○      |     ○      |
-| 読み込み中の印（Spinner）               |   △    |  ○  |      ○       |     ○     |    ○    |   ○    |   ○    |     ○     |     ○      |     ○      |
-| 単一選択のコンボボックス                |   —    |  ○  |      —       |     ○     |    ○    |   ○    |   ○    |     ○     |     ○      |     ○      |
-| 複数選択のコンボボックス                |   —    |  ○  |      —       |     △     |    ○    |   ○    |   ○    |     ○     |     ○      |     —      |
-| 日付の入力（DatePicker / Calendar）     |   —    |  ○  |      —       |     ○     |    ○    |   —    |   ○    |     ○     |     ○      |     ○      |
-| 時刻の入力                              |   —    |  ○  |      —       |     —     |    ○    |   —    |   ○    |     ○     |     ○      |     —      |
-| 和暦の入力                              |   —    |  —  |      —       |     —     |    —    |   —    |   —    |     —     |     ○      |     —      |
-| 手順の表示（Stepper）                   |   —    |  ○  |      —       |     —     |    ○    |   —    |   ○    |     ○     |     ○      |     ○      |
-| ドロワー（Drawer / Sheet）              |   —    |  ○  |      —       |     ○     |    ○    |   △    |   △    |     ○     |     —      |     ○      |
-| チップ・タグ                            |   △    |  ○  |      —       |     —     |    ○    |   ○    |   ○    |     ○     |     ○      |     ○      |
-| 切り替え（SegmentedControl）            |   —    |  ○  |      ○       |     ○     |    ○    |   ○    |   ○    |     —     |     ○      |     —      |
-| 画面の枠・サイドナビ（AppShell）        |   —    |  △  |      —       |     ○     |    ○    |   ○    |   ○    |     ○     |     ○      |     ○      |
-| 検索欄                                  |   —    |  —  |      △       |     —     |    —    |   △    |   ○    |     —     |     ○      |     ○      |
-| 数値の入力（NumberInput）               |   —    |  △  |      —       |     —     |    ○    |   —    |   ○    |     —     |     —      |     —      |
-| ファイルの添付（FileUpload / DropZone） |   —    |  —  |      —       |     —     |    ○    |   —    |   ○    |     —     |     ○      |     ○      |
-| 表の操作バー・一括操作                  |   —    |  ○  |      —       |     △     |    —    |   △    |   ○    |     —     |     ○      |     ○      |
-| 履歴（Timeline）                        |   —    |  ○  |      —       |     —     |    ○    |   ○    |   —    |     —     |     ○      |     —      |
-| スライダー                              |   —    |  ○  |      ○       |     ○     |    ○    |   —    |   ○    |     ○     |     —      |     —      |
-| 仮想化した表                            |   —    |  ○  |      —       |     —     |    —    |   —    |   —    |     △     |     —      |     —      |
-| チャート                                |   △    |  ○  |      —       |     ○     |    ○    |   —    |   △    |     —     |     —      |     —      |
-| ツリー                                  |   —    |  ○  |      —       |     —     |    ○    |   ○    |   ○    |     △     |     —      |     —      |
-| コマンドパレット                        |   —    |  —  |      —       |     ○     |    ○    |   —    |   —    |     —     |     —      |     —      |
-| 目次                                    |   —    |  —  |      —       |     —     |    ○    |   —    |   —    |     —     |     —      |     ○      |
-| 画面から隠す読み上げ用の文字            |   —    |  △  |      ○       |     —     |    ○    |   ○    |   △    |     ○     |     ○      |     —      |
-| 値の書式（数値・日付）                  |   —    |  —  |      —       |     —     |    ○    |   —    |   —    |     —     |     ○      |     —      |
+| 部品                               | lievre | M3 / MUI | Fluent | Carbon | Atlassian | Primer | Ant | Radix Themes | SmartHR |
+| ---------------------------------- | :----: | :------: | :----: | :----: | :-------: | :----: | :-: | :----------: | :-----: |
+| 入力のまとまり（Field / Fieldset） |   △    |    ○     |   ○    |   ○    |     ○     |   ○    |  ○  |      —       |    ○    |
+| チェックボックスの組               |   —    |    ○     |   ○    |   ○    |     ○     |   ○    |  ○  |      ○       |    ○    |
+| チップ・タグ                       |   △    |    ○     |   ○    |   ○    |     ○     |   ○    |  ○  |      —       |    ○    |
+| 数のバッジ（Counter）              |   △    |    ○     |   ○    |   △    |     ○     |   ○    |  ○  |      —       |    ○    |
+| 切り替え（SegmentedControl）       |   —    |    ○     |   —    |   ○    |     —     |   ○    |  ○  |      ○       |    ○    |
+| 押して入り切りするボタン（Toggle） |   —    |    ○     |   ○    |   △    |     △     |   —    |  —  |      —       |    —    |
+| ボタンの組・分割ボタン             |   —    |    ○     |   ○    |   ○    |     ○     |   △    |  △  |      —       |    ○    |
+| 開閉（Accordion）                  |   —    |    ○     |   ○    |   ○    |     —     |   △    |  ○  |      △       |    ○    |
+| 単一選択のコンボボックス           |   —    |    ○     |   ○    |   ○    |     △     |   ○    |  ○  |      —       |    ○    |
+| 複数選択のコンボボックス           |   —    |    ○     |   ○    |   ○    |     △     |   ○    |  ○  |      —       |    ○    |
+| 日付の入力                         |   —    |    ○     |   △    |   ○    |     ○     |   —    |  ○  |      —       |    ○    |
+| 時刻の入力                         |   —    |    ○     |   △    |   ○    |     ○     |   —    |  ○  |      —       |    ○    |
+| 手順の表示（Stepper）              |   —    |    ○     |   —    |   ○    |     ○     |   —    |  ○  |      —       |    ○    |
+| ドロワー（Drawer / Sheet）         |   —    |    ○     |   ○    |   ○    |     ○     |   △    |  ○  |      —       |    —    |
+| 画面の枠・サイドナビ               |   —    |    ○     |   ○    |   ○    |     ○     |   ○    |  ○  |      —       |    ○    |
+| 検索欄                             |   —    |    ○     |   ○    |   ○    |     △     |   △    |  ○  |      △       |    ○    |
+| 数値の入力                         |   —    |    △     |   ○    |   ○    |     —     |   —    |  ○  |      —       |    △    |
+| ファイルの添付                     |   —    |    —     |   —    |   ○    |     —     |   —    |  ○  |      —       |    ○    |
+| スライダー                         |   —    |    ○     |   ○    |   ○    |     ○     |   —    |  ○  |      ○       |    —    |
+| ページ上部のお知らせ（Banner）     |   —    |    —     |   △    |   △    |     ○     |   ○    |  △  |      —       |    ○    |
+| 説明のポップアップ（Toggletip）    |   —    |    —     |   ○    |   ○    |     △     |   —    |  —  |      —       |    —    |
+| 履歴（Timeline）                   |   —    |    △     |   —    |   —    |     —     |   ○    |  ○  |      —       |    ○    |
+| ツリー                             |   —    |    △     |   ○    |   ○    |     △     |   ○    |  ○  |      —       |    —    |
+| 一覧（List / ActionList）          |   —    |    ○     |   ○    |   ○    |     —     |   ○    |  ○  |      ○       |    ○    |
+| 道具の並び（Toolbar）              |   —    |    ○     |   ○    |   —    |     —     |   ○    |  —  |      —       |    —    |
+| その場で直す（InlineEdit）         |   —    |    —     |   —    |   ○    |     ○     |   —    |  △  |      —       |    —    |
+| 写すボタン（CopyButton）           |   —    |    —     |   —    |   ○    |     —     |   —    |  △  |      —       |    —    |
+| 案内のツアー（Tour / Coachmark）   |   —    |    —     |   ○    |   ○    |     ○     |   —    |  ○  |      —       |    —    |
+| 評価（Rating）                     |   —    |    ○     |   ○    |   —    |     —     |   —    |  ○  |      —       |    —    |
+| カルーセル                         |   —    |    ○     |   ○    |   —    |     —     |   —    |  ○  |      —       |    —    |
+| 浮かぶ操作ボタン（FAB）            |   —    |    ○     |   —    |   —    |     —     |   —    |  ○  |      —       |    —    |
 
-lievre の △：IconButton は `lv-icon-button` の CSS だけがあり部品として書き出していない。Field は TextField・Select・RadioGroup がそれぞれラベルを内蔵している。確認ダイアログは Dialog で組めるが、決まった形がない。Spinner は Button の中にだけある。チップは Badge が近い。チャートは Sparkline だけ。
+lievre の △：Field は TextField・Select・RadioGroup がそれぞれラベルを内蔵している。チップは Badge が近い。数のバッジは Tabs の `count` だけ。
 
-## 3. 優先順位の付け方
+## 3. バリエーションの比較
+
+今ある部品について、比べた8つのうち多くが持っていて lievre にないバリエーションです。「持つ数」は、8つのうち公式の props や部品としてそれを持つものの数で、目安です（近いものだけのときは数えません）。優先度は部品と同じく、高・中・低です。
+
+### 案内・フィードバック
+
+| 部品       | 足りないもの                           | 持つ数 | 優先度 | lievre での注意                                                                                                                             |
+| ---------- | -------------------------------------- | :----: | :----: | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Alert      | 操作の場所（`action`）                 |   5    |   高   | 「再読み込み」「詳細を見る」など。ボタンは Button の sm。                                                                                   |
+| Alert      | 閉じる（`onDismiss`）                  |   5    |   高   | 閉じるボタンは IconButton。閉じたあとフォーカスを失わせない（呼び出し側に戻し先を決めさせる）。`danger` の Alert は閉じさせない選択も残す。 |
+| Alert      | 強さ（面を色で塗る強い形）             |   4    |   低   | 状態の色の面は大きく塗ると目立ちすぎる。今の淡い面のままにし、強さは Banner で出す。                                                        |
+| Toast      | `tone` info / warning                  |   5    |   高   | 名前は Toast の今の `'error'` に合わせる。                                                                                                  |
+| Toast      | 操作のボタン（元に戻す など）          |   5    |   高   | WCAG 2.2.1（時間の調整）：操作のある通知は自動で消さない。Radix の `altText` で、通知から離れても同じ操作ができる場所を読み上げる。         |
+| Toast      | 表示の時間（`duration`）               |   4    |   中   | 5秒より短くしない。                                                                                                                         |
+| Progress   | 不確定の形（値が分からない）           |   7    |   高   | `value` を省くと不確定。動きを減らす設定では動かさず、「処理中」の文字で示す。`aria-valuenow` を付けない。                                  |
+| Progress   | 状態（完了・失敗）                     |   5    |   中   | 色だけでなく、ラベルの横に「完了」「失敗」の文字とアイコンを出す。                                                                          |
+| Progress   | 太さ・円形                             |   4    |   低   | 円形は Meter と役割が重なる。                                                                                                               |
+| Badge      | 強さ（`emphasis` 淡い面 / 塗り）       |   6    |   中   | 塗りは状態の色の面に `--lv-surface` の文字。状態の色は面に対して4.5:1 なので、逆にしても4.5:1。                                             |
+| Badge      | 大きさ（`size` sm）                    |   5    |   中   | 表のセルや Tabs の中で使う。12px の文字のまま、高さを 20px から 16px にする。                                                               |
+| Badge      | 数のバッジ（Counter）                  |   7    |   中   | 数は等幅。「未読 3件」のように読み上げる言葉を必須にする。                                                                                  |
+| Tooltip    | 位置（`side`、`align`）                |   7    |   中   | Popover と同じ名前。                                                                                                                        |
+| Tooltip    | 名前か説明か（label / description）    |   4    |   低   | 今は IconButton の名前にだけ使っている。説明に使うときは `aria-describedby` に。                                                            |
+| Skeleton   | 形（文字の行・円・四角）               |   6    |   中   | 文字の行は `--lv-line-body` の高さで並べ、読み込み後に行の箱がずれないようにする。                                                          |
+| Spinner    | 大きさ（lg 48）                        |   6    |   低   | パネル全体の読み込みでも md 24 で足りることが多い。                                                                                         |
+| EmptyState | 大きさ（表やパネルの中で使う小さな形） |   2    |   中   | 表の空の表示（DataTable）と同じ形をそろえる。                                                                                               |
+
+### 操作・移動
+
+| 部品         | 足りないもの                               | 持つ数 | 優先度 | lievre での注意                                                                                                                       |
+| ------------ | ------------------------------------------ | :----: | :----: | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Button       | 後ろのアイコン（`iconEnd`）                |   7    |   中   | 外部への移動や開閉（ChevronDown）。アイコンと文字の縦の中心は今と同じ検査。                                                           |
+| Button       | 幅いっぱい（`block`）                      |   6    |   中   | 狭い画面の申し込みの「次へ」。                                                                                                        |
+| Button       | 押して入り切り（`pressed`、ToggleButton）  |   5    |   中   | `aria-pressed`。入っているときは `--lv-selected` の面と文字の太さ。色だけにしない。                                                   |
+| Button       | 押せない理由（`disabledReason`）           |   1    |   中   | SmartHR のもの。押せない理由をツールチップか補助文で伝える。`disabled` のボタンにはフォーカスが届かないので、`aria-disabled` にする。 |
+| Button       | 数（`count`）                              |   2    |   低   | Counter を中に入れれば足りる。                                                                                                        |
+| ButtonGroup  | ボタンの組・分割ボタン                     |   6    |   中   | 分割ボタンは Button と DropdownMenu の組み合わせ。間の線が重なって2pxにならないこと。                                                 |
+| Link         | 控えめな色（`muted`）・外部の印            |   5    |   中   | 外部へのリンクは、アイコンだけでなく「（新しいタブで開く）」を読み上げる。下線は消さない（色だけでリンクを示さない）。                |
+| Tabs         | アイコン                                   |   6    |   中   | アイコンは補助。言葉は消さない。                                                                                                      |
+| Tabs         | 移動のタブ（URL で切り替える TabNav）      |   4    |   中   | 中身を持たず、`aria-current="page"` の Link を並べる。Tabs の ARIA（tablist）は使わない。                                             |
+| Tabs         | 縦に並べる・幅いっぱい                     |   5    |   低   | 縦は設定画面向け。SideNav と役割が近い。                                                                                              |
+| Pagination   | ページ番号を並べる形                       |   6    |   高   | 番号は等幅。いまのページは `aria-current="page"` と面の色。間は「…」で省く。                                                          |
+| Pagination   | 1ページの件数の選択・件数の表示            |   3    |   中   | DataTable の `pageSize` とつなぐ。「全 128 件中 1〜20 件」。                                                                          |
+| Breadcrumb   | 長いときの省略                             |   4    |   中   | 省いた分は DropdownMenu で開く。                                                                                                      |
+| DropdownMenu | 入れ子（サブメニュー）                     |   7    |   中   | Radix の Sub。右矢印で開き、左矢印で戻る。                                                                                            |
+| DropdownMenu | 項目の説明文・ふつうの項目のグループ見出し |   6    |   中   | 説明文は `aria-describedby`。                                                                                                         |
+| DropdownMenu | 開く向き（`side`）                         |   7    |   低   | Popover と同じ名前。                                                                                                                  |
+
+### 入力
+
+| 部品       | 足りないもの                         | 持つ数 | 優先度 | lievre での注意                                                                                                                       |
+| ---------- | ------------------------------------ | :----: | :----: | ------------------------------------------------------------------------------------------------------------------------------------- |
+| 入力すべて | 必須の示し方をそろえる               |   —    |   高   | TextField・Select・Textarea は `*`（読み上げない）、RadioGroup は「（必須）」とばらばら。「必須」の文字にそろえる（Field で一度に）。 |
+| TextField  | 前後の飾り（単位・アイコン・接頭辞） |   7    |   高   | 単位（円・件・%）は入力欄の外に言葉で添え、`aria-describedby` で読む。アイコンは補助。                                                |
+| TextField  | 読むだけ（`readOnly`）の見た目       |   6    |   高   | 無効（disabled）と見分ける。読むだけは値を4.5:1 で読め、フォーカスも届く。                                                            |
+| TextField  | 大きさ sm（32px）                    |   7    |   中   | 表の上の絞り込みなど、密度とは別に小さくしたい場面。                                                                                  |
+| TextField  | 文字数と上限                         |   5    |   中   | 6章の「文字数の表示」と同じ。数は等幅。上限に近づいたことを色だけで示さない。                                                         |
+| TextField  | 幅（`width`）                        |   3    |   中   | 郵便番号・年など、入る文字数に合わせた幅（`ch` ではなく、等幅なら 0.5em 単位）。                                                      |
+| TextField  | 等幅の入力（ID・コード）             |   2    |   中   | `.lv-mono` を入力欄にも。                                                                                                             |
+| TextField  | 入力の消去                           |   2    |   低   | SearchField に持たせる。                                                                                                              |
+| Textarea   | 自動の高さ                           |   6    |   中   | `field-sizing: content` が使えるブラウザではそれで、使えないときは行数を固定。                                                        |
+| Textarea   | 文字数と上限                         |   5    |   中   | TextField と同じ。                                                                                                                    |
+| Select     | 大きさ（sm / lg）                    |   7    |   高   | TextField に `controlSize` lg があるのに Select にない。並べたときに高さがそろわない。                                                |
+| Select     | 選択肢のグループ                     |   5    |   中   | Radix の Group と Label。                                                                                                             |
+| Checkbox   | 組（CheckboxGroup）                  |   8    |   高   | 5章の Field・Fieldset と一緒に。                                                                                                      |
+| RadioGroup | 横に並べる（`orientation`）          |   5    |   高   | 「はい・いいえ」など短い選択肢。狭い幅では縦に戻す。                                                                                  |
+| RadioGroup | カードの形（RadioCards）             |   4    |   中   | 料金の選択など。カード全体が当たり判定で、選んだカードは線と面の両方で示す。                                                          |
+| Checkbox   | カードの形（CheckboxCards）          |   2    |   低   | RadioCards と同じ形で作れる。                                                                                                         |
+| Switch     | ラベルの位置・大きさ                 |   5    |   低   | 設定の一覧では今の右つまみが読みやすい。                                                                                              |
+
+### 表示・重なり・データ
+
+| 部品      | 足りないもの                            | 持つ数 | 優先度 | lievre での注意                                                                                                             |
+| --------- | --------------------------------------- | :----: | :----: | --------------------------------------------------------------------------------------------------------------------------- |
+| Dialog    | 幅（`size` sm / md / lg）               |   7    |   高   | 確認は sm、フォームは md、表の詳細は lg。狭い画面では全幅。ConfirmDialog は sm に固定。                                     |
+| Dialog    | 全画面                                  |   4    |   低   | 狭い画面で lg が全幅になれば足りる。                                                                                        |
+| Text      | 行数の切り詰め（`maxLines`）            |   7    |   高   | 切った全文は `title` ではなく、詳細の画面や Tooltip で読めるようにする。表の長い件名で要る。                                |
+| Text      | 太さ（`weight`）                        |   6    |   中   | regular / medium / bold の3つ。                                                                                             |
+| Heading   | 大きさの段                              |   7    |   中   | 今の3段（section 18 / title 22 / display 36）に、小見出し（16）と 28 を足して5段にする。                                    |
+| Avatar    | 画像                                    |   6    |   中   | 画像が読めないときは頭文字に戻す。`alt` ではなく `aria-label` の名前を保つ。                                                |
+| Avatar    | 大きさの段（24 / 32 / 40 / 48）         |   7    |   中   | 4px の格子に乗せる。                                                                                                        |
+| Avatar    | 四角（組織・取引先）・グループ          |   6    |   低   | グループは「ほか3人」を言葉で。                                                                                             |
+| Card      | 種類（枠 / 面だけ / 押せる / 選べる）   |   6    |   中   | 押せるカードは中の見出しのリンクを全体に広げる（入れ子のボタンを作らない）。影は使わない。                                  |
+| Card      | 内側の余白の段                          |   3    |   低   | 密度で足りる。                                                                                                              |
+| Popover   | 幅の段                                  |   3    |   低   | 中身次第で足りる。                                                                                                          |
+| DataTable | 見出しの固定                            |   4    |   高   | 長い表をスクロールしたときに見出しが消えない。`focus-room` の検査で輪郭が切れないこと。                                     |
+| DataTable | 密度を表ごとに                          |   6    |   中   | 画面は comfortable のまま、表だけ compact にする。今は LievreProvider を入れ子にすれば足りるので、まずは例を Story で示す。 |
+| DataTable | 行の展開                                |   3    |   中   | 開閉のボタンに `aria-expanded`。                                                                                            |
+| DataTable | 縞                                      |   1    |   低   | lievre は罫線で行を分ける。縞は選択の面と紛らわしい。                                                                       |
+| DataTable | 列の固定                                |   2    |   低   | 横に長い表で。                                                                                                              |
+| Divider   | 縦                                      |   4    |   中   | 道具の並びの区切り。`aria-orientation="vertical"`。                                                                         |
+| Kbd       | 大きさ                                  |   1    |   低   | 置いた場所の文字の大きさで足りる。                                                                                          |
+| Stack     | 主軸の揃え（`justify`）・折り返しの指定 |   —    |   中   | 画面例で `style` を足して組んでいる。                                                                                       |
+
+### バリエーションを足すときの約束
+
+- **名前を部品の間でそろえる**：強さは `variant`、状態の色は `tone`、大きさは `size`（入力は今の `controlSize` を残すか、Field で `size` にまとめるかを Field の段階で決める）、開く向きは `side` / `align`。同じ意味に別の名前を付けない。
+- **大きさは操作の高さの段に乗せる**：24 / 32 / 40 / 48px（タッチは44px）。文字は 12 / 14 / 16px のどれか。新しい大きさには `control-height` と `{ padding }` の検査をかける。
+- **色の組を足したらコントラストのテストを足す**：文字は4.5:1、操作の輪郭・フォーカス・状態を示す形は3:1を、Paper と Ink の両方、質感（wear）を重ねた面でも `packages/react/src/test/contrast.test.tsx` で止める。
+- **状態を色だけで示さない**：選んだ・入っている・失敗したは、文字・アイコン・線の太さのどれかを必ず添える。
+- **動きは動きを減らす設定に従う**：不確定の Progress、Skeleton、開閉の動きは `prefers-reduced-motion: reduce` で止める。
+- **Story を足す**：バリエーションごとに Story を足し、`layoutGate` に測る部品を書く（[配置の品質基準](quality-gate.md)）。
+
+## 4. 優先順位の付け方
 
 次の5つで見ました。
 
 1. **業務画面で要るか**：探す・読む・申し込む・管理するのどれで、どのくらい使うか。
-2. **多くのシステムが持っているか**：上の表で ○ が多いものは、利用者が「あって当然」と思う。
+2. **多くのシステムが持っているか**：2章・3章の表で ○ や持つ数が多いものは、利用者が「あって当然」と思う。
 3. **lievre の方針と合うか**：影なし・面と線・状態は色と言葉で・数値は等幅。浮かぶ部品（メニュー・ポップオーバー）は影の代わりに線と面の明るさで浮かせる必要がある。
 4. **実装の土台があるか**：今使っている `radix-ui`（1.8）にあるか、ほかに頼れる実装があるか。
 5. **アクセシビリティの難しさ**：キーボード操作・読み上げ・フォーカスの扱いを自前で作る量。
@@ -89,9 +240,9 @@ lievre の △：IconButton は `lv-icon-button` の CSS だけがあり部品�
 
 優先度は、高＝次の実装でまず入れる、中＝業務画面を広げるときに要る、低＝必要が出たら、です。
 
-## 4. 部品ごとの評価
+## 5. 部品ごとの評価
 
-各部品の「品質基準で見る点」は、品質基準の CI で特に確かめたいことです。品質基準の項目名が決まったら、ここをその名前に合わせてください。
+各部品の「品質基準で見る点」は、配置の品質基準の CI（[quality-gate.md](quality-gate.md)）で特に確かめたいことです。IconButton・Popover・DropdownMenu・ConfirmDialog・DescriptionList・Spinner・VisuallyHidden は作り終えていて、ここの評価は作る前の記録として残しています。
 
 ### 優先度：高
 
@@ -302,7 +453,7 @@ lievre の △：IconButton は `lv-icon-button` の CSS だけがあり部品�
 - **lievre での注意**：ツリーはキーボード操作の作り込みが多く、難しさは高い。目次は今いる節を `aria-current` で示す。
 - **品質基準で見る点**：ツリーの階層ごとの字下げが 4px の倍数で揃うこと、開閉の矢印と文字の縦の中心。
 
-## 5. 日本語の業務に特有のもの
+## 6. 日本語の業務に特有のもの
 
 ほかのシステムの表にはほとんど出てこないが、日本の申し込み・管理画面ではよく要るものです。多くは見た目の部品より、入力の扱い（hook や関数）として作るのがよいと考えます。
 
@@ -315,29 +466,51 @@ lievre の △：IconButton は `lv-icon-button` の CSS だけがあり部品�
 | 文字数の表示           |   低   | Textarea の文字数と上限の表示。                                                                                                                   | 全角を2と数える制度（全角換算）か、文字数かを prop で選べるようにする。絵文字などを1文字として数える（`Intl.Segmenter`）。数は等幅。                                                                                                        | 文字数の表示の右揃えと、補助文とのベースライン。       |
 | 電話番号・法人番号など |   低   | 決まった形の番号の入力。                                                                                                                          | 全角・半角の正規化と、ハイフンの有無を両方受け付ける形で足りる。専用の部品は作らず、TextField と関数の組み合わせの例を Story で示す。                                                                                                       | なし。                                                 |
 
-## 6. 実装の順番
+## 7. 実装の順番
 
-品質基準と CI ができてから、次の3段階で進めることを提案します。各段階の部品は、品質基準の検査（アイコンと文字の縦の中心、左右の余白、密度ごとの高さ、4pxの倍数）を通してから次へ進みます。
+初版の第1段階（IconButton・Popover・DropdownMenu・ConfirmDialog・DescriptionList・VisuallyHidden・Spinner）は作り終えました。残りを、今ある部品のバリエーションと新しい部品を合わせて、次の段階で進めます。各段階は1つの PR にし、段階ごとに `npm run typecheck && npm run lint && npm test` と `npm run test:layout` を通してから次へ進みます。
 
-### 第1段階：土台と、すぐ作れる部品
+段階の番号は初版から付け直しました。[Combobox と DatePicker の土台](combobox-foundation.md) で「第2段階」と書いているのは、下の第5段階です。
 
-`radix-ui` にそのまま土台があり、アクセシビリティの難しさが低いものです。あとの段階の部品が使う土台（Field、Popover）を先に作ります。
+### 第1段階：案内と状態のバリエーション
 
-1. IconButton
-2. Popover
-3. DropdownMenu
-4. ConfirmDialog
-5. DescriptionList（画面例の手組みを置き換える）
-6. VisuallyHidden・Spinner（小さいので一緒に）
-7. Field・Fieldset・CheckboxGroup と ErrorSummary（エラーの示し方を一度で決める）
+依存を足さず、`radix-ui` の今の部品の中で作れるものです。どれも高か中で、今の部品の API に props を足すだけなので、利用する側の書き換えは要りません。
 
-Field で今の TextField・Select・RadioGroup を作り直すのは、配置の品質基準の CI が今の部品の測定値を記録し終えてからにします。作り直しの前後で見た目が変わらないことを、その記録と比べて確かめるためです。
+1. Alert：`action`（操作の場所）と `onDismiss`（閉じる）
+2. Toast：`tone` に info / warning、操作のボタン（`action`、操作のある通知は自動で消さない）
+3. Progress：不確定の形（`value` を省く）と、`tone` success / danger（文字とアイコンを添える）
+4. Badge：`emphasis` 淡い面 / 塗り、`size` sm
+5. Dialog：`size` sm / md / lg
 
-### 第2段階：申し込みと探す画面の入力
+### 第2段階：入力のまとまりと、入力のバリエーション
 
-`radix-ui` にない部品で、土台を1つ足す必要があります。候補は、コンボボックスと日付の両方を持ち、和暦（`@internationalized/date` の `JapaneseCalendar`）に対応する React Aria です。ただし、依存を増やす判断として、Ariakit や Downshift など範囲の狭い土台とも比べます。比べる点は、機能が足りるか、依存の大きさ、「依存を増やすときの約束」を満たせるかです。先に Combobox だけを試作して確かめてから決めます。全角・半角の正規化と IME の扱いは、ここで共通にします。
+1. Field・Fieldset・CheckboxGroup と ErrorSummary（5章）。必須の示し方を「必須」の文字にそろえる。
+2. TextField：前後の飾り（単位・アイコン）、`readOnly` の見た目、大きさ sm、幅、等幅
+3. Select：大きさ sm / lg、選択肢のグループ
+4. RadioGroup：横に並べる、カードの形（RadioCards）
+5. Textarea・TextField：文字数と上限、Textarea の自動の高さ
 
-試作の結果、Combobox の土台は Downshift（一覧の枠は Radix の Popover）、日付の計算は `@internationalized/date` にしました。理由と比べた結果は [Combobox と DatePicker の土台](combobox-foundation.md) にあります。
+Field で今の TextField・Select・RadioGroup を作り直すときは、配置の品質基準の CI が記録している今の測定値と比べ、見た目が変わらないことを確かめます。
+
+### 第3段階：操作と移動のバリエーション
+
+1. Button：`iconEnd`、`block`、`pressed`（ToggleButton）、押せない理由
+2. SegmentedControl（`radix-ui` の ToggleGroup）、ButtonGroup・分割ボタン
+3. Pagination：ページ番号を並べる形、件数の選択と表示
+4. Breadcrumb の省略、Tabs のアイコンと移動のタブ（TabNav）
+5. DropdownMenu：入れ子、項目の説明文、グループ見出し、`side`。Tooltip の `side` / `align`
+
+### 第4段階：表示と表のバリエーション
+
+1. Text の `maxLines`・`weight`、Heading の5段、Stack の `justify`
+2. Avatar の画像と大きさの段、Card の種類（押せる・選べる）
+3. DataTable の見出しの固定・行の展開、表だけ compact にする例
+4. Skeleton の形、EmptyState の小さな形、Divider の縦、Counter
+5. Chip・Tag、Accordion・Disclosure
+
+### 第5段階：申し込みと探す画面の入力（土台を1つ足す）
+
+`radix-ui` にない部品で、Combobox の土台に Downshift、日付の計算に `@internationalized/date` を足します（理由は [Combobox と DatePicker の土台](combobox-foundation.md)）。
 
 1. 全角・半角の正規化（関数）と Format
 2. Combobox（単一）
@@ -345,18 +518,17 @@ Field で今の TextField・Select・RadioGroup を作り直すのは、配置�
 4. SearchField・NumberField
 5. Stepper（申し込みの流れを画面例で組み直す）
 
-### 第3段階：管理画面を広げる部品
+### 第6段階：管理画面を広げる部品
 
-1. Chip・MultiCombobox
+1. MultiCombobox（Chip を使う）
 2. TableToolbar（DataTable の選択とつなぐ）
-3. Drawer・AppShell・SideNav
-4. SegmentedControl・TimeField
+3. Drawer・AppShell・SideNav、Banner（ページ上部のお知らせ）
+4. TimeField
 5. FileUpload、郵便番号から住所、氏名とふりがな
-6. Accordion・Disclosure（読む画面を広げるとき）
 
-優先度が低の部品（Timeline、Slider、VirtualTable、Chart、TreeView など）は、使う画面が出てきたときに個別に判断します。
+優先度が低のもの（Timeline、Slider、VirtualTable、Chart、TreeView、Toolbar、InlineEdit、CopyButton、Toggletip、低のバリエーション）は、使う画面が出てきたときに個別に判断します。
 
-## 7. 作らないもの
+## 8. 作らないもの
 
 カルーセル・画像スライダー・評価（星）・メガメニューなど、宣伝やサイトの画面向けの部品は、いまは作りません。lievre は用途を業務に絞ってはいませんが、これらは読む・探す・申し込む・管理するの画面で要る場面が少ないためです。
 

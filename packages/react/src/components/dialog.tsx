@@ -13,6 +13,8 @@ export type DialogProps = {
   children: ReactNode;
   /** 操作。閉じるだけのボタンは `<DialogClose asChild><Button>…</Button></DialogClose>` で包みます。 */
   footer?: ReactNode;
+  /** 幅。'sm' は 400px（短い知らせ・入力1つ）、'md'（既定）は 520px（ふつうのフォーム）、'lg' は 720px（表や詳細を見せる）。狭い画面では、どれも画面の幅から左右 16px を引いた幅に縮みます。 */
+  size?: 'sm' | 'md' | 'lg';
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 };
@@ -24,6 +26,7 @@ export function Dialog({
   description,
   children,
   footer,
+  size = 'md',
   open,
   onOpenChange,
 }: DialogProps) {
@@ -33,7 +36,7 @@ export function Dialog({
       <DialogPrimitive.Portal>
         <PortalSurface>
           <DialogPrimitive.Overlay className="lv-dialog-overlay" />
-          <DialogPrimitive.Content className="lv-dialog">
+          <DialogPrimitive.Content className="lv-dialog" data-size={size}>
             <header className="lv-dialog-header">
               <div>
                 {eyebrow && <div className="lv-eyebrow">{eyebrow}</div>}

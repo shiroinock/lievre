@@ -94,3 +94,19 @@ export const OpenClose: Story = {
 };
 /** 開いた状態。配置の検査は、この Story でダイアログの中を測ります。 */
 export const Open: Story = { args: { open: true } };
+/** 幅 400px。短い知らせや入力1つ。 */
+export const OpenSmall: Story = { args: { open: true, size: 'sm' } };
+/** 幅 720px。表や詳細を見せるとき。 */
+export const OpenLarge: Story = {
+  args: {
+    open: true,
+    size: 'lg',
+    title: '作業の詳細',
+    description: '作業 W-1024 の記録です。',
+    children: (
+      <p>
+        幅の広いダイアログは、表や詳細の一覧を見せるときに使います。狭い画面では、画面の幅に合わせて縮みます。
+      </p>
+    ),
+  },
+};
