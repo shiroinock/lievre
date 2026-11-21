@@ -1477,6 +1477,98 @@
     display: none;
   }
 
+  /* Accordion: headings divided by 1px lines. The arrow sits on the first line of the heading,
+     and the content starts at the heading's left edge. */
+  .lv-accordion {
+    border-top: 1px solid var(--lv-border);
+  }
+  .lv-accordion-item {
+    border-bottom: 1px solid var(--lv-border);
+  }
+  .lv-accordion-heading {
+    margin: 0;
+    font-size: var(--lv-text-base);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-accordion-trigger {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--lv-space-3);
+    width: 100%;
+    padding: 12px 0;
+    border: 0;
+    background: transparent;
+    color: var(--lv-text);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+  }
+  .lv-accordion-trigger:hover:not(:disabled) .lv-accordion-title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+  }
+  .lv-accordion-trigger:disabled {
+    color: var(--lv-muted);
+    cursor: not-allowed;
+  }
+  /* As tall as one line of the heading, so the arrow is centred on the first line. */
+  .lv-accordion-icon,
+  .lv-disclosure-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    height: 1lh;
+    color: var(--lv-muted);
+  }
+  .lv-accordion-icon svg,
+  .lv-disclosure-icon svg {
+    transition: transform var(--lv-motion) var(--lv-ease);
+  }
+  .lv-accordion-trigger[data-state='open'] .lv-accordion-icon svg {
+    transform: rotate(180deg);
+  }
+  .lv-accordion-content {
+    padding-bottom: var(--lv-space-4);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-body);
+  }
+
+  /* Disclosure: a small button in the flow of the text. The content starts at the button's
+     text, past the arrow and the gap. */
+  .lv-disclosure-trigger {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--lv-space-1);
+    min-height: 24px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--lv-accent);
+    font: inherit;
+    font-size: var(--lv-text-md);
+    line-height: 24px;
+    text-align: start;
+    cursor: pointer;
+  }
+  .lv-disclosure-trigger:hover .lv-disclosure-summary {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+  }
+  .lv-disclosure-icon {
+    color: inherit;
+  }
+  .lv-disclosure-trigger[data-state='open'] .lv-disclosure-icon svg {
+    transform: rotate(90deg);
+  }
+  .lv-disclosure-content {
+    margin-top: var(--lv-space-1);
+    margin-inline-start: 20px;
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-body);
+  }
+
   /* Kbd */
   .lv-kbd {
     display: inline-flex;

@@ -81,6 +81,7 @@
 - 表示の形を切り替える `SegmentedControl`、関係のあるボタンを並べる `ButtonGroup`（`attached` で隙間なくつなげる）、主な操作とほかの方法のメニューをつなげた `SplitButton`。（#36）
 - DropdownMenu に `{ type: 'submenu' }`（入れ子のメニュー。右矢印か Enter で開き、左矢印か Escape でその入れ子だけ閉じて親の項目へ戻る）、項目の `description`（項目の下の補足。`aria-describedby` で読み上げる）、`{ type: 'group' }`（見出しの付いたまとまり。見出しがまとまりの名前になる）、`side`（開く向き）。（#40）
 - Tooltip に `side`・`align`。画面の端で入らないときは反対側に回る。（#40）
+- 見出しを押して中身を開閉する `Accordion`（`headingLevel` で見出しのレベル、`multiple` で同時に複数を開く。上下の矢印キーで見出しの間を移る）と、1つの補足を開閉する `Disclosure`。どちらも開閉を矢印の向きと `aria-expanded` で伝える。（#PR）
 
 #### 直したもの
 
