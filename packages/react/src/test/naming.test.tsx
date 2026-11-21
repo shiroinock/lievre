@@ -95,8 +95,10 @@ describe('the rename to lievre', () => {
 // Links to this repository (the lint rules' docs URLs, the documents): the file and the heading they
 // point at must be on main, or the link lands on the wrong page after a move or a rename.
 const REPOSITORY = 'https://github.com/shiroinock/lievre';
+// The path stops at the punctuation that ends a sentence or a Markdown link. The anchor keeps to the
+// characters a heading's slug keeps, so 「…#lint。」 and <…#lint> read as #lint.
 const LINK =
-  /https:\/\/github\.com\/shiroinock\/lievre(?:\/(?:blob|tree)\/main\/([^\s'"`)#]*))?(?:#([^\s'"`)]+))?/gu;
+  /https:\/\/github\.com\/shiroinock\/lievre(?:\/(?:blob|tree)\/main\/([^\s'"`()#<>「」。、]*))?(?:#([\p{L}\p{N}_%-]+))?/gu;
 // The anchor GitHub gives a heading: lower case, punctuation dropped, spaces to hyphens.
 const slug = (heading: string) =>
   heading
@@ -105,35 +107,62 @@ const slug = (heading: string) =>
     .replace(/[^\p{L}\p{N}\s_-]/gu, '')
     .replace(/\s/g, '-');
 
+const brokenLinks = (file: string, content: string) => {
+  const found: string[] = [];
+  for (const [url, rawPath = '', anchor] of content.matchAll(LINK)) {
+    const path = rawPath.replace(/[.,:;!?]+$/, '');
+    const target = join(root, path);
+    const page =
+      existsSync(target) && statSync(target).isDirectory() ? join(target, 'README.md') : target;
+    if (!existsSync(page)) {
+      found.push(`${file}：${url} の ${path || 'README.md'} がありません。今の場所を指してください`);
+      continue;
+    }
+    if (!anchor) continue;
+    const headings = readFileSync(page, 'utf8')
+      .split('\n')
+      .filter((line) => /^#{1,6} /.test(line))
+      .map((line) => slug(line.replace(/^#+ /, '')));
+    if (!headings.includes(decodeURIComponent(anchor)))
+      found.push(
+        `${file}：${url} の見出し #${anchor} が ${page.slice(root.length + 1)} にありません。見出しのある README を指してください（${REPOSITORY}/tree/main/<フォルダ>#<見出し>）`,
+      );
+  }
+  return found;
+};
+
 describe('the links to this repository', () => {
   it('point at a file and a heading that are there', () => {
     const found: string[] = [];
     for (const file of files) {
       if (OUTSIDE_DATA.some((p) => p.test(file))) continue;
       if (/^packages\/react\/bench\/agent\/results\//.test(file)) continue;
-      for (const [url, path = '', anchor] of readFileSync(join(root, file), 'utf8').matchAll(
-        LINK,
-      )) {
-        const target = join(root, path);
-        const page =
-          existsSync(target) && statSync(target).isDirectory() ? join(target, 'README.md') : target;
-        if (!existsSync(page)) {
-          found.push(
-            `${file}：${url} の ${path || 'README.md'} がありません。今の場所を指してください`,
-          );
-          continue;
-        }
-        if (!anchor) continue;
-        const headings = readFileSync(page, 'utf8')
-          .split('\n')
-          .filter((line) => /^#{1,6} /.test(line))
-          .map((line) => slug(line.replace(/^#+ /, '')));
-        if (!headings.includes(decodeURIComponent(anchor)))
-          found.push(
-            `${file}：${url} の見出し #${anchor} が ${page.slice(root.length + 1)} にありません。見出しのある README を指してください（${REPOSITORY}/tree/main/<フォルダ>#<見出し>）`,
-          );
-      }
+      found.push(...brokenLinks(file, readFileSync(join(root, file), 'utf8')));
     }
     expect(found).toEqual([]);
+  });
+
+  // Written from REPOSITORY, so the scan above does not read these as links of this file.
+  it('stops a missing file or heading, and passes the ones that are there', () => {
+    const react = `${REPOSITORY}/tree/main/packages/react`;
+    for (const ok of [
+      REPOSITORY,
+      `${REPOSITORY}/pull/26`,
+      `${REPOSITORY}/blob/main/DESIGN.md`,
+      `${REPOSITORY}/blob/main/DESIGN.md.`,
+      `${react}#lint`,
+      `${react}#lint。`,
+      `<${react}#lint>`,
+      `[lint](${react}#lint).`,
+      `「${react}#lint」`,
+    ])
+      expect(brokenLinks('ok', ok), ok).toEqual([]);
+    for (const bad of [
+      `${REPOSITORY}#lint`,
+      `${REPOSITORY}/blob/main/nope.md`,
+      `${react}#nolint`,
+      `${react}#nolint。`,
+    ])
+      expect(brokenLinks('bad', bad), bad).toHaveLength(1);
   });
 });
