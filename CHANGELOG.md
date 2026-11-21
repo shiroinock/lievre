@@ -81,7 +81,7 @@
 - 表示の形を切り替える `SegmentedControl`、関係のあるボタンを並べる `ButtonGroup`（`attached` で隙間なくつなげる）、主な操作とほかの方法のメニューをつなげた `SplitButton`。（#36）
 - DropdownMenu に `{ type: 'submenu' }`（入れ子のメニュー。右矢印か Enter で開き、左矢印か Escape でその入れ子だけ閉じて親の項目へ戻る）、項目の `description`（項目の下の補足。`aria-describedby` で読み上げる）、`{ type: 'group' }`（見出しの付いたまとまり。見出しがまとまりの名前になる）、`side`（開く向き）。（#40）
 - Tooltip に `side`・`align`。画面の端で入らないときは反対側に回る。（#40）
-- 分類や選んだ値を示す `Chip` と、その並び `ChipGroup`。何も渡さなければ表示だけの札（タグ）、`onRemove` で外せる札（外すボタンは「{label}を外す」と読み上げる）、`selected`・`onSelectedChange` で押して入り切りする絞り込みの札（`aria-pressed`。選んでいる間はチェックの印を添える）。`size` は md（32px）・sm（24px）。（#PR）
+- 分類や選んだ値を示す `Chip` と、その並び `ChipGroup`。何も渡さなければ表示だけの札（タグ）、`onRemove` で外せる札（外すボタンは「{label}を外す」と読み上げる）、`selected`・`onSelectedChange` で押して入り切りする絞り込みの札（`aria-pressed`。選んでいる間はチェックの印を添える）。`size` は md（32px）・sm（24px）。（#6）
 
 #### 直したもの
 
