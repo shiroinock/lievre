@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { LayoutGate } from '../test/layout/declare';
 import { Button, Badge, TextField, DialogClose, ToastProvider, useToast } from '../index';
 import { useState } from 'react';
-import { Plus, Settings2, FolderOpen } from 'lucide-react';
+import { Plus, Settings2, FolderOpen, ChevronDown, ArrowUpRight, Pin } from 'lucide-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 const meta = {
@@ -23,12 +23,17 @@ const meta = {
             { icon: 'svg' },
           ],
         },
+        {
+          name: '幅いっぱいのボタン',
+          selector: '.lv-button--block',
+          checks: ['inset-x', 'inset-y', 'control-height', 'fits'],
+        },
       ],
     } satisfies LayoutGate,
     docs: {
       description: {
         component:
-          '主要操作はprimaryを1つ。通常はsecondary、補助操作はghost。loading中は再クリックを防ぎ、ボタンのラベルは残します。',
+          '主要操作はprimaryを1つ。通常はsecondary、補助操作はghost。loading中は再クリックを防ぎ、ボタンのラベルは残します。iconEnd は押したあとに起きること（開く・外へ移る）を示すアイコン、block は幅いっぱい。pressed を渡すと入り切りのボタン（aria-pressed）になります。disabledReason を渡すと、押せないままフォーカスが届き、理由をツールチップと読み上げで伝えます。',
       },
     },
   },
@@ -58,5 +63,50 @@ export const ClickInteraction: Story = {
   play: async ({ canvasElement, args }) => {
     await userEvent.click(within(canvasElement).getByRole('button'));
     await expect(args.onClick).toHaveBeenCalled();
+  },
+};
+export const IconEnd: Story = {
+  args: { iconEnd: <ChevronDown />, children: '並べ替え' },
+};
+export const ExternalLinkIcon: Story = {
+  args: { variant: 'ghost', iconEnd: <ArrowUpRight />, children: '別の画面で開く' },
+};
+export const Block: Story = {
+  args: { variant: 'primary', block: true, children: '次へ進む' },
+};
+function PressedDemo() {
+  const [pinned, setPinned] = useState(false);
+  return (
+    <Button icon={<Pin size={16} />} pressed={pinned} onClick={() => setPinned((p) => !p)}>
+      上に固定
+    </Button>
+  );
+}
+/** 押して入り切りするボタン。入っているときは面と線と太い文字で示します。 */
+export const Pressed: Story = {
+  render: () => <PressedDemo />,
+  play: async ({ canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: '上に固定' });
+    await expect(button).toHaveAttribute('aria-pressed', 'false');
+    await userEvent.click(button);
+    await expect(button).toHaveAttribute('aria-pressed', 'true');
+  },
+};
+/** 押せない理由。フォーカスが届き、理由をツールチップと読み上げで伝えます。 */
+export const DisabledReason: Story = {
+  args: {
+    variant: 'primary',
+    disabled: true,
+    disabledReason: '必須の項目をすべて入力すると送れます。',
+    children: '送る',
+  },
+  play: async ({ canvasElement, args }) => {
+    const button = within(canvasElement).getByRole('button', { name: '送る' });
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+    await expect(button).toHaveAttribute('aria-disabled', 'true');
+    await expect(button).toHaveAccessibleDescription('必須の項目をすべて入力すると送れます。');
+    await userEvent.keyboard('{Enter}');
+    await expect(args.onClick).not.toHaveBeenCalled();
   },
 };

@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { LayoutGate } from '../test/layout/declare';
 import { IconButton, Card, DataTable, Stack } from '../index';
-import { MoreHorizontal, Plus, Settings2, Trash2, X } from 'lucide-react';
+import { Bold, MoreHorizontal, Plus, Settings2, Trash2, X } from 'lucide-react';
+import { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 const meta = {
@@ -97,5 +98,28 @@ export const Open: Story = {
     await userEvent.tab();
     const tooltip = await within(canvasElement.ownerDocument.body).findByRole('tooltip');
     await expect(tooltip).toHaveTextContent('設定を開く');
+  },
+};
+function PressedDemo() {
+  const [bold, setBold] = useState(true);
+  return (
+    <IconButton
+      label="太字"
+      icon={<Bold />}
+      variant="secondary"
+      pressed={bold}
+      onClick={() => setBold((b) => !b)}
+    />
+  );
+}
+/** 押して入り切りするアイコンのボタン（aria-pressed）。 */
+export const Pressed: Story = {
+  args: { label: '太字', icon: <Bold /> },
+  render: () => <PressedDemo />,
+  play: async ({ canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: '太字' });
+    await expect(button).toHaveAttribute('aria-pressed', 'true');
+    await userEvent.click(button);
+    await expect(button).toHaveAttribute('aria-pressed', 'false');
   },
 };

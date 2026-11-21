@@ -168,7 +168,7 @@
     background: var(--lv-accent);
     color: var(--lv-on-accent);
   }
-  .lv-button--primary:where(:hover, :active):not(:disabled) {
+  .lv-button--primary:where(:hover, :active):not(:disabled, [aria-disabled='true']) {
     background: var(--lv-accent-hover);
   }
   .lv-button--secondary {
@@ -176,10 +176,10 @@
     border-color: var(--lv-border-strong);
     color: var(--lv-text);
   }
-  .lv-button--secondary:hover:not(:disabled) {
+  .lv-button--secondary:hover:not(:disabled, [aria-disabled='true']) {
     background: var(--lv-surface-sunken);
   }
-  .lv-button--secondary:active:not(:disabled) {
+  .lv-button--secondary:active:not(:disabled, [aria-disabled='true']) {
     background: var(--lv-accent-soft);
     border-color: var(--lv-accent);
   }
@@ -187,18 +187,18 @@
     background: transparent;
     color: var(--lv-muted);
   }
-  .lv-button--ghost:hover:not(:disabled) {
+  .lv-button--ghost:hover:not(:disabled, [aria-disabled='true']) {
     background: var(--lv-surface-sunken);
     color: var(--lv-text);
   }
-  .lv-button--ghost:active:not(:disabled) {
+  .lv-button--ghost:active:not(:disabled, [aria-disabled='true']) {
     background: var(--lv-accent-soft);
   }
   .lv-button--danger {
     background: var(--lv-danger);
     color: var(--lv-on-danger);
   }
-  .lv-button--danger:hover:not(:disabled) {
+  .lv-button--danger:hover:not(:disabled, [aria-disabled='true']) {
     background: color-mix(in srgb, var(--lv-danger) 86%, var(--lv-text));
   }
   .lv-button--sm {
@@ -211,10 +211,33 @@
     padding: 0 20px;
     font-size: var(--lv-text-base);
   }
-  .lv-button:disabled {
+  .lv-button:disabled,
+  .lv-button[aria-disabled='true'] {
     background: var(--lv-surface-sunken);
     border-color: var(--lv-border);
     color: var(--lv-muted);
+  }
+  .lv-button[aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+  .lv-button--block {
+    display: flex;
+    width: 100%;
+  }
+  .lv-button-end {
+    display: inline-flex;
+  }
+  .lv-button-end > svg {
+    width: 16px;
+    height: 16px;
+  }
+  /* Pressed (aria-pressed): the selected surface, the accent outline and bold words together,
+     so it is not told by colour alone. */
+  .lv-button[aria-pressed='true'],
+  .lv-icon-button[aria-pressed='true'] {
+    border-color: var(--lv-accent);
+    background: var(--lv-selected);
+    color: var(--lv-text);
   }
 
   /* A square: width = height = the control height of its size. The border is transparent
@@ -379,6 +402,87 @@
     height: 6px;
     border-radius: 50%;
     background: currentColor;
+  }
+
+  /* SegmentedControl: the same look as ViewSwitch. */
+  .lv-segmented {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--lv-space-1);
+  }
+  .lv-segmented-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--lv-space-2);
+    min-height: var(--lv-control-height);
+    padding: var(--lv-control-padding);
+    border: 1px solid var(--lv-border-strong);
+    border-radius: var(--lv-radius-md);
+    background: var(--lv-surface);
+    color: var(--lv-muted);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-tight);
+    white-space: nowrap;
+  }
+  .lv-segmented--sm .lv-segmented-item {
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: var(--lv-text-sm);
+  }
+  .lv-segmented-item:hover:not(:disabled) {
+    color: var(--lv-text);
+  }
+  .lv-segmented-item[data-state='on'] {
+    border-color: var(--lv-accent);
+    background: var(--lv-selected);
+    color: var(--lv-text);
+    font-weight: var(--lv-weight-bold);
+  }
+  .lv-segmented-item:disabled {
+    border-color: var(--lv-border);
+    color: var(--lv-subtle);
+    cursor: not-allowed;
+  }
+  .lv-segmented-icon {
+    display: inline-flex;
+  }
+  .lv-segmented-icon > svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ButtonGroup */
+  .lv-button-group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--lv-space-2);
+  }
+  /* Attached: one 1px line between buttons (each overlaps the last by its border), and only
+     the outer corners rounded. The hovered or focused one comes to the front. */
+  .lv-button-group--attached {
+    flex-wrap: nowrap;
+    gap: 0;
+  }
+  .lv-button-group--attached > * + * {
+    margin-inline-start: -1px;
+  }
+  .lv-button-group--attached > :not(:first-child) {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+  .lv-button-group--attached > :not(:last-child) {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .lv-button-group--attached > :is(:hover, :focus-visible, [aria-pressed='true']) {
+    position: relative;
+    z-index: 1;
+  }
+  /* Filled buttons have no border of their own: draw the line between them. */
+  .lv-button-group--attached > :is(.lv-button--primary, .lv-icon-button--primary) + * {
+    border-inline-start-color: color-mix(in srgb, var(--lv-on-accent) 60%, var(--lv-accent));
   }
 
   /* Field */
@@ -2019,6 +2123,14 @@
     }
     .lv-tab[data-state='active']::after {
       background: Highlight;
+    }
+    .lv-segmented-item[data-state='on'],
+    .lv-button[aria-pressed='true'],
+    .lv-icon-button[aria-pressed='true'] {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
     }
     .lv-radio-card:has(input:checked) {
       border-color: Highlight;
