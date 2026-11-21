@@ -1,0 +1,35 @@
+# Stops PRs that change what apps receive without a line in CHANGELOG.md.
+# It also runs when the description is edited, so adding the opt-out line reruns only this check.
+name: 変更履歴
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+concurrency:
+  group: changelog-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  changelog:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      # The pull_request checkout is the merge commit, so HEAD^1 is the base and HEAD^1..HEAD is
+      # exactly what the PR changes.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The body goes through env, never into the script text, so it cannot inject shell.
+      - name: CHANGELOG.md の書き忘れと書き方
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node scripts/check-changelog.mjs HEAD^1 HEAD
