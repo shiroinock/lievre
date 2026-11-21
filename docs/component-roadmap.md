@@ -500,9 +500,10 @@ lievre の △：Field は TextField・Select・RadioGroup がそれぞれラベ
 
 第2段階の残り（後半のあとに、別の PR で）：
 
-1. TextField：幅（入る文字数に合わせる）、等幅の入力
-2. RadioGroup：カードの形（RadioCards）
-3. Textarea・TextField：文字数と上限、Textarea の自動の高さ
+1. TextField：幅（`chars`。入る文字数に合わせ、全角は2と数える）、等幅の入力（`mono`）
+2. RadioGroup：カードの形（`variant="card"`。枠全体が押せて、選んだ枠は線と面と丸の3つで示す）
+3. Textarea・TextField：文字数と上限（`maxCount`。上限を超えても入力は止めず、超えた数を言葉と記号で示す。読み上げは上限を一度と、入力が止まってから残りの数）、数え方（`countBy`。見た目の1文字か、全角を2と数えるか）
+4. Textarea の自動の高さ（`autoResize`。CSS の `field-sizing` で4行分から12行分まで。対応しないブラウザでは高さは決まったまま）
 
 Field で今の TextField・Select・RadioGroup を作り直すときは、配置の品質基準の CI（`npm run test:layout`）を通し、上の3点のほかは見た目が変わらないことを確かめます。
 
@@ -630,7 +631,7 @@ Field で今の TextField・Select・RadioGroup を作り直すときは、配�
 
 1. `Operations.tsx` の作業キューに「順に見る」を足し、DataTable の行の選択と状態を共有する。一覧で選んだ行は「対応する」に、選択を外すと未決に戻る（`applySelection`、フックの `selected` / `setSelected`）。「見送る」にした行は、選択を外しても変えない
 2. 一覧へ切り替えたら今の項目の行のページへ移ってその行へ、戻ったら今の項目へフォーカスを移す（DecisionQueue の `autoFocus`）。最初に開いたときはフォーカスを動かさない
-3. 「残りの待機中の作業 2 件をまとめて見送る」の近道（DecisionQueue の `bulk`）。当たるものが2件以上のときだけ出し、1件ずつ記録に積むので1つ戻すで1件ずつ戻せる
+3. 「残りの待機中の作業 2 件をまとめて見送る」の近道（DecisionQueue の `bulk`）。当たるものが2件以上のときだけ出し、押す前に当たる項目を示し（今の項目を含むか）、押したら「2件を『見送る』にしました」と読み上げる。まとめた分は1つの操作として記録し、1つ戻すの1回でまとめて戻す（`undoKeys`、状態の `batches`）
 4. 見せ方を URL の `?view=queue` に残す例（画面例の `useViewParam`）。作業の状態は URL に入れず、`replaceState` で履歴を増やさない
 
 ### タイムライン型の段階3：増えるものと時間で動くもの

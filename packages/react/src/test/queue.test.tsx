@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { act, render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, afterEach } from 'vitest';
 import axe from 'axe-core';
@@ -14,6 +14,7 @@ import {
   decideItem,
   deferItem,
   undoDecision,
+  undoKeys,
   decideItems,
   selectionOf,
   applySelection,
@@ -225,10 +226,33 @@ describe('queue controls', () => {
 });
 
 describe('Sharing the queue with a list', () => {
-  it('decides many at once, one log entry each, so undo goes back one by one', () => {
-    const state = decideItems(emptyDecisionState, ['c', 'd'], 'out');
-    expect(state.log).toEqual(['c', 'd']);
-    expect(undoDecision(state).decisions).toEqual({ c: 'out' });
+  it('undoes a decision made at once in one step, and single ones one by one', () => {
+    let state = decideItem(emptyDecisionState, 'a', 'in');
+    state = decideItems(state, ['c', 'd'], 'out');
+    state = decideItem(state, 'b', 'in');
+    expect(state.log).toEqual(['a', 'c', 'd', 'b']);
+    expect(undoKeys(state)).toEqual(['b']);
+    state = undoDecision(state);
+    expect(undoKeys(state)).toEqual(['c', 'd']);
+    state = undoDecision(state);
+    expect(state).toEqual(decideItem(emptyDecisionState, 'a', 'in'));
+    expect(undoKeys(undoDecision(state))).toEqual([]);
+  });
+  it('takes an item out of its batch when it is decided again on its own', () => {
+    let state = decideItems(emptyDecisionState, ['a', 'b', 'c'], 'out');
+    state = decideItem(state, 'b', 'in');
+    expect(undoKeys(state)).toEqual(['b']);
+    state = undoDecision(state);
+    expect(undoKeys(state)).toEqual(['a', 'c']);
+    // Two batches stay apart.
+    state = decideItems(state, ['b', 'd'], 'in');
+    expect(undoKeys(state)).toEqual(['b', 'd']);
+    expect(undoKeys(undoDecision(state))).toEqual(['a', 'c']);
+  });
+  it('treats one item decided through decideItems as a single step', () => {
+    const state = decideItems(emptyDecisionState, ['a'], 'in');
+    expect(state).toEqual(decideItem(emptyDecisionState, 'a', 'in'));
+    expect(state.batches).toBeUndefined();
   });
   it('maps list selection onto one value and leaves the other decisions alone', () => {
     let state = decideItem(emptyDecisionState, 'a', 'out');
@@ -268,7 +292,33 @@ describe('DecisionQueue bulk and focus', () => {
     await waitFor(() => expect(screen.getByRole('article', { name: /項目A/ })).toHaveFocus());
     expect(screen.queryByRole('button', { name: /まとめて/ })).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: '1つ戻す' }));
-    expect(progressText()).toHaveTextContent('1 / 4 件を確認');
+    // The two decided at once go back together.
+    expect(progressText()).toHaveTextContent('0 / 4 件を確認');
+  });
+  it('lists the items the shortcut takes before it is pressed, current one included', () => {
+    setup(<BulkHarness />);
+    const bulk = screen.getByRole('button', { name: /まとめて/ });
+    expect(bulk).toHaveAccessibleDescription('対象：項目C、項目D');
+  });
+  it('reads out what each action did, in one shape', async () => {
+    setup(<BulkHarness />);
+    const status = () => screen.getByRole('status');
+    await userEvent.click(screen.getByRole('button', { name: 'もらう' }));
+    await waitFor(() =>
+      expect(status()).toHaveTextContent('「項目A」を「もらう」にしました。4件中2件目：項目B'),
+    );
+    await userEvent.click(screen.getByRole('button', { name: /まとめて/ }));
+    await waitFor(() =>
+      expect(status()).toHaveTextContent('2件を「もらわない」にしました。4件中4件目：項目B'),
+    );
+    await userEvent.click(screen.getByRole('button', { name: '1つ戻す' }));
+    await waitFor(() =>
+      expect(status()).toHaveTextContent('2件を未決に戻しました。4件中2件目：項目B'),
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'あとで' }));
+    await waitFor(() => expect(status()).toHaveTextContent('「項目B」をあとに回しました。'));
+    await userEvent.click(screen.getByRole('button', { name: '1つ戻す' }));
+    await waitFor(() => expect(status()).toHaveTextContent('「項目A」を未決に戻しました。'));
   });
   it('hides the shortcut when fewer than two items match', async () => {
     setup(<BulkHarness />);
@@ -322,6 +372,20 @@ describe('Work queue example: both views share one state', () => {
     for (let i = 0; i < order.length; i++) await userEvent.keyboard('n');
     await userEvent.click(screen.getByRole('button', { name: '一覧で選んだ作業を見る' }));
     await waitFor(() => expect(screen.getByRole('radio', { name: '一覧から選ぶ' })).toHaveFocus());
+  });
+  it('does not move focus when Back or Forward changes the view', async () => {
+    setup(<OperationsExample compact />);
+    await userEvent.click(screen.getByRole('radio', { name: '順に見る' }));
+    await waitFor(() =>
+      expect(screen.getByRole('article', { name: new RegExp(order[0].name) })).toHaveFocus(),
+    );
+    act(() => {
+      window.history.replaceState(null, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+    expect(screen.getByRole('radio', { name: '一覧から選ぶ' })).toBeChecked();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(document.activeElement?.closest('table')).toBeNull();
   });
   it('opens the view named in the URL without moving focus', async () => {
     window.history.replaceState(null, '', '/?view=queue');
