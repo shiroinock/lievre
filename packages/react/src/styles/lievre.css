@@ -1524,8 +1524,11 @@
   }
 
   /* Pagination */
+  /* Wraps on a narrow screen: with justify-content: flex-end an overflowing row would push the
+     start (the page-size choice) out to the left, where it cannot be scrolled to. */
   .lv-pagination {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
     gap: var(--lv-space-2);
@@ -1545,6 +1548,7 @@
   .lv-pagination > .lv-pagination-range {
     font-family: var(--lv-font-sans);
     font-size: var(--lv-text-sm);
+    white-space: nowrap;
   }
   /* The page-size choice sits at the start, its label beside it rather than above. */
   .lv-pagination-size {
@@ -1553,6 +1557,14 @@
   .lv-pagination-size .lv-field {
     grid-auto-flow: column;
     align-items: center;
+  }
+  /* The step buttons and the numbers wrap as one, so "previous" never sits alone on a line. */
+  .lv-pagination-steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--lv-space-1);
   }
   .lv-pagination-pages {
     display: flex;

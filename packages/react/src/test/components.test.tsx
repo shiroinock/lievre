@@ -901,6 +901,21 @@ describe('Navigation variations', () => {
     expect(screen.getByRole('link', { name: '組織' })).toHaveFocus();
     expect(screen.getByText('作業')).toHaveAttribute('aria-current', 'page');
   });
+  it('moves the focus to the first level left out even when it has no link', async () => {
+    setup(
+      <Breadcrumb
+        maxItems={2}
+        items={[
+          { label: 'ホーム', href: '#' },
+          { label: '組織' },
+          { label: '拠点', href: '#' },
+          { label: '作業' },
+        ]}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: '省いた2つの階層を出す' }));
+    expect(screen.getByText('組織')).toHaveFocus();
+  });
   it('lays links out as tabs, the current page marked', () => {
     setup(
       <TabNav

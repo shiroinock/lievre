@@ -683,8 +683,8 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `href: string` — 移る先。
   - `label: string`
   - `current?: boolean` — 今のページなら true。aria-current="page" と下線で示します。
-  - `count?: number`
-  - `icon?: ReactNode`
+  - `count?: number` — 件数。等幅で出し、言葉の後ろに読み上げます。
+  - `icon?: ReactNode` — 言葉の前のアイコン。飾りなので読み上げず、言葉は消しません。
 - `type BreadcrumbItem = { label: string; href?: string };`
 - `type Column<T>`
   - `key: string`
