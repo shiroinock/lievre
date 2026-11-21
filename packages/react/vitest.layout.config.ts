@@ -10,7 +10,11 @@ export default defineConfig({
     browser: {
       enabled: true,
       headless: true,
-      provider: playwright({ contextOptions: { reducedMotion: 'reduce' } }),
+      provider: playwright({
+        contextOptions: { reducedMotion: 'reduce' },
+        // `nix develop` sets this to nixpkgs' headless shell; otherwise Playwright's own download.
+        launchOptions: { executablePath: process.env.LIEVRE_CHROMIUM || undefined },
+      }),
       instances: [{ browser: 'chromium' }],
       viewport: { width: 1280, height: 900 },
       screenshotFailures: false,

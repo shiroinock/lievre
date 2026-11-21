@@ -14,6 +14,10 @@ coverage/
 wear-fonts/
 # Python for the worn fonts, from `npm run wear:setup`
 .venv-wear/
+# nix build and direnv
+result
+result-*
+.direnv/
 
 # Copied from the repository root by prepack (packages/react)
 packages/react/DESIGN.md
