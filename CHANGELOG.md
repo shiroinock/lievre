@@ -88,6 +88,10 @@
 - Avatar に `src`（画像。読み込めないときは頭文字に戻す）、`size` に `lg`（40px）・`xl`（48px）、`shape="square"`（組織・取引先）。（#1）
 - Card に `variant="plain"`（線のない凹んだ面）、`href`（見出しのリンクをカード全体に広げる）、`selection`（チェックボックスの当たり判定をカード全体に広げる選べるカード）。（#1）
 - DataTable に `maxHeight`（表の中でスクロールし、見出しの行を上に残す）、`renderExpanded`・`expandedIds`・`onExpandedChange`（行を広げて中身を出す。開閉のボタンは `aria-expanded`）、`paginationVariant`・`pageSizeOptions`・`onPageSizeChange`（下のページ送りにページ番号と表示件数。件数を変えると1ページ目に戻る）。（#2）
+- Skeleton に `shape`（`text` は本文の行の高さで `lines` 行並べ、最後の行を短くする。`circle` は `width` を直径にした丸）。（#5）
+- EmptyState に `size="sm"`（小さなパネルや表の中に置く形。余白と文字を小さくし、絵は出さない）。（#5）
+- Divider に `orientation="vertical"`（並びの高さに伸びる縦の線。`aria-orientation="vertical"` を付ける）と `decorative`（読み上げに区切りを伝えない）。（#5）
+- 数を示す `Counter`。数字は等幅で、読み上げは `label` と `unit` を付けて「未読 12件」と伝える。`max` を超えると「99+」に縮める。`tone` は neutral・accent・danger。（#5）
 
 #### 直したもの
 
