@@ -231,13 +231,14 @@
     width: 16px;
     height: 16px;
   }
-  /* Pressed (aria-pressed): the selected surface, the accent outline and bold words together,
-     so it is not told by colour alone. */
+  /* Pressed (aria-pressed): the selected surface and a 2px accent line (the border plus an inset
+     ring). Buttons are always bold, so the thicker line is what tells it apart without colour. */
   .lv-button[aria-pressed='true'],
   .lv-icon-button[aria-pressed='true'] {
     border-color: var(--lv-accent);
     background: var(--lv-selected);
     color: var(--lv-text);
+    box-shadow: inset 0 0 0 1px var(--lv-accent);
   }
 
   /* A square: width = height = the control height of its size. The border is transparent
@@ -472,13 +473,19 @@
     border-start-start-radius: 0;
     border-end-start-radius: 0;
   }
-  .lv-button-group--attached > :not(:last-child) {
+  /* Not :last-child: a Button with disabledReason leaves its hidden reason after it. */
+  .lv-button-group--attached > :has(~ :not(.lv-sr-only)) {
     border-start-end-radius: 0;
     border-end-end-radius: 0;
   }
-  .lv-button-group--attached > :is(:hover, :focus-visible, [aria-pressed='true']) {
+  .lv-button-group--attached > :is(:hover, [aria-pressed='true']) {
     position: relative;
     z-index: 1;
+  }
+  /* Focus above all, so a pressed neighbour later in the row cannot cover the ring. */
+  .lv-button-group--attached > :focus-visible {
+    position: relative;
+    z-index: 2;
   }
   /* Filled buttons have no border of their own: draw the line between them. */
   .lv-button-group--attached > :is(.lv-button--primary, .lv-icon-button--primary) + * {
@@ -2123,6 +2130,11 @@
     }
     .lv-tab[data-state='active']::after {
       background: Highlight;
+    }
+    /* aria-disabled is not :disabled, so the system does not grey it out by itself. */
+    .lv-button[aria-disabled='true'] {
+      border-color: GrayText;
+      color: GrayText;
     }
     .lv-segmented-item[data-state='on'],
     .lv-button[aria-pressed='true'],
