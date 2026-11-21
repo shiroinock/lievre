@@ -12,3 +12,4 @@ export * from './components/chip';
 export * from './components/disclosure';
 export * from './components/format';
 export * from './components/normalize';
+export * from './components/date';

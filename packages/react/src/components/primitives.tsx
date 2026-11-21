@@ -361,6 +361,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
             {...control}
             onChange={count.onChange}
             onBlur={onBlur}
+            // A field inside a group (DateField) is marked invalid by the group's error.
+            aria-invalid={control['aria-invalid'] ?? props['aria-invalid']}
             aria-describedby={joinIds(
               prefix && `${control.id}-prefix`,
               suffix && `${control.id}-suffix`,

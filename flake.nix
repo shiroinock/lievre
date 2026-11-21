@@ -36,7 +36,7 @@
           {
             inherit version src;
             nodejs = pkgs.nodejs_22;
-            npmDepsHash = "sha256-HhEbI123UmJSDB4XbO2QOeBqveW+SUhGGSUEG/HX97Y=";
+            npmDepsHash = "sha256-4Am7pbrq54XrMwLvD7E9/udm1VeajAj83QdABbLJuiY=";
             # The npm playwright package must not fetch browsers; nothing here runs one.
             env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
           }

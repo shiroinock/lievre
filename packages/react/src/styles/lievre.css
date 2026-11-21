@@ -796,6 +796,14 @@
     padding: 4px 12px;
   }
 
+  /* DateField: year, month and day side by side, each as wide as its digits. */
+  .lv-date-field-parts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--lv-space-3);
+  }
+
   /* Checkbox, Switch, Radio — "on" is always the accent, never a status color. */
   /* Controls beside text sit on the centre of its first line: (1lh − size) / 2 from the top. */
   .lv-check-field {
