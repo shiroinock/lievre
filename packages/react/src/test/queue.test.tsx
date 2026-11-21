@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect } from 'vitest';
@@ -204,4 +205,17 @@ describe('QueueProgress and ViewSwitch', () => {
     expect(screen.getByRole('radio', { name: '一覧から選ぶ' })).toBeChecked();
     expect((await axe.run(container)).violations).toEqual([]);
   });
+});
+
+// --lv-border is the pale rule of disabled controls and dividers (about 1.4:1 on the surface);
+// a pressable control's outline must be border-strong, which holds 3:1 (WCAG 1.4.11).
+describe('queue controls', () => {
+  const css = readFileSync('src/styles/lievre.css', 'utf8');
+  for (const selector of ['.lv-queue-done-item', '.lv-view-switch-item'])
+    it(`outlines ${selector} in border-strong, not the pale divider`, () => {
+      const block = css.match(new RegExp(`\\${selector} \\{([^}]*)\\}`))?.[1] ?? '';
+      expect(block, `${selector} の border は var(--lv-border-strong) にしてください`).toMatch(
+        /border: 1px solid var\(--lv-border-strong\)/,
+      );
+    });
 });
