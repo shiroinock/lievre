@@ -687,6 +687,8 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `decisions: Record<string, string>` — 項目のキー → 決めた値（choices の value）。入っていない項目は未決です。
   - `log: string[]` — 決めた順の項目のキー。1つ戻す（undo）はこの最後から戻します。
   - `deferred: string[]` — 「あとで」に回した順の項目のキー。未決のものは、列の最後にこの順で出ます。
+  - `batches?: Record<string, number>` — まとめて決めた項目のキー → まとめの番号。同じ番号の項目は1つの操作として、1つ戻すの1回でまとめて戻ります。
+1件ずつ決めた項目は入りません。省いてもかまいません。
 - `type DecisionQueueSnapshot` — 状態から組んだ、列の今の姿。
   - `current: string | undefined` — いま見ている項目のキー。すべて決め終えたら undefined。
   - `currentDeferred: boolean` — current があとで回した項目なら true。
@@ -716,9 +718,10 @@ altText には、通知の外で同じ操作ができる場所を書きます（
 keys にないキーの決定は数えません。
 - `decideItem`: `(state: DecisionState, key: string, value: string | undefined) => DecisionState` — 項目を決めます。value を undefined にすると未決に戻し（決め直し）、列に戻します。
 - `deferItem`: `(state: DecisionState, key: string) => DecisionState` — 項目を「あとで」に回します。決めてあれば未決に戻してから回します。
-- `decideItems`: `(state: DecisionState, keys: readonly string[], value: string) => DecisionState` — 複数の項目を同じ値で決めます。1件ずつ決めたのと同じく、渡した順で記録に積むので、1つ戻すと最後の1件から戻ります。
+- `decideItems`: `(state: DecisionState, keys: readonly string[], value: string) => DecisionState` — 複数の項目を同じ値で決めます。2件以上なら1つの操作として記録し、1つ戻すの1回でまとめて戻ります。
 - `selectionOf`: `(state: DecisionState, value?: string) => string[]` — value で決めた項目のキー（一覧の行の選択として使う）。並びは決めた順です。
 - `applySelection`: `(state: DecisionState, selected: readonly string[], value?: string) => DecisionState` — 一覧の行の選択を状態に写します。選んだ行は value で決め、選択を外した行のうち value で決めていたものは未決に戻します。
 ほかの値で決めた行（「見送る」など）は、選択を外しても変えません。
-- `undoDecision`: `(state: DecisionState) => DecisionState` — 最後に決めた項目を未決に戻します。
+- `undoKeys`: `(state: DecisionState) => string[]` — 1つ戻すで未決に戻る項目のキー。最後の操作が、まとめて決めたものならその全部、1件ずつなら最後の1件です。
+- `undoDecision`: `(state: DecisionState) => DecisionState` — 最後の操作を取り消します。まとめて決めた分は1回でまとめて、1件ずつ決めた分は1件ずつ戻ります。
 - `emptyDecisionState`: `DecisionState` — 何も決めていない状態。
