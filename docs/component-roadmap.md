@@ -257,7 +257,7 @@ lievre の △：Field は TextField・Select・RadioGroup がそれぞれラベ
 
 - **理由**：申し込み画面では、ラベル・補助文・エラー・必須の印を、どの入力でも同じ形にする必要がある。今は TextField・Select・RadioGroup がそれぞれ別に持っていて、日付やコンボボックスを足すたびに作り直すことになる。複数のチェックボックスをまとめる部品もない。
 - **参考**：Primer の FormControl、SmartHR UI の FormControl / Fieldset、Radix の `Label`。
-- **lievre での注意**：今の TextField などはこの Field を使って作り直し、見た目と API は変えない。必須は「必須」の文字で示し、`*` や色だけにしない。エラーは赤の線だけでなく、記号と文で示す。
+- **lievre での注意**：今の TextField などはこの Field を使って作り直し、API は変えない。見た目は、必須の印・補助文とエラーの並び・エラーの記号の3点だけが変わる。必須は「必須」の文字で示し、`*` や色だけにしない。エラーは赤の線だけでなく、記号と文で示す。
 - **品質基準で見る点**：ラベル・入力・補助文の縦の間隔が部品をまたいで同じ値であること。ラベルの左端と入力の左端が揃うこと。チェックボックスの四角と1行目の文字の縦の中心が揃うこと（2行に折り返したときも1行目に合わせる）。
 
 #### ErrorSummary（入力の誤りの一覧）
@@ -484,13 +484,22 @@ lievre の △：Field は TextField・Select・RadioGroup がそれぞれラベ
 
 ### 第2段階：入力のまとまりと、入力のバリエーション
 
-1. Field・Fieldset・CheckboxGroup と ErrorSummary（5章）。必須の示し方を「必須」の文字にそろえる。
-2. TextField：前後の飾り（単位・アイコン）、`readOnly` の見た目、大きさ sm、幅、等幅
-3. Select：大きさ sm / lg、選択肢のグループ
-4. RadioGroup：横に並べる、カードの形（RadioCards）
-5. Textarea・TextField：文字数と上限、Textarea の自動の高さ
+大きいので、PR を2つに分けます。
 
-Field で今の TextField・Select・RadioGroup を作り直すときは、配置の品質基準の CI が記録している今の測定値と比べ、見た目が変わらないことを確かめます。
+第2段階の前半（入力のまとまり）：
+
+1. Field・Fieldset・CheckboxGroup と ErrorSummary（5章）。TextField・Textarea・Select・Checkbox・RadioGroup を Field と Fieldset で組み直す。
+2. 必須の示し方を「必須」の文字にそろえる。1つの入力では、入力の required（aria-required）が読み上げで「必須」と伝えるので、文字は読み上げから外して二重に読まない。Fieldset・RadioGroup・CheckboxGroup の legend では、まとまりの名前と一緒に読み上げる。
+3. エラーは補助文を消さずにその下に出し、記号（アイコン）を添える。
+
+第2段階の後半（入力のバリエーション）：
+
+1. TextField：前後の飾り（単位・アイコン）、`readOnly` の見た目、大きさ sm、幅、等幅
+2. Select：大きさ sm / lg、選択肢のグループ
+3. RadioGroup：横に並べる、カードの形（RadioCards）
+4. Textarea・TextField：文字数と上限、Textarea の自動の高さ
+
+Field で今の TextField・Select・RadioGroup を作り直すときは、配置の品質基準の CI（`npm run test:layout`）を通し、上の3点のほかは見た目が変わらないことを確かめます。
 
 ### 第3段階：操作と移動のバリエーション
 
@@ -612,10 +621,12 @@ Field で今の TextField・Select・RadioGroup を作り直すときは、配�
 
 ### タイムライン型の段階2：画面例と一覧とのつなぎ
 
-1. `Operations.tsx` の作業キューに「順に見る」を足し、DataTable の行の選択と状態を共有する
-2. 一覧へ切り替えたら今の項目の行へ、戻ったら今の項目へフォーカスを移す
-3. 「残りの低いものをまとめて決める」の近道（根拠を言葉で示す）
-4. 見せ方を URL に残す例
+作り終えました。部品の側は `queue.tsx` に、画面例の側は `packages/react/src/patterns/Operations.tsx` にあります。
+
+1. `Operations.tsx` の作業キューに「順に見る」を足し、DataTable の行の選択と状態を共有する。一覧で選んだ行は「対応する」に、選択を外すと未決に戻る（`applySelection`、フックの `selected` / `setSelected`）。「見送る」にした行は、選択を外しても変えない
+2. 一覧へ切り替えたら今の項目の行のページへ移ってその行へ、戻ったら今の項目へフォーカスを移す（DecisionQueue の `autoFocus`）。最初に開いたときはフォーカスを動かさない
+3. 「残りの待機中の作業 2 件をまとめて見送る」の近道（DecisionQueue の `bulk`）。当たるものが2件以上のときだけ出し、1件ずつ記録に積むので1つ戻すで1件ずつ戻せる
+4. 見せ方を URL の `?view=queue` に残す例（画面例の `useViewParam`）。作業の状態は URL に入れず、`replaceState` で履歴を増やさない
 
 ### タイムライン型の段階3：増えるものと時間で動くもの
 

@@ -392,8 +392,11 @@
     font-weight: var(--lv-weight-bold);
     line-height: var(--lv-line-tight);
   }
+  /* Words, not an asterisk: read out with the label, and not a status, so not red. */
   .lv-required {
-    color: var(--lv-danger);
+    margin-left: var(--lv-space-2);
+    color: var(--lv-muted);
+    font-weight: var(--lv-weight-regular);
   }
   .lv-field-hint {
     margin: 0;
@@ -401,8 +404,17 @@
     line-height: var(--lv-line-body);
     color: var(--lv-muted);
   }
+  /* An error carries a mark as well as its colour; the mark sits on the first line. */
   .lv-field-error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--lv-space-1);
     color: var(--lv-danger);
+  }
+  .lv-field-error > svg {
+    flex-shrink: 0;
+    width: 14px;
+    height: 1lh;
   }
 
   .lv-input,
@@ -594,14 +606,18 @@
     border-color: var(--lv-border);
   }
 
-  .lv-radio-group {
+  .lv-fieldset {
     min-width: 0;
     margin: 0;
     padding: 0;
     border: 0;
   }
-  .lv-radio-group legend {
+  .lv-fieldset > legend {
     margin-bottom: var(--lv-space-3);
+    padding: 0;
+  }
+  .lv-fieldset > .lv-field-hint {
+    margin-top: var(--lv-space-2);
   }
   .lv-radio-option {
     display: flex;
@@ -700,6 +716,27 @@
   .lv-alert-content {
     flex: 1;
     min-width: 0;
+  }
+  /* ErrorSummary: the heading reads like the alert's title, the links in the status colour,
+     underlined so they are links by shape, not by colour alone. */
+  .lv-error-summary-title {
+    margin: 0;
+    color: var(--tone);
+    font-size: inherit;
+    font-weight: var(--lv-weight-bold);
+    line-height: inherit;
+  }
+  .lv-error-summary-list {
+    display: grid;
+    gap: var(--lv-space-1);
+    margin: var(--lv-space-2) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lv-error-summary-list a {
+    color: var(--tone);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
   .lv-alert-actions {
     display: flex;
@@ -1959,6 +1996,11 @@
   }
   .lv-queue-end > :last-child {
     margin-bottom: 0;
+  }
+
+  /* The shortcut to decide the rest at once names its reason in the button itself. */
+  .lv-queue-bulk {
+    margin: 0;
   }
 
   /* What comes next stays small and pale: a few names, then a count. */

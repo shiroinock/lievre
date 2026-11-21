@@ -31,6 +31,8 @@ import {
   X,
 } from 'lucide-react';
 import { cx, PortalSurface } from './system';
+import { Field } from './form';
+import { describedBy, FieldMessages, RequiredMark } from './field-parts';
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -164,101 +166,79 @@ export function Badge({
   );
 }
 
-function FieldFrame({
+export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> & {
+  /** 見える名前。input と結びます。placeholder の代わりにはしません。 */
+  label: string;
+  /** 補助文。入力の下に出し、aria-describedby で入力と結びます。 */
+  hint?: string;
+  /** エラー文。補助文の下に記号を添えて出し、aria-invalid と aria-describedby を付けます。補助文は消しません。 */
+  error?: string;
+  /** ラベルの横に「必須」の文字を出し、input に required を付けます。 */
+  required?: boolean;
+  /** input の id。省くと部品が作ります。ErrorSummary から移るときは、ここで決めた id を使います。 */
+  id?: string;
+  controlSize?: 'md' | 'lg';
+};
+/** ラベル・補助文・エラーと入力を関連付けた標準入力。 */
+export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function TextField(
+  { label, hint, error, controlSize = 'md', id, required, className, ...props },
+  ref,
+) {
+  return (
+    <Field {...{ label, hint, error, id, required }}>
+      {(control) => (
+        <input
+          {...props}
+          {...control}
+          aria-describedby={joinIds(control['aria-describedby'], props['aria-describedby'])}
+          ref={ref}
+          className={cx('lv-input', controlSize === 'lg' && 'lv-control--lg', className)}
+        />
+      )}
+    </Field>
+  );
+});
+/** 複数行の入力。label・hint・error・required・id の扱いは TextField と同じです。 */
+export function Textarea({
   label,
   hint,
   error,
   id,
   required,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  error?: string;
-  id: string;
-  required?: boolean;
-  children: ReactNode;
-}) {
-  return (
-    <div className="lv-field">
-      <label className="lv-label" htmlFor={id}>
-        {label}
-        {required && (
-          <span aria-hidden className="lv-required">
-            {' '}
-            *
-          </span>
-        )}
-      </label>
-      {children}
-      {(error || hint) && (
-        <p id={`${id}-description`} className={cx('lv-field-hint', error && 'lv-field-error')}>
-          {error || hint}
-        </p>
-      )}
-    </div>
-  );
-}
-export type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
-  /** 見える名前。input と結びます。placeholder の代わりにはしません。 */
-  label: string;
-  /** 補助文。aria-describedby で入力と結びます。 */
-  hint?: string;
-  /** エラー文。渡すと hint の代わりに表示し、aria-invalid と aria-describedby を付けます。 */
-  error?: string;
-  controlSize?: 'md' | 'lg';
-};
-/** ラベル・補助文・エラーと入力を関連付けた標準入力。 */
-export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function TextField(
-  { label, hint, error, controlSize = 'md', id: givenId, required, className, ...props },
-  ref,
-) {
-  const uid = useId();
-  const id = givenId ?? uid;
-  return (
-    <FieldFrame {...{ label, hint, error, id, required }}>
-      <input
-        {...props}
-        ref={ref}
-        id={id}
-        required={required}
-        className={cx('lv-input', controlSize === 'lg' && 'lv-control--lg', className)}
-        aria-invalid={!!error || undefined}
-        aria-describedby={hint || error ? `${id}-description` : props['aria-describedby']}
-      />
-    </FieldFrame>
-  );
-});
-/** 複数行の入力。label・hint・error の扱いは TextField と同じです。 */
-export function Textarea({
-  label,
-  hint,
-  error,
-  id: givenId,
-  required,
   className,
   ...props
-}: TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string; hint?: string; error?: string }) {
-  const uid = useId();
-  const id = givenId ?? uid;
+}: Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'id'> & {
+  /** 見える名前。textarea と結びます。 */
+  label: string;
+  /** 補助文。入力の下に出し、aria-describedby で結びます。 */
+  hint?: string;
+  /** エラー文。補助文の下に記号を添えて出し、aria-invalid を付けます。 */
+  error?: string;
+  /** ラベルの横に「必須」の文字を出し、required を付けます。 */
+  required?: boolean;
+  /** textarea の id。省くと部品が作ります。 */
+  id?: string;
+}) {
   return (
-    <FieldFrame {...{ label, hint, error, id, required }}>
-      <textarea
-        {...props}
-        id={id}
-        required={required}
-        className={cx('lv-input', 'lv-textarea', className)}
-        aria-invalid={!!error || undefined}
-        aria-describedby={hint || error ? `${id}-description` : props['aria-describedby']}
-      />
-    </FieldFrame>
+    <Field {...{ label, hint, error, id, required }}>
+      {(control) => (
+        <textarea
+          {...props}
+          {...control}
+          aria-describedby={joinIds(control['aria-describedby'], props['aria-describedby'])}
+          className={cx('lv-input', 'lv-textarea', className)}
+        />
+      )}
+    </Field>
   );
 }
+const joinIds = (...ids: (string | undefined)[]) => ids.filter(Boolean).join(' ') || undefined;
 
 export type CheckboxProps = {
   label: string;
+  /** 補助文。ラベルの下に出し、aria-describedby で結びます。 */
   hint?: string;
-  /** エラー文。aria-invalid と aria-describedby を付けます。 */
+  /** エラー文。記号を添えて出し、aria-invalid と aria-describedby を付けます。 */
   error?: string;
   checked?: boolean | 'indeterminate';
   defaultChecked?: boolean;
@@ -266,9 +246,11 @@ export type CheckboxProps = {
   onCheckedChange?: (checked: boolean | 'indeterminate') => void;
   disabled?: boolean;
   name?: string;
+  /** ラベルの横に「必須」の文字を出し、required を付けます（同意の確認など）。 */
   required?: boolean;
   id?: string;
 };
+/** 1つの入り切り。複数の選択肢をまとめるときは CheckboxGroup を使います。 */
 export function Checkbox({ label, hint, error, id: givenId, ...props }: CheckboxProps) {
   const uid = useId();
   const id = givenId ?? uid;
@@ -279,7 +261,7 @@ export function Checkbox({ label, hint, error, id: givenId, ...props }: Checkbox
         id={id}
         className="lv-checkbox"
         aria-invalid={!!error || undefined}
-        aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
+        aria-describedby={describedBy(id, hint, error)}
       >
         <CheckboxPrimitive.Indicator>
           {props.checked === 'indeterminate' ? (
@@ -292,17 +274,9 @@ export function Checkbox({ label, hint, error, id: givenId, ...props }: Checkbox
       <div>
         <label htmlFor={id} className="lv-check-label">
           {label}
+          {props.required && <RequiredMark />}
         </label>
-        {hint && (
-          <p className="lv-field-hint" id={`${id}-hint`}>
-            {hint}
-          </p>
-        )}
-        {error && (
-          <p className="lv-field-hint lv-field-error" id={`${id}-error`}>
-            {error}
-          </p>
-        )}
+        <FieldMessages id={id} hint={hint} error={error} />
       </div>
     </div>
   );
@@ -355,11 +329,15 @@ export type SelectProps = {
   /** onChange ではなくこちらを使います。 */
   onValueChange?: (value: string) => void;
   disabled?: boolean;
+  /** ラベルの横に「必須」の文字を出し、required を付けます。 */
   required?: boolean;
   name?: string;
+  /** 補助文。選択の欄の下に出し、aria-describedby で結びます。 */
   hint?: string;
-  /** エラー文。aria-invalid と aria-describedby を付けます。 */
+  /** エラー文。記号を添えて出し、aria-invalid と aria-describedby を付けます。 */
   error?: string;
+  /** 開くボタンの id。省くと部品が作ります。ErrorSummary から移るときは、ここで決めた id を使います。 */
+  id?: string;
 };
 /** 矢印キー・文字検索・Escapeに対応した単一選択。 */
 export function Select({
@@ -368,46 +346,47 @@ export function Select({
   placeholder = '選択してください',
   hint,
   error,
+  id,
   ...props
 }: SelectProps) {
-  const id = useId();
   return (
-    <FieldFrame {...{ label, hint, error, id, required: props.required }}>
-      <SelectPrimitive.Root {...props}>
-        <SelectPrimitive.Trigger
-          id={id}
-          className="lv-select-trigger"
-          aria-invalid={!!error || undefined}
-          aria-describedby={hint || error ? `${id}-description` : undefined}
-        >
-          <SelectPrimitive.Value placeholder={placeholder} />
-          <SelectPrimitive.Icon className="lv-select-icon">
-            <ChevronDown size={16} />
-          </SelectPrimitive.Icon>
-        </SelectPrimitive.Trigger>
-        <SelectPrimitive.Portal>
-          <PortalSurface>
-            <SelectPrimitive.Content position="popper" sideOffset={5} className="lv-select-content">
-              <SelectPrimitive.Viewport>
-                {options.map((option) => (
-                  <SelectPrimitive.Item
-                    key={option.value}
-                    value={option.value}
-                    disabled={option.disabled}
-                    className="lv-select-item"
-                  >
-                    <SelectPrimitive.ItemText>{option.label}</SelectPrimitive.ItemText>
-                    <SelectPrimitive.ItemIndicator className="lv-select-indicator">
-                      <Check size={14} />
-                    </SelectPrimitive.ItemIndicator>
-                  </SelectPrimitive.Item>
-                ))}
-              </SelectPrimitive.Viewport>
-            </SelectPrimitive.Content>
-          </PortalSurface>
-        </SelectPrimitive.Portal>
-      </SelectPrimitive.Root>
-    </FieldFrame>
+    <Field {...{ label, hint, error, id, required: props.required }}>
+      {({ required: _required, ...control }) => (
+        <SelectPrimitive.Root {...props}>
+          <SelectPrimitive.Trigger {...control} className="lv-select-trigger">
+            <SelectPrimitive.Value placeholder={placeholder} />
+            <SelectPrimitive.Icon className="lv-select-icon">
+              <ChevronDown size={16} />
+            </SelectPrimitive.Icon>
+          </SelectPrimitive.Trigger>
+          <SelectPrimitive.Portal>
+            <PortalSurface>
+              <SelectPrimitive.Content
+                position="popper"
+                sideOffset={5}
+                className="lv-select-content"
+              >
+                <SelectPrimitive.Viewport>
+                  {options.map((option) => (
+                    <SelectPrimitive.Item
+                      key={option.value}
+                      value={option.value}
+                      disabled={option.disabled}
+                      className="lv-select-item"
+                    >
+                      <SelectPrimitive.ItemText>{option.label}</SelectPrimitive.ItemText>
+                      <SelectPrimitive.ItemIndicator className="lv-select-indicator">
+                        <Check size={14} />
+                      </SelectPrimitive.ItemIndicator>
+                    </SelectPrimitive.Item>
+                  ))}
+                </SelectPrimitive.Viewport>
+              </SelectPrimitive.Content>
+            </PortalSurface>
+          </SelectPrimitive.Portal>
+        </SelectPrimitive.Root>
+      )}
+    </Field>
   );
 }
 

@@ -1244,3 +1244,12 @@ body:has(.lievre-app) {
     outline-color: Highlight;
   }
 }
+
+/* Work queue: the view switch above both views, and the queue view's padding. */
+.queue-view {
+  padding: 0 20px 12px;
+}
+.queue-timeline {
+  padding: 4px 20px 20px;
+  border-top: 1px solid var(--lv-border);
+}

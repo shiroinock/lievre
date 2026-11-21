@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach } from 'vitest';
 import axe from 'axe-core';
 import {
   LievreProvider,
@@ -14,10 +14,14 @@ import {
   decideItem,
   deferItem,
   undoDecision,
+  decideItems,
+  selectionOf,
+  applySelection,
   emptyDecisionState,
   type DecisionState,
   type QueueChoice,
 } from '../index';
+import { OperationsExample, initialWork, queueOrder } from '../patterns/Operations';
 
 const keys = ['a', 'b', 'c', 'd'];
 
@@ -218,4 +222,116 @@ describe('queue controls', () => {
         /border: 1px solid var\(--lv-border-strong\)/,
       );
     });
+});
+
+describe('Sharing the queue with a list', () => {
+  it('decides many at once, one log entry each, so undo goes back one by one', () => {
+    const state = decideItems(emptyDecisionState, ['c', 'd'], 'out');
+    expect(state.log).toEqual(['c', 'd']);
+    expect(undoDecision(state).decisions).toEqual({ c: 'out' });
+  });
+  it('maps list selection onto one value and leaves the other decisions alone', () => {
+    let state = decideItem(emptyDecisionState, 'a', 'out');
+    state = applySelection(state, ['b', 'c']);
+    expect(selectionOf(state)).toEqual(['b', 'c']);
+    state = applySelection(state, ['c', 'a']);
+    expect(state.decisions).toEqual({ c: 'in', a: 'in' });
+    state = applySelection(state, []);
+    expect(state.decisions).toEqual({});
+    const kept = applySelection(decideItem(emptyDecisionState, 'd', 'out'), []);
+    expect(kept.decisions).toEqual({ d: 'out' });
+  });
+});
+
+function BulkHarness({ autoFocus = false }: { autoFocus?: boolean }) {
+  const queue = useDecisionQueue({ keys });
+  return (
+    <DecisionQueue
+      items={items}
+      getKey={(i) => i.id}
+      getLabel={(i) => i.name}
+      renderItem={(i) => i.name}
+      queue={queue}
+      choices={choices}
+      label="まとめる列"
+      bulk={{ label: 'CとDの項目', match: (i) => i.id === 'c' || i.id === 'd', value: 'out' }}
+      autoFocus={autoFocus}
+    />
+  );
+}
+describe('DecisionQueue bulk and focus', () => {
+  it('offers the shortcut with its reason, and the result can still be undone', async () => {
+    setup(<BulkHarness />);
+    const bulk = screen.getByRole('button', { name: '残りのCとDの項目 2 件をまとめてもらわない' });
+    await userEvent.click(bulk);
+    expect(progressText()).toHaveTextContent('2 / 4 件を確認');
+    await waitFor(() => expect(screen.getByRole('article', { name: /項目A/ })).toHaveFocus());
+    expect(screen.queryByRole('button', { name: /まとめて/ })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: '1つ戻す' }));
+    expect(progressText()).toHaveTextContent('1 / 4 件を確認');
+  });
+  it('hides the shortcut when fewer than two items match', async () => {
+    setup(<BulkHarness />);
+    await userEvent.click(screen.getByRole('button', { name: 'あとで' }));
+    await userEvent.click(screen.getByRole('button', { name: 'もらう' }));
+    await userEvent.click(screen.getByRole('button', { name: 'もらう' }));
+    expect(screen.queryByRole('button', { name: /まとめて/ })).not.toBeInTheDocument();
+  });
+  it('takes focus on mount only with autoFocus', async () => {
+    const { unmount } = setup(<BulkHarness />);
+    expect(document.body).toHaveFocus();
+    unmount();
+    setup(<BulkHarness autoFocus />);
+    await waitFor(() => expect(screen.getByRole('article', { name: /項目A/ })).toHaveFocus());
+  });
+});
+
+describe('Work queue example: both views share one state', () => {
+  afterEach(() => window.history.replaceState(null, '', '/'));
+  const order = queueOrder(initialWork);
+  it('orders high priority first and, within it, the ones to check', () => {
+    expect(order.slice(0, 3).map((r) => r.status)).toEqual(['要確認', '要確認', '稼働中']);
+    expect(order.at(-1)?.priority).toBe(3);
+  });
+  it('keeps the view in the URL and shares decisions with the table selection', async () => {
+    setup(<OperationsExample compact />);
+    await userEvent.click(screen.getByRole('checkbox', { name: `${order[0].id} を選択` }));
+    await userEvent.click(screen.getByRole('radio', { name: '順に見る' }));
+    expect(window.location.search).toBe('?view=queue');
+    // The ticked row is already decided, so the queue starts at the second item and has focus.
+    const card = await screen.findByRole('article', { name: new RegExp(order[1].name) });
+    await waitFor(() => expect(card).toHaveFocus());
+    expect(screen.getByText('件を確認', { exact: false })).toHaveTextContent(
+      `1 / ${order.length} 件を確認`,
+    );
+    await userEvent.keyboard('y');
+    await userEvent.click(screen.getByRole('radio', { name: '一覧から選ぶ' }));
+    expect(window.location.search).toBe('');
+    expect(screen.getByText('2件を選択中')).toBeInTheDocument();
+    // Focus lands on the row of the item the queue was showing (on its page).
+    await waitFor(() =>
+      expect(screen.getByRole('checkbox', { name: `${order[2].id} を選択` })).toHaveFocus(),
+    );
+    await userEvent.click(screen.getByRole('button', { name: '次のページ' }));
+    expect(screen.getByRole('checkbox', { name: `${order[1].id} を選択` })).toBeChecked();
+  });
+  it('moves focus to the view switch when the queue has ended', async () => {
+    setup(<OperationsExample compact />);
+    await userEvent.click(screen.getByRole('radio', { name: '順に見る' }));
+    await screen.findByRole('article', { name: new RegExp(order[0].name) });
+    for (let i = 0; i < order.length; i++) await userEvent.keyboard('n');
+    await userEvent.click(screen.getByRole('button', { name: '一覧で選んだ作業を見る' }));
+    await waitFor(() => expect(screen.getByRole('radio', { name: '一覧から選ぶ' })).toHaveFocus());
+  });
+  it('opens the view named in the URL without moving focus', async () => {
+    window.history.replaceState(null, '', '/?view=queue');
+    setup(<OperationsExample compact />);
+    expect(screen.getByRole('radio', { name: '順に見る' })).toBeChecked();
+    expect(
+      await screen.findByRole('article', { name: new RegExp(order[0].name) }),
+    ).not.toHaveFocus();
+    expect(
+      screen.getByRole('button', { name: /残りの待機中の作業 2 件をまとめて見送る/ }),
+    ).toBeInTheDocument();
+  });
 });

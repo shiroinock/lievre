@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Plus, Download, Search, SlidersHorizontal, ChevronRight } from 'lucide-react';
 import {
   LievreProvider,
@@ -7,6 +7,7 @@ import {
   Card,
   Checkbox,
   DataTable,
+  DecisionQueue,
   DescriptionList,
   Dialog,
   DialogClose,
@@ -19,7 +20,10 @@ import {
   Textarea,
   ToastProvider,
   useToast,
+  useDecisionQueue,
+  ViewSwitch,
   type Column,
+  type QueueChoice,
 } from '../index';
 
 export type WorkItem = {
@@ -114,6 +118,43 @@ export function WorkBadge({ status }: { status: WorkItem['status'] }) {
   );
 }
 const priorityNames = ['', '高', '中', '低'];
+
+// The order the queue view shows: high priority first, and within a priority the ones to check.
+const statusRank: Record<WorkItem['status'], number> = { 要確認: 0, 稼働中: 1, 待機中: 2 };
+export const queueOrder = (rows: readonly WorkItem[]) =>
+  [...rows].sort((a, b) => a.priority - b.priority || statusRank[a.status] - statusRank[b.status]);
+const workChoices: QueueChoice[] = [
+  { value: 'in', label: '対応する', shortcut: 'Y' },
+  { value: 'out', label: '見送る', shortcut: 'N' },
+];
+const VIEWS = ['list', 'queue'];
+
+/**
+ * The chosen view lives in the URL (?view=queue), apart from the work itself: a reload or a shared
+ * link opens the same view, while decisions stay in memory. replaceState keeps Back for pages.
+ */
+export function useViewParam(name: string, fallback: string, allowed: readonly string[]) {
+  const read = () => {
+    if (typeof window === 'undefined') return fallback;
+    const value = new URLSearchParams(window.location.search).get(name);
+    return value && allowed.includes(value) ? value : fallback;
+  };
+  const [value, setValue] = useState(read);
+  useEffect(() => {
+    const sync = () => setValue(read());
+    window.addEventListener('popstate', sync);
+    return () => window.removeEventListener('popstate', sync);
+    // read only depends on its arguments, which do not change for one screen.
+  }, []);
+  const set = (next: string) => {
+    setValue(next);
+    const url = new URL(window.location.href);
+    if (next === fallback) url.searchParams.delete(name);
+    else url.searchParams.set(name, next);
+    window.history.replaceState(window.history.state, '', url);
+  };
+  return [value, set] as const;
+}
 
 export function NewWorkDialog({ onCreate }: { onCreate: (item: WorkItem) => void }) {
   const [open, setOpen] = useState(false);
@@ -272,8 +313,11 @@ function OperationsContent({ compact }: { compact: boolean }) {
   const [rows, setRows] = useState(initialWork);
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('all');
-  const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState(1);
+  const [view, setView] = useViewParam('view', 'list', VIEWS);
+  // Set when the person switches views, so the next view takes focus (not on the first load).
+  const switched = useRef(false);
+  const viewRef = useRef<HTMLDivElement>(null);
   const toast = useToast();
   const filtered = rows.filter(
     (row) =>
@@ -282,6 +326,31 @@ function OperationsContent({ compact }: { compact: boolean }) {
         .toLowerCase()
         .includes(query.toLowerCase()),
   );
+  const ordered = useMemo(() => queueOrder(filtered), [filtered]);
+  const keys = useMemo(() => ordered.map((r) => r.id), [ordered]);
+  // One state for both views: a row ticked in the list is 「対応する」 in the queue, and back.
+  const queue = useDecisionQueue({ keys });
+  const selected = queue.selected();
+  const decisions = queue.state.decisions;
+  const changeView = (next: string) => {
+    switched.current = true;
+    if (next === 'list' && queue.snapshot.current) {
+      const index = filtered.findIndex((r) => r.id === queue.snapshot.current);
+      if (index >= 0) setPage(Math.floor(index / 5) + 1);
+    }
+    setView(next);
+  };
+  // In the list, focus goes to the current item's row so the place is not lost. With nothing left
+  // (the end's button is gone), it goes to the view switch rather than dropping to the page.
+  useEffect(() => {
+    if (!switched.current || view !== 'list') return;
+    switched.current = false;
+    const id = queue.snapshot.current;
+    const box = id
+      ? document.querySelector<HTMLInputElement>(`input[aria-label="${CSS.escape(id)} を選択"]`)
+      : null;
+    (box ?? viewRef.current?.querySelector<HTMLElement>('[aria-checked="true"]'))?.focus();
+  });
   const columns = useMemo<Column<WorkItem>[]>(
     () => [
       {
@@ -332,9 +401,18 @@ function OperationsContent({ compact }: { compact: boolean }) {
         sortValue: (r) => r.updated,
         render: (r) => <span className="lv-mono lv-muted">{r.updated}</span>,
       },
+      {
+        key: 'decision',
+        header: '判断',
+        render: (r) => (
+          <span className="lv-muted">
+            {workChoices.find((c) => c.value === decisions[r.id])?.label ?? '未決'}
+          </span>
+        ),
+      },
       { key: 'actions', header: '詳細', render: (r) => <WorkDetails item={r} /> },
     ],
-    [],
+    [decisions],
   );
   const exportCsv = () => {
     const csv =
@@ -420,6 +498,9 @@ function OperationsContent({ compact }: { compact: boolean }) {
             接続中（サンプル）
           </Badge>
         </div>
+        <div className="queue-view" ref={viewRef}>
+          <ViewSwitch value={view} onValueChange={changeView} label="作業キューの見せ方" />
+        </div>
         <div className="queue-tools">
           <div className="queue-search">
             <Search size={14} aria-hidden />
@@ -451,26 +532,64 @@ function OperationsContent({ compact }: { compact: boolean }) {
             />
           </div>
         </div>
-        {selected.length > 0 && (
+        {view === 'list' && selected.length > 0 && (
           <div className="queue-selection" role="status">
             <span>{selected.length}件を選択中</span>
-            <Button variant="ghost" size="sm" onClick={() => setSelected([])}>
+            <Button variant="ghost" size="sm" onClick={() => queue.setSelected([])}>
               選択解除
             </Button>
           </div>
         )}
-        <DataTable
-          rows={filtered}
-          columns={columns}
-          getRowId={(r) => r.id}
-          caption="作業キュー：作業名・状態・担当・優先度・更新時刻"
-          selectable
-          selectedIds={selected}
-          onSelectionChange={setSelected}
-          pageSize={5}
-          page={page}
-          onPageChange={setPage}
-        />
+        {view === 'queue' ? (
+          <div className="queue-timeline">
+            <DecisionQueue
+              items={ordered}
+              getKey={(r) => r.id}
+              getLabel={(r) => r.name}
+              queue={queue}
+              choices={workChoices}
+              label="作業キューを順に見る"
+              order="優先度の高いものから、同じ優先度では要確認のものから順に出します。「対応する」にした作業は、一覧で選択した行になります。"
+              reason={(r) =>
+                r.status === '要確認'
+                  ? '確認が必要な作業です'
+                  : `優先度が${priorityNames[r.priority]}の作業です`
+              }
+              renderItem={(r) => (
+                <DescriptionList
+                  items={[
+                    { label: '状態', value: <WorkBadge status={r.status} /> },
+                    { label: 'ID', value: r.id, mono: true },
+                    { label: '分類', value: r.category },
+                    { label: '担当', value: r.owner },
+                    { label: '優先度', value: priorityNames[r.priority] },
+                    { label: '更新', value: r.updated, mono: true },
+                  ]}
+                />
+              )}
+              bulk={{ label: '待機中の作業', match: (r) => r.status === '待機中', value: 'out' }}
+              endAction={
+                <Button variant="primary" onClick={() => changeView('list')}>
+                  一覧で選んだ作業を見る
+                </Button>
+              }
+              autoFocus={switched.current}
+            />
+          </div>
+        ) : (
+          <DataTable
+            rows={filtered}
+            columns={columns}
+            getRowId={(r) => r.id}
+            caption="作業キュー：作業名・状態・担当・優先度・更新時刻・判断"
+            selectable
+            selectedIds={selected}
+            onSelectionChange={queue.setSelected}
+            pageSize={5}
+            page={page}
+            onPageChange={setPage}
+          />
+        )}
       </section>
       {!compact && (
         <div className="operations-lower">
