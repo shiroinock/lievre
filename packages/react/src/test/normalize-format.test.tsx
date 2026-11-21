@@ -85,6 +85,22 @@ describe('formatDate', () => {
     expect(formatDate('2026-02-30')).toBe('2026-02-30');
     expect(formatDate('2026-13-01')).toBe('2026-13-01');
     expect(formatDate('2026-00-10')).toBe('2026-00-10');
+    expect(formatDate('2026-02-30T10:00:00+09:00', { style: 'datetime' })).toBe(
+      '2026-02-30T10:00:00+09:00',
+    );
+    expect(formatDate('2024-02-29T10:00:00+09:00', { timeZone: 'Asia/Tokyo' })).toBe(
+      '2024年2月29日',
+    );
+  });
+  it('counts weeks, months and years without calendar words that could be wrong', () => {
+    const now = new Date(2027, 0, 1, 12);
+    expect(formatRelativeTime(new Date(2025, 6, 5, 12), { now })).toBe('1 年前');
+    expect(formatRelativeTime(new Date(2026, 8, 18, 12), { now: new Date(2026, 10, 1, 12) })).toBe(
+      '1 か月前',
+    );
+    expect(
+      formatRelativeTime(new Date(2026, 10, 10, 12), { now: new Date(2026, 10, 22, 12) }),
+    ).toBe('2 週間前');
   });
   it('counts calendar days in the given time zone', () => {
     // 15:30 UTC on the 21st is already the 22nd in Tokyo and still the 21st in Los Angeles.
@@ -182,6 +198,15 @@ describe('TextField halfWidth', () => {
     expect(input).toHaveValue('１２３ー４５６７');
     await userEvent.tab();
     expect(input).toHaveValue('123-4567');
+  });
+  it('leaves a read-only field as it is', async () => {
+    const onChange = vi.fn();
+    render(<TextField label="番号" halfWidth readOnly defaultValue="０９０" onChange={onChange} />);
+    const input = screen.getByRole('textbox', { name: '番号' });
+    input.focus();
+    await userEvent.tab();
+    expect(input).toHaveValue('０９０');
+    expect(onChange).not.toHaveBeenCalled();
   });
   it('lets a controlled onBlur read the straightened state', async () => {
     const seen: string[] = [];
