@@ -234,9 +234,13 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### Skeleton
 
-- `width?: string | number` — 既定 '100%'
-- `height?: string | number` — 既定 16
-- `label?: string` — 既定 '読み込み中'
+読み込んだあとの形を保つ仮の表示。動きを減らす設定では明滅を止めます。
+
+- `shape?: 'rect' | 'text' | 'circle'` — 既定 'rect'。形。rect は四角、text は本文の行（行の高さは本文の --lv-line-body、最後の行は短く）、circle は Avatar などの丸。
+- `width?: string | number` — 幅。rect と text の既定は 100%、circle では直径（既定 40px）。
+- `height?: string | number` — 高さ。rect だけで使い、既定は 16px。text は行数、circle は width で決まります。
+- `lines?: number` — 既定 3。shape="text" の行の数。
+- `label?: string` — 既定 '読み込み中'。読み上げる文（role="status"）。何を待っているかを書くと伝わります。
 
 ### VisuallyHidden
 
@@ -255,15 +259,32 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### EmptyState
 
-- `title: string`
-- `description: string`
-- `action?: ReactNode`
-- `icon?: ReactNode`
-- `eyebrow?: string`
+一覧や表が空のときの説明と、次の操作。検索の結果が0件のときと、まだ1件も作っていないときは、文を分けます。
+
+- `title: string` — 何が無いか（「まだ作業がありません」）。見出し（h3）になります。
+- `description: string` — 理由か、次にできること。
+- `action?: ReactNode` — 次の操作のボタンなど。
+- `icon?: ReactNode` — 添える絵。読み上げません。size="sm" では出しません。
+- `eyebrow?: string` — 見出しの上の小さな文字。
+- `size?: 'sm' | 'md'` — 既定 'md'。大きさ。md はページや広い表、sm は小さなパネル・表の中・メニューの中に。
 
 ### Divider
 
-- `label?: string`
+まとまりの境目の線。横では見出しの文字（label）を挟めます。縦は横に並ぶ操作の間に置きます。
+
+- `label?: string` — 線に挟む文字。横のときだけ出します。
+- `orientation?: 'horizontal' | 'vertical'` — 既定 'horizontal'。向き。vertical は並びの高さいっぱいに伸びる縦の線で、aria-orientation="vertical" を付けます。
+- `decorative?: boolean` — 既定 false。見た目だけの線にして、読み上げに区切りを伝えない（role="none"）。並びの意味が線なしでも分かるときに。
+
+### Counter
+
+数を示す小さな印（タブの件数、未読の数）。数字は等幅で、読み上げは label と単位を付けて「未読 12件」のように伝えます。
+
+- `value: number` — 数。
+- `label: string` — 何の数か（「未読」）。画面には出さず、読み上げに使います。
+- `unit?: string` — 既定 '件'。読み上げの単位。
+- `max?: number` — 既定 99。これを超えると「99+」のように縮め、読み上げは「99件より多い」と伝えます。
+- `tone?: 'neutral' | 'danger' | 'accent'` — 既定 'neutral'。色。neutral は控えめな面、accent は強調の塗り、danger はエラーの数。
 
 ### Kbd
 
