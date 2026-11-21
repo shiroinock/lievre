@@ -340,6 +340,16 @@ function OperationsContent({ compact }: { compact: boolean }) {
     }
     setView(next);
   };
+  // The flag only means "the person pressed the switch". Once the queue has taken focus, or when
+  // the view changes some other way (Back / Forward restoring ?view=), nothing should move focus.
+  useEffect(() => {
+    if (view === 'queue') switched.current = false;
+  }, [view]);
+  useEffect(() => {
+    const clear = () => (switched.current = false);
+    window.addEventListener('popstate', clear);
+    return () => window.removeEventListener('popstate', clear);
+  }, []);
   // In the list, focus goes to the current item's row so the place is not lost. With nothing left
   // (the end's button is gone), it goes to the view switch rather than dropping to the page.
   useEffect(() => {
