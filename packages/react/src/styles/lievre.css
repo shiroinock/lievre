@@ -1424,6 +1424,31 @@
     background: var(--lv-skeleton);
     animation: lv-pulse 1.6s ease-in-out infinite;
   }
+  .lv-skeleton--circle {
+    border-radius: 50%;
+  }
+  /* Lines of body text: each line is as tall as a body line, and the bar is the height of the
+     letters, so the text that replaces it takes the same room. */
+  .lv-skeleton-text {
+    display: block;
+    max-width: 100%;
+    animation: lv-pulse 1.6s ease-in-out infinite;
+  }
+  .lv-skeleton-line {
+    display: flex;
+    align-items: center;
+    height: var(--lv-line-body);
+  }
+  .lv-skeleton-line::before {
+    content: '';
+    width: 100%;
+    height: 1em;
+    border-radius: var(--lv-radius-sm);
+    background: var(--lv-skeleton);
+  }
+  .lv-skeleton-line:last-child:not(:first-child)::before {
+    width: 60%;
+  }
   @keyframes lv-pulse {
     50% {
       opacity: 0.5;
@@ -1456,6 +1481,17 @@
   .lv-empty > :last-child {
     margin-bottom: 0;
   }
+  /* For a panel, a menu or the inside of a table: less room, smaller text, no picture. */
+  .lv-empty--sm {
+    padding: 16px;
+  }
+  .lv-empty--sm h3 {
+    font-size: var(--lv-text-md);
+  }
+  .lv-empty--sm p {
+    margin-bottom: var(--lv-space-3);
+    font-size: var(--lv-text-sm);
+  }
 
   /* Divider */
   .lv-divider {
@@ -1475,6 +1511,44 @@
   }
   .lv-divider:not(:has(span))::after {
     display: none;
+  }
+  /* Between items laid out in a row: as tall as the row, with the gap on both sides. */
+  .lv-divider--vertical {
+    align-self: stretch;
+    width: 1px;
+    min-height: 1lh;
+    margin: 0 var(--lv-space-2);
+    background: var(--lv-border);
+  }
+  .lv-divider--vertical::before {
+    display: none;
+  }
+
+  /* Counter: a count beside a label. Figures in mono; the room is the same as a small badge. */
+  .lv-counter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 4px;
+    border-radius: var(--lv-radius-full);
+    background: var(--lv-surface-sunken);
+    color: var(--lv-text);
+    font-family: var(--lv-font-mono);
+    font-size: var(--lv-text-mono-min);
+    font-variant-numeric: tabular-nums;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .lv-counter--accent {
+    background: var(--lv-accent);
+    color: var(--lv-on-accent);
+  }
+  .lv-counter--danger {
+    background: var(--lv-danger);
+    color: var(--lv-on-danger);
   }
 
   /* Kbd */
@@ -2198,6 +2272,17 @@
       forced-color-adjust: none;
       background: Canvas;
       color: CanvasText;
+    }
+    /* The counter's tint is gone in forced colours; an inner outline keeps its edge. */
+    .lv-counter {
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+    }
+    .lv-divider--vertical,
+    .lv-skeleton,
+    .lv-skeleton-line::before {
+      forced-color-adjust: none;
+      background: GrayText;
     }
     .lv-progress-indicator,
     .lv-status-dot,

@@ -908,17 +908,46 @@ export function Progress({
     </div>
   );
 }
+/** 読み込んだあとの形を保つ仮の表示。動きを減らす設定では明滅を止めます。 */
 export function Skeleton({
-  width = '100%',
-  height = 16,
+  shape = 'rect',
+  width,
+  height,
+  lines = 3,
   label = '読み込み中',
 }: {
+  /** 形。rect は四角、text は本文の行（行の高さは本文の --lv-line-body、最後の行は短く）、circle は Avatar などの丸。 */
+  shape?: 'rect' | 'text' | 'circle';
+  /** 幅。rect と text の既定は 100%、circle では直径（既定 40px）。 */
   width?: string | number;
+  /** 高さ。rect だけで使い、既定は 16px。text は行数、circle は width で決まります。 */
   height?: string | number;
+  /** shape="text" の行の数。 */
+  lines?: number;
+  /** 読み上げる文（role="status"）。何を待っているかを書くと伝わります。 */
   label?: string;
 }) {
+  if (shape === 'text')
+    return (
+      <span
+        className="lv-skeleton-text"
+        role="status"
+        aria-label={label}
+        style={{ width: width ?? '100%' }}
+      >
+        {Array.from({ length: Math.max(1, lines) }, (_, i) => (
+          <span key={i} className="lv-skeleton-line" />
+        ))}
+      </span>
+    );
+  const size = shape === 'circle' ? (width ?? 40) : undefined;
   return (
-    <span className="lv-skeleton" role="status" aria-label={label} style={{ width, height }} />
+    <span
+      className={cx('lv-skeleton', shape === 'circle' && 'lv-skeleton--circle')}
+      role="status"
+      aria-label={label}
+      style={{ width: size ?? width ?? '100%', height: size ?? height ?? 16 }}
+    />
   );
 }
 /** 画面には出さず、読み上げにだけ伝える文字。表の行の「詳細」ボタンに「（W-1024）」を足すときなどに使います。配置には影響しません。 */
@@ -948,22 +977,31 @@ export function Spinner({
     </span>
   );
 }
+/** 一覧や表が空のときの説明と、次の操作。検索の結果が0件のときと、まだ1件も作っていないときは、文を分けます。 */
 export function EmptyState({
   title,
   description,
   action,
   icon,
   eyebrow,
+  size = 'md',
 }: {
+  /** 何が無いか（「まだ作業がありません」）。見出し（h3）になります。 */
   title: string;
+  /** 理由か、次にできること。 */
   description: string;
+  /** 次の操作のボタンなど。 */
   action?: ReactNode;
+  /** 添える絵。読み上げません。size="sm" では出しません。 */
   icon?: ReactNode;
+  /** 見出しの上の小さな文字。 */
   eyebrow?: string;
+  /** 大きさ。md はページや広い表、sm は小さなパネル・表の中・メニューの中に。 */
+  size?: 'md' | 'sm';
 }) {
   return (
-    <div className="lv-empty">
-      {icon && (
+    <div className={cx('lv-empty', size === 'sm' && 'lv-empty--sm')}>
+      {icon && size !== 'sm' && (
         <span className="lv-empty-icon" aria-hidden>
           {icon}
         </span>
@@ -975,11 +1013,59 @@ export function EmptyState({
     </div>
   );
 }
-export function Divider({ label }: { label?: string }) {
+/** まとまりの境目の線。横では見出しの文字（label）を挟めます。縦は横に並ぶ操作の間に置きます。 */
+export function Divider({
+  label,
+  orientation = 'horizontal',
+  decorative = false,
+}: {
+  /** 線に挟む文字。横のときだけ出します。 */
+  label?: string;
+  /** 向き。vertical は並びの高さいっぱいに伸びる縦の線で、aria-orientation="vertical" を付けます。 */
+  orientation?: 'horizontal' | 'vertical';
+  /** 見た目だけの線にして、読み上げに区切りを伝えない（role="none"）。並びの意味が線なしでも分かるときに。 */
+  decorative?: boolean;
+}) {
+  const vertical = orientation === 'vertical';
   return (
-    <div className="lv-divider" role="separator">
-      {label && <span>{label}</span>}
+    <div
+      className={cx('lv-divider', vertical && 'lv-divider--vertical')}
+      role={decorative ? 'none' : 'separator'}
+      aria-orientation={!decorative && vertical ? 'vertical' : undefined}
+    >
+      {label && !vertical && <span>{label}</span>}
     </div>
+  );
+}
+/** 数を示す小さな印（タブの件数、未読の数）。数字は等幅で、読み上げは label と単位を付けて「未読 12件」のように伝えます。 */
+export function Counter({
+  value,
+  label,
+  unit = '件',
+  max = 99,
+  tone = 'neutral',
+}: {
+  /** 数。 */
+  value: number;
+  /** 何の数か（「未読」）。画面には出さず、読み上げに使います。 */
+  label: string;
+  /** 読み上げの単位。 */
+  unit?: string;
+  /** これを超えると「99+」のように縮め、読み上げは「99件より多い」と伝えます。 */
+  max?: number;
+  /** 色。neutral は控えめな面、accent は強調の塗り、danger はエラーの数。 */
+  tone?: 'neutral' | 'accent' | 'danger';
+}) {
+  const over = value > max;
+  return (
+    <span className={cx('lv-counter', tone !== 'neutral' && `lv-counter--${tone}`)}>
+      <span className="lv-counter-value" aria-hidden>
+        {over ? `${max}+` : value}
+      </span>
+      <VisuallyHidden>
+        {over ? `${label} ${max}${unit}より多い` : `${label} ${value}${unit}`}
+      </VisuallyHidden>
+    </span>
   );
 }
 export function Kbd({ children }: { children: ReactNode }) {
