@@ -1,4 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 import { act, render, screen } from '@testing-library/react';
@@ -285,5 +286,28 @@ describe('Wear: provider', () => {
       .closest('.lievre') as HTMLElement;
     expect(portal).toHaveAttribute('data-wear', 'live');
     expect(portal.style.getPropertyValue('--lv-wear-heading-0')).toBe(filter);
+  });
+});
+
+// Renovate raises the pins in requirements.txt; a version copied into a document is left behind.
+describe('Wear: Python versions', () => {
+  it('names the pinned versions only in requirements.txt', () => {
+    const pins = readFileSync('scripts/wear/requirements.txt', 'utf8')
+      .split('\n')
+      .map((line) => /^([\w.-]+)==/.exec(line)?.[1])
+      .filter((name): name is string => Boolean(name));
+    const docs = execFileSync('git', ['ls-files', '--', '*.md'], { cwd: '../..', encoding: 'utf8' })
+      .split('\n')
+      .filter(Boolean);
+    const copied = docs.flatMap((file) => {
+      const text = readFileSync(`../../${file}`, 'utf8');
+      return pins
+        .filter((name) => new RegExp(`\\b${name}\\s*\\d+\\.\\d+`, 'i').test(text))
+        .map((name) => `${file}: ${name}`);
+    });
+    expect(
+      copied,
+      '文書に Python のモジュールの版を写さないでください。版は scripts/wear/requirements.txt だけに書き、文書からはそのファイルを指してください（Renovate が上げるのは requirements.txt だけです）',
+    ).toEqual([]);
   });
 });
