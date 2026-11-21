@@ -93,10 +93,6 @@
 - 端末の部品を `@lievre/tui` として足した。色と字の組を決める `core`（truecolor・256色・16色・色なし、ASCII の組）と、Ink で描く `ink`。（#22）
 - 1件ずつ判断する列：`Queue`・`QueueProgress`・`useQueueInput` と、列の状態とキーの決まり（`queueKey`）。決まりは `@lievre/react` の DecisionQueue と同じ答えを返す。（#34）
 - 字の組に進み具合の線（unicode は `━` `─`、ASCII は `#` `-`）。（#34）
-<<<<<<< HEAD
-- 動きの中核 `core/motion`：`--lv-motion`・`--lv-ease` から決める長さと曲線（最低 `MIN_FRAMES` フレーム）、字と役割の名前で持つ絵 `Grid`、入り方（`reveal`・`sweep`・`dissolve`・`typewriter`）と光の帯 `shimmer`、明るさ・形・点字で字を選ぶ `shade`・`shapes`・`braille`、動かすかを決める `motionPolicy`（`LIEVRE_MOTION=full|reduced|off`）。
-- 動きの部品：起動のバナー `Banner`、読み込み中の `Loading`（終わったら `result` の1行）、入り方の `Animation`、絵を描く `Frame`、フレームを進める `useFrames`。入り方は Enter・Esc・空白で飛ばせ、動き続けるものは P・空白で止める・再開できる。動きを減らす設定では止めた絵、読み上げ・端末でない出力・CI では `label` の1行だけを出す。
-- エージェント向けの手引き `skills/tui-motion/SKILL.md` を配布物に入れた。
-=======
 - 動きの中核 `core/motion`：`--lv-motion`・`--lv-ease` から決める長さと曲線（最低 `MIN_FRAMES` フレーム）、字と役割の名前で持つ絵 `Grid`、入り方（`reveal`・`sweep`・`dissolve`・`typewriter`）と光の帯 `shimmer`、明るさ・形・点字で字を選ぶ `shade`・`shapes`・`braille`、動かすかを決める `motionPolicy`（`LIEVRE_MOTION=full|reduced|off`）。（#3）
->>>>>>> claude/tui-motion-core
+- 動きの部品：起動のバナー `Banner`、読み込み中の `Loading`（終わったら `result` の1行）、入り方の `Animation`、絵を描く `Frame`、フレームを進める `useFrames`。入り方は Enter・Esc・空白で飛ばせ、動き続けるものは P・空白で止める・再開できる。動きを減らす設定では止めた絵、読み上げ・端末でない出力・CI では `label` の1行だけを出す。（#4）
+- エージェント向けの手引き `skills/tui-motion/SKILL.md` を配布物に入れた。（#4）
