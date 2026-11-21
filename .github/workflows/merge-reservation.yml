@@ -1,11 +1,12 @@
-# Turns on auto-merge for PRs labelled マージ予約, but only once their base is main.
-# A stacked PR's base has no required checks, so auto-merge there would merge at once; this waits
-# for GitHub to retarget it to main after the PR below it is merged. See scripts/merge-reservation.mjs.
+# Turns on auto-merge for PRs labelled マージ予約 once they point at main.
+# The job lives in shiroinock/workflows; change it there, not here. Pinned to a commit that was
+# read; see claude.yml for how to update. workflows_ref must be the same SHA: the job checks out
+# the script from shiroinock/workflows separately, and would take main's otherwise.
 name: マージ予約
 
 on:
-  # pull_request_target: forks get a token that can merge too. The PR's code is never checked out
-  # or run here; only scripts/ of the base branch is.
+  # pull_request_target: forks get a token that can merge too. No code from the PR is checked out
+  # or run; the script comes from shiroinock/workflows.
   pull_request_target:
     types: [labeled, edited, ready_for_review, reopened, closed]
   # What GITHUB_TOKEN merged sends no events, so the PR stacked on it is picked up by this.
@@ -13,41 +14,15 @@ on:
     - cron: '*/10 * * * *'
   workflow_dispatch:
 
-concurrency:
-  group: merge-reservation
-  cancel-in-progress: false
-
 permissions: {}
 
 jobs:
   reserve:
-    # The label itself, a base change, a merge, or a PR that becomes ready with the label on.
-    if: >-
-      github.event_name != 'pull_request_target' ||
-      (github.event.action == 'labeled' && github.event.label.name == 'マージ予約') ||
-      (github.event.action == 'edited' && github.event.changes.base != null) ||
-      (github.event.action == 'closed' && github.event.pull_request.merged) ||
-      github.event.action == 'ready_for_review' ||
-      github.event.action == 'reopened'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    uses: shiroinock/workflows/.github/workflows/merge-reservation.yml@758c1f1e8804a28f42bdb5df285cb6e7efacf3f8
     permissions:
-      contents: write # merge
-      pull-requests: write # turn on auto-merge, comment
-      actions: write # start CI on main after a merge GITHUB_TOKEN made
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: scripts
-          persist-credentials: false
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: main に向いた PR に自動マージを入れる
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          BASE_BRANCH: main
-        run: node scripts/merge-reservation.mjs
+      contents: write
+      pull-requests: write
+      actions: write
+    with:
+      ci_workflow: ci.yml # accepts workflow_dispatch
+      workflows_ref: 758c1f1e8804a28f42bdb5df285cb6e7efacf3f8
