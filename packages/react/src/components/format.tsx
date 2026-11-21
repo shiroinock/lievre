@@ -26,20 +26,29 @@ export type DateFormatOptions = {
   calendar?: 'gregory' | 'japanese';
   /** 曜日を添える（2026年11月22日(日)）。style="date" のときだけ。 */
   weekday?: boolean;
-  /** 表示に使う時間帯（'Asia/Tokyo' など）。省くと見ている端末の時間帯です。サーバーとブラウザで同じ文字にしたいときに決めます。 */
+  /** 表示に使う時間帯（'Asia/Tokyo' など）。省くと見ている端末の時間帯です。サーバーとブラウザで同じ文字にしたいときに決めます。'YYYY-MM-DD' の文字は日付そのものなので、時間帯によらず同じ日に出します。 */
   timeZone?: string;
 };
 const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/;
-/** 'YYYY-MM-DD' is a calendar day, not midnight UTC: read it in the local time zone. */
-function toDate(value: Date | string) {
-  if (value instanceof Date) return value;
-  const day = DATE_ONLY.exec(value);
-  return day ? new Date(Number(day[1]), Number(day[2]) - 1, Number(day[3])) : new Date(value);
+/** A moment from the value, or null when it is not a date. 'YYYY-MM-DD' becomes midnight UTC
+ * and is always written in UTC: it names a calendar day, not a moment, so no time zone moves it. */
+function read(value: Date | string) {
+  const day = typeof value === 'string' ? DATE_ONLY.exec(value) : null;
+  const date =
+    value instanceof Date
+      ? value
+      : day
+        ? new Date(Date.UTC(Number(day[1]), Number(day[2]) - 1, Number(day[3])))
+        : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : { date, dayOnly: !!day };
 }
-/** 日付・日時を日本語の書式の文字にします。FormatDate と同じ書式を、文の中に使うときに。 */
+/** 日付・日時を日本語の書式の文字にします。FormatDate と同じ書式を、文の中に使うときに。日付として読めない文字は、そのまま返します。 */
 export function formatDate(value: Date | string, options: DateFormatOptions = {}) {
-  const { style = 'date', calendar = 'gregory', weekday = false, timeZone } = options;
-  const date = toDate(value);
+  const { style = 'date', calendar = 'gregory', weekday = false } = options;
+  const moment = read(value);
+  if (!moment) return value instanceof Date ? '' : value;
+  const { date, dayOnly } = moment;
+  const timeZone = dayOnly ? 'UTC' : options.timeZone;
   if (style === 'time')
     return new Intl.DateTimeFormat('ja-JP', { timeStyle: 'short', timeZone }).format(date);
   if (style === 'datetime')
@@ -57,12 +66,20 @@ export function formatDate(value: Date | string, options: DateFormatOptions = {}
     timeZone,
   }).format(date);
 }
-const pad = (n: number) => String(n).padStart(2, '0');
-/** The machine-readable value for <time datetime>. */
-function machineValue(value: Date | string, style: DateFormatOptions['style']) {
+/** The machine-readable value for <time datetime>, in the same time zone as the text; none when
+ * the value is not a date. */
+function machineValue(value: Date | string, options: DateFormatOptions) {
+  const moment = read(value);
+  if (!moment) return undefined;
   if (typeof value === 'string') return value;
-  const day = `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
-  return style === 'date' ? day : value.toISOString();
+  if ((options.style ?? 'date') !== 'date') return value.toISOString();
+  // en-CA writes YYYY-MM-DD.
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: options.timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(value);
 }
 
 const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
@@ -76,7 +93,9 @@ const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
 ];
 /** 今との差を言葉にします（3分前・昨日・2日後）。差のいちばん大きい単位で丸めます。 */
 export function formatRelativeTime(value: Date | string, now: Date = new Date()) {
-  const seconds = (toDate(value).getTime() - now.getTime()) / 1000;
+  const moment = read(value);
+  if (!moment) return value instanceof Date ? '' : value;
+  const seconds = (moment.date.getTime() - now.getTime()) / 1000;
   const [unit, size] = UNITS.find(([, s]) => Math.abs(seconds) >= s) ?? UNITS[UNITS.length - 1];
   return new Intl.RelativeTimeFormat('ja', { numeric: 'auto' }).format(
     Math.round(seconds / size),
@@ -95,10 +114,11 @@ export function FormatNumber({
   className,
   ...options
 }: NumberFormatOptions & {
+  /** 出す数。割合（percent）では 1 を 100% として渡します。 */
   value: number;
   /** 数字の後ろに添える単位（「円」「件」）。割合は percent を使い、ここに「%」を書きません。 */
   unit?: string;
-  /** 等幅の書体にする。既定は true。false では本文の書体のまま数字の幅だけをそろえます（文の中の数字）。 */
+  /** 等幅の書体にする。false では本文の書体のまま数字の幅だけをそろえます（文の中の数字）。 */
   mono?: boolean;
   className?: string;
 }) {
@@ -112,7 +132,7 @@ export function FormatNumber({
 
 /**
  * 日付・日時を、日本語の書式で <time datetime> に出します。和暦（calendar="japanese"）にも、今との差（relative）にもできます。
- * 'YYYY-MM-DD' の文字は、その日（端末の時間帯の日付）として扱います。
+ * 'YYYY-MM-DD' の文字は、その日として扱い、時間帯でずらしません。日付として読めない値は、その文字のまま出します（datetime は付けません）。
  */
 export function FormatDate({
   value,
@@ -128,13 +148,13 @@ export function FormatDate({
   relative?: boolean;
   /** relative の基準の「今」。省くと描いた時の時刻です。 */
   now?: Date;
-  /** 等幅の書体にする（表の日付の列で桁をそろえるとき）。既定は false で、数字の幅だけをそろえます。 */
+  /** 等幅の書体にする（表の日付の列で桁をそろえるとき）。false では本文の書体のまま、数字の幅だけをそろえます。 */
   mono?: boolean;
   className?: string;
 }) {
   return (
     <time
-      dateTime={machineValue(value, options.style ?? 'date')}
+      dateTime={machineValue(value, options)}
       className={cx('lv-format', mono ? 'lv-mono' : 'lv-tabular', className)}
     >
       {relative ? formatRelativeTime(value, now) : formatDate(value, options)}
