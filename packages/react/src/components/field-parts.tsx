@@ -44,10 +44,15 @@ const segmenter =
   typeof Intl !== 'undefined' && 'Segmenter' in Intl
     ? new Intl.Segmenter('ja', { granularity: 'grapheme' })
     : undefined;
-/** Half-width forms and ASCII are 1; everything else (kana, kanji, full-width forms) is 2. */
+/**
+ * Half-width forms and ASCII are 1; everything else (kana, kanji, full-width forms) is 2.
+ * A half-width (semi-)voiced mark joins the kana before it as one grapheme but takes a cell
+ * of its own (ｶﾞ is two half-width cells), so it adds 1.
+ */
 const cellWidth = (grapheme: string) => {
-  const code = grapheme.codePointAt(0) ?? 0;
-  return code <= 0x7e || (code >= 0xff61 && code <= 0xff9f) ? 1 : 2;
+  const [first = 0, ...rest] = Array.from(grapheme, (c) => c.codePointAt(0) ?? 0);
+  const base = first <= 0x7e || (first >= 0xff61 && first <= 0xff9f) ? 1 : 2;
+  return base + rest.filter((c) => c === 0xff9e || c === 0xff9f).length;
 };
 /** Counts what a person sees as one character (an emoji with modifiers is one). */
 export function countCharacters(value: string, countBy: 'grapheme' | 'width' = 'grapheme') {
