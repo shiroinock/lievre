@@ -1,6 +1,8 @@
-// Motion drawn with Ink. Ink keeps the clock (useAnimation: one shared timer, and only the changed
-// part of a changed line is written), so frames never clear the screen. The rules — which frame,
-// what a key does, whether to move at all — live in core/motion.
+// Motion drawn with Ink. Ink keeps the clock (useAnimation: one shared timer) and never clears the
+// screen between frames. By default Ink rewrites its whole output each frame, wrapped in a
+// synchronized update on a terminal; render(..., { incrementalRendering: true }) writes only the
+// lines that changed. The rules — which frame, what a key does, whether to move at all — live in
+// core/motion.
 //
 // Draw-only parts (Frame) take a grid; the moving parts (Animation, Banner, Loading) also take
 // keys: Enter, Esc or Space skips an entrance, P or Space pauses and resumes a loop.
@@ -223,7 +225,7 @@ export type LoadingProps = Omit<FramesOptions, 'loop' | 'onDone'> & {
   tone?: 'ok' | 'warn' | 'stop';
   /** 止める・再開するキーの案内を出すか。 */
   hint?: boolean;
-  /** 言葉のあとに足すもの（「12 / 40 件」など）。 */
+  /** 言葉のあとに足す言葉（「12 / 40 件」など）。文字列か `<Text>` を渡す。 */
   children?: ReactNode;
 };
 
@@ -283,7 +285,12 @@ function LoadingLine({
     <Box gap={2}>
       <Box>
         <Frame grid={grid} label={label} />
-        {children}
+        {/* Ink only takes words inside <Text>, so what follows the label is wrapped here. */}
+        {children !== undefined && (
+          <Text color={p.text} backgroundColor={p.surface}>
+            {children}
+          </Text>
+        )}
       </Box>
       {hint && controls.listening && (
         <Text color={p.muted} aria-hidden>

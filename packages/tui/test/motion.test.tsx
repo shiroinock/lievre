@@ -32,8 +32,15 @@ const LABEL = 'lievre の端末';
 const wrap = (node: React.ReactNode, p: Palette, g: Glyphs = glyphs({})) => (
   <Lievre.Provider value={{ p, g }}>{node}</Lievre.Provider>
 );
+// palette('256') searches the xterm colors on every call, so each level and theme is made once.
+const palettes = new Map<string, Palette>();
+const paletteOf = (level: Level, theme: ThemeName) => {
+  const key = `${level} ${theme}`;
+  if (!palettes.has(key)) palettes.set(key, palette(level, theme));
+  return palettes.get(key)!;
+};
 const draw = (node: React.ReactNode, level: Level = 'truecolor', theme: ThemeName = 'paper') =>
-  renderToString(wrap(node, palette(level, theme)), { columns: 60 });
+  renderToString(wrap(node, paletteOf(level, theme)), { columns: 60 });
 const plain = (s: string) => s.replace(ANSI, '');
 
 describe('Frame', () => {
@@ -106,6 +113,17 @@ describe('Banner and Loading without a terminal clock (renderToString)', () => {
     expect(plain(draw(<Loading label="取り込んでいます" policy="full" />))).not.toContain('[P]');
   });
 
+  it('takes words after the label, as the skill shows', () => {
+    const out = plain(
+      draw(
+        <Loading label="取り込んでいます" policy="reduced">
+          {'　12 / 40 件'}
+        </Loading>,
+      ),
+    );
+    expect(out).toBe('取り込んでいます　12 / 40 件');
+  });
+
   it('ends with one line: the mark and the result', () => {
     const out = plain(draw(<Loading label="取り込んでいます" result="40 件を取り込みました" />));
     expect(out).toBe('✓ 40 件を取り込みました');
@@ -132,7 +150,8 @@ function terminal() {
       return true;
     },
   });
-  const stdin = Object.assign(new EventEmitter(), {
+  const events = new EventEmitter();
+  const stdin = Object.assign(events, {
     isTTY: true,
     queue: [] as string[],
     setRawMode() {},
@@ -146,7 +165,7 @@ function terminal() {
     },
     press(data: string) {
       this.queue.push(data);
-      this.emit('readable');
+      events.emit('readable');
     },
   });
   return { stdout, stdin };
