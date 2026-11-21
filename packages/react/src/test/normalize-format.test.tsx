@@ -81,6 +81,21 @@ describe('formatDate', () => {
     expect(formatDate(new Date(NaN))).toBe('');
     expect(formatRelativeTime('いつか')).toBe('いつか');
   });
+  it('rejects a day that does not exist instead of rolling it over', () => {
+    expect(formatDate('2026-02-30')).toBe('2026-02-30');
+  });
+  it('says today, yesterday and tomorrow for a YYYY-MM-DD day by calendar days', () => {
+    const now = new Date(2026, 10, 22, 23, 30);
+    expect(formatRelativeTime('2026-11-22', now)).toBe('今日');
+    expect(formatRelativeTime('2026-11-21', now)).toBe('昨日');
+    expect(formatRelativeTime('2026-11-23', now)).toBe('明日');
+  });
+  it('picks yesterday by the calendar, not by hours divided by 24', () => {
+    const now = new Date(2026, 10, 22, 23, 0);
+    // 39 hours before is 08:00 on the 21st: yesterday, not the day before.
+    expect(formatRelativeTime(new Date(2026, 10, 21, 8, 0), now)).toBe('昨日');
+    expect(formatRelativeTime(new Date(2026, 10, 20, 1, 0), now)).toBe('一昨日');
+  });
   it('says the difference from now', () => {
     const now = new Date('2026-11-22T10:00:00+09:00');
     expect(formatRelativeTime('2026-11-21T10:00:00+09:00', now)).toBe('昨日');

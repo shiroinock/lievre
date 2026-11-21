@@ -968,10 +968,11 @@ keys にないキーの決定は数えません。
 - `emptyDecisionState`: `DecisionState` — 何も決めていない状態。
 - `formatNumber`: `(value: number, options?: NumberFormatOptions) => string` — 数を日本語の書式（桁区切り）の文字にします。FormatNumber と同じ書式を、文の中や aria-label に使うときに。
 - `formatDate`: `(value: string | Date, options?: DateFormatOptions) => string` — 日付・日時を日本語の書式の文字にします。FormatDate と同じ書式を、文の中に使うときに。日付として読めない文字は、そのまま返します。
-- `formatRelativeTime`: `(value: string | Date, now?: Date) => string` — 今との差を言葉にします（3分前・昨日・2日後）。差のいちばん大きい単位で丸めます。
+- `formatRelativeTime`: `(value: string | Date, now?: Date) => string` — 今との差を言葉にします（3分前・昨日・2日後）。1日より近い時刻は時間・分・秒で、それより離れた日は暦の日の差（昨日・一昨日・3日前）で、
+1週より離れると週・月・年で丸めて言います。'YYYY-MM-DD' の文字は日付なので、今日・昨日・明日のように日の差だけで言います。
 - `toHalfWidth`: `(text: string, options?: HalfWidthOptions) => string` — 全角の数字・英字・記号・空白を半角に直します。半角のカタカナ（ｶﾅ）や、①・㈱などは変えません。
 電話番号・郵便番号・金額・メールの欄で、確定した文字に使います（変換中の文字には使いません）。
 - `toFullWidthKana`: `(text: string) => string` — 半角のカタカナ（ｶﾞﾝﾀﾞﾑ）を全角（ガンダム）に直します。濁点・半濁点は前の字と合わせます。ほかの字は変えません。
 - `toSearchKey`: `(text: string) => string` — 探すときに比べる形に直します。全角と半角（NFKC）、カタカナとひらがな、大文字と小文字、空白の違いを無視します。
-候補と入力の両方をこの形にしてから比べます（Combobox の絞り込みと同じ）。表示には使いません。
+候補の絞り込みなどで、候補と入力の両方をこの形にしてから比べます。表示には使いません。
 - `filterOptions`: `(options: ComboboxOption[], query: string) => ComboboxOption[]`
