@@ -484,13 +484,22 @@ lievre の △：Field は TextField・Select・RadioGroup がそれぞれラベ
 
 ### 第2段階：入力のまとまりと、入力のバリエーション
 
-1. Field・Fieldset・CheckboxGroup と ErrorSummary（5章）。必須の示し方を「必須」の文字にそろえる。
-2. TextField：前後の飾り（単位・アイコン）、`readOnly` の見た目、大きさ sm、幅、等幅
-3. Select：大きさ sm / lg、選択肢のグループ
-4. RadioGroup：横に並べる、カードの形（RadioCards）
-5. Textarea・TextField：文字数と上限、Textarea の自動の高さ
+大きいので、PR を2つに分けます。
 
-Field で今の TextField・Select・RadioGroup を作り直すときは、配置の品質基準の CI が記録している今の測定値と比べ、見た目が変わらないことを確かめます。
+第2段階の前半（入力のまとまり）：
+
+1. Field・Fieldset・CheckboxGroup と ErrorSummary（5章）。TextField・Textarea・Select・Checkbox・RadioGroup を Field と Fieldset で組み直す。
+2. 必須の示し方を「必須」の文字にそろえる。1つの入力では、入力の required（aria-required）が読み上げで「必須」と伝えるので、文字は読み上げから外して二重に読まない。Fieldset・RadioGroup・CheckboxGroup の legend では、まとまりの名前と一緒に読み上げる。
+3. エラーは補助文を消さずにその下に出し、記号（アイコン）を添える。
+
+第2段階の後半（入力のバリエーション）：
+
+1. TextField：前後の飾り（単位・アイコン）、`readOnly` の見た目、大きさ sm、幅、等幅
+2. Select：大きさ sm / lg、選択肢のグループ
+3. RadioGroup：横に並べる、カードの形（RadioCards）
+4. Textarea・TextField：文字数と上限、Textarea の自動の高さ
+
+Field で今の TextField・Select・RadioGroup を作り直すときは、配置の品質基準の CI（`npm run test:layout`）を通し、見た目が変わらないことを確かめます。
 
 ### 第3段階：操作と移動のバリエーション
 

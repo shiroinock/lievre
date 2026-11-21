@@ -16,6 +16,7 @@ const meta = {
           selector: '.lv-input',
           checks: ['inset-y', 'control-height', { padding: 'input' }],
         },
+        { name: 'エラー文', selector: '.lv-field-error', checks: [{ icon: ':scope > svg' }] },
       ],
     } satisfies LayoutGate,
     docs: {

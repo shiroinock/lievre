@@ -1,7 +1,6 @@
 import {
   createElement,
   forwardRef,
-  useId,
   type AnchorHTMLAttributes,
   type HTMLAttributes,
   type ReactElement,
@@ -112,77 +111,5 @@ export function Grid({
         ...style,
       }}
     />
-  );
-}
-export type RadioOption = {
-  value: string;
-  label: string;
-  description?: string;
-  disabled?: boolean;
-};
-/** ネイティブradioの矢印キー操作・フォーム送信を保つ単一選択。 */
-export function RadioGroup({
-  label,
-  options,
-  value,
-  defaultValue,
-  onValueChange,
-  name,
-  disabled = false,
-  error,
-  required = false,
-}: {
-  /** まとまりの名前。fieldset の legend になります。 */
-  label: string;
-  options: RadioOption[];
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
-  name?: string;
-  disabled?: boolean;
-  /** エラー文。fieldset に aria-describedby で結びます。 */
-  error?: string;
-  required?: boolean;
-}) {
-  const id = useId();
-  return (
-    <fieldset
-      className="lv-radio-group"
-      disabled={disabled}
-      aria-describedby={error ? `${id}-error` : undefined}
-    >
-      <legend className="lv-label">
-        {label}
-        {required ? '（必須）' : ''}
-      </legend>
-      <Stack gap={3}>
-        {options.map((o, i) => (
-          <label className="lv-radio-option" key={o.value}>
-            <input
-              type="radio"
-              name={name ?? id}
-              value={o.value}
-              checked={value === undefined ? undefined : value === o.value}
-              defaultChecked={value === undefined ? defaultValue === o.value : undefined}
-              onChange={() => onValueChange?.(o.value)}
-              disabled={o.disabled}
-              required={required}
-              aria-labelledby={`${id}-${i}-label`}
-              aria-invalid={!!error || undefined}
-              aria-describedby={o.description ? `${id}-${i}` : undefined}
-            />
-            <span>
-              <span id={`${id}-${i}-label`}>{o.label}</span>
-              {o.description && <small id={`${id}-${i}`}>{o.description}</small>}
-            </span>
-          </label>
-        ))}
-      </Stack>
-      {error && (
-        <p id={`${id}-error`} className="lv-field-hint lv-field-error">
-          {error}
-        </p>
-      )}
-    </fieldset>
   );
 }
