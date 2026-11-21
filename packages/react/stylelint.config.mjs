@@ -14,6 +14,7 @@ export default {
     'lievre/spacing-grid': true,
     'lievre/surface-tokens': true,
     'lievre/colour-tokens': true,
+    'lievre/side-stripe': true,
     // The `font` shorthand resets line-height to `normal`, so always give it one.
     'declaration-property-value-allowed-list': [
       { font: ['inherit', '/\\//'] },

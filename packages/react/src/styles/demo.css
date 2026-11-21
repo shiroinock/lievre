@@ -1035,7 +1035,7 @@ body:has(.lievre-app) {
 .everyday-prose blockquote {
   margin: 32px 0;
   padding: 20px 24px;
-  border-left: 3px solid var(--lv-accent);
+  border-radius: var(--lv-radius-md);
   background: var(--lv-accent-soft);
   font-size: var(--lv-text-lg);
 }

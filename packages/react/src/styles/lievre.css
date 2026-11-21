@@ -1875,7 +1875,7 @@
     overflow-wrap: anywhere;
   }
 
-  /* The current item is the only large thing on screen; its accent edge matches a selected row. */
+  /* The current item is the only large thing on screen: one card, with the count above it. */
   .lv-queue-card {
     display: grid;
     gap: var(--lv-space-4);
@@ -1883,8 +1883,7 @@
     padding: var(--lv-panel-padding);
     border: 1px solid var(--lv-border-strong);
     border-radius: var(--lv-radius-lg);
-    background: var(--lv-surface) linear-gradient(var(--lv-accent), var(--lv-accent)) left / 4px
-      100% no-repeat;
+    background: var(--lv-surface);
     animation: lv-queue-arrive var(--lv-motion) var(--lv-ease);
   }
   /* Only a small shift: if the animation is paused (a background tab), the card is still fully drawn. */
@@ -2015,9 +2014,6 @@
   }
 
   @media (forced-colors: active) {
-    .lv-queue-card {
-      border-left: 4px solid Highlight;
-    }
     .lv-view-switch-item[data-state='on'] {
       forced-color-adjust: none;
       border-color: Highlight;

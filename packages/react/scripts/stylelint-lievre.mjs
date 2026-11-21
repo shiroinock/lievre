@@ -160,6 +160,54 @@ const colourTokens = rule(
   },
 );
 
+// A coloured band down one side of a box is a decoration that says nothing: it is unclear what it
+// marks, and it is a cue made of colour alone. Hairline (1px) dividers on one side pass, and so
+// does the accent edge of a state the selector names (a selected row, the current tab), because
+// there the edge means "this one is chosen" beside the fill. Several gradient layers (a meter's
+// bars) are drawings, not a band.
+const ONE_SIDE =
+  /^border-(left|right|top|bottom|inline-start|inline-end|block-start|block-end)(-width)?$/;
+const px = (word) => {
+  if (word === 'thin') return 1;
+  if (word === 'medium') return 3;
+  if (word === 'thick') return 5;
+  const m = /^(\d*\.?\d+)(px)?$/.exec(word);
+  return m ? parseFloat(m[1]) : undefined;
+};
+const sideStripeMessage = (s, what) =>
+  `「${s}」の ${what} は、片側だけの飾りの帯です。何を示すのかが曖昧で、色だけの合図になります（DESIGN.md）。今のもの・強調するものは、枠全体（border）、見出し、アイコンと文字で示してください。状態の印なら、セレクタに状態（[data-selected]・[aria-current] など）を書きます。区切り線は 1px にします。`;
+const sideStripe = rule('side-stripe', '', (root, fail) => {
+  root.walkRules((r) => {
+    const names = selectors(r).filter((sel) => !STATE.test(sel));
+    if (!names.length) return;
+    const name = names.join(', ');
+    r.each((decl) => {
+      if (decl.type !== 'decl') return;
+      if (ONE_SIDE.test(decl.prop)) {
+        const width = words(decl.value)
+          .map(px)
+          .find((n) => n !== undefined);
+        if (width !== undefined && width > 1)
+          fail(decl, sideStripeMessage(name, `${decl.prop}: ${decl.value}`));
+        return;
+      }
+      if (!/^background(-image)?$/.test(decl.prop)) return;
+      const layers = [
+        ...decl.value.matchAll(/(?<!-)linear-gradient\(([^()]*(?:\([^()]*\)[^()]*)*)\)/g),
+      ];
+      if (layers.length !== 1) return;
+      const stops = layers[0][1].split(/,(?![^(]*\))/).map((t) => t.trim());
+      if (stops.length !== 2 || stops[0] !== stops[1]) return;
+      const sizeDecl = r.nodes.find((d) => d.type === 'decl' && d.prop === 'background-size');
+      const size = decl.value.includes('/') ? decl.value.split('/').pop() : (sizeDecl?.value ?? '');
+      const [w, h] = words(size.trim());
+      const thick = (a, b) => b === '100%' && (px(a) ?? 0) > 1;
+      if (thick(w, h) || thick(h, w))
+        fail(decl, sideStripeMessage(name, `単色のグラデーション（${words(size).join(' ')}）`));
+    });
+  });
+});
+
 export default [
   utilitiesNoSize,
   monoUnicodeRange,
@@ -168,6 +216,7 @@ export default [
   spacingGrid,
   surfaceTokens,
   colourTokens,
+  sideStripe,
 ];
 
 // ------------------------------------------------------------- layout gate
