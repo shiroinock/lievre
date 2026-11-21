@@ -500,9 +500,10 @@ lievre の △：Field は TextField・Select・RadioGroup がそれぞれラベ
 
 第2段階の残り（後半のあとに、別の PR で）：
 
-1. TextField：幅（入る文字数に合わせる）、等幅の入力
-2. RadioGroup：カードの形（RadioCards）
-3. Textarea・TextField：文字数と上限、Textarea の自動の高さ
+1. TextField：幅（`chars`。入る文字数に合わせ、全角は2と数える）、等幅の入力（`mono`）
+2. RadioGroup：カードの形（`variant="card"`。枠全体が押せて、選んだ枠は線と面と丸の3つで示す）
+3. Textarea・TextField：文字数と上限（`maxCount`。上限を超えても入力は止めず、超えた数を言葉と記号で示す。読み上げは上限を一度と、入力が止まってから残りの数）、数え方（`countBy`。見た目の1文字か、全角を2と数えるか）
+4. Textarea の自動の高さ（`autoResize`。CSS の `field-sizing` で4行分から12行分まで。対応しないブラウザでは高さは決まったまま）
 
 Field で今の TextField・Select・RadioGroup を作り直すときは、配置の品質基準の CI（`npm run test:layout`）を通し、上の3点のほかは見た目が変わらないことを確かめます。
 

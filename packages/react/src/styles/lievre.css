@@ -466,6 +466,47 @@
     padding: 8px 16px;
     font-size: var(--lv-text-base);
   }
+  /* Mono fields: the figures keep the mono floor, like .lv-mono text elsewhere. */
+  .lv-input.lv-mono:not(.lv-control--lg) {
+    font-size: max(var(--lv-text-md), var(--lv-text-mono-min));
+  }
+  /* A field as wide as the characters it takes (chars), plus its padding and border. */
+  .lv-input[data-chars] {
+    --input-x: 12px;
+    /* A length, not min(100%, …): a percentage inside the shrink-to-fit wrapper (with a prefix
+       or suffix) would size the wrapper from the input's default width instead. */
+    width: calc(var(--chars) * 1ch + 2 * var(--input-x) + 2px);
+    max-width: 100%;
+  }
+  .lievre[data-density='compact'] .lv-input[data-chars],
+  .lv-input[data-chars].lv-control--sm {
+    --input-x: 8px;
+  }
+  .lievre .lv-input[data-chars].lv-control--lg {
+    --input-x: 16px;
+  }
+  .lv-input[data-chars].lv-input--icon {
+    width: calc(var(--chars) * 1ch + 2 * var(--input-x) + 16px + var(--lv-space-2) + 2px);
+  }
+  .lv-input-wrap:has(> [data-chars]) {
+    flex: 0 1 auto;
+  }
+  /* The count under a field, at its right edge. Over the limit it turns red and adds a mark. */
+  .lv-field-count {
+    justify-self: end;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-xs);
+    line-height: var(--lv-line-body);
+  }
+  .lv-field-count[data-over] {
+    color: var(--lv-danger);
+  }
+  .lv-field-count svg {
+    width: 14px;
+    height: 1lh;
+    margin-right: var(--lv-space-1);
+    vertical-align: top;
+  }
   /* Words before and after the box (units, "https://") and an icon inside it. */
   .lv-input-group {
     display: flex;
@@ -515,6 +556,20 @@
     min-height: 104px;
     line-height: var(--lv-line-body);
     resize: vertical;
+  }
+  /* Grows with its text between 104px and twelve lines. One more pixel above and below keeps
+     each height on the 4px grid: 24px lines + 2 × (8 + 1)px + 2px border = 24n + 20. */
+  @supports (field-sizing: content) {
+    .lv-textarea--auto {
+      field-sizing: content;
+      max-height: calc(12lh + 20px);
+      padding-block: calc(8px + 1px);
+      resize: none;
+    }
+    .lievre[data-density='compact'] .lv-textarea--auto {
+      max-height: calc(12lh + 12px);
+      padding-block: calc(4px + 1px);
+    }
   }
 
   /* Select */
@@ -738,6 +793,37 @@
   .lv-radio-option:has(input:disabled) {
     color: var(--lv-muted);
     cursor: not-allowed;
+  }
+  /* RadioGroup variant="card": the whole box is the hit area; the choice shows as the accent
+     outline and the selected surface together, with the filled dot as well. */
+  .lv-radio-card {
+    /* 1px less above and below, for the border: the card's height stays on the 4px grid. */
+    padding: calc(12px - 1px) 16px;
+    border: 1px solid var(--lv-border-strong);
+    border-radius: var(--lv-radius-md);
+    background: var(--lv-surface-raised);
+  }
+  .lv-radio-cards[data-orientation='horizontal'] > .lv-radio-card {
+    flex: 1 1 12rem;
+  }
+  .lv-radio-card:hover:not(:has(input:disabled, input:checked)) {
+    border-color: var(--lv-text);
+  }
+  .lv-radio-card:has(input:checked) {
+    border-color: var(--lv-accent);
+    background: var(--lv-selected);
+  }
+  .lv-radio-card:has(input:disabled) {
+    background: var(--lv-surface-sunken);
+    border-color: var(--lv-border);
+  }
+  /* The ring goes round the card, not the dot inside it. */
+  .lv-radio-card:has(input:focus-visible) {
+    outline: 2px solid var(--lv-focus);
+    outline-offset: 2px;
+  }
+  .lv-radio-card input:focus-visible {
+    outline: none;
   }
 
   /* Card */
@@ -1938,6 +2024,16 @@
     }
     .lv-tab[data-state='active']::after {
       background: Highlight;
+    }
+    .lv-radio-card:has(input:checked) {
+      border-color: Highlight;
+      outline: 1px solid Highlight;
+      background: Canvas;
+    }
+    /* The checked outline above must not swallow the focus ring (focus sits on the checked card). */
+    .lv-radio-card:has(input:focus-visible) {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
     }
     /* No value: stripes in system colours, so it never reads as a full (finished) bar. */
     .lv-progress-indicator[data-state='indeterminate'] {

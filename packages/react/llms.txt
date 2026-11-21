@@ -121,13 +121,16 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### Textarea
 
-複数行の入力。label・hint・error・required・id の扱いは TextField と同じです。
+複数行の入力。label・hint・error・required・id・maxCount の扱いは TextField と同じです。
 
 - `required?: boolean` — ラベルの横に「必須」の文字を出し、required を付けます。
+- `maxCount?: number` — 文字数の上限。入力の下に「12 / 100」を出し、上限を超えても入力は止めず、超えた数を言葉と記号で示します。読み上げでは上限を一度伝え、入力が止まってから残りの数を知らせます。送信を止めるかどうかは呼び出す側で決め、error で伝えます。
+- `countBy?: 'grapheme' | 'width'` — 既定 'grapheme'。数え方。'grapheme'（既定）は見た目の1文字を1と数えます（絵文字の組み合わせも1）。'width' は全角を2、半角を1と数えます（全角換算の制度に合わせるとき）。
 - `label: string` — 見える名前。textarea と結びます。
 - `hint?: string` — 補助文。入力の下に出し、aria-describedby で結びます。
 - `error?: string` — エラー文。補助文の下に記号を添えて出し、aria-invalid を付けます。
 - `id?: string` — textarea の id。省くと部品が作ります。
+- `autoResize?: boolean` — 既定 false。書いた分だけ高さを伸ばします（4行分から12行分まで。それより長いとスクロール）。CSS の field-sizing に対応しないブラウザでは、今までどおり高さは決まったままで、手で広げられます。
 
 ### Checkbox
 
@@ -302,6 +305,10 @@ baked はビルド時の値（npm run wear）で決まります。
 - `icon?: ReactNode` — 入力欄の中の先頭に置くアイコン（虫眼鏡など）。飾りなので読み上げません。意味はラベルに書きます。
 - `prefix?: string` — 入力欄の前に置く言葉（「https://」「¥」など）。入力と aria-describedby で結びます。
 - `suffix?: string` — 入力欄の後ろに置く言葉。単位（「円」「件」「%」）はここに書き、値には含めません。入力と aria-describedby で結びます。
+- `maxCount?: number` — 文字数の上限。入力の下に「12 / 100」を出し、上限を超えても入力は止めず、超えた数を言葉と記号で示します。読み上げでは上限を一度伝え、入力が止まってから残りの数を知らせます。送信を止めるかどうかは呼び出す側で決め、error で伝えます。
+- `countBy?: 'grapheme' | 'width'` — 既定 'grapheme'。数え方。'grapheme'（既定）は見た目の1文字を1と数えます（絵文字の組み合わせも1）。'width' は全角を2、半角を1と数えます（全角換算の制度に合わせるとき）。
+- `chars?: number` — 入る文字の数（半角で数え、全角は2）。入力欄の幅をこの文字数に合わせます（郵便番号は 8、西暦の年は 4）。幅が足りない画面では親の幅に縮みます。省くと親の幅いっぱいです。
+- `mono?: boolean` — 等幅の書体にします。番号・ID・コード・金額など、桁をそろえて読む値に使います。
 
 ### Dialog
 
@@ -449,6 +456,7 @@ baked はビルド時の値（npm run wear）で決まります。
 - `required?: boolean` — 必須の入力。ラベルの横に「必須」の文字を出し、入力に required を付けます。読み上げでは入力の required が「必須」と伝えるので、文字は重ねて読みません。
 - `id?: string` — 入力の id。省くと部品が作ります。ErrorSummary から入力へ移るときは、ここで決めた id を使います。
 - `children: (control: FieldControlProps) => ReactNode` — 入力を描く関数。受け取った属性（id・aria-describedby・aria-invalid・required）を、入力の要素にそのまま渡します。`{(control) => <input {...control} className="lv-input" />}`
+- `after?: ReactNode` — 入力のすぐ下の右端に置く表示（文字数など）。補助文とエラーはこの下に出します。
 
 ### Fieldset
 
@@ -478,6 +486,7 @@ baked はビルド時の値（npm run wear）で決まります。
 - `required?: boolean` — 既定 false。legend の横に「必須」の文字を出し、選択肢に required を付けます。
 - `id?: string` — 最初の選択肢の id。ErrorSummary からこのまとまりへ移るときに使います。
 - `orientation?: 'horizontal' | 'vertical'` — 既定 'vertical'。'vertical'（既定）は縦に並べ、'horizontal' は横に並べます。「はい・いいえ」など短い選択肢に使い、幅が足りないと折り返します。矢印キーの動きはどちらも同じです。
+- `variant?: 'list' | 'card'` — 既定 'list'。'list'（既定）は丸と文字を並べ、'card' は選択肢ごとに枠で囲みます。料金の種類のように、選択肢ごとの説明を比べて選ぶときに使います。枠全体が押せて、選んだ枠は線と面の両方で示します。'horizontal' と組み合わせると、幅に合わせて段に並べます。
 
 ### CheckboxGroup
 
