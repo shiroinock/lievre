@@ -33,6 +33,12 @@ export const SCREEN_PARTS: LayoutPart[] = [
     selector: '.lv-progress-label',
     checks: [{ baseline: ':scope > *' }, 'line-grid'],
   },
+  {
+    name: '見せ方の切り替え',
+    selector: '.lv-view-switch-item',
+    checks: ['inset-x', 'inset-y', 'control-height'],
+  },
+  { name: '列の今の項目', selector: '.lv-queue-card', checks: ['padding-equal', 'fits'] },
   { name: '指標の値', selector: '.lv-metric-value', checks: ['line-grid'] },
   { name: 'メーターの読み値', selector: '.lv-meter-reading > strong', checks: ['line-grid'] },
 ];

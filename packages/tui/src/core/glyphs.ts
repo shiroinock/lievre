@@ -24,6 +24,9 @@ export type Glyphs = {
   focusRight: string;
   /** Left edge of a selected row (lievre draws an ultramarine line there on the web too). */
   selectedBar: string;
+  /** Progress line: the done part and the rest. The count in words always comes first. */
+  barDone: string;
+  barTodo: string;
   /** Status marks: the word always follows, so the mark only repeats it. */
   ok: string;
   warn: string;
@@ -63,6 +66,8 @@ const unicode: Glyphs = {
   focusLeft: '▏',
   focusRight: '▕',
   selectedBar: '▌',
+  barDone: '━',
+  barTodo: '─',
   ok: '✓',
   warn: '!',
   stop: '✕',
@@ -105,6 +110,8 @@ const ascii: Glyphs = {
   focusLeft: '[',
   focusRight: ']',
   selectedBar: '>',
+  barDone: '#',
+  barTodo: '-',
   ok: 'o',
   warn: '!',
   stop: 'x',

@@ -70,6 +70,41 @@ describe('stylelint: lievre rules', () => {
     expect(await cssRules('.lv-x::after { background: var(--lv-selected); }')).toEqual([]);
   });
 
+  it('keeps a dashed or dotted outline in forced colours', async () => {
+    const forced = (body: string) => `@media (forced-colors: active) { ${body} }`;
+    const reset = forced('.lv-x { border: 1px solid ButtonText; }');
+    const dashed = '.lv-x:read-only { border-style: dashed; }';
+    expect(await cssRules(reset + dashed)).toContain('lievre/forced-colors-border-style');
+    expect(
+      await cssRules(reset + '.lv-y .lv-x { border: 1px dotted var(--lv-border); }'),
+    ).toContain('lievre/forced-colors-border-style');
+    expect(
+      await cssRules(reset + dashed + forced('.lv-x:read-only { border-style: dashed; }')),
+    ).toEqual([]);
+    // A part the forced-colours block leaves alone keeps its own line.
+    expect(await cssRules(reset + '.lv-z { border-style: dashed; }')).toEqual([]);
+  });
+
+  it('keeps a part at 44px on touch when a more specific rule shrinks it', async () => {
+    const coarse = (body: string) => `@media (pointer: coarse) { ${body} }`;
+    const raised = coarse('.lv-x { min-height: 44px; }');
+    const small = ".lv-list[data-size='sm'] .lv-x { min-height: 32px; }";
+    expect(await cssRules(raised + small)).toContain('lievre/coarse-target');
+    expect(
+      await cssRules(
+        raised + small + coarse(".lv-list[data-size='sm'] .lv-x { min-height: 44px; }"),
+      ),
+    ).toEqual([]);
+    // Larger than 44px, or the bare part itself, stays as it is.
+    expect(
+      await cssRules(
+        raised + ".lv-list[data-size='lg'] .lv-x { min-height: 48px; } .lv-x { min-height: 32px; }",
+      ),
+    ).toEqual([]);
+    // A different part whose name starts the same is not the raised one.
+    expect(await cssRules(raised + '.lv-list .lv-x-label { min-height: 24px; }')).toEqual([]);
+  });
+
   it('keeps spacing on the 4px grid', async () => {
     expect(await cssRules('.a { padding: 6px 12px; }')).toContain('lievre/spacing-grid');
     expect(await cssRules('.a { gap: 10px; }')).toContain('lievre/spacing-grid');
