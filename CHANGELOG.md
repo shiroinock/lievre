@@ -71,6 +71,10 @@
 - RadioGroup に `variant="card"`（選択肢ごとに枠で囲む）。（#35）
 - Field に `after`（入力のすぐ下の右端の表示）。（#35）
 - 1つ戻すと戻る項目を返す `undoKeys`。（#37）
+- Pagination に `variant="numbers"`（ページ番号を並べ、間は「…」で省く。今のページは `aria-current="page"`）、`totalCount`・`pageSize`（「128件中 21〜40件」）、`pageSizeOptions`・`onPageSizeChange`（表示件数の選択）。狭い幅では折り返す。（#39）
+- Breadcrumb に `maxItems`（間を「…」のボタンにまとめ、押すとその場に出してフォーカスを移す）。（#39）
+- Tabs の項目に `icon`（言葉の前。読み上げない）。（#39）
+- リンクをタブの見た目で並べる `TabNav`（`nav` と `aria-current="page"`）。（#39）
 
 #### 直したもの
 
