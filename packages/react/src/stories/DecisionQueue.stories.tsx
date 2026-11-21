@@ -165,7 +165,7 @@ const meta = {
         },
         {
           name: '見せ方の切り替え',
-          selector: '.lv-view-switch-item',
+          selector: '.lv-segmented-item',
           checks: ['control-height', 'inset-x', 'inset-y', { padding: 'button' }],
         },
         {
