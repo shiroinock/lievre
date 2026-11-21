@@ -134,7 +134,7 @@ lievre の △：Field は TextField・Select・RadioGroup がそれぞれラベ
 | Progress   | 状態（完了・失敗）                     |   5    |   中   | 色だけでなく、ラベルの横に「完了」「失敗」の文字とアイコンを出す。                                                                          |
 | Progress   | 太さ・円形                             |   4    |   低   | 円形は Meter と役割が重なる。                                                                                                               |
 | Badge      | 強さ（`emphasis` 淡い面 / 塗り）       |   6    |   中   | 塗りは状態の色の面に `--lv-surface` の文字。状態の色は面に対して4.5:1 なので、逆にしても4.5:1。                                             |
-| Badge      | 大きさ（`size` sm）                    |   5    |   中   | 表のセルや Tabs の中で使う。12px の文字で、高さは 20px。                                                                                    |
+| Badge      | 大きさ（`size` sm）                    |   5    |   中   | 表のセルや Tabs の中で使う。12px の文字のまま、高さを 20px から 16px にする。                                                               |
 | Badge      | 数のバッジ（Counter）                  |   7    |   中   | 数は等幅。「未読 3件」のように読み上げる言葉を必須にする。                                                                                  |
 | Tooltip    | 位置（`side`、`align`）                |   7    |   中   | Popover と同じ名前。                                                                                                                        |
 | Tooltip    | 名前か説明か（label / description）    |   4    |   低   | 今は IconButton の名前にだけ使っている。説明に使うときは `aria-describedby` に。                                                            |
