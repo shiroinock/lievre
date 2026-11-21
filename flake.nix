@@ -1,7 +1,7 @@
 {
   description = "lievre: 日本語の画面のためのデザインシステム（トークン・React の部品・端末の部品）";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   outputs =
     { self, nixpkgs }:
@@ -9,7 +9,6 @@
       inherit (nixpkgs) lib;
       systems = [
         "aarch64-darwin"
-        "x86_64-darwin"
         "x86_64-linux"
         "aarch64-linux"
       ];

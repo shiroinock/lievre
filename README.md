@@ -30,7 +30,7 @@ npm run dev         # 概要のデモ http://127.0.0.1:5173
 
 ### Nix で使う
 
-Nix（flakes を有効にしたもの）があれば、Node.js などを別に入れなくても始められます。nixpkgs は `nixos-26.05` を `flake.lock` で固定しています。
+Nix（flakes を有効にしたもの）があれば、Node.js などを別に入れなくても始められます。nixpkgs は `nixpkgs-unstable` を `flake.lock` で固定しています。対応する system は `aarch64-darwin`・`x86_64-linux`・`aarch64-linux` です（x86_64-darwin は nixpkgs 26.11 でサポートが終わったので外しています）。
 
 ```sh
 nix develop         # Node.js 22、npm、Chromium（Playwright 用）、fontTools と brotli 入りの Python
