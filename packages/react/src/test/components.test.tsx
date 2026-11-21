@@ -939,6 +939,54 @@ describe('Menu variations', () => {
     await waitFor(() => expect(move).toHaveBeenCalledOnce());
     expect(trigger).toHaveFocus();
   });
+  it('closes a submenu with ArrowLeft or Escape and gives focus back to its row', async () => {
+    setup(
+      <DropdownMenu
+        trigger={<Button>操作</Button>}
+        items={[
+          { type: 'submenu', label: '移す', items: [{ label: '東京拠点', onSelect: () => {} }] },
+        ]}
+      />,
+    );
+    screen.getByRole('button', { name: '操作' }).focus();
+    await userEvent.keyboard('{Enter}');
+    const row = await screen.findByRole('menuitem', { name: '移す' });
+    for (const key of ['{ArrowLeft}', '{Escape}']) {
+      row.focus();
+      await userEvent.keyboard('{ArrowRight}');
+      expect(await screen.findByRole('menuitem', { name: '東京拠点' })).toHaveFocus();
+      await userEvent.keyboard(key);
+      await waitFor(() =>
+        expect(screen.queryByRole('menuitem', { name: '東京拠点' })).not.toBeInTheDocument(),
+      );
+      expect(row).toHaveFocus();
+    }
+  });
+  it('keeps ids apart between a submenu and the rows after it', async () => {
+    const note = (n: number) => ({
+      label: `項目${n}`,
+      description: `補足${n}`,
+      onSelect: () => {},
+    });
+    setup(
+      <DropdownMenu
+        trigger={<Button>操作</Button>}
+        items={[
+          note(0),
+          { type: 'submenu', label: '移す', items: [note(100)] },
+          ...Array.from({ length: 9 }, (_, i) => note(i + 2)),
+        ]}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: '操作' }));
+    await userEvent.hover(await screen.findByRole('menuitem', { name: '移す' }));
+    await userEvent.keyboard('{ArrowRight}');
+    const inner = await screen.findByRole('menuitem', { name: '項目100' });
+    expect(inner).toHaveAccessibleDescription('補足100');
+    expect(screen.getByRole('menuitem', { name: '項目10' })).toHaveAccessibleDescription('補足10');
+    const ids = [...document.querySelectorAll('[id]')].map((el) => el.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
   it('names a group by its heading and describes an item by its note', async () => {
     setup(
       <DropdownMenu

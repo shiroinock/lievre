@@ -1,6 +1,6 @@
 import { DropdownMenu as MenuPrimitive, Popover as PopoverPrimitive } from 'radix-ui';
 import { Check, ChevronRight } from 'lucide-react';
-import { Fragment, useId, useRef, type ReactNode } from 'react';
+import { Fragment, useId, useRef, useState, type ReactNode } from 'react';
 import { PortalSurface } from './system';
 
 export type PopoverProps = {
@@ -119,6 +119,51 @@ const needsLead = (items: MenuItem[]): boolean =>
       (item.type === 'group' && needsLead(item.items)) ||
       ((!item.type || item.type === 'item' || item.type === 'submenu') && !!item.icon),
   );
+/** A nested menu. Escape closes only this level and goes back to its row, as ArrowLeft does
+ * (Radix closes the whole menu on Escape; the APG menu pattern closes the one holding focus). */
+function MenuSub({
+  label,
+  lead,
+  disabled,
+  nestedLead,
+  children,
+}: {
+  label: string;
+  lead: ReactNode;
+  disabled?: boolean;
+  nestedLead: boolean;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const rowRef = useRef<HTMLDivElement>(null);
+  return (
+    <MenuPrimitive.Sub open={open} onOpenChange={setOpen}>
+      <MenuPrimitive.SubTrigger ref={rowRef} className="lv-menu-item" disabled={disabled}>
+        {lead}
+        <span className="lv-menu-label">{label}</span>
+        <ChevronRight className="lv-menu-sub-icon" aria-hidden />
+      </MenuPrimitive.SubTrigger>
+      <MenuPrimitive.Portal>
+        <PortalSurface>
+          <MenuPrimitive.SubContent
+            className="lv-menu"
+            sideOffset={4}
+            alignOffset={-5}
+            collisionPadding={8}
+            data-lead={nestedLead || undefined}
+            onEscapeKeyDown={(event) => {
+              event.preventDefault();
+              setOpen(false);
+              rowRef.current?.focus();
+            }}
+          >
+            {children}
+          </MenuPrimitive.SubContent>
+        </PortalSurface>
+      </MenuPrimitive.Portal>
+    </MenuPrimitive.Sub>
+  );
+}
 /** 押すと開く操作の一覧。矢印キー・Home / End・文字での選択・Escape に対応し、閉じるとフォーカスを開いた元に戻します。 */
 export function DropdownMenu({
   trigger,
@@ -200,26 +245,15 @@ export function DropdownMenu({
         );
       if (item.type === 'submenu')
         return (
-          <MenuPrimitive.Sub key={key}>
-            <MenuPrimitive.SubTrigger className="lv-menu-item" disabled={item.disabled}>
-              {leadCell(item.icon)}
-              <span className="lv-menu-label">{item.label}</span>
-              <ChevronRight className="lv-menu-sub-icon" aria-hidden />
-            </MenuPrimitive.SubTrigger>
-            <MenuPrimitive.Portal>
-              <PortalSurface>
-                <MenuPrimitive.SubContent
-                  className="lv-menu"
-                  sideOffset={4}
-                  alignOffset={-5}
-                  collisionPadding={8}
-                  data-lead={needsLead(item.items) || undefined}
-                >
-                  {renderList(item.items, key)}
-                </MenuPrimitive.SubContent>
-              </PortalSurface>
-            </MenuPrimitive.Portal>
-          </MenuPrimitive.Sub>
+          <MenuSub
+            key={key}
+            label={item.label}
+            lead={leadCell(item.icon)}
+            disabled={item.disabled}
+            nestedLead={needsLead(item.items)}
+          >
+            {renderList(item.items, `${key}-`)}
+          </MenuSub>
         );
       const describedId = item.description ? `${id}-${key}-description` : undefined;
       return (

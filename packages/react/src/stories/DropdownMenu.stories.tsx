@@ -67,7 +67,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '押すと開く操作の一覧。表の行の「その他の操作」、並べ替えの選択、表示する列の切り替えに使います。矢印キー・Home / End・文字での選択・Escape に対応し、閉じるとフォーカスを開いた元に戻します。アイコンの列は幅が決まっていて、アイコンのない項目も文字の開始位置がそろいます。危険な操作は tone: "danger" で赤の文字にし、label にも「削除」と書きます。項目の description は下に補足を出して読み上げに添え、{ type: "group" } は見出しの付いたまとまり、{ type: "submenu" } は入れ子のメニューです（右矢印で開き、左矢印で戻ります。入れ子は1段まで）。side で開く向きを選べます。',
+          '押すと開く操作の一覧。表の行の「その他の操作」、並べ替えの選択、表示する列の切り替えに使います。矢印キー・Home / End・文字での選択・Escape に対応し、閉じるとフォーカスを開いた元に戻します。アイコンの列は幅が決まっていて、アイコンのない項目も文字の開始位置がそろいます。危険な操作は tone: "danger" で赤の文字にし、label にも「削除」と書きます。項目の description は下に補足を出して読み上げに添え、{ type: "group" } は見出しの付いたまとまり、{ type: "submenu" } は入れ子のメニューです（右矢印で開き、左矢印か Escape でその入れ子だけ閉じて親の項目へ戻ります。入れ子は1段まで）。side で開く向きを選べます。',
       },
     },
   },
@@ -173,7 +173,7 @@ const nested = (onSelect: () => void): MenuItem[] => [
     onSelect,
   },
 ];
-/** 入れ子のメニュー。右矢印で開き、左矢印で戻ります。 */
+/** 入れ子のメニュー。右矢印で開き、左矢印か Escape で親の項目へ戻ります。 */
 export const Submenu: Story = {
   args: { items: nested(fn()) },
   play: async ({ canvasElement }) => {
@@ -185,6 +185,11 @@ export const Submenu: Story = {
     await userEvent.keyboard('{ArrowDown}{ArrowRight}');
     await expect(await body.findByRole('menuitem', { name: '東京拠点' })).toHaveFocus();
     await userEvent.keyboard('{ArrowLeft}');
+    await expect(body.getByRole('menuitem', { name: /移す/ })).toHaveFocus();
+    // Escape closes only the submenu, not the whole menu.
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(await body.findByRole('menuitem', { name: '東京拠点' })).toHaveFocus();
+    await userEvent.keyboard('{Escape}');
     await expect(body.getByRole('menuitem', { name: /移す/ })).toHaveFocus();
   },
 };

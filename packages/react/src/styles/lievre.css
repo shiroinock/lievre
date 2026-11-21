@@ -2217,6 +2217,12 @@
       background: Highlight;
       color: HighlightText;
     }
+    /* Opting out keeps the muted grey of the note, icon, arrow and keys; on Highlight they
+       need the row's own HighlightText. */
+    .lv-menu-item:is([data-highlighted], [data-state='open'])
+      :is(.lv-menu-description, .lv-menu-lead, .lv-menu-sub-icon, .lv-menu-shortcut) {
+      color: HighlightText;
+    }
     /* Rows keep forced colours for their contents; the selection becomes an outline. */
     .lv-table tbody tr[data-selected],
     .lv-table tbody tr[data-selected]:hover {

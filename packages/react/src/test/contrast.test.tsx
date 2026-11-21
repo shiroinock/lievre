@@ -223,4 +223,21 @@ describe('Forced colours', () => {
       /\.lv-badge--sm \{[^}]*forced-color-adjust: none;[^}]*background: Canvas;/,
     );
   });
+  // A highlighted menu row opts out of forced colours to paint Highlight; its muted parts would
+  // keep their grey on it unless they take HighlightText too.
+  it('letters every muted part of a highlighted menu row in HighlightText', () => {
+    const css = readFileSync('src/styles/lievre.css', 'utf8');
+    const forced = css.slice(css.indexOf('@media (forced-colors: active)'));
+    const rule = forced.match(
+      /\.lv-menu-item:is\(\[data-highlighted\], \[data-state='open'\]\)\s*:is\(([^)]*)\) \{\s*color: HighlightText;/,
+    );
+    expect(rule, 'ハイライトした行の中の muted の部品にも HighlightText を当てます').toBeTruthy();
+    for (const part of [
+      '.lv-menu-description',
+      '.lv-menu-lead',
+      '.lv-menu-sub-icon',
+      '.lv-menu-shortcut',
+    ])
+      expect(rule![1]).toContain(part);
+  });
 });
