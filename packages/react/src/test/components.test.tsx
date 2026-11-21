@@ -18,6 +18,11 @@ import {
   Sparkline,
   IconButton,
   DescriptionList,
+  Text,
+  Heading,
+  Stack,
+  Avatar,
+  Card,
   Spinner,
   VisuallyHidden,
   Alert,
@@ -1036,5 +1041,67 @@ describe('Menu variations', () => {
     const csv = await screen.findByRole('menuitem', { name: 'CSV' });
     expect(csv).toHaveAccessibleDescription('表計算ソフトで開けます');
     expect(screen.getByRole('group', { name: '表の形' })).toContainElement(csv);
+  });
+});
+
+describe('Display variations', () => {
+  it('clamps text by lines and sets weight by class', () => {
+    setup(
+      <Text maxLines={2} weight="bold">
+        長い件名
+      </Text>,
+    );
+    const text = screen.getByText('長い件名');
+    expect(text).toHaveClass('lv-text--clamp', 'lv-weight--bold');
+    expect(text.style.getPropertyValue('--lines')).toBe('2');
+  });
+  it('keeps the heading level apart from its size', () => {
+    setup(
+      <Heading level={4} size="minor">
+        小見出し
+      </Heading>,
+    );
+    expect(screen.getByRole('heading', { level: 4, name: '小見出し' })).toHaveClass(
+      'lv-heading--minor',
+    );
+  });
+  it('spreads a row to both ends', () => {
+    const { container } = setup(
+      <Stack direction="row" justify="between">
+        <span>左</span>
+      </Stack>,
+    );
+    expect((container.querySelector('.lv-stack') as HTMLElement).style.justifyContent).toBe(
+      'space-between',
+    );
+  });
+  it('names an avatar by name, with a picture or without, and falls back when it breaks', async () => {
+    const { container } = setup(
+      <Avatar name="計測 太郎" src="broken.png" shape="square" size="xl" />,
+    );
+    const avatar = screen.getByRole('img', { name: '計測 太郎' });
+    expect(avatar).toHaveClass('lv-avatar--square', 'lv-avatar--xl');
+    const img = container.querySelector('img') as HTMLImageElement;
+    expect(img).toHaveAttribute('alt', '');
+    img.dispatchEvent(new Event('error'));
+    await waitFor(() => expect(container.querySelector('img')).toBeNull());
+    expect(avatar).toHaveTextContent('計測');
+  });
+  it('makes one control of a card you press or choose, named by its title', async () => {
+    const change = vi.fn();
+    setup(
+      <>
+        <Card title="作業 W-1024" href="#w1024">
+          本文
+        </Card>
+        <Card title="東京拠点" selection={{ checked: false, onCheckedChange: change }}>
+          本文
+        </Card>
+      </>,
+    );
+    expect(screen.getByRole('link', { name: '作業 W-1024' })).toHaveAttribute('href', '#w1024');
+    await userEvent.click(screen.getByRole('checkbox', { name: '東京拠点' }));
+    expect(change).toHaveBeenCalledWith(true);
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
   });
 });

@@ -82,6 +82,23 @@
     font-size: var(--lv-text-lg);
     max-width: 38em;
   }
+  /* maxLines: cut at that many lines with an ellipsis. */
+  .lv-text--clamp {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--lines);
+    line-clamp: var(--lines);
+    overflow: hidden;
+  }
+  .lv-weight--regular {
+    font-weight: var(--lv-weight-regular);
+  }
+  .lv-weight--medium {
+    font-weight: var(--lv-weight-medium);
+  }
+  .lv-weight--bold {
+    font-weight: var(--lv-weight-bold);
+  }
 
   .lv-heading {
     margin: 0;
@@ -91,6 +108,12 @@
     font-feature-settings: 'palt';
     text-wrap: balance;
     overflow-wrap: anywhere;
+  }
+  .lv-heading--minor {
+    font-size: var(--lv-text-base);
+  }
+  .lv-heading--subsection {
+    font-size: var(--lv-text-lg);
   }
   .lv-heading--section {
     font-size: var(--lv-text-xl);
@@ -953,6 +976,50 @@
     gap: var(--lv-space-4);
     padding: var(--lv-panel-padding) var(--lv-panel-padding) 0;
   }
+  .lv-card-heading {
+    flex: 1;
+    min-width: 0;
+  }
+  /* Plain: no line, only the sunken surface. */
+  .lv-card--plain {
+    border-color: transparent;
+    background: var(--lv-surface-sunken);
+  }
+  /* A card you press (href) or choose (selection): the title link or the checkbox reaches over
+     the whole card, so there is one control, not a button around a link. */
+  .lv-card--interactive {
+    position: relative;
+  }
+  .lv-card--interactive:hover {
+    border-color: var(--lv-border-strong);
+  }
+  .lv-card-link {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  .lv-card-link::after,
+  .lv-card-check::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .lv-card-link:focus-visible,
+  .lv-card-check:focus-visible {
+    outline: none;
+  }
+  .lv-card--interactive:has(:focus-visible) {
+    outline: 2px solid var(--lv-focus);
+    outline-offset: 2px;
+  }
+  .lv-card-header > .lv-card-check {
+    margin-top: 0;
+  }
+  /* Chosen: the accent line, the selected surface and the check together. */
+  .lv-card[data-selected] {
+    border-color: var(--lv-accent);
+    background: var(--lv-selected);
+  }
   .lv-card-title {
     margin: 0;
     font-size: var(--lv-text-base);
@@ -1504,10 +1571,33 @@
     color: var(--lv-accent);
     font-size: var(--lv-text-xs);
     font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
   }
   .lv-avatar--sm {
     width: 24px;
     height: 24px;
+  }
+  .lv-avatar--lg {
+    width: 40px;
+    height: 40px;
+    font-size: var(--lv-text-sm);
+  }
+  .lv-avatar--xl {
+    width: 48px;
+    height: 48px;
+    font-size: var(--lv-text-md);
+  }
+  /* Square for organisations, so a person and an organisation differ by shape, not colour. */
+  .lv-avatar--square {
+    border-radius: var(--lv-radius-md);
+  }
+  .lv-avatar:has(> img) {
+    overflow: hidden;
+  }
+  .lv-avatar > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   /* Breadcrumb */
@@ -2272,6 +2362,10 @@
     }
     .lv-switch:disabled .lv-switch-thumb {
       background: GrayText;
+    }
+    .lv-card[data-selected] {
+      border-color: Highlight;
+      outline: 1px solid Highlight;
     }
     .lv-tab[data-state='active']::after,
     .lv-tab[aria-current='page']::after {

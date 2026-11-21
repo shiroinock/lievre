@@ -179,9 +179,14 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### Card
 
-- `title?: string`
-- `eyebrow?: string`
-- `action?: ReactNode`
+1つのまとまりの入れ物。見出し・本文・見出しの右の操作を持ちます。
+
+- `title?: string` — 見出し。h2 で出します。href や selection を使うときは必須で、カード全体の名前になります。
+- `eyebrow?: string` — 見出しの上の短い言葉（分類など）。
+- `action?: ReactNode` — 見出しの右に置く操作。href や selection のカードには置きません（カード全体が押せるため）。
+- `variant?: 'outline' | 'plain'` — 既定 'outline'。'outline'（既定）は線と面で囲み、'plain' は線のない凹んだ面だけにします。並べた中で控えめにしたいカードに使います。
+- `href?: string` — 移る先。見出しをリンクにし、そのリンクの当たり判定をカード全体に広げます（中にボタンを入れ子にしません）。中にほかの操作を置かないでください。
+- `selection?: { checked: boolean; onCheckedChange: (checked: boolean) => void; disabled?: boolean | undefined; }` — 選べるカード。見出しの横にチェックボックスを出し、その当たり判定をカード全体に広げます。選んだカードは線と面とチェックの3つで示します。中にほかの操作を置かないでください。
 - ほかに HTMLAttributes<HTMLElement> の属性を受け取ります。
 
 ### Alert
@@ -266,8 +271,12 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### Avatar
 
-- `name: string`
-- `size?: 'sm' | 'md'` — 既定 'md'
+人や組織の印。頭文字は sm で1文字、それより大きいと2文字です。
+
+- `name: string` — 人や組織の名前。読み上げの名前になり、画像がないときは頭文字を出します。
+- `src?: string` — 画像の URL。読み込めないときは頭文字に戻します。画像は飾りとして扱い、名前は name で読み上げます。
+- `size?: 'sm' | 'md' | 'lg' | 'xl'` — 既定 'md'。'sm' 24px・'md' 32px（既定）・'lg' 40px・'xl' 48px。
+- `shape?: 'circle' | 'square'` — 既定 'circle'。'circle'（既定）は人、'square' は組織・取引先・チーム。形で人と組織を見分けられるようにします。
 
 ### Breadcrumb
 
@@ -429,8 +438,10 @@ baked はビルド時の値（npm run wear）で決まります。
 用途に依存しない本文。密度と文字の役割を分けて選びます。
 
 - `as?: 'div' | 'p' | 'span'` — 既定 'p'
-- `size?: 'body' | 'small' | 'lead'` — 既定 'body'
-- `tone?: 'default' | 'muted'` — 既定 'default'
+- `size?: 'body' | 'small' | 'lead'` — 既定 'body'。'small' は 12px（補助）、'body' は本文（文字の設定で 16 / 14px）、'lead' は 18px（導入の文）。
+- `tone?: 'default' | 'muted'` — 既定 'default'。'muted' は補助の色。どちらも面に対して 4.5:1 を超えます。
+- `weight?: 'regular' | 'medium' | 'bold'` — 文字の太さ。既定は本文の太さ（regular）。'medium' は少し強く、'bold' は強調。強調は太さだけにし、色は変えません。
+- `maxLines?: number` — この行数で切り、末尾に「…」を出します。表の長い件名やカードの説明に使います。切った分は読み上げでは読まれますが、目では見えないので、全文は詳細の画面などで読めるようにします。
 - ほかに HTMLAttributes<HTMLElement> の属性を受け取ります。
 
 ### Link
@@ -452,9 +463,11 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### Stack
 
-- `gap?: Space` — 既定 4
+- `gap?: Space` — 既定 4。間の広さ（4px の格子の段）。
 - `direction?: 'row' | 'column'` — 既定 'column'
-- `align?: 'start' | 'center' | 'end' | 'stretch'` — 既定 'stretch'
+- `align?: 'start' | 'center' | 'end' | 'stretch'` — 既定 'stretch'。交わる向きのそろえ方。
+- `justify?: 'start' | 'center' | 'end' | 'between'` — 既定 'start'。並ぶ向きのそろえ方。'between' は両端に寄せて間を均等に空けます（見出しと操作を左右に分けるときなど）。
+- `wrap?: boolean` — 折り返すかどうか。既定は row で折り返し、column で折り返しません。
 - ほかに HTMLAttributes<HTMLDivElement> の属性を受け取ります。
 
 ### Grid
@@ -465,8 +478,8 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### Heading
 
-- `level?: 1 | 2 | 3 | 4 | 6 | 5` — 既定 2
-- `size?: 'title' | 'section' | 'display'` — 既定 'section'
+- `level?: 1 | 2 | 3 | 4 | 6 | 5` — 既定 2。見出しの段（h1〜h6）。文書の構造に合わせ、大きさとは別に選びます。
+- `size?: HeadingSize` — 既定 'section'。大きさ。'minor' 16px・'subsection' 18px・'section' 22px（既定）・'title' 28〜36px・'display' 36〜52px。'title' と 'display' は画面の幅で伸び縮みします。
 - ほかに HTMLAttributes<HTMLHeadingElement> の属性を受け取ります。
 
 ### Field
@@ -742,6 +755,7 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `mono?: boolean` — 値が数値・ID・日時・コードのとき true。等幅で桁をそろえます。単位は value の中で `.lv-mono` の外に置けないので、単位のある値は false のまま `<span className="lv-mono">` で包みます。
   - `wide?: boolean` — layout="stack" で段を組むとき、行の幅いっぱいに広げます（メモなど長い値）。
 - `type Space = 0 | 1 | 2 | 3 | 4 | 6 | 8 | 12;`
+- `type HeadingSize = 'minor' | 'subsection' | 'section' | 'title' | 'display';`
 - `type RadioOption = { value: string; label: string; description?: string; disabled?: boolean; };`
 - `type CheckboxOption`
   - `value: string`

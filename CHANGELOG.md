@@ -81,10 +81,16 @@
 - 表示の形を切り替える `SegmentedControl`、関係のあるボタンを並べる `ButtonGroup`（`attached` で隙間なくつなげる）、主な操作とほかの方法のメニューをつなげた `SplitButton`。（#36）
 - DropdownMenu に `{ type: 'submenu' }`（入れ子のメニュー。右矢印か Enter で開き、左矢印か Escape でその入れ子だけ閉じて親の項目へ戻る）、項目の `description`（項目の下の補足。`aria-describedby` で読み上げる）、`{ type: 'group' }`（見出しの付いたまとまり。見出しがまとまりの名前になる）、`side`（開く向き）。（#40）
 - Tooltip に `side`・`align`。画面の端で入らないときは反対側に回る。（#40）
+- Text に `maxLines`（その行数で切って「…」を出す）・`weight`（regular・medium・bold）。（#PR）
+- Heading の `size` に `minor`（16px）・`subsection`（18px）。（#PR）
+- Stack に `justify`（start・center・end・between）・`wrap`。（#PR）
+- Avatar に `src`（画像。読み込めないときは頭文字に戻す）、`size` に `lg`（40px）・`xl`（48px）、`shape="square"`（組織・取引先）。（#PR）
+- Card に `variant="plain"`（線のない凹んだ面）、`href`（見出しのリンクをカード全体に広げる）、`selection`（チェックボックスの当たり判定をカード全体に広げる選べるカード）。（#PR）
 
 #### 直したもの
 
 - lint のルールの説明の URL が、リポジトリの改名のあと行き先のない見出しを指していた。`packages/react` の README の lint の節を指すようにした。（#26）
+- Avatar の頭文字が、置いた場所の行の高さを受け継いで、上下の中央から少しずれることがあった。行の高さを部品で決めるようにした。（#PR）
 
 ### @lievre/tui
 
