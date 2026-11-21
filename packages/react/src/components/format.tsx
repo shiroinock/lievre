@@ -40,7 +40,10 @@ function read(value: Date | string) {
       : day
         ? new Date(Date.UTC(Number(day[1]), Number(day[2]) - 1, Number(day[3])))
         : new Date(value);
-  return Number.isNaN(date.getTime()) ? null : { date, dayOnly: !!day };
+  if (Number.isNaN(date.getTime())) return null;
+  // Date.UTC rolls 2026-02-30 over to March; a day that does not exist is not a date.
+  if (day && date.getUTCDate() !== Number(day[3])) return null;
+  return { date, dayOnly: !!day };
 }
 /** 日付・日時を日本語の書式の文字にします。FormatDate と同じ書式を、文の中に使うときに。日付として読めない文字は、そのまま返します。 */
 export function formatDate(value: Date | string, options: DateFormatOptions = {}) {
@@ -82,25 +85,34 @@ function machineValue(value: Date | string, options: DateFormatOptions) {
   }).format(value);
 }
 
-const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
-  ['year', 365 * 24 * 3600],
-  ['month', 30 * 24 * 3600],
-  ['week', 7 * 24 * 3600],
-  ['day', 24 * 3600],
-  ['hour', 3600],
-  ['minute', 60],
-  ['second', 1],
-];
-/** 今との差を言葉にします（3分前・昨日・2日後）。差のいちばん大きい単位で丸めます。 */
+const DAY = 24 * 3600 * 1000;
+/** Days since the epoch of the calendar day a moment falls on: in UTC for a 'YYYY-MM-DD' day,
+ * in the viewer's time zone otherwise. */
+const dayNumber = (date: Date, utc: boolean) =>
+  utc
+    ? Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) / DAY
+    : Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / DAY;
+/**
+ * 今との差を言葉にします（3分前・昨日・2日後）。1日より近い時刻は時間・分・秒で、それより離れた日は暦の日の差（昨日・一昨日・3日前）で、
+ * 1週より離れると週・月・年で丸めて言います。'YYYY-MM-DD' の文字は日付なので、今日・昨日・明日のように日の差だけで言います。
+ */
 export function formatRelativeTime(value: Date | string, now: Date = new Date()) {
   const moment = read(value);
   if (!moment) return value instanceof Date ? '' : value;
-  const seconds = (moment.date.getTime() - now.getTime()) / 1000;
-  const [unit, size] = UNITS.find(([, s]) => Math.abs(seconds) >= s) ?? UNITS[UNITS.length - 1];
-  return new Intl.RelativeTimeFormat('ja', { numeric: 'auto' }).format(
-    Math.round(seconds / size),
-    unit,
-  );
+  const words = new Intl.RelativeTimeFormat('ja', { numeric: 'auto' });
+  const ms = moment.date.getTime() - now.getTime();
+  if (!moment.dayOnly && Math.abs(ms) < DAY) {
+    const seconds = ms / 1000;
+    if (Math.abs(seconds) >= 3600) return words.format(Math.round(seconds / 3600), 'hour');
+    if (Math.abs(seconds) >= 60) return words.format(Math.round(seconds / 60), 'minute');
+    return words.format(Math.round(seconds), 'second');
+  }
+  // Calendar days, not elapsed hours: 39 hours ago late at night is still yesterday.
+  const days = dayNumber(moment.date, moment.dayOnly) - dayNumber(now, false);
+  if (Math.abs(days) < 7) return words.format(days, 'day');
+  if (Math.abs(days) < 30) return words.format(Math.round(days / 7), 'week');
+  if (Math.abs(days) < 365) return words.format(Math.round(days / 30), 'month');
+  return words.format(Math.round(days / 365), 'year');
 }
 
 /**
