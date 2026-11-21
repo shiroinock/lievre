@@ -121,9 +121,23 @@ export function useFrames({
 
   const skip = () => setPlayback((p) => skipPlayback(timeline, p));
   const toggle = () => {
-    setPlayback((p) => togglePlayback(timeline, p, elapsed.current));
+    // React may run the updater only at the next render, after the count below is reset, so the
+    // frame to pause on is read now.
+    const at = elapsed.current;
+    setPlayback((p) => togglePlayback(timeline, p, at));
     elapsed.current = 0;
   };
+
+  // When motion is turned down while it plays (a --no-motion flag, a screen reader), the
+  // entrance goes to its last frame and the loop pauses where it is.
+  const lastMode = useRef(mode);
+  useEffect(() => {
+    if (lastMode.current === mode) return;
+    lastMode.current = mode;
+    if (mode === 'full') return;
+    if (!timeline.loop) skip();
+    else if (!playback.paused) toggle();
+  });
 
   // Ink throws when it turns on raw mode for a stdin that cannot take it (a pipe), so keys are
   // only read when the terminal can give them.
@@ -161,11 +175,18 @@ function roleStyle(p: Palette, role: MotionRole) {
   return p.paints ? { color: p[role] } : { bold: role === 'accent' };
 }
 
+export type FrameProps = {
+  /** 描く絵。`makeGrid`・`shade`・`braille` などで作る。 */
+  grid: Grid;
+  /** 絵の代わりに読み上げる言葉。絵の中身ではなく、伝えたいことを書く。 */
+  label: string;
+};
+
 /**
  * 1枚の絵を描く。面（surface）の上に描くので、色の組は検査した値どうしになる。
  * 読み上げでは絵を読まず、label だけを読む。
  */
-export function Frame({ grid, label }: { grid: Grid; label: string }) {
+export function Frame({ grid, label }: FrameProps) {
   const { p } = useLievre();
   return (
     // The width is fixed so that a blank cell at the end of a line still holds its place (Ink drops

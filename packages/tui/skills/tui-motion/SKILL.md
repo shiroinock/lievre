@@ -74,7 +74,8 @@ function Orbit() {
   const { g } = useLievre();
   const { phase } = useFrames({ loop: true });
   const a = phase * Math.PI * 2;
-  // A cell is about twice as tall as it is wide: 24 columns × 6 rows is close to a square.
+  // A cell is about twice as tall as it is wide, so 24 columns × 6 rows is twice as wide as it is
+  // tall. Halving the distance along v keeps the dot round.
   const dot = (u: number, v: number) =>
     Math.hypot(u - 0.5 - Math.cos(a) * 0.3, (v - 0.5 - Math.sin(a) * 0.3) / 2) < 0.08 ? 1 : 0;
   return <Frame grid={braille(dot, 24, 6, { set: g.set, role: 'accent' })} label="衛星の軌道" />;

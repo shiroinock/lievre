@@ -9,6 +9,7 @@ import {
   Lievre,
   Loading,
   glyphs,
+  useFrames,
   makeGrid,
   palette,
   shimmer,
@@ -186,7 +187,11 @@ describe('in a terminal (render)', () => {
       ...options,
     });
     unmount = () => app.unmount();
-    return { ...t, last: () => plain(t.stdout.chunks.join('')) };
+    return {
+      ...t,
+      last: () => plain(t.stdout.chunks.join('')),
+      rerender: (next: React.ReactNode) => app.rerender(wrap(next, palette('truecolor', 'paper'))),
+    };
   }
 
   it('plays the banner to its last frame, then stops writing', async () => {
@@ -226,6 +231,35 @@ describe('in a terminal (render)', () => {
     t.stdin.press('p');
     await wait(200);
     expect(t.stdout.chunks.length).toBeGreaterThan(written);
+  });
+
+  function Count({ policy = 'full' }: { policy?: MotionPolicy }) {
+    const { frame, paused } = useFrames({ loop: true, policy, frames: 1000 });
+    return <Text>{`f=${frame} ${paused ? 'paused' : 'moving'}`}</Text>;
+  }
+  const shown = (t: { last: () => string }) => t.last().split('f=').pop()!.trim();
+
+  it('pauses on the frame it was showing', async () => {
+    const t = start(<Count />);
+    await wait(400);
+    const [before] = shown(t).split(' ');
+    t.stdin.press('p');
+    await wait(60);
+    const [at, state] = shown(t).split(' ');
+    expect(state).toBe('paused');
+    expect(Number(at)).toBeGreaterThanOrEqual(Number(before));
+    expect(Number(at)).toBeGreaterThan(0);
+  });
+
+  it('pauses the loop when motion is turned down while it moves', async () => {
+    const t = start(<Count />);
+    await wait(200);
+    t.rerender(<Count policy="reduced" />);
+    await wait(60);
+    expect(shown(t)).toMatch(/ paused$/);
+    const written = t.stdout.chunks.length;
+    await wait(200);
+    expect(t.stdout.chunks.length).toBe(written);
   });
 
   it('reads one line of words to a screen reader, and never redraws it', async () => {
