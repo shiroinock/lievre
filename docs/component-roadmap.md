@@ -517,7 +517,7 @@ Field で今の TextField・Select・RadioGroup を作り直すときは、配�
 2. SegmentedControl（`radix-ui` の ToggleGroup。見た目と操作は ViewSwitch と同じ）
 3. ButtonGroup（`attached` で隙間なくつなげ、間の線を1本にする）・SplitButton（Button と DropdownMenu をつなげる）
 
-ViewSwitch を SegmentedControl の上に組み直して土台を1つにするのは、タイムライン型の段階2（`queue.tsx` を触る）がマージされてから行います。
+ViewSwitch は SegmentedControl の上に組み直し、土台を1つにしました（タイムライン型の段階2と、そのあとの読み上げと取り消しの修正がマージされてから、別の PR で）。
 
 第3段階の2（移動）：
 

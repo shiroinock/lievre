@@ -45,6 +45,7 @@
 - TextField・Textarea・Select・Checkbox を Field で、RadioGroup を Fieldset で組み直した。`hint` と `error` はどちらも `aria-describedby` で入力に結ぶ。書き出す名前と props は変わらない。（#32）
 - DecisionQueue は、操作の結果（「『項目A』を『もらう』にしました」「2件を未決に戻しました」など）を先に読み上げ、続けて今の位置を知らせる。（#37）
 - `decideItems` で2件以上を決めた操作は、`undoDecision` の1回で全部戻る。状態に省ける項目 `batches` を足した。1件ずつ決めた操作はこれまでどおり1件ずつ戻る。（#37）
+- ViewSwitch を SegmentedControl で組み直した。クラスは SegmentedControl と同じ `.lv-segmented`・`.lv-segmented-item` になる。props・既定の言葉・見た目・読み上げ・キー操作は変わらない。（#42）
 
 #### 足したもの
 

@@ -35,7 +35,7 @@ export const SCREEN_PARTS: LayoutPart[] = [
   },
   {
     name: '見せ方の切り替え',
-    selector: '.lv-view-switch-item',
+    selector: '.lv-segmented-item',
     checks: ['inset-x', 'inset-y', 'control-height'],
   },
   { name: '列の今の項目', selector: '.lv-queue-card', checks: ['padding-equal', 'fits'] },

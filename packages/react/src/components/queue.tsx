@@ -8,8 +8,9 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
-import { Progress as ProgressPrimitive, ToggleGroup as ToggleGroupPrimitive } from 'radix-ui';
+import { Progress as ProgressPrimitive } from 'radix-ui';
 import { Button, Kbd } from './primitives';
+import { SegmentedControl } from './actions';
 
 // ---------------------------------------------------------------------------
 // State: pure functions, shared by the queue and the list view.
@@ -295,7 +296,7 @@ const DEFAULT_VIEWS: ViewSwitchItem[] = [
   { value: 'queue', label: '順に見る' },
   { value: 'list', label: '一覧から選ぶ' },
 ];
-/** 同じ項目の見せ方を切り替えます（既定は「順に見る」「一覧から選ぶ」）。中身を2つ持つ Tabs と違い、状態は1つのまま見せ方だけを変えます。矢印キーで移動します。 */
+/** 同じ項目の見せ方を切り替えます（既定は「順に見る」「一覧から選ぶ」）。中身を2つ持つ Tabs と違い、状態は1つのまま見せ方だけを変えます。SegmentedControl で組んでいるので、見た目と操作（矢印キーで移り、選んでいるものは外れない）は同じです。 */
 export function ViewSwitch({
   value,
   onValueChange,
@@ -309,25 +310,9 @@ export function ViewSwitch({
   /** 選択肢。既定は queue「順に見る」と list「一覧から選ぶ」。言葉で書き、アイコンだけにしません。 */
   items?: ViewSwitchItem[];
 }) {
+  // One base with SegmentedControl: the same look, keys and never-empty choice.
   return (
-    <ToggleGroupPrimitive.Root
-      type="single"
-      className="lv-view-switch"
-      aria-label={label}
-      value={value}
-      // Pressing the selected item again would leave nothing selected; keep the current view.
-      onValueChange={(next) => next && onValueChange(next)}
-    >
-      {items.map((item) => (
-        <ToggleGroupPrimitive.Item
-          key={item.value}
-          value={item.value}
-          className="lv-view-switch-item"
-        >
-          {item.label}
-        </ToggleGroupPrimitive.Item>
-      ))}
-    </ToggleGroupPrimitive.Root>
+    <SegmentedControl label={label} items={items} value={value} onValueChange={onValueChange} />
   );
 }
 

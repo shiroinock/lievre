@@ -405,7 +405,7 @@
     background: currentColor;
   }
 
-  /* SegmentedControl: the same look as ViewSwitch. */
+  /* SegmentedControl, and ViewSwitch built on it. */
   .lv-segmented {
     display: inline-flex;
     flex-wrap: wrap;
@@ -2454,45 +2454,6 @@
   .lv-queue-next-note {
     margin-left: var(--lv-space-2);
     font-size: var(--lv-text-xs);
-  }
-
-  /* View switch: two words, the chosen one shown by fill, accent edge and weight. */
-  .lv-view-switch {
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: var(--lv-space-1);
-  }
-  .lv-view-switch-item {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: var(--lv-control-height);
-    padding: var(--lv-control-padding);
-    border: 1px solid var(--lv-border-strong);
-    border-radius: var(--lv-radius-md);
-    background: var(--lv-surface);
-    color: var(--lv-muted);
-    font-size: var(--lv-text-md);
-    line-height: var(--lv-line-tight);
-    white-space: nowrap;
-  }
-  .lv-view-switch-item:hover {
-    color: var(--lv-text);
-  }
-  .lv-view-switch-item[data-state='on'] {
-    border-color: var(--lv-accent);
-    background: var(--lv-selected);
-    color: var(--lv-text);
-    font-weight: var(--lv-weight-bold);
-  }
-
-  @media (forced-colors: active) {
-    .lv-view-switch-item[data-state='on'] {
-      forced-color-adjust: none;
-      border-color: Highlight;
-      background: Highlight;
-      color: HighlightText;
-    }
   }
 }
 

@@ -216,7 +216,7 @@ describe('QueueProgress and ViewSwitch', () => {
 // a pressable control's outline must be border-strong, which holds 3:1 (WCAG 1.4.11).
 describe('queue controls', () => {
   const css = readFileSync('src/styles/lievre.css', 'utf8');
-  for (const selector of ['.lv-queue-done-item', '.lv-view-switch-item'])
+  for (const selector of ['.lv-queue-done-item', '.lv-segmented-item'])
     it(`outlines ${selector} in border-strong, not the pale divider`, () => {
       const block = css.match(new RegExp(`\\${selector} \\{([^}]*)\\}`))?.[1] ?? '';
       expect(block, `${selector} の border は var(--lv-border-strong) にしてください`).toMatch(
