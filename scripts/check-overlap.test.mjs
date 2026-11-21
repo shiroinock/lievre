@@ -160,6 +160,20 @@ test('引数がなければ今の枝の PR を、手元の未 push の変更と�
   assert.throws(() => pickTarget(['9'], prs, { git: git('main') }), /#9 は開いた PR にありません/);
 });
 
+test('積んだ枝は向き先の枝と比べ、まだ add していないファイルも数える', () => {
+  const prs = [pr(1), pr(2, { baseRefName: 'claude/p1' })];
+  const calls = [];
+  const fake = (args) => {
+    calls.push(args.join(' '));
+    if (args[0] === 'branch') return 'claude/p2\n';
+    if (args[0] === 'ls-files') return 'new.ts\n';
+    return '';
+  };
+  const target = pickTarget([], prs, { git: fake });
+  assert.ok(calls.includes('diff --name-only origin/claude/p1...HEAD'), calls.join('\n'));
+  assert.deepEqual(target.files, ['new.ts']);
+});
+
 test('--all は重なる組だけを出す', () => {
   const prs = [
     pr(1, { files: [{ path: 'a.ts' }] }),

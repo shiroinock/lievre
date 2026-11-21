@@ -175,13 +175,18 @@ export function pickTarget(args, prs, { git = (a) => sh('git', a) } = {}) {
   }
   const branch = git(['branch', '--show-current']).trim();
   const own = prs.find((p) => p.headRefName === branch);
-  // Uncommitted and unpushed changes count too: they are what this branch is about to touch.
+  // Uncommitted, untracked and unpushed changes count too: they are what this branch is about to
+  // touch. A stacked branch is compared with the branch it is stacked on, not with main, so the
+  // changes it builds on are not counted as its own.
+  const base = own?.baseRefName ?? 'main';
   const local = [
-    ...git(['diff', '--name-only', 'origin/main...HEAD']).split('\n'),
+    ...git(['diff', '--name-only', `origin/${base}...HEAD`]).split('\n'),
     ...git(['diff', '--name-only', 'HEAD']).split('\n'),
-  ].filter(Boolean);
+    ...git(['ls-files', '--others', '--exclude-standard']).split('\n'),
+  ];
+  const fresh = [...new Set(local.filter(Boolean))];
   if (own) {
-    const files = [...new Set([...(own.files ?? []).map((f) => f.path ?? f), ...local])];
+    const files = [...new Set([...(own.files ?? []).map((f) => f.path ?? f), ...fresh])];
     return { ...own, files };
   }
   return {
@@ -190,7 +195,7 @@ export function pickTarget(args, prs, { git = (a) => sh('git', a) } = {}) {
     headRefName: branch,
     baseRefName: 'main',
     body: '',
-    files: local,
+    files: fresh,
   };
 }
 
@@ -216,7 +221,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     // Telling only: a missing gh or network never fails the caller.
     console.error(`重なりを調べられませんでした：${error.message}`);
     console.error(
-      '  直し方：gh をログインした状態で入れ（gh auth login）、リポジトリの直下で流す。',
+      '  直し方：gh をログインした状態で入れ（gh auth login）、git fetch origin してから、リポジトリの直下で流す。',
     );
   }
 }
