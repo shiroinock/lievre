@@ -1,0 +1,3 @@
+{
+  "extends": ["github>shiroinock/workflows//renovate/default"]
+}

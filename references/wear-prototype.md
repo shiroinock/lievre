@@ -100,7 +100,7 @@ npm run wear:setup   # .venv-wear/ を作り、fontTools と brotli を入れる
 npm run wear:tune
 ```
 
-- `npm run wear:setup` は、リポジトリの中に `.venv-wear/`（git の管理外）を作り、[scripts/wear/requirements.txt](../packages/react/scripts/wear/requirements.txt) の版（fontTools 4.55.3、brotli 1.1.0）を PyPI から入れます。uv があれば uv を、なければ `python3 -m venv` と pip を使います。何度実行しても同じ結果になります。
+- `npm run wear:setup` は、リポジトリの中に `.venv-wear/`（git の管理外）を作り、[scripts/wear/requirements.txt](../packages/react/scripts/wear/requirements.txt) で固定した版を PyPI から入れます（版はこのファイルだけに書き、Renovate が上げます）。uv があれば uv を、なければ `python3 -m venv` と pip を使います。何度実行しても同じ結果になります。
 - 焼き込みに使う Python は、`LIEVRE_WEAR_PYTHON`、`.venv-wear/bin/python3`、`python3` の順に選びます（[scripts/wear/python.mjs](../packages/react/scripts/wear/python.mjs)）。`npm run wear:font` と、調整画面の「保存して焼き込む」「その場の焼き込み」で共通です。
 - 必要なモジュールがないときは、ターミナルにも調整画面にも「npm run wear:setup を実行してください」と出します。
 

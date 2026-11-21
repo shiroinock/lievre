@@ -1,4 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 import { act, render, screen } from '@testing-library/react';
@@ -285,5 +286,51 @@ describe('Wear: provider', () => {
       .closest('.lievre') as HTMLElement;
     expect(portal).toHaveAttribute('data-wear', 'live');
     expect(portal.style.getPropertyValue('--lv-wear-heading-0')).toBe(filter);
+  });
+});
+
+// Renovate raises the pins in requirements.txt; a version copied into a document is left behind.
+// Between the name and the number: spaces, ==, <, >, ~, !, a v, a colon, brackets or の.
+const copiesVersion = (text: string, name: string) =>
+  new RegExp(
+    `\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s=<>~!vV:：（(の]*\\d+\\.\\d+`,
+    'i',
+  ).test(text);
+
+describe('Wear: Python versions', () => {
+  it('catches the usual ways of writing a version', () => {
+    for (const text of [
+      'fontTools 4.55.3',
+      'pip install fonttools==4.55.3',
+      'fontTools v4.55.3',
+      'fontTools（4.55.3）',
+      'fontTools の 4.55.3',
+    ]) {
+      expect(copiesVersion(text, 'fonttools'), text).toBe(true);
+    }
+    expect(copiesVersion('pip install fonttools brotli', 'fonttools')).toBe(false);
+    expect(copiesVersion('zopeXinterface 5.0', 'zope.interface')).toBe(false);
+  });
+
+  it('names the pinned versions only in requirements.txt', () => {
+    const pins = readFileSync('scripts/wear/requirements.txt', 'utf8')
+      .split('\n')
+      .map((line) => /^([\w.-]+)==/.exec(line)?.[1])
+      .filter((name): name is string => Boolean(name));
+    // -z: without it, git quotes paths with non-ASCII names and they cannot be opened.
+    const docs = execFileSync('git', ['ls-files', '-z', '--', '*.md', '*.mdx'], {
+      cwd: '../..',
+      encoding: 'utf8',
+    })
+      .split('\0')
+      .filter(Boolean);
+    const copied = docs.flatMap((file) => {
+      const text = readFileSync(`../../${file}`, 'utf8');
+      return pins.filter((name) => copiesVersion(text, name)).map((name) => `${file}: ${name}`);
+    });
+    expect(
+      copied,
+      '文書に Python のモジュールの版を写さないでください。版は scripts/wear/requirements.txt だけに書き、文書からはそのファイルを指してください（Renovate が上げるのは requirements.txt だけです）',
+    ).toEqual([]);
   });
 });
