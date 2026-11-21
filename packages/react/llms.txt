@@ -651,6 +651,29 @@ baked はビルド時の値（npm run wear）で決まります。
 - `runningText?: string` — 既定 '自動で更新しています'。動いているときの言葉。
 - `pausedText?: string` — 既定 '止めています'。止めているときの言葉。
 
+### Chip
+
+分類や選んだ値を示す小さな札。状態（稼働中・要確認）は Badge、分類と選んだ値は Chip を使います。
+何も渡さなければ表示だけの札（タグ）、onRemove で外せる札（選んだ絞り込みの条件、複数選択の値）、
+selected・onSelectedChange で押して入り切りする絞り込みの札になります。選んでいる札は、面と線の色に加えて印で示します。
+
+- `label: string` — チップの言葉（分類の名前や、選んだ値）。
+- `icon?: ReactNode` — 言葉の前のアイコン。飾りなので読み上げません。選べるチップでは、選んでいる間は印に替わります。
+- `size?: 'sm' | 'md'` — 'md'（既定）は 32px、'sm' は 24px の高さ。
+- `disabled?: boolean`
+- `onRemove?: (() => void)` — 外すボタンを付け、押すと呼びます。外したあとは、次のチップか入力欄へフォーカスを移してください。
+- `removeLabel?: string` — 外すボタンの読み上げ。既定は「{label}を外す」。
+- `selected?: boolean` — 選んでいるか。渡すと外で持ち、チップは押すと入り切りするボタン（aria-pressed）になります。
+- `defaultSelected?: boolean` — 外で持たないときの、はじめの選択。
+- `onSelectedChange?: ((selected: boolean) => void)` — 選択が変わったときに呼びます。これか selected・defaultSelected を渡すと、選べるチップになります。
+
+### ChipGroup
+
+チップの並び。名前（label）を付けたまとまりにして、折り返して並べます。
+
+- `label: string` — まとまりの名前。画面には出さず、読み上げに使います（「絞り込みの条件」）。
+- `children: ReactNode`
+
 ## フック
 
 ### useLievreTheme
