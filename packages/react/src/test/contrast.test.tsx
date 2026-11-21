@@ -205,3 +205,16 @@ describe('Semantic color contrast', () => {
     });
   }
 });
+
+// Under forced colours the browser paints a backplate behind text as tall as the glyphs. On the
+// small badge's 16px line it covers the forced border at the top and bottom, so the small badge
+// paints itself in system colours with no backplate.
+describe('Forced colours', () => {
+  it('keeps the small badge border clear of the text backplate', () => {
+    const css = readFileSync('src/styles/lievre.css', 'utf8');
+    const forced = css.slice(css.indexOf('@media (forced-colors: active)'));
+    expect(forced).toMatch(
+      /\.lv-badge--sm \{[^}]*forced-color-adjust: none;[^}]*background: Canvas;/,
+    );
+  });
+});

@@ -1732,6 +1732,14 @@
     .lv-tab {
       border: 1px solid ButtonText;
     }
+    /* The browser paints a backplate behind forced text as tall as the glyphs, which is taller
+       than the small badge's 16px line, so it would cover the top and bottom border. Paint the
+       badge in system colours ourselves, without a backplate. */
+    .lv-badge--sm {
+      forced-color-adjust: none;
+      background: Canvas;
+      color: CanvasText;
+    }
     .lv-progress-indicator,
     .lv-status-dot,
     .lv-meter-hand {
