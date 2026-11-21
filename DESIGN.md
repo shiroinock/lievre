@@ -96,7 +96,7 @@ CI では、すべての Story をこの基準で測ります（`npm run test:la
 | 次に見るもの  | システムが決めて、1列に1件ずつ出す               | 利用者が全体を見て、自分で探す                           |
 | 楽なところ    | 注意の向け先を部品が肩代わりする。考えずに進める | 全体を比べられる。配置を覚えられ、探す楽しさがある       |
 | 危ういところ  | 見すぎる・流される。大事なものも流れていく       | 考える負担がある。迷う・見落とす                         |
-| lievre の部品 | DecisionQueue・QueueProgress・ViewSwitch（予定） | DataTable・Tabs・Breadcrumb・Pagination・DescriptionList |
+| lievre の部品 | DecisionQueue・QueueProgress・ViewSwitch         | DataTable・Tabs・Breadcrumb・Pagination・DescriptionList |
 
 楽さと見すぎは表裏一体です。lievre はこれまで地形の部品を中心に作ってきました。タイムラインの部品を足すときは、楽さを借りながら、見すぎに歯止めをかける作りにします。ここでの「タイムライン」は見せ方の名前で、操作の履歴を並べる部品（Timeline）とは別のものです。
 

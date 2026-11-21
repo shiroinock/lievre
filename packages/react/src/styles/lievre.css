@@ -1713,3 +1713,213 @@
     }
   }
 }
+
+/* --------------------------------------------------------- queue (timeline) */
+
+/* One item at a time, chosen by the system, with the count and the end always in view
+   (DESIGN.md「地形とタイムライン」). */
+@layer lievre.components {
+  .lv-queue {
+    display: grid;
+    gap: var(--lv-space-4);
+    min-width: 0;
+  }
+  .lv-queue-order {
+    margin: 0;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+    line-height: var(--lv-line-body);
+  }
+  .lv-queue-progress .lv-progress-label {
+    color: var(--lv-text);
+  }
+
+  /* Decided items stack up in order; pressing one puts it back in the queue. */
+  .lv-queue-done {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--lv-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lv-queue-done-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lv-space-2);
+    min-height: 32px;
+    max-width: 100%;
+    padding: 0 12px;
+    border: 1px solid var(--lv-border);
+    border-radius: var(--lv-radius-md);
+    background: var(--lv-surface);
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+    line-height: var(--lv-line-tight);
+    text-align: left;
+  }
+  .lv-queue-done-item:hover {
+    border-color: var(--lv-border-strong);
+    color: var(--lv-text);
+  }
+  .lv-queue-done-mark {
+    color: var(--lv-text);
+    font-weight: var(--lv-weight-bold);
+    white-space: nowrap;
+  }
+  .lv-queue-done-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  /* The current item is the only large thing on screen; its accent edge matches a selected row. */
+  .lv-queue-card {
+    display: grid;
+    gap: var(--lv-space-4);
+    min-width: 0;
+    padding: var(--lv-panel-padding);
+    border: 1px solid var(--lv-border-strong);
+    border-radius: var(--lv-radius-lg);
+    background: var(--lv-surface) linear-gradient(var(--lv-accent), var(--lv-accent)) left / 4px
+      100% no-repeat;
+    animation: lv-queue-arrive var(--lv-motion) var(--lv-ease);
+  }
+  /* Only a small shift: if the animation is paused (a background tab), the card is still fully drawn. */
+  @keyframes lv-queue-arrive {
+    from {
+      transform: translateY(4px);
+    }
+  }
+  .lv-queue-card-header {
+    display: grid;
+    gap: var(--lv-space-1);
+  }
+  .lv-queue-reason {
+    margin: 0;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-queue-reason:empty {
+    display: none;
+  }
+  .lv-queue-card-title {
+    margin: 0;
+    font-size: var(--lv-text-lg);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+    overflow-wrap: anywhere;
+  }
+  .lv-queue-card-body {
+    min-width: 0;
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-body);
+  }
+  .lv-queue-card-body > :where(:first-child) {
+    margin-top: 0;
+  }
+  .lv-queue-card-body > :where(:last-child) {
+    margin-bottom: 0;
+  }
+  .lv-queue-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--lv-space-2);
+  }
+  .lv-queue-undo {
+    margin-left: auto;
+  }
+  .lv-queue-key {
+    display: inline-flex;
+  }
+
+  /* The end: the queue stops here and does not start another one by itself. */
+  .lv-queue-end {
+    padding: var(--lv-panel-padding);
+    border: 1px solid var(--lv-border);
+    border-radius: var(--lv-radius-lg);
+    background: var(--lv-surface);
+    color: var(--lv-muted);
+    text-align: center;
+  }
+  .lv-queue-end h3 {
+    margin: 0 0 var(--lv-space-1);
+    color: var(--lv-text);
+    font-size: var(--lv-text-base);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-queue-end p {
+    margin: 0 0 var(--lv-space-4);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-body);
+  }
+  .lv-queue-end > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* What comes next stays small and pale: a few names, then a count. */
+  .lv-queue-next {
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-queue-next-title {
+    margin: 0 0 var(--lv-space-1);
+    font-weight: var(--lv-weight-bold);
+  }
+  .lv-queue-next ol {
+    display: grid;
+    gap: var(--lv-space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .lv-queue-next-note {
+    margin-left: var(--lv-space-2);
+    font-size: var(--lv-text-xs);
+  }
+
+  /* View switch: two words, the chosen one shown by fill, accent edge and weight. */
+  .lv-view-switch {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--lv-space-1);
+  }
+  .lv-view-switch-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--lv-control-height);
+    padding: var(--lv-control-padding);
+    border: 1px solid var(--lv-border);
+    border-radius: var(--lv-radius-md);
+    background: var(--lv-surface);
+    color: var(--lv-muted);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-tight);
+    white-space: nowrap;
+  }
+  .lv-view-switch-item:hover {
+    color: var(--lv-text);
+  }
+  .lv-view-switch-item[data-state='on'] {
+    border-color: var(--lv-accent);
+    background: var(--lv-selected);
+    color: var(--lv-text);
+    font-weight: var(--lv-weight-bold);
+  }
+
+  @media (forced-colors: active) {
+    .lv-queue-card {
+      border-left: 4px solid Highlight;
+    }
+    .lv-view-switch-item[data-state='on'] {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
+    }
+  }
+}

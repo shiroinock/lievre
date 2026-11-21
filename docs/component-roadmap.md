@@ -430,7 +430,7 @@ Field で今の TextField・Select・RadioGroup を作り直すのは、配置�
 
 ### タイムライン型の段階1：1件ずつ判断する列の土台
 
-依存を足さず、`radix-ui` の今の部品（ToggleGroup）と今のトークンで作ります。
+依存を足さず、`radix-ui` の今の部品（ToggleGroup）と今のトークンで作ります。作り終えました（`packages/react/src/components/queue.tsx`）。
 
 1. useDecisionQueue（状態の純粋関数とフック）
 2. DecisionQueue（今の項目・判断のボタンと Kbd・あとで・1つ戻す・済みの積み・このあと数件・終わりの表示・列の中だけで効くキー）
