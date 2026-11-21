@@ -47,3 +47,20 @@ export const ControlsInRow: Story = {
     </Stack>
   ),
 };
+/** 両端に寄せる形。見出しと操作を左右に分けるときなど。 */
+export const JustifyBetween: Story = {
+  render: () => (
+    <Stack direction="row" justify="between" align="center">
+      <Text>今週の作業</Text>
+      <Button size="sm">作業を追加</Button>
+    </Stack>
+  ),
+};
+export const JustifyEnd: Story = {
+  render: () => (
+    <Stack direction="row" justify="end" gap={2}>
+      <Button>キャンセル</Button>
+      <Button variant="primary">保存</Button>
+    </Stack>
+  ),
+};

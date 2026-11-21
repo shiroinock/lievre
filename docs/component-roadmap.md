@@ -533,11 +533,22 @@ DataTable の下のページ送りに番号と件数の選択を出すのは、D
 
 ### 第4段階：表示と表のバリエーション
 
-1. Text の `maxLines`・`weight`、Heading の5段、Stack の `justify`
-2. Avatar の画像と大きさの段、Card の種類（押せる・選べる）
-3. DataTable の見出しの固定・行の展開、表だけ compact にする例
-4. Skeleton の形、EmptyState の小さな形、Divider の縦、Counter
-5. Chip・Tag、Accordion・Disclosure
+PR を3つに分けます。積み重ねるのは2本までにして、マージを待ちながら進めます。
+
+第4段階の1（文字・配置・Avatar・Card）：
+
+1. Text の `maxLines`・`weight`、Heading の5段（`minor` 16px・`subsection` 18px を足す）、Stack の `justify`・`wrap`
+2. Avatar の画像（読み込めないときは頭文字）と大きさの段（24 / 32 / 40 / 48px）、四角（組織）
+3. Card の種類：線のない `plain`、押せる `href`、選べる `selection`。どちらも1つの操作（見出しのリンクかチェックボックス）の当たり判定をカード全体に広げ、ボタンの入れ子を作らない
+
+第4段階の2（表）：
+
+1. DataTable の見出しの固定・行の展開、表だけ compact にする例、下のページ送りの番号と件数の選択
+
+第4段階の3（そのほかの表示）：
+
+1. Skeleton の形、EmptyState の小さな形、Divider の縦、Counter
+2. Chip・Tag、Accordion・Disclosure
 
 ### 第5段階：申し込みと探す画面の入力（土台を1つ足す）
 
