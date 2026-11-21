@@ -31,6 +31,9 @@ import {
   SegmentedControl,
   ButtonGroup,
   SplitButton,
+  Pagination,
+  Breadcrumb,
+  TabNav,
   type Column,
   type ToastMessage,
 } from '../index';
@@ -845,5 +848,70 @@ describe('Action variations', () => {
     await userEvent.click(screen.getByRole('button', { name: '保存のほかの方法' }));
     await userEvent.click(await screen.findByRole('menuitem', { name: '下書きとして保存' }));
     await waitFor(() => expect(draft).toHaveBeenCalledOnce());
+  });
+});
+
+describe('Navigation variations', () => {
+  it('shows the ends and the neighbours of the current page, leaving gaps for the rest', async () => {
+    const { pageItems } = await import('../components/paging');
+    expect(pageItems(6, 12)).toEqual([1, null, 5, 6, 7, null, 12]);
+    expect(pageItems(2, 12)).toEqual([1, 2, 3, null, 12]);
+    // A gap of one page shows the page instead of "…".
+    expect(pageItems(4, 12)).toEqual([1, 2, 3, 4, 5, null, 12]);
+    expect(pageItems(1, 1)).toEqual([1]);
+  });
+  it('marks the current page and moves by number, with the range in words', async () => {
+    const change = vi.fn();
+    setup(
+      <Pagination
+        variant="numbers"
+        page={2}
+        totalPages={7}
+        onPageChange={change}
+        totalCount={128}
+        pageSize={20}
+      />,
+    );
+    expect(screen.getByRole('button', { name: '2ページ目' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('128件中 21〜40件');
+    await userEvent.click(screen.getByRole('button', { name: '7ページ目' }));
+    expect(change).toHaveBeenCalledWith(7);
+    await userEvent.click(screen.getByRole('button', { name: '2ページ目' }));
+    expect(change).toHaveBeenCalledTimes(1);
+  });
+  it('folds the middle of a long breadcrumb and opens it in place', async () => {
+    setup(
+      <Breadcrumb
+        maxItems={3}
+        items={[
+          { label: 'ホーム', href: '#' },
+          { label: '組織', href: '#' },
+          { label: '東日本', href: '#' },
+          { label: '拠点', href: '#' },
+          { label: '作業' },
+        ]}
+      />,
+    );
+    expect(screen.queryByRole('link', { name: '組織' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '拠点' })).toBeVisible();
+    await userEvent.click(screen.getByRole('button', { name: '省いた2つの階層を出す' }));
+    expect(screen.getByRole('link', { name: '組織' })).toHaveFocus();
+    expect(screen.getByText('作業')).toHaveAttribute('aria-current', 'page');
+  });
+  it('lays links out as tabs, the current page marked', () => {
+    setup(
+      <TabNav
+        label="設定"
+        items={[
+          { href: '#a', label: '全般', current: true },
+          { href: '#b', label: 'メンバー', count: 3 },
+        ]}
+      />,
+    );
+    expect(screen.getByRole('link', { name: '全般' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
   });
 });

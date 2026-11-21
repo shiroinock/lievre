@@ -1,4 +1,5 @@
 import {
+  Fragment,
   forwardRef,
   useId,
   useLayoutEffect,
@@ -35,6 +36,7 @@ import {
 } from 'lucide-react';
 import { cx, PortalSurface } from './system';
 import { Field } from './form';
+import { pageItems } from './paging';
 import {
   CharacterCount,
   countCharacters,
@@ -711,7 +713,10 @@ export type TabItem = {
   label: string;
   content: ReactNode;
   disabled?: boolean;
+  /** 件数。等幅で出し、言葉の後ろに読み上げます。 */
   count?: number;
+  /** 言葉の前のアイコン。飾りなので読み上げず、言葉は消しません。 */
+  icon?: ReactNode;
 };
 export function Tabs({
   items,
@@ -741,6 +746,11 @@ export function Tabs({
             value={item.value}
             disabled={item.disabled}
           >
+            {item.icon && (
+              <span className="lv-tab-icon" aria-hidden>
+                {item.icon}
+              </span>
+            )}
             {item.label}
             {item.count !== undefined && <span className="lv-tab-count">{item.count}</span>}
           </TabsPrimitive.Trigger>
@@ -752,6 +762,44 @@ export function Tabs({
         </TabsPrimitive.Content>
       ))}
     </TabsPrimitive.Root>
+  );
+}
+export type TabNavItem = {
+  /** 移る先。 */
+  href: string;
+  label: string;
+  /** 今のページなら true。aria-current="page" と下線で示します。 */
+  current?: boolean;
+  count?: number;
+  icon?: ReactNode;
+};
+/** タブの見た目のまま、ページを移るリンクを並べます。URL ごとに中身が変わる画面（設定の各ページなど）に使います。同じ画面の中で中身を切り替えるなら Tabs を使います。Tabs の矢印キーの操作はなく、リンクとして Tab で順に移ります。 */
+export function TabNav({
+  label,
+  items,
+}: {
+  /** 並びの名前。画面には出さず、nav の名前として読み上げます。 */
+  label: string;
+  items: TabNavItem[];
+}) {
+  return (
+    <nav aria-label={label}>
+      <ul className="lv-tabs-list lv-tab-nav">
+        {items.map((item) => (
+          <li key={item.href}>
+            <a href={item.href} className="lv-tab" aria-current={item.current ? 'page' : undefined}>
+              {item.icon && (
+                <span className="lv-tab-icon" aria-hidden>
+                  {item.icon}
+                </span>
+              )}
+              {item.label}
+              {item.count !== undefined && <span className="lv-tab-count">{item.count}</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 export function Tooltip({
@@ -936,36 +984,89 @@ export function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md'
     </span>
   );
 }
-export function Breadcrumb({ items }: { items: { label: string; href?: string }[] }) {
+export type BreadcrumbItem = { label: string; href?: string };
+/** 今いる場所までの階層。最後の項目は今のページで、aria-current="page" を付けます。 */
+export function Breadcrumb({
+  items,
+  maxItems,
+}: {
+  /** 上の階層から順に。最後は今のページで、href は付けても使いません。 */
+  items: BreadcrumbItem[];
+  /** 出す数の上限。超えると、最初の1つと最後の (maxItems - 1) 個を残し、間を「…」のボタンにまとめます。押すと省いた階層をその場に出し、フォーカスを省いていた最初の階層へ移します。 */
+  maxItems?: number;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const firstHidden = useRef<HTMLAnchorElement>(null);
+  const collapse = !expanded && maxItems !== undefined && maxItems >= 2 && items.length > maxItems;
+  const hiddenCount = collapse ? items.length - maxItems : 0;
+  useLayoutEffect(() => {
+    if (expanded) firstHidden.current?.focus();
+  }, [expanded]);
+  const shown = items
+    .map((item, i) => ({ item, i }))
+    .filter(({ i }) => !collapse || i === 0 || i > hiddenCount);
   return (
     <nav aria-label="パンくず">
       <ol className="lv-breadcrumb">
-        {items.map((item, i) => (
-          <li key={i}>
-            {i > 0 && <span aria-hidden>/</span>}
-            {item.href && i < items.length - 1 ? (
-              <a href={item.href}>{item.label}</a>
-            ) : (
-              <span aria-current={i === items.length - 1 ? 'page' : undefined}>{item.label}</span>
+        {shown.map(({ item, i }, n) => (
+          <Fragment key={i}>
+            {collapse && n === 1 && (
+              <li>
+                <span aria-hidden>/</span>
+                <button
+                  type="button"
+                  className="lv-breadcrumb-more"
+                  aria-label={`省いた${hiddenCount}つの階層を出す`}
+                  onClick={() => setExpanded(true)}
+                >
+                  …
+                </button>
+              </li>
             )}
-          </li>
+            <li>
+              {i > 0 && <span aria-hidden>/</span>}
+              {item.href && i < items.length - 1 ? (
+                <a href={item.href} ref={expanded && i === 1 && maxItems ? firstHidden : undefined}>
+                  {item.label}
+                </a>
+              ) : (
+                <span aria-current={i === items.length - 1 ? 'page' : undefined}>{item.label}</span>
+              )}
+            </li>
+          </Fragment>
         ))}
       </ol>
     </nav>
   );
 }
 
-/** 前後のページ送り。いまのページを「5ページ中2ページ目」と読み上げ、ページが変わると知らせます。端のページで押したボタンが無効になったら、フォーカスを反対のボタンへ移します。DataTable のページ送りには、これを横に置かずに DataTable の pageSize を使います。 */
-export function Pagination({
-  page,
-  totalPages,
-  onPageChange,
-}: {
+export type PaginationProps = {
   /** 1 始まり。 */
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-}) {
+  /** 'compact'（既定）は前後のボタンと「2 / 5」。'numbers' はページ番号を並べます（端と今のページの前後だけを出し、間は「…」で省きます）。番号は等幅で、今のページは aria-current="page" と選択の面で示します。 */
+  variant?: 'compact' | 'numbers';
+  /** 全体の件数。pageSize と一緒に渡すと、「128件中 21〜40件」と出します。 */
+  totalCount?: number;
+  /** 1ページの件数。totalCount と一緒に渡すと件数の範囲を出し、pageSizeOptions を渡すと選べるようにします。 */
+  pageSize?: number;
+  /** 選べる1ページの件数（[20, 50, 100]）。渡すと「表示件数」の選択を出します。 */
+  pageSizeOptions?: number[];
+  /** 1ページの件数が変わったときに呼びます。ページを1ページ目に戻すのは呼び出す側です。 */
+  onPageSizeChange?: (pageSize: number) => void;
+};
+/** ページ送り。いまのページを「5ページ中2ページ目」と読み上げ、ページが変わると知らせます。端のページで押したボタンが無効になったら、フォーカスを反対のボタンへ移します。DataTable のページ送りには、これを横に置かずに DataTable の pageSize を使います。 */
+export function Pagination({
+  page,
+  totalPages,
+  onPageChange,
+  variant = 'compact',
+  totalCount,
+  pageSize,
+  pageSizeOptions,
+  onPageSizeChange,
+}: PaginationProps) {
   const total = Math.max(1, Math.floor(totalPages));
   const current = Math.min(total, Math.max(1, page));
   const prev = useRef<HTMLButtonElement>(null);
@@ -981,15 +1082,46 @@ export function Pagination({
     if (from.current?.disabled && (active === from.current || active === document.body))
       to.current?.focus();
   }, [current, total]);
+  const range =
+    totalCount !== undefined && pageSize
+      ? {
+          from: totalCount === 0 ? 0 : (current - 1) * pageSize + 1,
+          to: Math.min(totalCount, current * pageSize),
+        }
+      : undefined;
   return (
-    <nav className="lv-pagination" aria-label="ページ切り替え">
-      <span role="status">
-        <span aria-hidden>
-          {current} / {total}
-        </span>
-        <VisuallyHidden>
-          {total}ページ中 {current}ページ目
-        </VisuallyHidden>
+    <nav className="lv-pagination" aria-label="ページ切り替え" data-variant={variant}>
+      {pageSizeOptions && pageSize && (
+        <div className="lv-pagination-size">
+          <Select
+            label="表示件数"
+            controlSize="sm"
+            value={String(pageSize)}
+            onValueChange={(v) => onPageSizeChange?.(Number(v))}
+            options={pageSizeOptions.map((n) => ({ value: String(n), label: `${n}件` }))}
+          />
+        </div>
+      )}
+      <span role="status" className={cx('lv-pagination-status', range && 'lv-pagination-range')}>
+        {range ? (
+          <>
+            <span className="lv-tabular">{totalCount}</span>件中{' '}
+            <span className="lv-tabular">{range.from}</span>〜
+            <span className="lv-tabular">{range.to}</span>件
+            <VisuallyHidden>
+              、{total}ページ中 {current}ページ目
+            </VisuallyHidden>
+          </>
+        ) : (
+          <>
+            <span aria-hidden>
+              {current} / {total}
+            </span>
+            <VisuallyHidden>
+              {total}ページ中 {current}ページ目
+            </VisuallyHidden>
+          </>
+        )}
       </span>
       <Button
         ref={prev}
@@ -1003,6 +1135,29 @@ export function Pagination({
       >
         <ChevronLeft size={16} aria-hidden />
       </Button>
+      {variant === 'numbers' && (
+        <ol className="lv-pagination-pages">
+          {pageItems(current, total).map((p, i) =>
+            p === null ? (
+              <li key={`gap-${i}`} className="lv-pagination-gap" aria-hidden>
+                …
+              </li>
+            ) : (
+              <li key={p}>
+                <button
+                  type="button"
+                  className="lv-pagination-page"
+                  aria-label={`${p}ページ目`}
+                  aria-current={p === current ? 'page' : undefined}
+                  onClick={() => p !== current && onPageChange(p)}
+                >
+                  <span className="lv-mono">{p}</span>
+                </button>
+              </li>
+            ),
+          )}
+        </ol>
+      )}
       <Button
         ref={next}
         size="sm"
