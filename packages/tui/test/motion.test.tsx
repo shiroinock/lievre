@@ -184,6 +184,9 @@ describe('in a terminal (render)', () => {
       stdin: t.stdin as unknown as NodeJS.ReadStream,
       patchConsole: false,
       exitOnCtrlC: false,
+      // Ink writes no frame until the end when it sees CI, even on a terminal. These tests stand in
+      // for a person at a terminal, so Ink is told it is one (the motion policy is passed apart).
+      interactive: true,
       ...options,
     });
     unmount = () => app.unmount();
