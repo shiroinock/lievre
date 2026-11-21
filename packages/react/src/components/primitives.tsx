@@ -1048,8 +1048,9 @@ export type AvatarProps = {
 };
 /** 人や組織の印。頭文字は sm で1文字、それより大きいと2文字です。 */
 export function Avatar({ name, src, size = 'md', shape = 'circle' }: AvatarProps) {
-  const [failed, setFailed] = useState(false);
-  const image = src && !failed;
+  // Remember which picture broke, so a new src is tried again instead of staying on the initials.
+  const [failedSrc, setFailedSrc] = useState<string>();
+  const image = src && failedSrc !== src;
   return (
     <span
       className={cx(
@@ -1061,7 +1062,7 @@ export function Avatar({ name, src, size = 'md', shape = 'circle' }: AvatarProps
       aria-label={name}
     >
       {image ? (
-        <img src={src} alt="" onError={() => setFailed(true)} />
+        <img src={src} alt="" onError={() => setFailedSrc(src)} />
       ) : (
         Array.from(name)
           .slice(0, size === 'sm' ? 1 : 2)

@@ -990,7 +990,7 @@
   .lv-card--interactive {
     position: relative;
   }
-  .lv-card--interactive:hover {
+  .lv-card--interactive:hover:not(:has(:disabled)) {
     border-color: var(--lv-border-strong);
   }
   .lv-card-link {
@@ -2366,6 +2366,11 @@
     .lv-card[data-selected] {
       border-color: Highlight;
       outline: 1px solid Highlight;
+    }
+    /* The chosen outline above must not swallow the focus ring (focus sits on the chosen card). */
+    .lv-card--interactive:has(:focus-visible) {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
     }
     .lv-tab[data-state='active']::after,
     .lv-tab[aria-current='page']::after {

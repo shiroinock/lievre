@@ -1087,6 +1087,13 @@ describe('Display variations', () => {
     await waitFor(() => expect(container.querySelector('img')).toBeNull());
     expect(avatar).toHaveTextContent('計測');
   });
+  it('tries a new avatar picture after the old one broke', async () => {
+    const { container, rerender } = setup(<Avatar name="計測 太郎" src="broken.png" />);
+    (container.querySelector('img') as HTMLImageElement).dispatchEvent(new Event('error'));
+    await waitFor(() => expect(container.querySelector('img')).toBeNull());
+    rerender(wrap(<Avatar name="計測 太郎" src="next.png" />, 'paper'));
+    expect(container.querySelector('img')).toHaveAttribute('src', 'next.png');
+  });
   it('makes one control of a card you press or choose, named by its title', async () => {
     const change = vi.fn();
     setup(

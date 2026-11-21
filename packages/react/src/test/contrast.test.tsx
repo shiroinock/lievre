@@ -223,6 +223,33 @@ describe('Forced colours', () => {
       /\.lv-badge--sm \{[^}]*forced-color-adjust: none;[^}]*background: Canvas;/,
     );
   });
+  // A chosen card or option is outlined in Highlight; a later focus rule must still draw the ring,
+  // or a focused chosen one looks like any other chosen one.
+  it('keeps the focus ring over every chosen outline', () => {
+    const css = readFileSync('src/styles/lievre.css', 'utf8');
+    const forced = css.slice(css.indexOf('@media (forced-colors: active)'));
+    const rules = [...forced.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^}]*)\}/g)].map(
+      (m) => ({
+        selector: m[1].trim(),
+        body: m[2],
+        at: m.index!,
+      }),
+    );
+    for (const chosen of rules.filter((r) => /outline: 1px solid Highlight/.test(r.body))) {
+      const block = chosen.selector.match(/^\.[\w-]+/)![0];
+      const ring = rules.find(
+        (r) =>
+          r.at > chosen.at &&
+          r.selector.includes(':focus-visible') &&
+          /outline: 2px solid Highlight/.test(r.body) &&
+          r.selector.startsWith(block),
+      );
+      expect(
+        ring,
+        `${chosen.selector} の線のあとに、フォーカスの輪郭（:focus-visible で outline: 2px solid Highlight）を置きます`,
+      ).toBeTruthy();
+    }
+  });
   // A highlighted menu row opts out of forced colours to paint Highlight; its muted parts would
   // keep their grey on it unless they take HighlightText too.
   it('letters every muted part of a highlighted menu row in HighlightText', () => {
