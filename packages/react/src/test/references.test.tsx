@@ -33,4 +33,16 @@ describe('References', () => {
       ).not.toMatch(/"(thumbnail|thumbnail_source|screenshot_frames)"\s*:/);
     }
   });
+
+  // A board URL carries the account name; a pin URL (/pin/<id>/) does not.
+  it('name no Pinterest account', () => {
+    for (const file of tracked) {
+      if (!/\.(json|md|html)$/.test(file)) continue;
+      const text = readFileSync(join(root, file), 'utf8');
+      expect(
+        text.match(/pinterest\.com\/(?!pin\/)[\w.-]+\/[\w.-]+/g) ?? [],
+        `${file}：Pinterest のボードやアカウントの URL は書かないでください（アカウント名が入ります）。ピンの URL（/pin/<番号>/）だけを残してください`,
+      ).toEqual([]);
+    }
+  });
 });

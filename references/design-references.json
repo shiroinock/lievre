@@ -5,7 +5,7 @@
   "references": [
     {
       "id": "board-001",
-      "url": "",
+      "url": null,
       "title": "UI",
       "type": "board",
       "source": "user_provided",
