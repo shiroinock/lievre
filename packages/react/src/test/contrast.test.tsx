@@ -74,6 +74,25 @@ describe('Semantic color contrast', () => {
         );
       });
     }
+    // A strong badge is filled with the status colour and lettered in the surface colour.
+    for (const tone of ['muted', 'success', 'warning', 'danger', 'info'])
+      it(`${theme}: strong badge text / ${tone} reaches 4.5:1`, () => {
+        expect(ratio(resolve(set, 'surface'), resolve(set, tone))).toBeGreaterThanOrEqual(4.5);
+      });
+    // The progress bar (and its stripes when it has no value) must show on the sunken track.
+    for (const bar of ['accent', 'success', 'danger'])
+      it(`${theme}: progress bar ${bar} / surface-sunken reaches 3:1`, () => {
+        expect(ratio(resolve(set, bar), resolve(set, 'surface-sunken'))).toBeGreaterThanOrEqual(3);
+      });
+    // An alert's own controls sit on its tinted ground: the muted close icon, the secondary
+    // button's outline and the focus ring.
+    for (const tone of ['success', 'warning', 'danger', 'info'])
+      for (const foreground of ['muted', 'border-strong', 'focus'])
+        it(`${theme}: alert control ${foreground} / ${tone}-soft reaches 3:1`, () => {
+          expect(
+            ratio(resolve(set, foreground), resolve(set, `${tone}-soft`)),
+          ).toBeGreaterThanOrEqual(3);
+        });
     it(`${theme}: OFF switch thumb reaches 3:1`, () => {
       expect(
         ratio(resolve(set, 'border-strong'), resolve(set, 'surface-sunken')),
@@ -185,4 +204,17 @@ describe('Semantic color contrast', () => {
         expect(ratio(heldOutline(WEAR_CONFIG, set, theme), worn)).toBeGreaterThanOrEqual(3);
     });
   }
+});
+
+// Under forced colours the browser paints a backplate behind text as tall as the glyphs. On the
+// small badge's 16px line it covers the forced border at the top and bottom, so the small badge
+// paints itself in system colours with no backplate.
+describe('Forced colours', () => {
+  it('keeps the small badge border clear of the text backplate', () => {
+    const css = readFileSync('src/styles/lievre.css', 'utf8');
+    const forced = css.slice(css.indexOf('@media (forced-colors: active)'));
+    expect(forced).toMatch(
+      /\.lv-badge--sm \{[^}]*forced-color-adjust: none;[^}]*background: Canvas;/,
+    );
+  });
 });

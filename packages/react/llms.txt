@@ -112,7 +112,9 @@ baked はビルド時の値（npm run wear）で決まります。
 
 - `children: ReactNode`
 - `tone?: Tone` — 既定 'neutral'。'neutral' | 'success' | 'warning' | 'danger' | 'info'。Toast の 'error' はここでは 'danger'。
-- `dot?: boolean` — 既定 false
+- `emphasis?: 'soft' | 'strong'` — 既定 'soft'。'soft'（既定）は淡い面に状態の色の文字。'strong' は状態の色で塗り、文字を面の色にします。一覧の中で特に目立たせたい1つだけに使います。
+- `size?: 'sm' | 'md'` — 既定 'md'。'md'（既定）は高さ 20px、'sm' は 16px。文字はどちらも 12px で、sm は表のセルやタブの中など行の高さが詰まった場所に使います。
+- `dot?: boolean` — 既定 false。状態を補う丸い印。稼働・接続など、続いている状態に付けます。
 - ほかに HTMLAttributes<HTMLSpanElement> の属性を受け取ります。
 
 ### Textarea
@@ -174,9 +176,13 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### Alert
 
-- `title: string`
-- `tone?: Tone` — 既定 'info'
-- ほかに HTMLAttributes<HTMLDivElement> の属性を受け取ります。
+画面に残しておく知らせ。状態の色・アイコン・見出しの言葉の3つで状態を示します。一時的な結果の通知は Toast を使います。
+
+- `tone?: Tone` — 既定 'info'。'info'（既定）| 'success' | 'warning' | 'danger' | 'neutral'。'danger' は role="alert"、それ以外は role="status" で伝えます。
+- `title: string` — 何が起きたかを短く。状態の色とアイコンに加えて、言葉でも状態が分かるように書きます。
+- `action?: ReactNode` — 操作の場所。本文の下に並べます。「再読み込み」「詳細を見る」など、この知らせを受けてすることを Button の size="sm" で置きます。
+- `onDismiss?: (() => void)` — 渡すと右上に閉じるボタンを出し、押したときに呼びます。Alert を消すのは呼び出す側です。閉じるボタンにあったフォーカスは消えるので、消したあとに続きの場所（見出しや次の操作）へフォーカスを移します。
+- `dismissLabel?: string` — 既定 '閉じる'。閉じるボタンの名前。既定は「閉じる」。画面に知らせが複数あるときは「同期のお知らせを閉じる」のように何を閉じるかを書きます。
 
 ### Tabs
 
@@ -193,11 +199,13 @@ baked はビルド時の値（npm run wear）で決まります。
 
 ### Progress
 
-0〜100に丸め、色に加えて数値を併記します。
+処理の進み具合。数値は0〜100に丸め、色に加えて数値か言葉を併記します。値の分からない処理は value を省きます。動きを減らす設定では、値の分からない形も動かさずに縞で示します。
 
-- `value: number`
-- `label: string`
-- `showValue?: boolean` — 既定 true
+- `value?: number` — 0〜100。範囲の外は丸めます。省くと「値の分からない処理中」の形になり、数値の代わりに「処理中」と出します。
+- `label: string` — 何の進み具合か。画面に出し、読み上げの名前にも使います。
+- `showValue?: boolean` — 既定 true。数値（%）を出すかどうか。既定は true。
+- `tone?: 'success' | 'danger' | 'default'` — 既定 'default'。'default'（既定）は進行中。'success' は完了、'danger' は失敗で、棒の色に加えて見出しの横にアイコンと言葉（「完了」「失敗」）を出します。
+- `statusLabel?: string` — tone の言葉を変えるとき。「3件が失敗」のように、何が起きたかを書けます。
 
 ### Skeleton
 
@@ -294,6 +302,7 @@ baked はビルド時の値（npm run wear）で決まります。
 - `description: string` — 何が起きるかの説明。aria-describedby で結びます。
 - `children: ReactNode` — 本文。フォームや詳細を置きます。
 - `footer?: ReactNode` — 操作。閉じるだけのボタンは `<DialogClose asChild><Button>…</Button></DialogClose>` で包みます。
+- `size?: 'sm' | 'md' | 'lg'` — 既定 'md'。幅。'sm' は 400px（短い知らせ・入力1つ）、'md'（既定）は 520px（ふつうのフォーム）、'lg' は 720px（表や詳細を見せる）。狭い画面では、どれも画面の幅から左右 16px を引いた幅に縮みます。
 - `open?: boolean`
 - `onOpenChange?: ((open: boolean) => void)`
 
@@ -487,9 +496,12 @@ live は wearSeed から SVG のフィルタを作り、文字も歪ませる。
 - `type Density = 'comfortable' | 'compact';`
 - `type Typography = 'standard' | 'interface';`
 - `type ToastMessage`
-  - `title: string`
+  - `title: string` — 何が起きたかを短く（「設定を保存しました」）。
   - `description?: string`
-  - `tone?: 'success' | 'error'` — 既定は 'success'。失敗は 'error'（Badge・Alert の 'danger' とは名前が違います）。
+  - `tone?: 'success' | 'error' | 'info' | 'warning'` — 既定は 'success'。失敗は 'error'（Badge・Alert の 'danger' とは名前が違います）。'info' は知らせ、'warning' は注意。どれもアイコンと title の言葉で状態を伝えます。
+  - `action?: { label: string; altText: string; onClick: () => void }` — 通知の中に置く操作（「元に戻す」など）。渡すと、利用者が操作できるように通知は自動で消えなくなります（閉じるボタンかスワイプで閉じます）。
+altText には、通知の外で同じ操作ができる場所を書きます（「履歴の画面から元に戻せます」）。通知の操作ボタンへ移れない読み上げの利用者に、代わりとして読み上げます。
+押すと onClick を呼んでから通知を閉じます。
 - `type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';`
 - `type TabItem = { value: string; label: string; content: ReactNode; disabled?: boolean; count?: number; };`
 - `type Column<T>`

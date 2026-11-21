@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from 'react';
 import { Toast as ToastPrimitive } from 'radix-ui';
-import { X, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, CheckCircle2, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import { LiveWearFilters, liveAgeStyle, liveWearStyle } from '../wear/live';
 import type { Age } from '../wear/age.mjs';
 import { WEAR_CONFIG } from '../wear/params.mjs';
@@ -169,10 +169,17 @@ export function PortalSurface({ children }: { children: ReactNode }) {
   );
 }
 export type ToastMessage = {
+  /** 何が起きたかを短く（「設定を保存しました」）。 */
   title: string;
   description?: string;
-  /** 既定は 'success'。失敗は 'error'（Badge・Alert の 'danger' とは名前が違います）。 */
-  tone?: 'success' | 'error';
+  /** 既定は 'success'。失敗は 'error'（Badge・Alert の 'danger' とは名前が違います）。'info' は知らせ、'warning' は注意。どれもアイコンと title の言葉で状態を伝えます。 */
+  tone?: 'success' | 'error' | 'info' | 'warning';
+  /**
+   * 通知の中に置く操作（「元に戻す」など）。渡すと、利用者が操作できるように通知は自動で消えなくなります（閉じるボタンかスワイプで閉じます）。
+   * altText には、通知の外で同じ操作ができる場所を書きます（「履歴の画面から元に戻せます」）。通知の操作ボタンへ移れない読み上げの利用者に、代わりとして読み上げます。
+   * 押すと onClick を呼んでから通知を閉じます。
+   */
+  action?: { label: string; altText: string; onClick: () => void };
 };
 const ToastContext = createContext<((message: ToastMessage) => void) | null>(null);
 /** ToastProviderの子孫で使用します。保存結果や一時的な通知向け。`const toast = useToast(); toast({ title: '保存しました' })` */
@@ -183,6 +190,17 @@ export function useToast() {
       'useToast は ToastProvider の内側で呼んでください：<LievreProvider><ToastProvider>{app}</ToastProvider></LievreProvider>',
     );
   return ctx;
+}
+function ToastIcon({ tone }: { tone?: ToastMessage['tone'] }) {
+  const Icon =
+    tone === 'error'
+      ? AlertCircle
+      : tone === 'warning'
+        ? AlertTriangle
+        : tone === 'info'
+          ? Info
+          : CheckCircle2;
+  return <Icon size={20} aria-hidden />;
 }
 export function ToastProvider({ children }: { children: ReactNode }) {
   const parent = useContext(ToastContext);
@@ -202,15 +220,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             className="lv-toast"
             data-tone={message.tone ?? 'success'}
             key={message.id}
+            // An action needs time to reach (WCAG 2.2.1), so a toast with one stays until closed.
+            duration={message.action ? Infinity : undefined}
             onOpenChange={(open) => {
               if (!open) setMessages((prev) => prev.filter((t) => t.id !== message.id));
             }}
           >
-            {message.tone === 'error' ? (
-              <AlertCircle size={20} aria-hidden />
-            ) : (
-              <CheckCircle2 size={20} aria-hidden />
-            )}
+            <ToastIcon tone={message.tone} />
             <div>
               <ToastPrimitive.Title className="lv-toast-title">
                 {message.title}
@@ -219,6 +235,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 <ToastPrimitive.Description className="lv-toast-description">
                   {message.description}
                 </ToastPrimitive.Description>
+              )}
+              {message.action && (
+                <div className="lv-toast-actions">
+                  <ToastPrimitive.Action
+                    className="lv-button lv-button--secondary lv-button--sm"
+                    altText={message.action.altText}
+                    onClick={message.action.onClick}
+                  >
+                    {message.action.label}
+                  </ToastPrimitive.Action>
+                </div>
               )}
             </div>
             <ToastPrimitive.Close className="lv-icon-button" aria-label="通知を閉じる">

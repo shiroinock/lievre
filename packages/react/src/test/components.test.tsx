@@ -20,7 +20,10 @@ import {
   DescriptionList,
   Spinner,
   VisuallyHidden,
+  Alert,
+  useToast,
   type Column,
+  type ToastMessage,
 } from '../index';
 import { OperationsExample, SettingsExample } from '../patterns/Operations';
 import { StrictMode, type ReactNode } from 'react';
@@ -423,6 +426,19 @@ describe('Automated accessibility', () => {
           <Checkbox label="更新通知" />
           <Button variant="primary">保存</Button>
           <Badge tone="warning">要確認</Badge>
+          <Badge tone="danger" emphasis="strong" size="sm">
+            停止
+          </Badge>
+          <Alert
+            tone="info"
+            title="お知らせ"
+            action={<Button size="sm">詳細</Button>}
+            onDismiss={() => {}}
+          >
+            本文
+          </Alert>
+          <Progress label="書き出し" />
+          <Progress label="同期" value={30} tone="danger" />
           <Meter label="使用率" value={42} />
         </main>,
         theme,
@@ -446,4 +462,109 @@ describe('Automated accessibility', () => {
       ).toEqual([]);
     });
   }
+});
+
+describe('Feedback variations', () => {
+  it('places alert actions and a named dismiss button that calls back', async () => {
+    const dismiss = vi.fn();
+    setup(
+      <Alert
+        tone="warning"
+        title="読み込めませんでした"
+        action={<Button size="sm">再読み込み</Button>}
+        dismissLabel="読み込みのお知らせを閉じる"
+        onDismiss={dismiss}
+      >
+        3件の行が古い形式です。
+      </Alert>,
+    );
+    const alert = screen.getByRole('status');
+    expect(within(alert).getByRole('button', { name: '再読み込み' })).toBeVisible();
+    await userEvent.click(
+      within(alert).getByRole('button', { name: '読み込みのお知らせを閉じる' }),
+    );
+    expect(dismiss).toHaveBeenCalledOnce();
+  });
+  it('draws no dismiss button unless asked', () => {
+    setup(<Alert title="お知らせ">本文</Alert>);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+  function ToastButton(message: ToastMessage) {
+    const toast = useToast();
+    return <Button onClick={() => toast(message)}>出す</Button>;
+  }
+  it('keeps a toast with an action until it is used, then closes it', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const undo = vi.fn();
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      setup(
+        <ToastButton
+          title="作業を削除しました"
+          tone="info"
+          action={{ label: '元に戻す', altText: '履歴の画面から元に戻せます', onClick: undo }}
+        />,
+      );
+      await user.click(screen.getByRole('button', { name: '出す' }));
+      const action = await screen.findByRole('button', { name: '元に戻す' });
+      vi.advanceTimersByTime(10000);
+      expect(action).toBeInTheDocument();
+      expect(action).toHaveAttribute('data-radix-toast-announce-alt', '履歴の画面から元に戻せます');
+      await user.click(action);
+      expect(undo).toHaveBeenCalledOnce();
+      await waitFor(() => expect(screen.queryByText('作業を削除しました')).not.toBeInTheDocument());
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it('still closes a toast without an action on its own', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      setup(<ToastButton title="保存しました" tone="warning" />);
+      await user.click(screen.getByRole('button', { name: '出す' }));
+      expect(await screen.findByText('保存しました')).toBeInTheDocument();
+      vi.advanceTimersByTime(6000);
+      await waitFor(() => expect(screen.queryByText('保存しました')).not.toBeInTheDocument());
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it('shows an indeterminate progress in words, without a value', () => {
+    setup(<Progress label="書き出しの準備" />);
+    const bar = screen.getByRole('progressbar', { name: '書き出しの準備' });
+    expect(bar).not.toHaveAttribute('aria-valuenow');
+    expect(bar).toHaveAttribute('data-state', 'indeterminate');
+    expect(screen.getByText('処理中')).toBeVisible();
+  });
+  it('tells a finished or failed progress in words, not colour alone', () => {
+    setup(
+      <>
+        <Progress label="同期" value={100} tone="success" />
+        <Progress label="書き出し" value={40} tone="danger" statusLabel="3件が失敗" />
+      </>,
+    );
+    expect(screen.getByRole('progressbar', { name: '同期' })).toHaveAccessibleDescription('完了');
+    expect(screen.getByRole('progressbar', { name: '書き出し' })).toHaveAccessibleDescription(
+      '3件が失敗',
+    );
+  });
+  it('keeps the badge words at every emphasis and size', () => {
+    setup(
+      <Badge tone="danger" emphasis="strong" size="sm">
+        停止
+      </Badge>,
+    );
+    const badge = screen.getByText('停止');
+    expect(badge).toHaveClass('lv-badge', 'lv-tone-danger', 'lv-badge--strong', 'lv-badge--sm');
+  });
+  it('sizes a dialog by its size prop', async () => {
+    setup(
+      <Dialog trigger={<Button>開く</Button>} title="詳細" description="作業の記録" size="lg">
+        本文
+      </Dialog>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: '開く' }));
+    expect(screen.getByRole('dialog', { name: '詳細' })).toHaveAttribute('data-size', 'lg');
+  });
 });
