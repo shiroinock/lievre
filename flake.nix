@@ -35,8 +35,8 @@
         pkgs.buildNpmPackage (
           {
             inherit version src;
-            nodejs = pkgs.nodejs_22;
-            npmDepsHash = "sha256-HhEbI123UmJSDB4XbO2QOeBqveW+SUhGGSUEG/HX97Y=";
+            nodejs = pkgs.nodejs_24;
+            npmDepsHash = "sha256-1m/Ow6cVzZgM7T5IQUKOFmeUugft9Po9s3I0zMgW4aQ=";
             # The npm playwright package must not fetch browsers; nothing here runs one.
             env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
           }
@@ -47,7 +47,7 @@
       packages = forAllSystems (
         pkgs:
         let
-          nodejs = pkgs.nodejs_22;
+          nodejs = pkgs.nodejs_24;
           # Builds an npm script of packages/react and copies its output folder to $out.
           site =
             name: script: dir:
@@ -123,7 +123,7 @@
         {
           default = pkgs.mkShell {
             packages = [
-              pkgs.nodejs_22
+              pkgs.nodejs_24
               wearPython
               pkgs.nixfmt
             ];

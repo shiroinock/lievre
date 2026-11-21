@@ -1,5 +1,8 @@
-# Runs Claude Code when the repository owner writes @claude in an issue, a PR comment or a review.
-# Anyone else's mention does nothing, so strangers cannot spend the subscription.
+# The owner's @claude in an issue, a PR comment or a review runs Claude Code.
+# The job lives in shiroinock/workflows; change it there, not here.
+# Pinned to a commit that was read, not @main: the job gets CLAUDE_CODE_OAUTH_TOKEN, so a change
+# there must not reach this public repository unseen. To update, read the new commit and replace
+# the SHA in all three workflows (claude.yml, claude-code-review.yml, merge-reservation.yml).
 name: Claude
 
 on:
@@ -12,50 +15,16 @@ on:
   issues:
     types: [opened, assigned]
 
-# One run per issue or PR at a time; a later mention waits instead of cutting the earlier one off.
-concurrency:
-  group: claude-${{ github.event.issue.number || github.event.pull_request.number }}
-  cancel-in-progress: false
-
 permissions: {}
 
 jobs:
   claude:
-    # The text is only matched here, never passed to a shell.
-    if: >-
-      (github.event_name == 'issue_comment' &&
-        github.event.comment.author_association == 'OWNER' &&
-        contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' &&
-        github.event.comment.author_association == 'OWNER' &&
-        contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' &&
-        github.event.review.author_association == 'OWNER' &&
-        contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' &&
-        github.event.issue.author_association == 'OWNER' &&
-        (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    uses: shiroinock/workflows/.github/workflows/claude.yml@eb1ef0dc284c9b116968b388815528b17e3df135
     permissions:
       contents: read
       pull-requests: read
       issues: read
-      actions: read # read CI results on PRs
-      id-token: write # the action exchanges it for the Claude GitHub App's token
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          persist-credentials: false
-
-      - name: Claude Code
-        uses: anthropics/claude-code-action@v1
-        with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          allow_fork_prs: 'false'
-          # Only the owner's (and Claude's own) comments reach Claude: in a public repository anyone
-          # can comment on the thread the owner calls @claude in.
-          include_comments_by_actor: ${{ github.repository_owner }},claude[bot]
-          additional_permissions: |
-            actions: read
+      actions: read
+      id-token: write
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
