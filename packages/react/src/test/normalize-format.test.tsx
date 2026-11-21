@@ -83,38 +83,61 @@ describe('formatDate', () => {
   });
   it('rejects a day that does not exist instead of rolling it over', () => {
     expect(formatDate('2026-02-30')).toBe('2026-02-30');
+    expect(formatDate('2026-13-01')).toBe('2026-13-01');
+    expect(formatDate('2026-00-10')).toBe('2026-00-10');
+  });
+  it('counts calendar days in the given time zone', () => {
+    // 15:30 UTC on the 21st is already the 22nd in Tokyo and still the 21st in Los Angeles.
+    const now = new Date('2026-11-22T03:00:00Z');
+    const at = new Date('2026-11-21T15:30:00Z');
+    expect(
+      formatRelativeTime(new Date('2026-11-20T15:30:00Z'), { now, timeZone: 'Asia/Tokyo' }),
+    ).toBe('昨日');
+    expect(
+      formatRelativeTime(new Date('2026-11-20T22:00:00Z'), {
+        now,
+        timeZone: 'America/Los_Angeles',
+      }),
+    ).toBe('昨日');
+    expect(at.getTime()).toBeLessThan(now.getTime());
   });
   it('says today, yesterday and tomorrow for a YYYY-MM-DD day by calendar days', () => {
     const now = new Date(2026, 10, 22, 23, 30);
-    expect(formatRelativeTime('2026-11-22', now)).toBe('今日');
-    expect(formatRelativeTime('2026-11-21', now)).toBe('昨日');
-    expect(formatRelativeTime('2026-11-23', now)).toBe('明日');
+    expect(formatRelativeTime('2026-11-22', { now })).toBe('今日');
+    expect(formatRelativeTime('2026-11-21', { now })).toBe('昨日');
+    expect(formatRelativeTime('2026-11-23', { now })).toBe('明日');
   });
   it('picks yesterday by the calendar, not by hours divided by 24', () => {
     const now = new Date(2026, 10, 22, 23, 0);
     // 39 hours before is 08:00 on the 21st: yesterday, not the day before.
-    expect(formatRelativeTime(new Date(2026, 10, 21, 8, 0), now)).toBe('昨日');
-    expect(formatRelativeTime(new Date(2026, 10, 20, 1, 0), now)).toBe('一昨日');
+    expect(formatRelativeTime(new Date(2026, 10, 21, 8, 0), { now })).toBe('昨日');
+    expect(formatRelativeTime(new Date(2026, 10, 20, 1, 0), { now })).toBe('一昨日');
   });
   it('says the difference from now', () => {
     const now = new Date('2026-11-22T10:00:00+09:00');
-    expect(formatRelativeTime('2026-11-21T10:00:00+09:00', now)).toBe('昨日');
-    expect(formatRelativeTime('2026-11-22T09:57:00+09:00', now)).toBe('3 分前');
-    expect(formatRelativeTime('2026-11-24T10:00:00+09:00', now)).toBe('明後日');
+    expect(formatRelativeTime('2026-11-21T10:00:00+09:00', { now })).toBe('昨日');
+    expect(formatRelativeTime('2026-11-22T09:57:00+09:00', { now })).toBe('3 分前');
+    expect(formatRelativeTime('2026-11-24T10:00:00+09:00', { now })).toBe('明後日');
   });
 });
 
 describe('FormatNumber and FormatDate', () => {
-  it('draws mono figures with the unit apart', () => {
+  it('draws mono figures with the unit outside them', () => {
     const { container } = render(<FormatNumber value={128000} unit="円" />);
     const out = container.querySelector('.lv-format')!;
-    expect(out).toHaveClass('lv-mono');
     expect(out).toHaveTextContent('128,000円');
+    expect(out.querySelector('.lv-mono')).toHaveTextContent(/^128,000$/);
     expect(out.querySelector('.lv-format-unit')).toHaveTextContent('円');
+  });
+  it('keeps the percent sign outside the mono figures', () => {
+    const { container } = render(<FormatNumber value={0.123} percent />);
+    expect(container.querySelector('.lv-mono')).toHaveTextContent(/^12\.3$/);
+    expect(container.querySelector('.lv-format-unit')).toHaveTextContent('%');
   });
   it('uses tabular figures in the body face without mono', () => {
     const { container } = render(<FormatNumber value={3} mono={false} />);
-    expect(container.querySelector('.lv-format')).toHaveClass('lv-tabular');
+    expect(container.querySelector('.lv-tabular')).toHaveTextContent('3');
+    expect(container.querySelector('.lv-mono')).toBeNull();
   });
   it('puts the machine value on <time>', () => {
     render(<FormatDate value="2019-05-01" calendar="japanese" />);
@@ -137,6 +160,17 @@ describe('FormatNumber and FormatDate', () => {
       />,
     );
     expect(screen.getByText('昨日')).toHaveAttribute('datetime', '2026-11-21T10:00:00+09:00');
+  });
+  it('keeps the exact moment of a Date when relative', () => {
+    render(
+      <FormatDate
+        value={new Date('2026-11-21T01:00:00Z')}
+        relative
+        now={new Date('2026-11-22T01:00:00Z')}
+        timeZone="Asia/Tokyo"
+      />,
+    );
+    expect(screen.getByText('昨日')).toHaveAttribute('datetime', '2026-11-21T01:00:00.000Z');
   });
 });
 
