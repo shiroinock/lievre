@@ -528,7 +528,7 @@ DataTable の下のページ送りに番号と件数の選択を出すのは、D
 
 第3段階の3（メニューとツールチップ）：
 
-1. DropdownMenu：入れ子、項目の説明文、グループ見出し、`side`
+1. DropdownMenu：入れ子（`{ type: 'submenu' }`、1段まで）、項目の説明文（`description`。名前は言葉だけにし、説明は aria-describedby）、見出しの付いたまとまり（`{ type: 'group' }`）、`side`
 2. Tooltip の `side` / `align`
 
 ### 第4段階：表示と表のバリエーション

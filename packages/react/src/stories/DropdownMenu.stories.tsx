@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { LayoutGate } from '../test/layout/declare';
 import { DropdownMenu, Button, IconButton, type MenuItem } from '../index';
 import { useState } from 'react';
-import { ArrowDownUp, Copy, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { ArrowDownUp, Copy, FolderInput, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 const rowActions = (onSelect: () => void): MenuItem[] => [
@@ -48,15 +48,26 @@ const meta = {
         },
         {
           name: 'メニューの項目',
-          selector: '.lv-menu-item',
+          selector: '.lv-menu-item:not([data-described])',
           checks: ['inset-y', 'control-height', { icon: '.lv-menu-lead', text: '.lv-menu-label' }],
+        },
+        {
+          // Two lines: the box is taller than a control, and the icon sits on the label's line.
+          name: '説明のあるメニューの項目',
+          selector: '.lv-menu-item[data-described]',
+          checks: ['grid-height', { icon: '.lv-menu-lead', text: '.lv-menu-label' }],
+        },
+        {
+          name: '入れ子を開く項目の矢印',
+          selector: '.lv-menu-item:has(> .lv-menu-sub-icon)',
+          checks: [{ icon: '.lv-menu-sub-icon', text: '.lv-menu-label' }],
         },
       ],
     } satisfies LayoutGate,
     docs: {
       description: {
         component:
-          '押すと開く操作の一覧。表の行の「その他の操作」、並べ替えの選択、表示する列の切り替えに使います。矢印キー・Home / End・文字での選択・Escape に対応し、閉じるとフォーカスを開いた元に戻します。アイコンの列は幅が決まっていて、アイコンのない項目も文字の開始位置がそろいます。危険な操作は tone: "danger" で赤の文字にし、label にも「削除」と書きます。',
+          '押すと開く操作の一覧。表の行の「その他の操作」、並べ替えの選択、表示する列の切り替えに使います。矢印キー・Home / End・文字での選択・Escape に対応し、閉じるとフォーカスを開いた元に戻します。アイコンの列は幅が決まっていて、アイコンのない項目も文字の開始位置がそろいます。危険な操作は tone: "danger" で赤の文字にし、label にも「削除」と書きます。項目の description は下に補足を出して読み上げに添え、{ type: "group" } は見出しの付いたまとまり、{ type: "submenu" } は入れ子のメニューです（右矢印で開き、左矢印で戻ります。入れ子は1段まで）。side で開く向きを選べます。',
       },
     },
   },
@@ -144,4 +155,86 @@ export const ChecksAndChoices: Story = {
       'true',
     );
   },
+};
+const moveTargets = (onSelect: () => void): MenuItem[] => [
+  { label: '東京拠点', onSelect },
+  { label: '大阪拠点', onSelect },
+  { label: '福岡拠点', onSelect },
+];
+const nested = (onSelect: () => void): MenuItem[] => [
+  { label: '編集', icon: <Pencil />, onSelect },
+  { type: 'submenu', label: '移す', icon: <FolderInput />, items: moveTargets(onSelect) },
+  { type: 'separator' },
+  {
+    label: '削除',
+    icon: <Trash2 />,
+    tone: 'danger',
+    description: '30日後に完全に消えます。',
+    onSelect,
+  },
+];
+/** 入れ子のメニュー。右矢印で開き、左矢印で戻ります。 */
+export const Submenu: Story = {
+  args: { items: nested(fn()) },
+  play: async ({ canvasElement }) => {
+    const trigger = within(canvasElement).getByRole('button', { name: 'W-1024 の操作' });
+    trigger.focus();
+    await userEvent.keyboard('{Enter}');
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(await body.findByRole('menuitem', { name: /編集/ })).toHaveFocus();
+    await userEvent.keyboard('{ArrowDown}{ArrowRight}');
+    await expect(await body.findByRole('menuitem', { name: '東京拠点' })).toHaveFocus();
+    await userEvent.keyboard('{ArrowLeft}');
+    await expect(body.getByRole('menuitem', { name: /移す/ })).toHaveFocus();
+  },
+};
+/** 入れ子を開いた状態。配置の検査は、この Story で入れ子のメニューも測ります。 */
+export const SubmenuOpen: Story = {
+  args: { items: nested(fn()) },
+  play: async ({ canvasElement }) => {
+    within(canvasElement).getByRole('button', { name: 'W-1024 の操作' }).focus();
+    await userEvent.keyboard('{Enter}');
+    const body = within(canvasElement.ownerDocument.body);
+    await body.findByRole('menuitem', { name: /編集/ });
+    await userEvent.keyboard('{ArrowDown}{ArrowRight}');
+    await expect(await body.findByRole('menuitem', { name: '東京拠点' })).toBeVisible();
+  },
+};
+/** 見出しの付いたまとまりと、項目の補足。 */
+export const GroupsAndDescriptions: Story = {
+  args: {
+    trigger: <Button icon={<FolderInput size={16} />}>書き出す</Button>,
+    items: [
+      {
+        type: 'group',
+        label: '表の形',
+        items: [
+          { label: 'CSV', description: '表計算ソフトで開けます。', onSelect: fn() },
+          { label: 'JSON', description: 'ほかのシステムに取り込むとき。', onSelect: fn() },
+        ],
+      },
+      { type: 'separator' },
+      {
+        type: 'group',
+        label: '文書の形',
+        items: [{ label: 'PDF', description: '印刷や配布に。', onSelect: fn() }],
+      },
+    ],
+  },
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: '書き出す' }));
+    const body = within(canvasElement.ownerDocument.body);
+    const csv = await body.findByRole('menuitem', { name: 'CSV' });
+    await expect(csv).toHaveAccessibleDescription('表計算ソフトで開けます。');
+    await expect(body.getByRole('group', { name: '表の形' })).toContainElement(csv);
+  },
+};
+/** 上に開く形。画面の下の端に置いた操作に使います。 */
+export const SideTop: Story = {
+  args: { side: 'top' },
+  render: (args) => (
+    <div style={{ paddingTop: 200 }}>
+      <DropdownMenu {...args} />
+    </div>
+  ),
 };

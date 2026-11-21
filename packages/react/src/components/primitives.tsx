@@ -806,6 +806,8 @@ export function Tooltip({
   content,
   children,
   onOpenChange,
+  side = 'top',
+  align = 'center',
 }: {
   /** 出す言葉。短く1文で。操作できる中身は Popover に置きます。 */
   content: string;
@@ -813,6 +815,10 @@ export function Tooltip({
   children: ReactNode;
   /** 開いた・閉じたときに呼びます。 */
   onOpenChange?: (open: boolean) => void;
+  /** 出す向き。既定は 'top'。画面の端で入らないときは反対側に回ります。Popover・DropdownMenu と同じ名前です。 */
+  side?: 'top' | 'right' | 'bottom' | 'left';
+  /** 元の要素とのそろえ方。既定は 'center'。 */
+  align?: 'start' | 'center' | 'end';
 }) {
   return (
     <TooltipPrimitive.Provider delayDuration={250}>
@@ -820,7 +826,13 @@ export function Tooltip({
         <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
         <TooltipPrimitive.Portal>
           <PortalSurface>
-            <TooltipPrimitive.Content className="lv-tooltip" sideOffset={7}>
+            <TooltipPrimitive.Content
+              className="lv-tooltip"
+              side={side}
+              align={align}
+              sideOffset={7}
+              collisionPadding={8}
+            >
               {content}
               <TooltipPrimitive.Arrow className="lv-tooltip-arrow" />
             </TooltipPrimitive.Content>

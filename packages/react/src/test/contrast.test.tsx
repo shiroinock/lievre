@@ -74,6 +74,12 @@ describe('Semantic color contrast', () => {
         );
       });
     }
+    // Menu rows: the description (muted) stays readable on the highlighted row, including a
+    // danger row, and the submenu arrow on the open row.
+    for (const background of ['accent-soft', 'danger-soft'])
+      it(`${theme}: menu description muted / ${background} reaches 4.5:1`, () => {
+        expect(ratio(resolve(set, 'muted'), resolve(set, background))).toBeGreaterThanOrEqual(4.5);
+      });
     // A strong badge is filled with the status colour and lettered in the surface colour.
     for (const tone of ['muted', 'success', 'warning', 'danger', 'info'])
       it(`${theme}: strong badge text / ${tone} reaches 4.5:1`, () => {

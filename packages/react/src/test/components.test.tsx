@@ -34,6 +34,7 @@ import {
   Pagination,
   Breadcrumb,
   TabNav,
+  DropdownMenu,
   type Column,
   type ToastMessage,
 } from '../index';
@@ -913,5 +914,47 @@ describe('Navigation variations', () => {
     );
     expect(screen.getByRole('link', { name: '全般' })).toHaveAttribute('aria-current', 'page');
     expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+  });
+});
+
+describe('Menu variations', () => {
+  it('opens a submenu with the arrow keys and runs its item after giving focus back', async () => {
+    const move = vi.fn();
+    setup(
+      <DropdownMenu
+        trigger={<Button>操作</Button>}
+        items={[
+          { label: '編集', onSelect: () => {} },
+          { type: 'submenu', label: '移す', items: [{ label: '東京拠点', onSelect: move }] },
+        ]}
+      />,
+    );
+    const trigger = screen.getByRole('button', { name: '操作' });
+    trigger.focus();
+    await userEvent.keyboard('{Enter}');
+    await screen.findByRole('menuitem', { name: '編集' });
+    await userEvent.keyboard('{ArrowDown}{ArrowRight}');
+    expect(await screen.findByRole('menuitem', { name: '東京拠点' })).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => expect(move).toHaveBeenCalledOnce());
+    expect(trigger).toHaveFocus();
+  });
+  it('names a group by its heading and describes an item by its note', async () => {
+    setup(
+      <DropdownMenu
+        trigger={<Button>書き出す</Button>}
+        items={[
+          {
+            type: 'group',
+            label: '表の形',
+            items: [{ label: 'CSV', description: '表計算ソフトで開けます', onSelect: () => {} }],
+          },
+        ]}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: '書き出す' }));
+    const csv = await screen.findByRole('menuitem', { name: 'CSV' });
+    expect(csv).toHaveAccessibleDescription('表計算ソフトで開けます');
+    expect(screen.getByRole('group', { name: '表の形' })).toContainElement(csv);
   });
 });

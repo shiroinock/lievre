@@ -212,6 +212,8 @@ baked はビルド時の値（npm run wear）で決まります。
 - `content: string` — 出す言葉。短く1文で。操作できる中身は Popover に置きます。
 - `children: ReactNode` — 1つの要素。ボタンなどフォーカスの届く要素を渡します。
 - `onOpenChange?: ((open: boolean) => void)` — 開いた・閉じたときに呼びます。
+- `side?: 'top' | 'right' | 'bottom' | 'left'` — 既定 'top'。出す向き。既定は 'top'。画面の端で入らないときは反対側に回ります。Popover・DropdownMenu と同じ名前です。
+- `align?: 'start' | 'center' | 'end'` — 既定 'center'。元の要素とのそろえ方。既定は 'center'。
 
 ### Progress
 
@@ -450,7 +452,7 @@ baked はビルド時の値（npm run wear）で決まります。
 
 - `gap?: Space` — 既定 4
 - `direction?: 'row' | 'column'` — 既定 'column'
-- `align?: 'center' | 'stretch' | 'start' | 'end'` — 既定 'stretch'
+- `align?: 'start' | 'center' | 'end' | 'stretch'` — 既定 'stretch'
 - ほかに HTMLAttributes<HTMLDivElement> の属性を受け取ります。
 
 ### Grid
@@ -571,7 +573,7 @@ baked はビルド時の値（npm run wear）で決まります。
 - `title: string` — パネルの見出し。画面に出し、aria-labelledby でパネルと結びます。
 - `children: ReactNode` — 中身。絞り込みの条件や設定など、操作できるものを置きます。説明だけなら Tooltip を使います。
 - `side?: 'top' | 'right' | 'bottom' | 'left'` — 既定 'bottom'。開く向き。画面の端で入らないときは反対側に回ります。
-- `align?: 'center' | 'start' | 'end'` — 既定 'start'。開いた元の部品とのそろえ方。
+- `align?: 'start' | 'center' | 'end'` — 既定 'start'。開いた元の部品とのそろえ方。
 - `open?: boolean` — 中の「適用」などで閉じるときは、open と onOpenChange で開閉を持ちます。
 - `onOpenChange?: ((open: boolean) => void)`
 
@@ -580,8 +582,9 @@ baked はビルド時の値（npm run wear）で決まります。
 押すと開く操作の一覧。矢印キー・Home / End・文字での選択・Escape に対応し、閉じるとフォーカスを開いた元に戻します。
 
 - `trigger: ReactNode` — 開くボタン。Button か IconButton を渡します。メニューの名前はこのボタンの名前になります。
-- `items: MenuItem[]` — 項目。並べた順に出します。区切りは `{ type: 'separator' }`。
+- `items: MenuItem[]` — 項目。並べた順に出します。区切りは `{ type: 'separator' }`、見出しの付いたまとまりは `{ type: 'group' }`、入れ子は `{ type: 'submenu' }`。
 - `align?: 'start' | 'end'` — 既定 'start'。開いた元の部品とのそろえ方。表の行の端に置くときは 'end'。
+- `side?: 'top' | 'right' | 'bottom' | 'left'` — 既定 'bottom'。開く向き。画面の端で入らないときは反対側に回ります。
 
 ### QueueProgress
 
@@ -714,7 +717,7 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `label: string` — 選択肢の言葉。アイコンを添えても、言葉は消しません。
   - `icon?: ReactNode` — 言葉の前のアイコン。飾りなので読み上げません。
   - `disabled?: boolean`
-- `type MenuItem = | { type?: 'item'; label: string; onSelect: () => void; icon?: ReactNode; shortcut?: string; tone?: 'danger'; disabled?: boolean; } | { type: 'checkbox'; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; disabled?: boolean; } | { type: 'radio'; label: string; value: string; onValueChange: (value: string) => void; options: { value: string; label: string; disabled?: boolean }[]; } | { type: 'separator' };`
+- `type MenuItem = | { type?: 'item'; label: string; onSelect: () => void; icon?: ReactNode; description?: string; shortcut?: string; tone?: 'danger'; disabled?: boolean; } | { type: 'checkbox'; label: string; checked: boolean; onCheckedChange: (checked: boolean) => void; disabled?: boolean; } | { type: 'radio'; label: string; value: string; onValueChange: (value: string) => void; options: { value: string; label: string; disabled?: boolean }[]; } | { type: 'group'; label: string; items: MenuItem[]; } | { type: 'submenu'; label: string; icon?: ReactNode; items: MenuItem[]; disabled?: boolean; } | { type: 'separator' };`
 - `type DecisionState` — 1件ずつ判断する列の状態。タイムラインと一覧の両方の見せ方が、この1つを共有します。
   - `decisions: Record<string, string>` — 項目のキー → 決めた値（choices の value）。入っていない項目は未決です。
   - `log: string[]` — 決めた順の項目のキー。1つ戻す（undo）はこの最後から戻します。
