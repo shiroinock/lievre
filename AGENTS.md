@@ -30,3 +30,4 @@ npm run typecheck && npm run lint && npm test
 - 改名の前の名前は書かない（[MIGRATION.md](MIGRATION.md)）。残っていると `npm test` が止める。
 - 部品の props には `/** */` で説明を付ける。説明はそのまま `llms.txt` とエディタの補完に出る。
 - 利用する側に見える変更（`packages/*/src` の部品・スタイル、`packages/react` の `bin`・`lint`、`tokens.css`）は、[CHANGELOG.md](CHANGELOG.md) の「未公開」に1行足す。見えない変更なら PR の説明に「変更履歴：なし（理由）」と書く。書き忘れは CI の「変更履歴」が止める（`npm run check:changelog` で手元でも見られる）。
+- レビューを終えたら、PR にラベル「マージ予約」を付ける（`gh pr edit <番号> --add-label マージ予約`）。向き先が `main` になると自動マージが入る。積んだ PR に `gh pr merge --auto` を手で入れない（前の枝へその場でマージされる）。詳しくは [CONTRIBUTING.md](CONTRIBUTING.md) の「マージの予約」。

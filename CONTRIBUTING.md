@@ -82,3 +82,14 @@ npm run test:layout  # ブラウザ：配置の基準（初回は npx playwright
 CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査・build を走らせます。すべて通ってからレビューを頼んでください。
 
 利用する側に見える変更（`packages/*/src` の部品・スタイル、`packages/react` の `bin`・`lint`、`packages/tokens/tokens.css`）は、[CHANGELOG.md](CHANGELOG.md) の「未公開」の、パッケージと区分（見た目が変わる・振る舞いが変わる・足したもの・直したもの）の下に1行足します。書き方は CHANGELOG.md の冒頭にあります。テストや内部の整理だけで利用する側に見えないときは、PR の説明に「変更履歴：なし（理由）」の1行を書きます。書き忘れは `.github/workflows/changelog.yml` が止めます。
+
+### マージの予約
+
+レビューを終えたら、PR にラベル「マージ予約」を付けます。`.github/workflows/merge-reservation.yml` が、向き先が `main` の PR に自動マージ（merge commit）を入れ、必須の検査（`check`・`changelog`）が通るとマージされます。
+
+- 前の PR の枝に積んだ PR にも、レビューが済んだらすぐ付けてかまいません。向き先が `main` でないあいだは何もせず、前の PR がマージされて向き先が `main` に付け替わってから予約します。
+- 積んだ PR に `gh pr merge --auto` を手で入れないでください。前の枝には必須の検査がないので、その場で前の枝へマージされます。
+- 下書きの PR は、「Ready for review」にしてから予約します。
+- ラベルを外しても、入った自動マージは残ります。取り消すときは `gh pr merge <番号> --disable-auto` も行います。
+- `.github/workflows` を変える PR とフォークからの PR は、自動では予約しません（ボットがコメントで知らせます）。検査が通ったら `gh pr merge <番号> --merge` で手でマージします。
+- 自動マージのコミットは CI を起こさないので、この workflow が `main` の CI を `workflow_dispatch` で走らせます。付け替わった PR は 10 分ごとの見回りで拾います。GitHub の schedule は混むと遅れるので、急ぐときは Actions の「マージ予約」を手で走らせます（Run workflow）。
