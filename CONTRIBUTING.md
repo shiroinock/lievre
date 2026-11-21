@@ -79,7 +79,18 @@ npm run test:layout  # ブラウザ：配置の基準（初回は npx playwright
 
 作業を始める前に、下書きの PR を開き、本文の「触るファイル」に変えるつもりのファイルを1行に1つ書きます（`.github/pull_request_template.md` に節があります）。そのあと `npm run check:overlap` を流すと、ほかの開いた PR の宣言と実際の変更に重なるファイルが出ます。重なったら、相手と分け方を決めるか、相手の枝に積みます。`--all` を付けると、開いた PR どうしの重なりをすべて出します。知らせるだけで、検査は落ちません。`llms.txt`・`tokens.json`・`CHANGELOG.md` は、重なっても書き出し直せば済むので、別に出します。変更履歴の断片（`changes/`）は PR ごとのファイルなので、名前が重ならなければ食い違いません。
 
-CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査・build を走らせます。すべて通ってからレビューを頼んでください。
+CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査・build を走らせます。
+
+### レビュー
+
+下書きでない PR が開いたとき、「Ready for review」にしたとき、push したときに、`.github/workflows/claude-code-review.yml` が Claude Code でレビューします。
+
+- 経緯を知らない目で差分を読み、`/code-review high` も流し、確かめた指摘だけを PR にコメントで残します。観点は WCAG 2.x AA・キーボード操作と ARIA・props の説明と `llms.txt`・変更履歴・4px の格子などで、workflow の prompt に書いてあります。
+- コードは直しません。指摘は作者が直して push します。push するとレビューが走り直し、前のレビューは止まります。
+- 直す必要のある指摘がなければ、ラベル「マージ予約」を付けます（次の節）。push すると、レビューの前にラベルと自動マージをいったん外し、走り直したレビューで指摘がなければ付け直します。
+- 走るのは、このリポジトリの枝からの PR だけです。フォークからの PR では走りません。
+- `.github/workflows` の Claude の workflow を変える PR では、レビューが失敗します（Claude の GitHub App が、既定の枝と同じ workflow でないと動かないため）。手でレビューします。
+- 持ち主が Issue や PR のコメントに `@claude` と書くと、`.github/workflows/claude.yml` が Claude Code を動かします。ほかの人の `@claude` では動かず、Claude が読むのも持ち主と Claude 自身のコメントだけです。
 
 利用する側に見える変更（`packages/*/src` の部品・スタイル、`packages/react` の `bin`・`lint`、`packages/tokens/tokens.css`）は、`changes/` に PR ごとの断片を1つ足します。ファイル名は枝の名前から `claude/` などを除いたもの（例：`changes/component-chip.md`）で、中身は CHANGELOG.md と同じ見出しの、パッケージ（`###`）と区分（`####`、見た目が変わる・振る舞いが変わる・足したもの・直したもの）と項目です。
 
@@ -97,7 +108,7 @@ CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査�
 
 ### マージの予約
 
-レビューを終えたら、PR にラベル「マージ予約」を付けます。`.github/workflows/merge-reservation.yml` が、向き先が `main` の PR に自動マージ（merge commit）を入れ、必須の検査（`check`・`changelog`）が通るとマージされます。
+ラベル「マージ予約」は「レビューが済み、直す必要のある指摘がない」という印です。ふつうは CI のレビューが付けます。手でレビューしたときは、終えたら手で付けます。`.github/workflows/merge-reservation.yml` が、向き先が `main` の PR に自動マージ（merge commit）を入れ、必須の検査（`check`・`changelog`）が通るとマージされます。
 
 - 前の PR の枝に積んだ PR にも、レビューが済んだらすぐ付けてかまいません。向き先が `main` でないあいだは何もせず、前の PR がマージされて向き先が `main` に付け替わってから予約します。
 - 積んだ PR に `gh pr merge --auto` を手で入れないでください。前の枝には必須の検査がないので、その場で前の枝へマージされます。
