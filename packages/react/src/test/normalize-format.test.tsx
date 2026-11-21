@@ -71,6 +71,16 @@ describe('formatDate', () => {
     expect(formatDate(at, { style: 'datetime', timeZone: 'Asia/Tokyo' })).toBe('2026/11/22 9:05');
     expect(formatDate(at, { style: 'time', timeZone: 'Asia/Tokyo' })).toBe('9:05');
   });
+  it('keeps a YYYY-MM-DD day in any time zone', () => {
+    for (const timeZone of ['UTC', 'America/Los_Angeles', 'Pacific/Kiritimati', 'Asia/Tokyo'])
+      expect(formatDate('2026-11-22', { timeZone })).toBe('2026年11月22日');
+  });
+  it('returns text it cannot read as a date, instead of throwing', () => {
+    expect(formatDate('')).toBe('');
+    expect(formatDate('2026/13/40')).toBe('2026/13/40');
+    expect(formatDate(new Date(NaN))).toBe('');
+    expect(formatRelativeTime('いつか')).toBe('いつか');
+  });
   it('says the difference from now', () => {
     const now = new Date('2026-11-22T10:00:00+09:00');
     expect(formatRelativeTime('2026-11-21T10:00:00+09:00', now)).toBe('昨日');
@@ -95,6 +105,14 @@ describe('FormatNumber and FormatDate', () => {
     render(<FormatDate value="2019-05-01" calendar="japanese" />);
     expect(screen.getByText('令和元年5月1日')).toHaveAttribute('datetime', '2019-05-01');
   });
+  it('writes the datetime day in the same time zone as the text', () => {
+    render(<FormatDate value={new Date('2026-11-21T20:00:00Z')} timeZone="Asia/Tokyo" />);
+    expect(screen.getByText('2026年11月22日')).toHaveAttribute('datetime', '2026-11-22');
+  });
+  it('leaves out datetime for a value it cannot read', () => {
+    render(<FormatDate value="未定" />);
+    expect(screen.getByText('未定')).not.toHaveAttribute('datetime');
+  });
   it('keeps the exact moment when relative', () => {
     render(
       <FormatDate
@@ -115,6 +133,25 @@ describe('TextField halfWidth', () => {
     expect(input).toHaveValue('１２３ー４５６７');
     await userEvent.tab();
     expect(input).toHaveValue('123-4567');
+  });
+  it('lets a controlled onBlur read the straightened state', async () => {
+    const seen: string[] = [];
+    function Checked() {
+      const [value, setValue] = useState('');
+      return (
+        <TextField
+          label="番号"
+          halfWidth
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => seen.push(value)}
+        />
+      );
+    }
+    render(<Checked />);
+    await userEvent.type(screen.getByRole('textbox', { name: '番号' }), '１２３');
+    await userEvent.tab();
+    expect(seen).toEqual(['123']);
   });
   it('reports the straightened value to a controlled field and still calls onBlur', async () => {
     const onBlur = vi.fn();
