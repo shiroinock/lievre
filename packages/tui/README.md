@@ -10,6 +10,7 @@ lievre のデザイン言語を端末に広げる部品です。描画には Ink
 | `src/core/queue.ts`      | 1件ずつ判断する列の状態とキー（`@lievre/react` と同じ決まり。一致はテストで確かめる）                       |
 | `src/ink/queue.tsx`      | Queue・QueueProgress・useQueueInput（Y / N / L / Z）                                                        |
 | `src/ink/screen.tsx`     | 見本の画面                                                                                                  |
+| `src/core/motion`        | 動き：トークンからの長さと曲線、役割の名前で持つ絵（Grid）、入り方と光の帯、濃淡の字、動かすかの判定        |
 
 `src/core` は Ink に依りません。描画の道具を替えるときは `src/ink` だけを書き直します。
 
