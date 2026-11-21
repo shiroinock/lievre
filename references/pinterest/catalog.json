@@ -1,17 +1,15 @@
 {
-  "board_url": "",
+  "board_url": null,
   "recorded_date": "2026-10-24",
   "board_pin_count": 81,
   "collected_count": 81,
   "review_scope": "ボード全81件のURLと表示サムネイルを確認。各ピンの全スライド・動画全編・元サイトは未精査。",
   "labels": "label/category/observations/possible_applicationはアシスタントの観察・解釈。ユーザーの評価とは分離。",
-  "thumbnail_source": "ボードのスクリーンショットから切り出し・再構成。Pinterestのオーバーレイを含む場合あり。",
   "references": [
     {
       "id": "pin-124904589661738343",
       "url": "https://jp.pinterest.com/pin/124904589661738343/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "図解・配線",
       "label": "黒地の回路と注釈",
       "observations": [
@@ -20,19 +18,12 @@
       "possible_application": "関係図とログの情報階層",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738343.jpg",
-      "screenshot_frames": [
-        "board-01.png",
-        "board-02.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738342",
       "url": "https://jp.pinterest.com/pin/124904589661738342/",
       "parent_board": "board-001",
-      "title": "Sleep Pattern C",
       "category": "図解・配線",
       "label": "Sleep Pattern C",
       "observations": [
@@ -41,19 +32,12 @@
       "possible_application": "状態記号と補助線",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738342.jpg",
-      "screenshot_frames": [
-        "board-01.png",
-        "board-02.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738341",
       "url": "https://jp.pinterest.com/pin/124904589661738341/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "UI・計器",
       "label": "発光色の小型ウィジェット",
       "observations": [
@@ -62,19 +46,12 @@
       "possible_application": "小型メトリクスと操作状態",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738341.jpg",
-      "screenshot_frames": [
-        "board-01.png",
-        "board-02.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738340",
       "url": "https://jp.pinterest.com/pin/124904589661738340/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "色・質感",
       "label": "虹色の光と白い猫",
       "observations": [
@@ -83,20 +60,12 @@
       "possible_application": "空状態や背景の質感",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738340.jpg",
-      "screenshot_frames": [
-        "board-01.png",
-        "board-02.png",
-        "board-03.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738339",
       "url": "https://jp.pinterest.com/pin/124904589661738339/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "図解・配線",
       "label": "年代を分岐で見せる図版",
       "observations": [
@@ -105,20 +74,12 @@
       "possible_application": "履歴・系統図",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738339.jpg",
-      "screenshot_frames": [
-        "board-01.png",
-        "board-02.png",
-        "board-03.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738336",
       "url": "https://jp.pinterest.com/pin/124904589661738336/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "図解・配線",
       "label": "白黒の構造ダイアグラム",
       "observations": [
@@ -127,19 +88,12 @@
       "possible_application": "構造の強弱と階層",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738336.jpg",
-      "screenshot_frames": [
-        "board-02.png",
-        "board-03.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738335",
       "url": "https://jp.pinterest.com/pin/124904589661738335/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "図解・配線",
       "label": "青の透明キューブ図解",
       "observations": [
@@ -148,20 +102,12 @@
       "possible_application": "階層・関係の立体図解",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738335.jpg",
-      "screenshot_frames": [
-        "board-02.png",
-        "board-03.png",
-        "board-04.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738334",
       "url": "https://jp.pinterest.com/pin/124904589661738334/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "図解・配線",
       "label": "暗い空間の建築モジュール",
       "observations": [
@@ -170,19 +116,12 @@
       "possible_application": "空間的な情報整理",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738334.jpg",
-      "screenshot_frames": [
-        "board-03.png",
-        "board-04.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738333",
       "url": "https://jp.pinterest.com/pin/124904589661738333/",
       "parent_board": "board-001",
-      "title": "Clubmill Creative | M.Arch Design Portfolio - Oliver Johns",
       "category": "図解・配線",
       "label": "青い建築ポートフォリオ",
       "observations": [
@@ -191,19 +130,12 @@
       "possible_application": "図版と注釈の関係",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738333.jpg",
-      "screenshot_frames": [
-        "board-03.png",
-        "board-04.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738332",
       "url": "https://jp.pinterest.com/pin/124904589661738332/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "図解・配線",
       "label": "電柱と記号のグラフィック",
       "observations": [
@@ -212,19 +144,12 @@
       "possible_application": "接続線とアクセント記号",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738332.jpg",
-      "screenshot_frames": [
-        "board-03.png",
-        "board-04.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738331",
       "url": "https://jp.pinterest.com/pin/124904589661738331/",
       "parent_board": "board-001",
-      "title": "Abstract Transit Map",
       "category": "図解・配線",
       "label": "Abstract Transit Map",
       "observations": [
@@ -233,20 +158,12 @@
       "possible_application": "フローと経路の色分け",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738331.jpg",
-      "screenshot_frames": [
-        "board-03.png",
-        "board-04.png",
-        "board-05.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738330",
       "url": "https://jp.pinterest.com/pin/124904589661738330/",
       "parent_board": "board-001",
-      "title": "Pixel Cloud №2 | Bitmap Sky Phone Wallpaper",
       "category": "色・質感",
       "label": "Pixel Cloud №2",
       "observations": [
@@ -255,20 +172,12 @@
       "possible_application": "ピクセルと限られた色数",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738330.jpg",
-      "screenshot_frames": [
-        "board-03.png",
-        "board-04.png",
-        "board-05.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738329",
       "url": "https://jp.pinterest.com/pin/124904589661738329/",
       "parent_board": "board-001",
-      "title": "ISOMETRIC MAP :: Behance",
       "category": "図解・配線",
       "label": "等角投影の街区マップ",
       "observations": [
@@ -277,19 +186,12 @@
       "possible_application": "俯瞰・配置の理解",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738329.jpg",
-      "screenshot_frames": [
-        "board-04.png",
-        "board-05.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738327",
       "url": "https://jp.pinterest.com/pin/124904589661738327/",
       "parent_board": "board-001",
-      "title": "Open Figma with a Head Start — Find Your Next Free UI Kit",
       "category": "UI・計器",
       "label": "暗い計器カード群",
       "observations": [
@@ -298,20 +200,12 @@
       "possible_application": "メトリクスカードと状態表示",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738327.jpg",
-      "screenshot_frames": [
-        "board-04.png",
-        "board-05.png",
-        "board-06.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738326",
       "url": "https://jp.pinterest.com/pin/124904589661738326/",
       "parent_board": "board-001",
-      "title": "just a ui",
       "category": "UI・計器",
       "label": "ATHENAEUM ダッシュボード",
       "observations": [
@@ -320,20 +214,12 @@
       "possible_application": "一覧・インスペクターの構成",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738326.jpg",
-      "screenshot_frames": [
-        "board-04.png",
-        "board-05.png",
-        "board-06.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738325",
       "url": "https://jp.pinterest.com/pin/124904589661738325/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "UI・計器",
       "label": "密なシステム端末",
       "observations": [
@@ -342,19 +228,12 @@
       "possible_application": "ログ・システム診断",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738325.jpg",
-      "screenshot_frames": [
-        "board-05.png",
-        "board-06.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738324",
       "url": "https://jp.pinterest.com/pin/124904589661738324/",
       "parent_board": "board-001",
-      "title": "Personal Dashboard designed by quan ❖ for Kulak. Connect with them on Dribbble; the global community for designers and creative professionals.",
       "category": "UI・計器",
       "label": "Personal Dashboard",
       "observations": [
@@ -363,19 +242,12 @@
       "possible_application": "指標の優先順位",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738324.jpg",
-      "screenshot_frames": [
-        "board-05.png",
-        "board-06.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738323",
       "url": "https://jp.pinterest.com/pin/124904589661738323/",
       "parent_board": "board-001",
-      "title": "Instagram",
       "category": "図解・配線",
       "label": "橙の建築と青い線図",
       "observations": [
@@ -384,20 +256,12 @@
       "possible_application": "背景と対象物の分離",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738323.jpg",
-      "screenshot_frames": [
-        "board-05.png",
-        "board-06.png",
-        "board-07.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738322",
       "url": "https://jp.pinterest.com/pin/124904589661738322/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "図解・配線",
       "label": "抽象的な回路の枝",
       "observations": [
@@ -406,20 +270,12 @@
       "possible_application": "コネクタと端点の記号",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738322.jpg",
-      "screenshot_frames": [
-        "board-05.png",
-        "board-06.png",
-        "board-07.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738321",
       "url": "https://jp.pinterest.com/pin/124904589661738321/",
       "parent_board": "board-001",
-      "title": "foxrockettstudio (@foxrockett) on X",
       "category": "文字・印刷",
       "label": "MICROGRAPHICS 素材一覧",
       "observations": [
@@ -428,19 +284,12 @@
       "possible_application": "補助記号の統一",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738321.jpg",
-      "screenshot_frames": [
-        "board-06.png",
-        "board-07.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738320",
       "url": "https://jp.pinterest.com/pin/124904589661738320/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "UI・計器",
       "label": "Rotation 立方体ツール",
       "observations": [
@@ -449,20 +298,12 @@
       "possible_application": "作業対象と周辺操作",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738320.jpg",
-      "screenshot_frames": [
-        "board-06.png",
-        "board-07.png",
-        "board-08.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738318",
       "url": "https://jp.pinterest.com/pin/124904589661738318/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "文字・印刷",
       "label": "青いコラージュポスター",
       "observations": [
@@ -471,20 +312,12 @@
       "possible_application": "見出し周辺の図形表現",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738318.jpg",
-      "screenshot_frames": [
-        "board-06.png",
-        "board-07.png",
-        "board-08.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738317",
       "url": "https://jp.pinterest.com/pin/124904589661738317/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "色・質感",
       "label": "粒状の青い猫",
       "observations": [
@@ -493,19 +326,12 @@
       "possible_application": "柔らかなノイズ表現",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738317.jpg",
-      "screenshot_frames": [
-        "board-07.png",
-        "board-08.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738314",
       "url": "https://jp.pinterest.com/pin/124904589661738314/",
       "parent_board": "board-001",
-      "title": "Instagram",
       "category": "文字・印刷",
       "label": "技術ラベルのシート",
       "observations": [
@@ -514,20 +340,12 @@
       "possible_application": "ラベルとメタ情報",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738314.jpg",
-      "screenshot_frames": [
-        "board-07.png",
-        "board-08.png",
-        "board-09.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738313",
       "url": "https://jp.pinterest.com/pin/124904589661738313/",
       "parent_board": "board-001",
-      "title": "未来、予測不能。 - イマ｜HAKUHODO I-STUDIO RECRUIT 2015",
       "category": "図解・配線",
       "label": "密集した架空の計器盤",
       "observations": [
@@ -536,20 +354,12 @@
       "possible_application": "情報密度と図形の語彙",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738313.jpg",
-      "screenshot_frames": [
-        "board-07.png",
-        "board-08.png",
-        "board-09.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738296",
       "url": "https://jp.pinterest.com/pin/124904589661738296/",
       "parent_board": "board-001",
-      "title": "UI kit foundations: Shadow direction and ambient rules",
       "category": "UI・計器",
       "label": "PRODUCT UI STYLEGUIDE",
       "observations": [
@@ -558,21 +368,12 @@
       "possible_application": "トークンと状態の一覧",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738296.jpg",
-      "screenshot_frames": [
-        "board-07.png",
-        "board-11.png",
-        "board-12.png",
-        "board-13.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738295",
       "url": "https://jp.pinterest.com/pin/124904589661738295/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "色・質感",
       "label": "空間を伸ばす都市の図版",
       "observations": [
@@ -581,21 +382,12 @@
       "possible_application": "空間・透明感と粒状感",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738295.jpg",
-      "screenshot_frames": [
-        "board-07.png",
-        "board-11.png",
-        "board-12.png",
-        "board-13.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738311",
       "url": "https://jp.pinterest.com/pin/124904589661738311/",
       "parent_board": "board-001",
-      "title": "kulturometer.org - poster 2 | Flickr - Photo Sharing!",
       "category": "図解・配線",
       "label": "白黒の分岐図",
       "observations": [
@@ -604,19 +396,12 @@
       "possible_application": "分類・系統の視覚化",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738311.jpg",
-      "screenshot_frames": [
-        "board-08.png",
-        "board-09.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738310",
       "url": "https://jp.pinterest.com/pin/124904589661738310/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "UI・計器",
       "label": "橙と黒のActivity UI",
       "observations": [
@@ -625,20 +410,12 @@
       "possible_application": "運動・進捗の視認性",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738310.jpg",
-      "screenshot_frames": [
-        "board-08.png",
-        "board-09.png",
-        "board-10.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738309",
       "url": "https://jp.pinterest.com/pin/124904589661738309/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "文字・印刷",
       "label": "濃紺と赤のレコード図版",
       "observations": [
@@ -647,20 +424,12 @@
       "possible_application": "強い主役形状と配色",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738309.jpg",
-      "screenshot_frames": [
-        "board-08.png",
-        "board-09.png",
-        "board-10.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738308",
       "url": "https://jp.pinterest.com/pin/124904589661738308/",
       "parent_board": "board-001",
-      "title": "October, 2025",
       "category": "文字・印刷",
       "label": "October 2025 紙面",
       "observations": [
@@ -669,19 +438,12 @@
       "possible_application": "選択・強調の表現",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738308.jpg",
-      "screenshot_frames": [
-        "board-09.png",
-        "board-10.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738306",
       "url": "https://jp.pinterest.com/pin/124904589661738306/",
       "parent_board": "board-001",
-      "title": "Usage example of the Aeonik Fono typeface from CoType Foundry, desi...",
       "category": "UI・計器",
       "label": "Control Panel",
       "observations": [
@@ -690,19 +452,12 @@
       "possible_application": "メーターと集約表示",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738306.jpg",
-      "screenshot_frames": [
-        "board-09.png",
-        "board-10.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738305",
       "url": "https://jp.pinterest.com/pin/124904589661738305/",
       "parent_board": "board-001",
-      "title": "Inky Mono - Typeface - Siteoutsite",
       "category": "文字・印刷",
       "label": "Inky Mono",
       "observations": [
@@ -711,20 +466,12 @@
       "possible_application": "数値・技術ラベルの書体",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738305.jpg",
-      "screenshot_frames": [
-        "board-09.png",
-        "board-10.png",
-        "board-11.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738304",
       "url": "https://jp.pinterest.com/pin/124904589661738304/",
       "parent_board": "board-001",
-      "title": "Тренды дизайна 2026 | Дизайн постера | Poster design | Design trend 2026",
       "category": "文字・印刷",
       "label": "白く発光するドットの像",
       "observations": [
@@ -733,20 +480,12 @@
       "possible_application": "データ表現と対象の注釈",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738304.jpg",
-      "screenshot_frames": [
-        "board-09.png",
-        "board-10.png",
-        "board-11.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738301",
       "url": "https://jp.pinterest.com/pin/124904589661738301/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "図解・配線",
       "label": "白地のマイクロチップ回路",
       "observations": [
@@ -755,19 +494,12 @@
       "possible_application": "ハブと接続の表現",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738301.jpg",
-      "screenshot_frames": [
-        "board-10.png",
-        "board-11.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738300",
       "url": "https://jp.pinterest.com/pin/124904589661738300/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "図解・配線",
       "label": "レトロな観測室",
       "observations": [
@@ -776,20 +508,12 @@
       "possible_application": "観測パネルの雰囲気",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738300.jpg",
-      "screenshot_frames": [
-        "board-10.png",
-        "board-11.png",
-        "board-12.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738299",
       "url": "https://jp.pinterest.com/pin/124904589661738299/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "UI・計器",
       "label": "CASIO 3000 風パネル",
       "observations": [
@@ -798,20 +522,12 @@
       "possible_application": "計器の枠・目盛り",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738299.jpg",
-      "screenshot_frames": [
-        "board-10.png",
-        "board-11.png",
-        "board-12.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738298",
       "url": "https://jp.pinterest.com/pin/124904589661738298/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "文字・印刷",
       "label": "紙色の展示ポスター",
       "observations": [
@@ -820,19 +536,12 @@
       "possible_application": "展示的な情報階層",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738298.jpg",
-      "screenshot_frames": [
-        "board-11.png",
-        "board-12.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738297",
       "url": "https://jp.pinterest.com/pin/124904589661738297/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "UI・計器",
       "label": "色分けされたキーの端末",
       "observations": [
@@ -841,19 +550,12 @@
       "possible_application": "操作グループの色分け",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738297.jpg",
-      "screenshot_frames": [
-        "board-11.png",
-        "board-12.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738294",
       "url": "https://jp.pinterest.com/pin/124904589661738294/",
       "parent_board": "board-001",
-      "title": "Modern Color Combination for Presentations and Branding",
       "category": "色・質感",
       "label": "Burnt Peach と Steel Blue",
       "observations": [
@@ -862,20 +564,12 @@
       "possible_application": "主色と補色のバランス",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738294.jpg",
-      "screenshot_frames": [
-        "board-12.png",
-        "board-13.png",
-        "board-14.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738292",
       "url": "https://jp.pinterest.com/pin/124904589661738292/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "文字・印刷",
       "label": "FAST のタイポグラフィ",
       "observations": [
@@ -884,19 +578,12 @@
       "possible_application": "見出しのスケールと重なり",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738292.jpg",
-      "screenshot_frames": [
-        "board-12.png",
-        "board-13.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738291",
       "url": "https://jp.pinterest.com/pin/124904589661738291/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "文字・印刷",
       "label": "文字列のグリッチ紙面",
       "observations": [
@@ -905,20 +592,12 @@
       "possible_application": "グリッチと強調色の表現",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738291.jpg",
-      "screenshot_frames": [
-        "board-12.png",
-        "board-13.png",
-        "board-14.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738290",
       "url": "https://jp.pinterest.com/pin/124904589661738290/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "文字・印刷",
       "label": "青と白の古いウィンドウ群",
       "observations": [
@@ -927,19 +606,12 @@
       "possible_application": "ウィンドウと状態の記号",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738290.jpg",
-      "screenshot_frames": [
-        "board-13.png",
-        "board-14.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738289",
       "url": "https://jp.pinterest.com/pin/124904589661738289/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "色・質感",
       "label": "青いハーフトーンの人物",
       "observations": [
@@ -948,20 +620,12 @@
       "possible_application": "単色の網点表現",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738289.jpg",
-      "screenshot_frames": [
-        "board-13.png",
-        "board-14.png",
-        "board-15.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738288",
       "url": "https://jp.pinterest.com/pin/124904589661738288/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "図解・配線",
       "label": "回路で描いた波",
       "observations": [
@@ -970,19 +634,12 @@
       "possible_application": "配線と図形の融合",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738288.jpg",
-      "screenshot_frames": [
-        "board-13.png",
-        "board-14.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738287",
       "url": "https://jp.pinterest.com/pin/124904589661738287/",
       "parent_board": "board-001",
-      "title": "Vintage Futuristic Features",
       "category": "文字・印刷",
       "label": "RETRO FUTURISTIC ELEMENTS",
       "observations": [
@@ -991,20 +648,12 @@
       "possible_application": "記号の語彙と形の統一",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738287.jpg",
-      "screenshot_frames": [
-        "board-13.png",
-        "board-14.png",
-        "board-15.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738286",
       "url": "https://jp.pinterest.com/pin/124904589661738286/",
       "parent_board": "board-001",
-      "title": "Vintage Compact Cassette Poster | Swiss Minimalist Graphic Design | Retro Technology Wall Art",
       "category": "文字・印刷",
       "label": "COMPACT CASSETTE",
       "observations": [
@@ -1013,19 +662,12 @@
       "possible_application": "工業製品の仕様レイアウト",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738286.jpg",
-      "screenshot_frames": [
-        "board-14.png",
-        "board-15.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738285",
       "url": "https://jp.pinterest.com/pin/124904589661738285/",
       "parent_board": "board-001",
-      "title": "Light Cyber Brutalism UI (Vercel Style Web Design)",
       "category": "UI・計器",
       "label": "Light Cyber Brutalism",
       "observations": [
@@ -1034,20 +676,12 @@
       "possible_application": "ライト画面の技術的表現",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738285.jpg",
-      "screenshot_frames": [
-        "board-14.png",
-        "board-15.png",
-        "board-16.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738284",
       "url": "https://jp.pinterest.com/pin/124904589661738284/",
       "parent_board": "board-001",
-      "title": "Stickersheet moodboard; Black &amp; White webcore, Y2k Internetcore",
       "category": "文字・印刷",
       "label": "Webcore ステッカーシート",
       "observations": [
@@ -1056,20 +690,12 @@
       "possible_application": "実体のある操作部品",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738284.jpg",
-      "screenshot_frames": [
-        "board-14.png",
-        "board-15.png",
-        "board-16.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738283",
       "url": "https://jp.pinterest.com/pin/124904589661738283/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "UI・計器",
       "label": "ピンクのワイヤー計器",
       "observations": [
@@ -1078,19 +704,12 @@
       "possible_application": "情報パネルの区切り方",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738283.jpg",
-      "screenshot_frames": [
-        "board-15.png",
-        "board-16.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738282",
       "url": "https://jp.pinterest.com/pin/124904589661738282/",
       "parent_board": "board-001",
-      "title": "Cronograma Infográfico de la Música Visual",
       "category": "図解・配線",
       "label": "音楽の系譜タイムライン",
       "observations": [
@@ -1099,20 +718,12 @@
       "possible_application": "長い履歴と系統の整理",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738282.jpg",
-      "screenshot_frames": [
-        "board-15.png",
-        "board-16.png",
-        "board-17.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738281",
       "url": "https://jp.pinterest.com/pin/124904589661738281/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "色・質感",
       "label": "蛍光黄緑と黒の記号パターン",
       "observations": [
@@ -1121,20 +732,12 @@
       "possible_application": "粗密と強い色面",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738281.jpg",
-      "screenshot_frames": [
-        "board-15.png",
-        "board-16.png",
-        "board-17.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738280",
       "url": "https://jp.pinterest.com/pin/124904589661738280/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "図解・配線",
       "label": "多数の配線が集まる電柱",
       "observations": [
@@ -1143,19 +746,12 @@
       "possible_application": "接続と機能の集積感",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738280.jpg",
-      "screenshot_frames": [
-        "board-16.png",
-        "board-17.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738278",
       "url": "https://jp.pinterest.com/pin/124904589661738278/",
       "parent_board": "board-001",
-      "title": "Smart home app identity utilising Aeonik Fono by @cotypefoundry 💡⁠ ⁠ Test out CoType&#39;s fonts &gt;⁠ cotypefoundry.com⁠ ⁠ #type01… | Instagram",
       "category": "UI・計器",
       "label": "Lighting スマートホーム",
       "observations": [
@@ -1164,19 +760,12 @@
       "possible_application": "設定・計測画面の構成",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738278.jpg",
-      "screenshot_frames": [
-        "board-16.png",
-        "board-17.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738277",
       "url": "https://jp.pinterest.com/pin/124904589661738277/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "色・質感",
       "label": "多色グラデーションの形見本",
       "observations": [
@@ -1185,20 +774,12 @@
       "possible_application": "ぼかしと色のにじみ",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738277.jpg",
-      "screenshot_frames": [
-        "board-16.png",
-        "board-17.png",
-        "board-18.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738276",
       "url": "https://jp.pinterest.com/pin/124904589661738276/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "図解・配線",
       "label": "建物外壁の配管と猫",
       "observations": [
@@ -1207,20 +788,12 @@
       "possible_application": "機能の集まりと素材感",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738276.jpg",
-      "screenshot_frames": [
-        "board-16.png",
-        "board-17.png",
-        "board-18.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738275",
       "url": "https://jp.pinterest.com/pin/124904589661738275/",
       "parent_board": "board-001",
-      "title": "seek",
       "category": "文字・印刷",
       "label": "CREATIVE ECSTASY",
       "observations": [
@@ -1229,20 +802,12 @@
       "possible_application": "文字の密度と輪郭",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738275.jpg",
-      "screenshot_frames": [
-        "board-17.png",
-        "board-18.png",
-        "board-19.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738274",
       "url": "https://jp.pinterest.com/pin/124904589661738274/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "色・質感",
       "label": "NOKIA のドット画",
       "observations": [
@@ -1251,20 +816,12 @@
       "possible_application": "限定色とビットマップ",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738274.jpg",
-      "screenshot_frames": [
-        "board-17.png",
-        "board-18.png",
-        "board-19.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738273",
       "url": "https://jp.pinterest.com/pin/124904589661738273/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "色・質感",
       "label": "列車とピンクの建築",
       "observations": [
@@ -1273,19 +830,12 @@
       "possible_application": "寒暖色と立体感",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738273.jpg",
-      "screenshot_frames": [
-        "board-18.png",
-        "board-19.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738272",
       "url": "https://jp.pinterest.com/pin/124904589661738272/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "文字・印刷",
       "label": "KYOTO の旅行ポスター",
       "observations": [
@@ -1294,19 +844,12 @@
       "possible_application": "日本語・英字のサイズ対比",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738272.jpg",
-      "screenshot_frames": [
-        "board-18.png",
-        "board-19.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738270",
       "url": "https://jp.pinterest.com/pin/124904589661738270/",
       "parent_board": "board-001",
-      "title": "Washi Tape &amp; Sticker Design // Swiss Typography Assets (Industrial)",
       "category": "文字・印刷",
       "label": "Industrial ラベル帯",
       "observations": [
@@ -1315,20 +858,12 @@
       "possible_application": "管理番号と仕様ラベル",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738270.jpg",
-      "screenshot_frames": [
-        "board-18.png",
-        "board-19.png",
-        "board-20.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738269",
       "url": "https://jp.pinterest.com/pin/124904589661738269/",
       "parent_board": "board-001",
-      "title": "Japanese Grid Typography Posters - Kanji",
       "category": "文字・印刷",
       "label": "漢字グリッドポスター",
       "observations": [
@@ -1337,20 +872,12 @@
       "possible_application": "文字の幾何学と配色",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738269.jpg",
-      "screenshot_frames": [
-        "board-18.png",
-        "board-19.png",
-        "board-20.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738268",
       "url": "https://jp.pinterest.com/pin/124904589661738268/",
       "parent_board": "board-001",
-      "title": "Azam Jamalian | Architect (@azamjamaliaan) • Instagram photos and videos",
       "category": "図解・配線",
       "label": "青い建築の等角図",
       "observations": [
@@ -1359,20 +886,12 @@
       "possible_application": "強調対象と補助情報",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738268.jpg",
-      "screenshot_frames": [
-        "board-19.png",
-        "board-20.png",
-        "board-21.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738267",
       "url": "https://jp.pinterest.com/pin/124904589661738267/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "色・質感",
       "label": "半透明の矩形の積層",
       "observations": [
@@ -1381,20 +900,12 @@
       "possible_application": "レイヤーと透明感",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738267.jpg",
-      "screenshot_frames": [
-        "board-19.png",
-        "board-20.png",
-        "board-21.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738266",
       "url": "https://jp.pinterest.com/pin/124904589661738266/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "文字・印刷",
       "label": "KAMAKURA の旅行ポスター",
       "observations": [
@@ -1403,19 +914,12 @@
       "possible_application": "軽い配色と日英の組版",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738266.jpg",
-      "screenshot_frames": [
-        "board-20.png",
-        "board-21.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738264",
       "url": "https://jp.pinterest.com/pin/124904589661738264/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "色・質感",
       "label": "NEGRONI の図版",
       "observations": [
@@ -1424,19 +928,12 @@
       "possible_application": "影と限定パレット",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738264.jpg",
-      "screenshot_frames": [
-        "board-20.png",
-        "board-21.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738263",
       "url": "https://jp.pinterest.com/pin/124904589661738263/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "文字・印刷",
       "label": "THE ALGORITHM のポスター",
       "observations": [
@@ -1445,20 +942,12 @@
       "possible_application": "粒状感と余白の緊張",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738263.jpg",
-      "screenshot_frames": [
-        "board-20.png",
-        "board-21.png",
-        "board-22.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738262",
       "url": "https://jp.pinterest.com/pin/124904589661738262/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "色・質感",
       "label": "ピクセルの日本の路地",
       "observations": [
@@ -1467,19 +956,12 @@
       "possible_application": "パレットと画素表現",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738262.jpg",
-      "screenshot_frames": [
-        "board-21.png",
-        "board-22.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738261",
       "url": "https://jp.pinterest.com/pin/124904589661738261/",
       "parent_board": "board-001",
-      "title": "Vintage Arts &amp; Crafts Color Palette",
       "category": "色・質感",
       "label": "Arts & Crafts パレット",
       "observations": [
@@ -1488,19 +970,12 @@
       "possible_application": "くすんだ暖色の配色",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738261.jpg",
-      "screenshot_frames": [
-        "board-21.png",
-        "board-22.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738259",
       "url": "https://jp.pinterest.com/pin/124904589661738259/",
       "parent_board": "board-001",
-      "title": "Cygnito Moto Type",
       "category": "文字・印刷",
       "label": "CYGNITO MONO",
       "observations": [
@@ -1509,19 +984,12 @@
       "possible_application": "等幅書体と見出し帯",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738259.jpg",
-      "screenshot_frames": [
-        "board-21.png",
-        "board-22.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738258",
       "url": "https://jp.pinterest.com/pin/124904589661738258/",
       "parent_board": "board-001",
-      "title": "Post by @lay.the.designer 🔥 Comment LEARN, and I’ll send you a resource that teaches UX, AI, and design the right way.⁠\n⁠\nWant to learn how to actually create work like this? @ixdf_org (Interaction Design Foundation) gives you real courses, structured learning paths, and tools designed to help you grow fast and build real skills. ⁠\n⁠\nBeginner or experienced, it doesn’t matter. ⁠\nThis is how you level up. ⁠\n⁠\nComment LEARN 👇 ⁠\n-⁠\n#ui #ux #uiuxdaily #uiux #uiuxdesign #uiuxdesigner #uitutorial #...",
       "category": "UI・計器",
       "label": "紙色のデータ表現",
       "observations": [
@@ -1530,20 +998,12 @@
       "possible_application": "数値と記号の密度",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738258.jpg",
-      "screenshot_frames": [
-        "board-21.png",
-        "board-22.png",
-        "board-23.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738256",
       "url": "https://jp.pinterest.com/pin/124904589661738256/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "文字・印刷",
       "label": "POLYMER 48",
       "observations": [
@@ -1552,20 +1012,12 @@
       "possible_application": "数値のスケール差",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738256.jpg",
-      "screenshot_frames": [
-        "board-21.png",
-        "board-22.png",
-        "board-23.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738254",
       "url": "https://jp.pinterest.com/pin/124904589661738254/",
       "parent_board": "board-001",
-      "title": "tmp.0ut Issue 5 is out",
       "category": "文字・印刷",
       "label": "tmp.0ut Issue 5",
       "observations": [
@@ -1574,19 +1026,12 @@
       "possible_application": "ログとピクセル装飾",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738254.jpg",
-      "screenshot_frames": [
-        "board-22.png",
-        "board-23.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738253",
       "url": "https://jp.pinterest.com/pin/124904589661738253/",
       "parent_board": "board-001",
-      "title": "SUP©letter ISSUE 02 (link w bio)\n• Autentyczność a internet - Legenda o Perplexity \n• 8 ciekawych wniosków z badań o AI \n• The horse in motion w identyfikacji Twelvelabs\n&amp; more",
       "category": "文字・印刷",
       "label": "SUPletter のドット馬",
       "observations": [
@@ -1595,20 +1040,12 @@
       "possible_application": "単色の記号的イラスト",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738253.jpg",
-      "screenshot_frames": [
-        "board-22.png",
-        "board-23.png",
-        "board-24.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738252",
       "url": "https://jp.pinterest.com/pin/124904589661738252/",
       "parent_board": "board-001",
-      "title": "Junichi Otake - Meet the new app concept where data streams turn into visual language. Numbers, codes, and binary patterns transform into living structures – a system that looks as dynamic as it works. ❤️ if you love it and share your thoughts on this one! We’re open to new projects – let’s create: sethbukonen@gmail.com #inscript #creativecodingart #javascript #creativecoding #creativecodingart #aescripts #p5js #js #generativeart #generative #generativedesign #generativepatterns #ascii #startup",
       "category": "UI・計器",
       "label": "黒いASCIIのスマホUI",
       "observations": [
@@ -1617,22 +1054,12 @@
       "possible_application": "数値と点群のモジュール",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738252.jpg",
-      "screenshot_frames": [
-        "board-22.png",
-        "board-23.png",
-        "board-24.png",
-        "board-25.png",
-        "board-26.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738251",
       "url": "https://jp.pinterest.com/pin/124904589661738251/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "UI・計器",
       "label": "天気と宇宙のデータ画面",
       "observations": [
@@ -1641,21 +1068,12 @@
       "possible_application": "ライト・ダークの対比",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738251.jpg",
-      "screenshot_frames": [
-        "board-23.png",
-        "board-24.png",
-        "board-25.png",
-        "board-26.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738250",
       "url": "https://jp.pinterest.com/pin/124904589661738250/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "UI・計器",
       "label": "Unified Interface と Alarm",
       "observations": [
@@ -1664,21 +1082,12 @@
       "possible_application": "触れそうな操作部と余白",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738250.jpg",
-      "screenshot_frames": [
-        "board-23.png",
-        "board-24.png",
-        "board-25.png",
-        "board-26.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738249",
       "url": "https://jp.pinterest.com/pin/124904589661738249/",
       "parent_board": "board-001",
-      "title": "Post by @lay.the.designer 🔥 Comment LEARN, and I’ll send you a resource that teaches UX, AI, and design the right way.⁠\n⁠\nWant to learn how to actually create work like this? @ixdf_org (Interaction Design Foundation) gives you real courses, structured learning paths, and tools designed to help you grow fast and build real skills. ⁠\n⁠\nBeginner or experienced, it doesn’t matter. ⁠\nThis is how you level up. ⁠\n⁠\nComment LEARN 👇 ⁠\n-⁠\n#ui #ux #uiuxdaily #uiux #uiuxdesign #uiuxdesigner #uitutorial #...",
       "category": "UI・計器",
       "label": "CORE STABILITY の点群",
       "observations": [
@@ -1687,21 +1096,12 @@
       "possible_application": "ライブ状態とデータ表現",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738249.jpg",
-      "screenshot_frames": [
-        "board-23.png",
-        "board-24.png",
-        "board-25.png",
-        "board-26.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738248",
       "url": "https://jp.pinterest.com/pin/124904589661738248/",
       "parent_board": "board-001",
-      "title": "generative design • Instagram",
       "category": "UI・計器",
       "label": "白黒の文字・記号画面",
       "observations": [
@@ -1710,21 +1110,12 @@
       "possible_application": "数字・記号の独自性",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738248.jpg",
-      "screenshot_frames": [
-        "board-23.png",
-        "board-24.png",
-        "board-25.png",
-        "board-26.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738247",
       "url": "https://jp.pinterest.com/pin/124904589661738247/",
       "parent_board": "board-001",
-      "title": "無題",
       "category": "UI・計器",
       "label": "赤茶の計測スマホ画面",
       "observations": [
@@ -1733,20 +1124,12 @@
       "possible_application": "状態・波形・数値の統一",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738247.jpg",
-      "screenshot_frames": [
-        "board-24.png",
-        "board-25.png",
-        "board-26.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     },
     {
       "id": "pin-124904589661738244",
       "url": "https://jp.pinterest.com/pin/124904589661738244/",
       "parent_board": "board-001",
-      "title": "Post by @lay.the.designer 🔥 Comment LEARN, and I’ll send you a resource that teaches UX, AI, and design the right way.⁠ ⁠ Want to learn how to actually create work like this? @ixdf_org (Interaction Design Foundation) gives you real courses, structured learning paths, and tools designed to help you grow fast and build real skills. ⁠ ⁠ Beginner or experienced, it doesn’t matter. ⁠ This is how you level up. ⁠ ⁠ Comment LEARN 👇 ⁠ -⁠ #ui #ux #uiuxdaily #uiux #uiuxdesign #uiuxdesigner #uitutorial #...",
       "category": "UI・計器",
       "label": "物理機材風の操作パネル",
       "observations": [
@@ -1755,14 +1138,7 @@
       "possible_application": "操作部の高さ・素材・色分け",
       "user_comment": null,
       "preference_status": "ユーザーの参考ボードに保存済み。個別の採用・好みの強さは未確認。",
-      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。",
-      "thumbnail": "thumbnails/124904589661738244.jpg",
-      "screenshot_frames": [
-        "board-24.png",
-        "board-25.png",
-        "board-26.png"
-      ],
-      "screenshot_vertical_coverage": 1.0
+      "verification": "ボードのサムネイルを目視確認。カルーセルは表示中のスライドのみ。"
     }
   ]
 }
