@@ -132,7 +132,10 @@ function onLievre(components, check) {
 const rule = (description, messages, create, extra = {}) => ({
   meta: {
     type: 'problem',
-    docs: { description, url: 'https://github.com/shiroinock/kei-design-system#lint' },
+    docs: {
+      description,
+      url: 'https://github.com/shiroinock/lievre/tree/main/packages/react#lint',
+    },
     messages,
     schema: [],
     ...extra,

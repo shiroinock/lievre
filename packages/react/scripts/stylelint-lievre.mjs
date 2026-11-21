@@ -20,7 +20,7 @@ function rule(name, message, check) {
   ruleFunction.ruleName = ruleName;
   ruleFunction.messages = messages;
   ruleFunction.meta = {
-    url: 'https://github.com/shiroinock/kei-design-system/blob/main/DESIGN.md',
+    url: 'https://github.com/shiroinock/lievre/blob/main/DESIGN.md',
   };
   return createPlugin(ruleName, ruleFunction);
 }
@@ -246,7 +246,7 @@ const heightGridRule = (primary, options) => (root, result) => {
 heightGridRule.ruleName = 'lievre/height-grid';
 heightGridRule.messages = ruleMessages('lievre/height-grid', {});
 heightGridRule.meta = {
-  url: 'https://github.com/shiroinock/kei-design-system/blob/main/docs/quality-gate.md',
+  url: 'https://github.com/shiroinock/lievre/blob/main/docs/quality-gate.md',
 };
 const heightGrid = createPlugin('lievre/height-grid', heightGridRule);
 
