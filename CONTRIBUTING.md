@@ -78,3 +78,5 @@ npm run test:layout  # ブラウザ：配置の基準（初回は npx playwright
 ## プルリクエスト
 
 CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査・build を走らせます。すべて通ってからレビューを頼んでください。
+
+利用する側に見える変更（`packages/*/src` の部品・スタイル、`packages/tokens/tokens.css`）は、[CHANGELOG.md](CHANGELOG.md) の「未公開」の、パッケージと区分（見た目が変わる・振る舞いが変わる・足したもの・直したもの）の下に1行足します。書き方は CHANGELOG.md の冒頭にあります。テストや内部の整理だけで利用する側に見えないときは、PR の説明に「変更履歴：なし（理由）」の1行を書きます。書き忘れは `.github/workflows/changelog.yml` が止めます。

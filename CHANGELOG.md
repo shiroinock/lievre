@@ -1,0 +1,72 @@
+# 変更履歴
+
+利用する側に見える変更を、パッケージごとに書き残します。npm にはまだ公開していないので、すべて「未公開」の下にあります。
+
+## 書き方
+
+- `packages/*/src` の部品・スタイル・端末の部品や `packages/tokens/tokens.css` を変える PR では、ここに1行足します。CI の「変更履歴」の検査が、書き忘れを止めます。
+- 「未公開」の下の、パッケージ（`@lievre/tokens`・`@lievre/react`・`@lievre/tui`）の見出しに書きます。区分はこの順で、書くことのない区分は見出しごと省きます。
+  - **見た目が変わる**：同じ使い方のまま、画面の見え方が変わるもの。
+  - **振る舞いが変わる**：読み上げ・フォーカス・名前・API など、利用する側のコードやテストに響きうるもの。
+  - **足したもの**：新しい部品・props・トークン。今の使い方には響かないもの。
+  - **直したもの**：意図と違っていたものを直したもの。
+- 1行に1つ、利用する側の言葉で書き、末尾に PR の番号を付けます（例：`（#32）`）。番号は PR を出してから足せば十分です。新しい行は区分の末尾に足します。
+- 利用する側に見えない変更（テスト・Story・内部の整理だけ）は書きません。検査に当たるときは、PR の説明に `変更履歴：なし` で始まる1行と、その理由を書きます。
+- 公開するときは「未公開」を版と日付（例：`## 0.3.0（2026-12-01）`）に改め、空の「未公開」を上に足します。
+
+## 未公開
+
+### @lievre/tokens
+
+#### 振る舞いが変わる
+
+- CSS 変数の頭を `--lv-` に、カスケードの層を `lievre.tokens` にした。移り方は [MIGRATION.md](MIGRATION.md) にある。（#23）
+
+#### 足したもの
+
+- トークンを `@lievre/tokens` に分けた。正は `tokens.css` で、そこから `tokens.json` を書き出す。`@lievre/react` は焼き込んで持つので、React で使うだけなら入れなくてよい。（#22）
+
+### @lievre/react
+
+#### 見た目が変わる
+
+- 質感のソルトの既定値を `lievre` にし、同梱の焼き込みの画像を作り直した。擦れの位置が変わる（強さなどの値は同じ）。（#23）
+- DecisionQueue の今のカードから、左の強調色の帯を外した。枠は全体に `--lv-border-strong` のまま。（#30）
+- 必須の印を `*` から「必須」の文字にそろえた。色は赤ではなく `--lv-muted`。これまで `*` と「（必須）」が混ざっていた。（#32）
+- `hint` と `error` を両方渡すと、両方が出る。これまでは `error` が `hint` と置き換わっていた。（#32）
+- エラー文の前にアイコンが付く。（#32）
+- Select の一覧の選択肢の文字が、開く前の文字と同じ左端から始まる。compact の密度で 4px ずれていたのを直したので、一覧の見た目が少し変わる。（#33）
+
+#### 振る舞いが変わる
+
+- lievre に改名した。パッケージ `@lievre/react`、`LievreProvider`・`useLievreTheme`、根のクラス `.lievre`・`.lievre-portal`、クラスの頭 `.lv-`、層 `lievre.*`、lint のルール `lievre/…`、書体 Lievre Mono など。移り方は [MIGRATION.md](MIGRATION.md) と `npx lievre-migrate` にある。（#23）
+- 1つの入力の「必須」の文字は読み上げから外し、`required` か `aria-required` で伝える。Fieldset・RadioGroup・CheckboxGroup の `legend` では、まとまりの名前と一緒に「必須」を読み上げる。（#32）
+- TextField・Textarea・Select・Checkbox を Field で、RadioGroup を Fieldset で組み直した。`hint` と `error` はどちらも `aria-describedby` で入力に結ぶ。書き出す名前と props は変わらない。（#32）
+
+#### 足したもの
+
+- `npx lievre-migrate`（改名の書き換え）と、拾えなかった古い名前を止める lint のルール `lievre/no-legacy-prefix`（ESLint・Oxlint・Biome）。（#23）
+- Alert に `action`（本文の下の操作）と `onDismiss`・`dismissLabel`（閉じるボタン）。（#28）
+- Toast の `tone` に `info`・`warning`。`action` を渡すと自動で閉じなくなり、`altText` で通知の外の同じ操作を読み上げる。（#28）
+- Progress は `value` を省くと値の分からない形になる。`tone` の `success`・`danger` では、色に加えてアイコンと言葉（`statusLabel` で変えられる）を出す。（#28）
+- Badge に `emphasis`（`soft`・`strong`）と `size`（`sm`・`md`）。（#28）
+- Dialog に `size`（`sm` 400px・`md` 520px・`lg` 720px）。（#28）
+- 1件ずつ判断する列：`DecisionQueue`・`QueueProgress`・`ViewSwitch`、`useDecisionQueue` と状態の関数（`getQueueSnapshot`・`decideItem`・`deferItem`・`undoDecision`）。（#29）
+- 状態の関数 `decideItems`・`selectionOf`・`applySelection`、フックの戻り値の `decideMany`・`selected`・`setSelected`。DataTable の選択と状態を共有できる。（#31）
+- DecisionQueue に `bulk`（まとめて決める近道）と `autoFocus`。（#31）
+- 入力のまとまり：Field・Fieldset・CheckboxGroup・ErrorSummary。（#32）
+- Select（開くボタン）と RadioGroup（最初の選択肢）に `id`。ErrorSummary から移るときに使う。RadioGroup に `hint`。（#32）
+- 途中で増えた項目を、押すまで列に混ぜずに知らせる `useNewItems` と `NewItemsNotice`。（#34）
+- 時間で動くものを止める・再開する `useAutoAdvance` と `PauseControl`。動きを減らす設定では止めた状態で始まる。（#34）
+- TextField に `prefix`・`suffix`（前後の言葉。入力の説明として読み上げる）、`icon`（入力欄の中の先頭。読み上げない）、`controlSize` の `sm`（32px）。（#33）
+- TextField の `readOnly` は枠を破線にし、地を透明にする。値は読める色のまま、フォーカスも届く。（#33）
+- Select に `controlSize`（`sm`・`md`・`lg`）と、`{ label, options }` で見出しの付いたまとまり。（#33）
+- RadioGroup に `orientation="horizontal"`（横並び。幅が足りないと折り返す）。（#33）
+
+### @lievre/tui
+
+#### 足したもの
+
+- 端末の部品を `@lievre/tui` として足した。色と字の組を決める `core`（truecolor・256色・16色・色なし、ASCII の組）と、Ink で描く `ink`。（#22）
+- 1件ずつ判断する列：`Queue`・`QueueProgress`・`useQueueInput` と、列の状態とキーの決まり（`queueKey`）。決まりは `@lievre/react` の DecisionQueue と同じ答えを返す。（#34）
+- 字の組に進み具合の線（unicode は `━` `─`、ASCII は `#` `-`）。（#34）
