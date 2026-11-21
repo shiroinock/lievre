@@ -8,4 +8,5 @@ export * from './components/actions';
 export * from './components/popover';
 export * from './components/queue';
 export * from './components/stream';
+export * from './components/chip';
 export * from './components/disclosure';
