@@ -1,7 +1,7 @@
 // The rename to lievre (MIGRATION.md): no file may keep the old names, and the documents keep to
 // the words the author chose.
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -89,5 +89,51 @@ describe('the rename to lievre', () => {
       .filter((file) => file !== 'packages/react/src/test/naming.test.tsx')
       .filter((file) => text(file).includes('計器'));
     expect(found, '「計器」を「メーター」や「測った値」などに言い換えてください').toEqual([]);
+  });
+});
+
+// Links to this repository (the lint rules' docs URLs, the documents): the file and the heading they
+// point at must be on main, or the link lands on the wrong page after a move or a rename.
+const REPOSITORY = 'https://github.com/shiroinock/lievre';
+const LINK =
+  /https:\/\/github\.com\/shiroinock\/lievre(?:\/(?:blob|tree)\/main\/([^\s'"`)#]*))?(?:#([^\s'"`)]+))?/gu;
+// The anchor GitHub gives a heading: lower case, punctuation dropped, spaces to hyphens.
+const slug = (heading: string) =>
+  heading
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s_-]/gu, '')
+    .replace(/\s/g, '-');
+
+describe('the links to this repository', () => {
+  it('point at a file and a heading that are there', () => {
+    const found: string[] = [];
+    for (const file of files) {
+      if (OUTSIDE_DATA.some((p) => p.test(file))) continue;
+      if (/^packages\/react\/bench\/agent\/results\//.test(file)) continue;
+      for (const [url, path = '', anchor] of readFileSync(join(root, file), 'utf8').matchAll(
+        LINK,
+      )) {
+        const target = join(root, path);
+        const page =
+          existsSync(target) && statSync(target).isDirectory() ? join(target, 'README.md') : target;
+        if (!existsSync(page)) {
+          found.push(
+            `${file}：${url} の ${path || 'README.md'} がありません。今の場所を指してください`,
+          );
+          continue;
+        }
+        if (!anchor) continue;
+        const headings = readFileSync(page, 'utf8')
+          .split('\n')
+          .filter((line) => /^#{1,6} /.test(line))
+          .map((line) => slug(line.replace(/^#+ /, '')));
+        if (!headings.includes(decodeURIComponent(anchor)))
+          found.push(
+            `${file}：${url} の見出し #${anchor} が ${page.slice(root.length + 1)} にありません。見出しのある README を指してください（${REPOSITORY}/tree/main/<フォルダ>#<見出し>）`,
+          );
+      }
+    }
+    expect(found).toEqual([]);
   });
 });
