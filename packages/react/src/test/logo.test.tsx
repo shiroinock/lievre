@@ -15,6 +15,8 @@ const CLASS_TOKEN: Record<string, string> = {
   a: 'accent',
   g: 'on-accent',
   s: 'on-accent',
+  // The white tile behind the README logo.
+  b: 'surface-raised',
 };
 
 const hex = (value: string) => {
@@ -60,14 +62,14 @@ describe('Logos', () => {
   }
 
   // An SVG's own prefers-color-scheme follows the OS, not GitHub's theme.
-  it('README shows only fixed-colour logos', () => {
+  it('README shows the logo on its own white tile', () => {
     const readme = readFileSync(resolvePath(root, 'README.md'), 'utf8');
     const sources = [...readme.matchAll(/(?:src|srcset)="(logo\/[^"]+)"/g)].map(([, src]) => src);
     expect(sources.length).toBeGreaterThan(0);
     for (const src of sources)
       expect(
         src,
-        'README のロゴは、明暗を固定した -light.svg と -dark.svg を <picture> で出し分けてください',
-      ).toMatch(/-(light|dark)\.svg$/);
+        'README のロゴは、白い下地ごと色を固定した -tile-light.svg を使ってください（GitHub のテーマに左右されないように）',
+      ).toMatch(/-tile-light\.svg$/);
   });
 });
