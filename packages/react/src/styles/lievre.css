@@ -1870,6 +1870,7 @@
     .lv-select-trigger,
     .lv-tab,
     .lv-select-item,
+    .lv-select-content[data-size='sm'] .lv-select-item,
     .lv-menu-item {
       min-height: 44px;
     }
@@ -1942,6 +1943,10 @@
     .lv-switch,
     .lv-tab {
       border: 1px solid ButtonText;
+    }
+    /* The shorthand above resets the line to solid; read only keeps its dashed outline. */
+    .lv-input:read-only:not(:disabled) {
+      border-style: dashed;
     }
     /* The browser paints a backplate behind forced text as tall as the glyphs, which is taller
        than the small badge's 16px line, so it would cover the top and bottom border. Paint the
@@ -2182,6 +2187,11 @@
     margin-bottom: 0;
   }
 
+  /* The shortcut to decide the rest at once names its reason in the button itself. */
+  .lv-queue-bulk {
+    margin: 0;
+  }
+
   /* What comes next stays small and pale: a few names, then a count. */
   .lv-queue-next {
     color: var(--lv-muted);
@@ -2240,6 +2250,57 @@
       border-color: Highlight;
       background: Highlight;
       color: HighlightText;
+    }
+  }
+}
+
+/* ------------------------------------------------ new items and timed motion */
+
+@layer lievre.components {
+  /* New items wait here until the person takes them in; the queue and its count do not change. */
+  .lv-new-items {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lv-space-2) var(--lv-space-3);
+    padding: var(--lv-space-2) var(--lv-space-3);
+    border: 1px solid var(--lv-border-strong);
+    border-radius: var(--lv-radius-md);
+    background: var(--lv-surface-sunken);
+  }
+  .lv-new-items[data-state='added'] {
+    border-color: var(--lv-border);
+    background: var(--lv-surface);
+    color: var(--lv-muted);
+  }
+  .lv-new-items-text {
+    margin: 0;
+    font-size: var(--lv-text-sm);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-new-items[data-state='added'] .lv-new-items-text {
+    font-weight: var(--lv-weight-regular);
+  }
+
+  /* The stop button and the word for the current state sit side by side. */
+  .lv-pause-control {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--lv-space-2);
+  }
+  .lv-pause-control-state {
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+    line-height: var(--lv-line-tight);
+  }
+
+  /* The words carry the state; with forced colors the settled notice keeps a quieter outline. */
+  @media (forced-colors: active) {
+    .lv-new-items[data-state='added'] {
+      border-color: GrayText;
     }
   }
 }

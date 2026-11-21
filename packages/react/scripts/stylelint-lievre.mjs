@@ -113,6 +113,75 @@ const forcedColorsState = rule('forced-colors-state', '', (root, fail) => {
   });
 });
 
+// The forced-colors block sits in the utilities layer and resets a part's border with the
+// `border` shorthand, so a line shape set in the components layer (a dashed read-only
+// outline) is lost there unless the block sets it again.
+const LINE_SHAPE = /\b(dashed|dotted|double)\b/;
+const forcedColorsBorderStyle = rule('forced-colors-border-style', '', (root, fail) => {
+  const isForced = (a) => a.name === 'media' && /forced-colors:\s*active/.test(a.params);
+  const reset = new Set();
+  const kept = new Set();
+  root.walkRules((r) => {
+    if (!inside(r, isForced)) return;
+    for (const d of r.nodes) {
+      if (d.type !== 'decl') continue;
+      if (d.prop === 'border')
+        selectors(r)
+          .filter((s) => /^\.[\w-]+$/.test(s))
+          .forEach((s) => reset.add(s));
+      if (/^border(-style)?$/.test(d.prop) && LINE_SHAPE.test(d.value))
+        selectors(r).forEach((s) => kept.add(s));
+    }
+  });
+  root.walkDecls(/^border(-style)?$/, (decl) => {
+    const r = decl.parent;
+    if (r.type !== 'rule' || inside(r, isForced) || !LINE_SHAPE.test(decl.value)) return;
+    for (const s of selectors(r)) {
+      const last = s.split(/[\s>+~]+/).pop();
+      const part = [...reset].find((c) => new RegExp(`\\${c}(?![\\w-])`).test(last));
+      if (part && !kept.has(s))
+        fail(
+          decl,
+          `「${s}」の線の形（${decl.value}）は、@media (forced-colors: active) の「${part}」の border の一括指定で実線に戻ります。@media (forced-colors: active) に「${s} { border-style: … }」を足してください。`,
+        );
+    }
+  });
+});
+
+// A touch pointer raises a part to 44px in @media (pointer: coarse). A rule elsewhere that
+// names the same part with more qualifiers (a size, a density) is more specific and would
+// pull it back below 44px on touch, so it has to be raised in the coarse block as well.
+const COARSE_TARGET = 44;
+const coarseTarget = rule('coarse-target', '', (root, fail) => {
+  const isCoarse = (a) => a.name === 'media' && /pointer:\s*coarse/.test(a.params);
+  const raised = new Set();
+  const covered = new Set();
+  root.walkRules((r) => {
+    if (!inside(r, isCoarse)) return;
+    selectors(r).forEach((s) => covered.add(s));
+    const h = r.nodes.find((d) => d.type === 'decl' && d.prop === 'min-height');
+    if (h && parseFloat(h.value) >= COARSE_TARGET)
+      selectors(r)
+        .filter((s) => /^\.[\w-]+$/.test(s))
+        .forEach((s) => raised.add(s));
+  });
+  root.walkDecls('min-height', (decl) => {
+    const r = decl.parent;
+    if (r.type !== 'rule' || inside(r, isCoarse)) return;
+    const m = /^(\d*\.?\d+)px$/.exec(decl.value.trim());
+    if (!m || parseFloat(m[1]) >= COARSE_TARGET) return;
+    for (const s of selectors(r)) {
+      const last = s.split(/[\s>+~]+/).pop();
+      const part = [...raised].find((c) => s !== c && new RegExp(`\\${c}(?![\\w-])`).test(last));
+      if (part && !covered.has(s))
+        fail(
+          decl,
+          `「${s}」は min-height: ${decl.value} で、タッチの @media (pointer: coarse) が「${part}」に付ける ${COARSE_TARGET}px より強く効きます。@media (pointer: coarse) に「${s}」を足して ${COARSE_TARGET}px にしてください。`,
+        );
+    }
+  });
+});
+
 // Spacing sits on the 4px grid. 0 and 1px (a border's width) pass; anything else needs a
 // stylelint-disable comment that says why. calc() and var() are left to their inputs.
 const SPACING =
@@ -227,6 +296,8 @@ export default [
   monoUnicodeRange,
   monoWeights,
   forcedColorsState,
+  coarseTarget,
+  forcedColorsBorderStyle,
   spacingGrid,
   surfaceTokens,
   colourTokens,

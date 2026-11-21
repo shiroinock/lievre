@@ -31,6 +31,28 @@ export const Operations: Story = {
   },
   render: (args) => <OperationsExample compact={args.compact as boolean} />,
 };
+/** 作業キューを「順に見る」に切り替え、一覧で選んだ行と同じ状態を1件ずつ決めます。見せ方は URL の ?view=queue に残ります。 */
+export const OperationsQueue: Story = {
+  name: '作業モニター・順に見る',
+  args: { compact: true },
+  render: (args) => <OperationsExample compact={args.compact as boolean} />,
+  // Start from the list each time, even when an earlier run left ?view=queue in the URL.
+  beforeEach: () => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('view');
+    window.history.replaceState(window.history.state, '', url);
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('radio', { name: '順に見る' }));
+    const card = await canvas.findByRole('article', { name: /ゲートウェイの接続確認/ });
+    await expect(card).toHaveFocus();
+    await userEvent.keyboard('y');
+    await expect(
+      await canvas.findByRole('article', { name: /エッジ端末の更新/ }),
+    ).toBeInTheDocument();
+  },
+};
 export const Settings: Story = {
   name: '設定画面',
   render: () => (
