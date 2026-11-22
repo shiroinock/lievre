@@ -86,10 +86,10 @@ describe('checkNumber', () => {
     expect(checkNumber('100', { max: 99 }).kind).toBe('above-max');
   });
   it('words each reason with how to fix it', () => {
-    expect(numberCheckMessage({ kind: 'below-min', min: 1000 }, '円')).toBe(
+    expect(numberCheckMessage({ kind: 'below-min', min: 1000, value: 5 }, '円')).toBe(
       '1,000円以上の数を入れてください。',
     );
-    expect(numberCheckMessage({ kind: 'too-many-decimals', fractionDigits: 0 })).toBe(
+    expect(numberCheckMessage({ kind: 'too-many-decimals', fractionDigits: 0, value: 1.5 })).toBe(
       '小数ではなく、整数で入れてください。',
     );
     expect(numberCheckMessage({ kind: 'ok', value: 1 })).toBeUndefined();
@@ -118,6 +118,22 @@ describe('NumberField', () => {
     await userEvent.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}');
     expect(box()).toHaveValue('1');
     expect(onValueChange).toHaveBeenLastCalledWith(1);
+  });
+  it('steps from the number typed even when it does not pass', async () => {
+    render(<NumberField label="数量" max={100} step={1} />);
+    await userEvent.type(box(), '150');
+    await userEvent.keyboard('{ArrowDown}');
+    expect(box()).toHaveValue('100');
+  });
+  it('offers a number pad only when no negative is taken', () => {
+    const { rerender } = render(<NumberField label="数量" min={0} fractionDigits={0} />);
+    expect(box()).toHaveAttribute('inputmode', 'numeric');
+    rerender(<NumberField label="数量" min={0} />);
+    expect(box()).toHaveAttribute('inputmode', 'decimal');
+    rerender(<NumberField label="数量" />);
+    expect(box()).not.toHaveAttribute('inputmode');
+    rerender(<NumberField label="数量" min={-10} />);
+    expect(box()).not.toHaveAttribute('inputmode');
   });
   it('steps by decimals without float noise', async () => {
     render(<NumberField label="数量" step={0.1} defaultValue={0.2} />);

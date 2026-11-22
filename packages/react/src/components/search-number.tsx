@@ -80,13 +80,7 @@ export function SearchField({
   return (
     <Field {...{ label, hint, error, id }}>
       {(control) => (
-        <div
-          className={cx(
-            'lv-input-wrap',
-            'lv-search-field',
-            controlSize !== 'md' && `lv-search-field--${controlSize}`,
-          )}
-        >
+        <div className="lv-input-wrap lv-search-field">
           <span className="lv-input-icon" aria-hidden>
             <Search />
           </span>
@@ -141,9 +135,9 @@ export function SearchField({
 export type NumberCheck =
   | { kind: 'empty' }
   | { kind: 'not-number' }
-  | { kind: 'too-many-decimals'; fractionDigits: number }
-  | { kind: 'below-min'; min: number }
-  | { kind: 'above-max'; max: number }
+  | { kind: 'too-many-decimals'; fractionDigits: number; value: number }
+  | { kind: 'below-min'; min: number; value: number }
+  | { kind: 'above-max'; max: number; value: number }
   | { kind: 'ok'; value: number };
 
 /** 入れた文字を確かめて数にします。全角の数字・記号と桁区切り（1,234）も受けます。数でない文字や、小数の桁の超え、min・max の外は、その理由を返します。 */
@@ -158,9 +152,9 @@ export function checkNumber(
   const decimals = plain.split('.')[1]?.length ?? 0;
   const { min, max, fractionDigits } = rules;
   if (fractionDigits !== undefined && decimals > fractionDigits)
-    return { kind: 'too-many-decimals', fractionDigits };
-  if (min !== undefined && value < min) return { kind: 'below-min', min };
-  if (max !== undefined && value > max) return { kind: 'above-max', max };
+    return { kind: 'too-many-decimals', fractionDigits, value };
+  if (min !== undefined && value < min) return { kind: 'below-min', min, value };
+  if (max !== undefined && value > max) return { kind: 'above-max', max, value };
   return { kind: 'ok', value: Object.is(value, -0) ? 0 : value };
 }
 
@@ -282,7 +276,9 @@ export function NumberField({
     const up = e.key === 'ArrowUp';
     if (!up && e.key !== 'ArrowDown') return;
     e.preventDefault();
-    const base = check.kind === 'ok' ? check.value : (min ?? 0);
+    // From the number typed, even one that does not pass (150 over a max of 100 steps down to
+    // 100); from min, or 0, only when nothing readable is there.
+    const base = 'value' in check ? check.value : (min ?? 0);
     // Round to the step's own decimals: 0.1 + 0.2 is 0.30000000000000004.
     const places = Math.max(String(step).split('.')[1]?.length ?? 0, fractionDigits ?? 0);
     let next = Number((base + (up ? step : -step)).toFixed(places));
@@ -306,7 +302,10 @@ export function NumberField({
         suffix={unit}
         mono
         value={text}
-        inputMode={fractionDigits === 0 && (min ?? -1) >= 0 ? 'numeric' : 'decimal'}
+        // Phone number pads have no minus sign: they only fit a field that takes no negative.
+        inputMode={
+          min !== undefined && min >= 0 ? (fractionDigits === 0 ? 'numeric' : 'decimal') : undefined
+        }
         autoComplete="off"
         onChange={(e) => write(e.target.value)}
         onKeyDown={onKeyDown}
