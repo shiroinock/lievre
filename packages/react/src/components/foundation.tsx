@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { cx } from './system';
+import { FamilyScope } from './theme-context';
 export type Space = 0 | 1 | 2 | 3 | 4 | 6 | 8 | 12;
 const space = (n: Space) => (n === 0 ? 0 : `var(--lv-space-${n})`);
 /** 用途に依存しない本文。密度と文字の役割を分けて選びます。 */
@@ -31,10 +32,10 @@ export function Text({
   weight?: 'regular' | 'medium' | 'bold';
   /** この行数で切り、末尾に「…」を出します。表の長い件名やカードの説明に使います。切った分は読み上げでは読まれますが、目では見えないので、全文は詳細の画面などで読めるようにします。 */
   maxLines?: number;
-  /** 日本語も含めて等幅にします。ログ・コマンドの出力・コードのように、字の桁をそろえて読む文に使います。英数字 1 対日本語 2 の幅でそろい、14.4px より小さくしません。中に置いた部品も等幅になります。 */
+  /** 日本語も含めて等幅にします。ログ・コマンドの出力・コードのように、字の桁をそろえて読む文に使います。英数字 1 対日本語 2 の幅でそろい、14.4px より小さくしません。中に置いた部品も、中から開くツールチップなどのポータルも等幅になります。 */
   mono?: boolean;
 }): ReactElement {
-  return createElement(as, {
+  const text = createElement(as, {
     ...props,
     style: maxLines ? ({ ...style, '--lines': maxLines } as CSSProperties) : style,
     className: cx(
@@ -47,6 +48,7 @@ export function Text({
       className,
     ),
   });
+  return mono ? <FamilyScope family="mono">{text}</FamilyScope> : text;
 }
 export type HeadingSize = 'minor' | 'subsection' | 'section' | 'title' | 'display';
 export const Heading = forwardRef<

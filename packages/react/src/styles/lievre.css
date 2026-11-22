@@ -15,7 +15,11 @@
   .lv-mono {
     font-size: max(1em, var(--lv-text-mono-min));
   }
+  /* Tracking and 'palt' go through these, so a monospace scope can turn them off for everything
+     inside it and a nested LievreProvider (family="sans") turns them back on. */
   .lievre {
+    --lv-tracking: 1;
+    --lv-kerning: 'palt';
     color: var(--lv-text);
     background: var(--lv-bg);
     font: var(--lv-weight-regular) var(--lv-body) / var(--lv-leading-body) var(--lv-font-sans);
@@ -36,6 +40,10 @@
     --lv-text-xs: var(--lv-text-mono-min);
     --lv-text-sm: var(--lv-text-mono-min);
     --lv-text-md: var(--lv-text-mono-min);
+    /* Tracking adds the same to a 0.5em letter and a 1em one, and 'palt' narrows kana: both
+       would break the 1:2 columns. */
+    --lv-tracking: 0;
+    --lv-kerning: normal;
     font-family: var(--lv-font-mono);
     font-variant-numeric: tabular-nums;
   }
@@ -128,8 +136,8 @@
     margin: 0;
     font-weight: var(--lv-weight-bold);
     line-height: var(--lv-line-tight);
-    letter-spacing: var(--lv-tracking-heading);
-    font-feature-settings: 'palt';
+    letter-spacing: calc(var(--lv-tracking-heading) * var(--lv-tracking));
+    font-feature-settings: var(--lv-kerning);
     text-wrap: balance;
     overflow-wrap: anywhere;
   }
@@ -155,7 +163,7 @@
     font-size: var(--lv-text-xs);
     font-weight: var(--lv-weight-bold);
     line-height: var(--lv-line-body);
-    letter-spacing: 0.04em;
+    letter-spacing: calc(0.04em * var(--lv-tracking));
     color: var(--lv-muted);
   }
 
@@ -1398,7 +1406,7 @@
     font-size: var(--lv-text-base);
     font-weight: var(--lv-weight-bold);
     line-height: var(--lv-line-tight);
-    letter-spacing: 0.02em;
+    letter-spacing: calc(0.02em * var(--lv-tracking));
   }
   .lv-card-body {
     padding: var(--lv-panel-padding);
@@ -2409,8 +2417,8 @@
     font-size: var(--lv-text-xl);
     font-weight: var(--lv-weight-bold);
     line-height: var(--lv-line-tight);
-    letter-spacing: var(--lv-tracking-heading);
-    font-feature-settings: 'palt';
+    letter-spacing: calc(var(--lv-tracking-heading) * var(--lv-tracking));
+    font-feature-settings: var(--lv-kerning);
   }
   .lv-dialog-description {
     margin: 0;
@@ -2571,7 +2579,7 @@
     font-weight: var(--lv-weight-regular);
     font-variant-numeric: tabular-nums;
     line-height: round(1.2em, 4px);
-    letter-spacing: -0.01em;
+    letter-spacing: calc(-0.01em * var(--lv-tracking));
   }
   /* Units are words, not data: the sans face keeps % the same size as 件 or 秒.
      line-height: 1 keeps the smaller sans box inside the figure's line. */

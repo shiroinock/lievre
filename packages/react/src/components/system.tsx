@@ -13,7 +13,7 @@ import { Toast as ToastPrimitive } from 'radix-ui';
 import { X, CheckCircle2, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import { LiveWearFilters, liveAgeStyle, liveWearStyle } from '../wear/live';
 import type { Age } from '../wear/age.mjs';
-import { WEAR_CONFIG } from '../wear/params.mjs';
+import { ThemeContext } from './theme-context';
 import type { WearConfig } from '../wear/presets.mjs';
 
 export type { WearConfig, Age };
@@ -30,26 +30,6 @@ export type Typography = 'standard' | 'interface';
 export type Family = 'sans' | 'mono';
 export const cx = (...values: (string | false | undefined | null)[]) =>
   values.filter(Boolean).join(' ');
-const ThemeContext = createContext<{
-  theme: Theme;
-  density: Density;
-  typography: Typography;
-  family: Family;
-  wear: Wear;
-  wearSeed: string;
-  wearConfig: WearConfig;
-  wearStyle?: CSSProperties;
-  age: Age;
-}>({
-  theme: 'paper',
-  density: 'comfortable',
-  typography: 'standard',
-  family: 'sans',
-  wear: 'off',
-  wearSeed: WEAR_CONFIG.salt,
-  wearConfig: WEAR_CONFIG,
-  age: 'none',
-});
 export function useLievreTheme() {
   return useContext(ThemeContext);
 }
@@ -109,7 +89,8 @@ export function LievreProvider({
    * 選べ、等幅では小さい文字も 14.4px（英数字が 12px に見える大きさ）より小さくしません。
    * 入れ子にすると、指定しない値は外側から引き継ぎます。等幅の画面の一部だけ本文の書体に戻すときは、
    * その範囲を `<LievreProvider family="sans">` で包みます。範囲だけを等幅にするなら、Text・Card の
-   * `mono` か、クラス `lv-family-mono` を使います。
+   * `mono` を使います（中から開いたポップオーバーや入れ子の LievreProvider にも届きます）。クラス
+   * `lv-family-mono` はその要素の中だけで、ポータルに出る部品と入れ子の LievreProvider には届きません。
    */
   family?: Family;
   /** 試作：質感の段階。既定は off。 */

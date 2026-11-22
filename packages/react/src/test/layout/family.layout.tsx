@@ -9,6 +9,7 @@ import {
   Badge,
   Button,
   Card,
+  Heading,
   LievreProvider,
   Text,
   type Family,
@@ -62,20 +63,26 @@ function expectMono(scope: Element) {
 
 /** Two Latin characters are as wide as one Japanese, at the size the scope draws. */
 function expectHalfWidth(scope: Element) {
-  const probe = (text: string) => {
-    const span = scope.appendChild(document.createElement('span'));
-    span.textContent = text;
-    const width = span.getBoundingClientRect().width;
-    span.remove();
-    return width;
-  };
-  const ja = probe('日本語の文字');
-  const latin = probe('abcdef012345');
-  // Advances land on 1/64px, so twelve characters may drift by up to 12/64px.
-  expect(
-    Math.abs(latin - ja),
-    `英数字 12 字（${latin}px）と日本語 6 字（${ja}px）の差`,
-  ).toBeLessThanOrEqual(12 / 64);
+  // Inside every element that holds text too: headings, the eyebrow and card titles carry their own
+  // tracking and 'palt', which a span at the top of the scope would not see.
+  for (const host of [scope, ...texts(scope)]) {
+    const probe = (text: string) => {
+      const span = host.appendChild(document.createElement('span'));
+      span.textContent = text;
+      const width = span.getBoundingClientRect().width;
+      span.remove();
+      return width;
+    };
+    // Kana as well as kanji: 'palt' narrows kana.
+    const ja = probe('かなとカナ漢字');
+    const latin = probe('abcdefg0123456');
+    const what = `${host.tagName.toLowerCase()}.${[...host.classList].join('.')}`;
+    // Advances land on 1/64px, so fourteen characters may drift by up to 14/64px.
+    expect(
+      Math.abs(latin - ja),
+      `${what} の中で、英数字 14 字（${latin}px）と日本語 7 字（${ja}px）の差`,
+    ).toBeLessThanOrEqual(14 / 64);
+  }
 }
 
 const PARTS = (
@@ -84,6 +91,9 @@ const PARTS = (
     <Text size="small">補助：差分は +3 −1 行</Text>
     <Badge tone="success">稼働中</Badge>
     <Button>再実行する</Button>
+    <Heading level={3} size="subsection">
+      かなの見出し
+    </Heading>
   </>
 );
 
@@ -93,7 +103,7 @@ describe('範囲を等幅にする', () => {
       const host = await render(
         <LievreProvider typography={typography}>
           <p className="outside">外の文はそのまま</p>
-          <Card title="実行の記録" mono>
+          <Card title="実行の記録" eyebrow="夜間の処理" mono>
             {PARTS}
           </Card>
         </LievreProvider>,
@@ -141,7 +151,9 @@ describe('画面を等幅にする', () => {
     it(`LievreProvider の family="mono"（${typography}）`, async () => {
       const host = await render(
         <LievreProvider family="mono" typography={typography}>
-          <Card title="実行の記録">{PARTS}</Card>
+          <Card title="実行の記録" eyebrow="夜間の処理">
+            {PARTS}
+          </Card>
         </LievreProvider>,
       );
       const screen = host.querySelector('.lievre')!;
@@ -163,6 +175,7 @@ describe('画面を等幅にする', () => {
           <p className="inherited">引き継ぐ</p>
           <LievreProvider family={'sans' as Family}>
             <p className="back">本文の書体に戻す</p>
+            <Heading className="back-heading">見出しは字間と詰めも戻る</Heading>
           </LievreProvider>
         </LievreProvider>
       </LievreProvider>,
@@ -174,5 +187,8 @@ describe('画面を等幅にする', () => {
     expect(back!.getAttribute('data-family')).toBe('sans');
     expect(back!.getAttribute('data-theme')).toBe('ink');
     expect(face(host.querySelector('.back')!)).toBe('Lievre Sans');
+    const heading = getComputedStyle(host.querySelector('.back-heading')!);
+    expect(heading.fontFeatureSettings).toContain('palt');
+    expect(parseFloat(heading.letterSpacing)).toBeGreaterThan(0);
   });
 });
