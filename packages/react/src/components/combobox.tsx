@@ -56,6 +56,17 @@ export type ComboboxProps = {
 
 /** Whether a key belongs to the IME: Chrome sends the committing Enter with isComposing,
  * Safari sends it after compositionend with keyCode 229. */
+/** Scrolls the list just enough to show the highlighted option, without moving the page. */
+function reveal(layer: HTMLElement | null) {
+  const list = layer?.querySelector<HTMLElement>('.lv-combobox-list');
+  const option = list?.querySelector<HTMLElement>('[role="option"][aria-selected="true"]');
+  if (!list || !option) return;
+  const view = list.getBoundingClientRect();
+  const box = option.getBoundingClientRect();
+  if (box.top < view.top) list.scrollTop -= view.top - box.top;
+  else if (box.bottom > view.bottom) list.scrollTop += box.bottom - view.bottom;
+}
+
 const fromIme = (e: { isComposing?: boolean; keyCode?: number }) =>
   !!e.isComposing || e.keyCode === 229;
 
@@ -121,6 +132,8 @@ export function Combobox({
       {(control) => (
         <ComboboxControl
           {...{ control, items, selected, placeholder, disabled, name, controlSize, emptyText }}
+          // The form sends the value held, even one no option names yet.
+          value={current}
           anchor={anchor}
           composing={composing}
           onCompositionEnd={onCompositionEnd}
@@ -146,6 +159,7 @@ type ControlProps = {
   };
   items: ComboboxOption[];
   selected: ComboboxOption | null;
+  value: string | null;
   placeholder?: string;
   disabled?: boolean;
   name?: string;
@@ -161,6 +175,7 @@ function ComboboxControl({
   control,
   items,
   selected,
+  value,
   placeholder,
   disabled,
   name,
@@ -276,9 +291,7 @@ function ComboboxControl({
           <ChevronDown size={16} aria-hidden />
         </button>
       </div>
-      {name && (
-        <input type="hidden" name={name} value={selected?.value ?? ''} disabled={disabled} />
-      )}
+      {name && <input type="hidden" name={name} value={value ?? ''} disabled={disabled} />}
       <VisuallyHidden role="status" aria-live="polite">
         {cb.isOpen ? (choosable ? `${choosable}件の候補があります` : emptyText) : ''}
       </VisuallyHidden>
@@ -302,8 +315,13 @@ function ComboboxControl({
               data-size={controlSize}
               sideOffset={5}
               align="start"
-              // The focus stays in the input: opening and closing don't move it.
-              onOpenAutoFocus={(e) => e.preventDefault()}
+              // The focus stays in the input: opening and closing don't move it. Radix fills the
+              // portal a commit after Downshift scrolled to the highlighted option, so scroll
+              // again once the list is there and placed.
+              onOpenAutoFocus={(e) => {
+                e.preventDefault();
+                requestAnimationFrame(() => reveal(content.current));
+              }}
               onCloseAutoFocus={(e) => e.preventDefault()}
               // The input, the button and the list are not "outside".
               onFocusOutside={(e) => inside(e.target) && e.preventDefault()}

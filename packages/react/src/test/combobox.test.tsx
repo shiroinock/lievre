@@ -239,6 +239,15 @@ describe('Combobox', () => {
     expect(container.querySelector('input[type="hidden"]')).toHaveAttribute('value', 'abc');
     expect(container.querySelector('input[type="hidden"]')).toHaveAttribute('name', 'partner');
   });
+  it('sends the value it holds even when no option names it yet', () => {
+    const { container } = render(
+      <form>
+        <Combobox label="取引先" options={options} name="partner" value="new" />
+      </form>,
+    );
+    expect(new FormData(container.querySelector('form')!).get('partner')).toBe('new');
+    expect(input()).toHaveValue('');
+  });
   it('does not filter or choose while converting', async () => {
     const onValueChange = vi.fn();
     render(<Combobox label="取引先" options={options} onValueChange={onValueChange} />);
