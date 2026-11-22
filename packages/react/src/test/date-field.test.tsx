@@ -117,6 +117,17 @@ describe('DateField', () => {
     );
     expect(onValueChange).toHaveBeenCalledWith(null);
   });
+  it('keeps a year before 1000 in four digits, so the value passes again', async () => {
+    const onValueChange = vi.fn();
+    render(<DateField label="記録の日" defaultValue="0999-01-01" onValueChange={onValueChange} />);
+    expect(box('年')).toHaveValue('0999');
+    expect(onValueChange).not.toHaveBeenCalled();
+    box('日').focus();
+    await userEvent.tab();
+    await settle();
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(box('年')).not.toHaveAttribute('aria-invalid', 'true');
+  });
   it('straightens full-width digits when leaving a field', async () => {
     render(<DateField label="生年月日" />);
     await userEvent.type(box('年'), '１９９０');

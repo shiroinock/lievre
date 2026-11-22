@@ -15,7 +15,12 @@ function partsOf(value: string | null | undefined): Parts {
   if (!value) return EMPTY;
   try {
     const date = parseDate(value);
-    return { year: String(date.year), month: String(date.month), day: String(date.day) };
+    // The year keeps four digits (0999), as checkDate asks for them.
+    return {
+      year: String(date.year).padStart(4, '0'),
+      month: String(date.month),
+      day: String(date.day),
+    };
   } catch {
     return EMPTY;
   }
