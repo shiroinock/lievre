@@ -1059,6 +1059,13 @@
   .lievre[data-density='compact'] .lv-calendar {
     --day: 32px;
   }
+  /* On a touch screen the days reach 44px, as the other controls do, in every density. */
+  @media (pointer: coarse) {
+    .lievre .lv-calendar,
+    .lievre[data-density='compact'] .lv-calendar {
+      --day: 44px;
+    }
+  }
   .lv-calendar-header {
     display: flex;
     align-items: center;
