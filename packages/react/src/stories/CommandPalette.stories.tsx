@@ -45,6 +45,8 @@ const commands: CommandItem[] = [
   },
   { value: 'theme', label: 'Ink のテーマにする', kana: 'いんくのてーまにする', group: '表示' },
   { value: 'density', label: '詰めた表示にする', kana: 'つめたひょうじにする', group: '表示' },
+  // No group: it sits after the last group, below a rule, not under its heading.
+  { value: 'help', label: 'ヘルプを開く', kana: 'へるぷをひらく' },
 ];
 
 const meta = {

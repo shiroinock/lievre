@@ -984,7 +984,8 @@
     list-style: none;
   }
   .lv-command-palette-group + .lv-command-palette-group,
-  .lv-command-palette-item + .lv-command-palette-group {
+  .lv-command-palette-item + .lv-command-palette-group,
+  .lv-command-palette-group + .lv-command-palette-item {
     margin-top: 4px;
     padding-top: 4px;
     border-top: 1px solid var(--lv-border);

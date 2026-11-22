@@ -47,7 +47,9 @@ export type CommandHotkey = {
   key: string;
   /** Mac では ⌘、ほかでは Ctrl を押しながら。1文字のキーを document 全体で受けないように、mod か alt のどちらかは付けます。 */
   mod?: boolean;
+  /** ⇧（Shift）を押しながら。修飾キーはちょうど一致したときだけ反応するので、⌘⇧K は ⌘K の開くキーには反応しません。 */
   shift?: boolean;
+  /** ⌥（Mac）/ Alt を押しながら。mod の代わりにもなります（⌥K など）。Mac では ⌥ で別の字が入るので、そのときだけ物理キーの位置で見ます。 */
   alt?: boolean;
 };
 
@@ -114,14 +116,15 @@ function matchesHotkey(e: globalThis.KeyboardEvent, hotkey: CommandHotkey, mac: 
     return false;
   if (!!hotkey.shift !== e.shiftKey || !!hotkey.alt !== e.altKey) return false;
   const want = hotkey.key.toLowerCase();
-  // With ⌥ a Mac types another character (⌥K is "˚"), so fall back to the physical key.
-  return (
-    e.key.toLowerCase() === want || (want.length === 1 && e.code === `Key${want.toUpperCase()}`)
-  );
+  if (e.key.toLowerCase() === want) return true;
+  // With ⌥ a Mac types another character (⌥K is "˚"), so fall back to the physical key — but only
+  // then, or when the layout gives no Latin letter: on Dvorak, Ctrl+T sits where QWERTY has K.
+  const latin = /^[a-z]$/i.test(e.key);
+  return want.length === 1 && (hotkey.alt || !latin) && e.code === `Key${want.toUpperCase()}`;
 }
 
 /**
- * 項目を探して実行する。group ごとの順を保ち、全角と半角・カタカナとひらがな・大文字と小文字の違いを無視して、
+ * 項目を絞り込みます（実行はしません）。group ごとの順を保ち、全角と半角・カタカナとひらがな・大文字と小文字の違いを無視して、
  * 名前・読み・探し言葉・補足で絞り込みます。
  */
 export function filterCommands(items: CommandItem[], query: string) {
@@ -166,6 +169,8 @@ export function CommandPalette({
   const openRef = useRef(isOpen);
   openRef.current = isOpen;
   const setOpen = (next: boolean) => {
+    // Any other close (Esc, outside, the hotkey) is not the choice's.
+    if (!next && openRef.current) pending.current = null;
     if (open === undefined) setInner(next);
     onOpenChange?.(next);
   };
@@ -176,7 +181,11 @@ export function CommandPalette({
   const pending = useRef<CommandItem | null>(null);
   // Before Radix moves the focus into the palette (its effects run after this layout effect).
   useLayoutEffect(() => {
-    if (isOpen) opener.current = document.activeElement as HTMLElement | null;
+    if (!isOpen) return;
+    opener.current = document.activeElement as HTMLElement | null;
+    // A choice the parent never acted on (it kept the palette open) must not run on a later,
+    // unrelated close.
+    pending.current = null;
   }, [isOpen]);
   const [mac, setMac] = useState(false);
   useEffect(() => setMac(isMac()), []);
@@ -250,8 +259,14 @@ export function CommandPalette({
               placeholder={placeholder}
               emptyText={emptyText}
               onChoose={(item) => {
-                pending.current = item;
                 setOpen(false);
+                pending.current = item;
+                // A parent that holds open and does not close for this choice (it keeps the
+                // palette up to confirm, say) drops it: a later Esc or outside close must not
+                // run it.
+                setTimeout(() => {
+                  if (openRef.current && pending.current === item) pending.current = null;
+                });
               }}
             />
           </DialogPrimitive.Content>
@@ -289,6 +304,10 @@ function PaletteBody({ items, label, placeholder, emptyText, onChoose }: BodyPro
       // The list never closes, so pressing the field toggles nothing; and leaving it (closing
       // the palette, the window losing focus) neither runs a command nor writes one's name in.
       if (type === InputBlur || type === InputClick) return state;
+      // Typing keeps the highlight where it is; the effect below moves it once the committed text
+      // narrows the list. (Downshift would drop it on every input, conversions included.)
+      if (type === useCombobox.stateChangeTypes.InputChange)
+        return { ...changes, highlightedIndex: state.highlightedIndex };
       // Choosing keeps the typed text instead of writing the command's name into the field.
       if (changes.selectedItem) return { ...changes, inputValue: state.inputValue };
       return changes;
@@ -299,9 +318,16 @@ function PaletteBody({ items, label, placeholder, emptyText, onChoose }: BodyPro
     },
   });
   // Narrowing the list puts the first command it still has under the cursor, so Enter runs the
-  // best match.
+  // best match. Keyed on the text and the commands shown, not the array: a parent that passes a
+  // new array on every render must not move the highlight.
   const { setHighlightedIndex } = cb;
-  useEffect(() => setHighlightedIndex(firstEnabled(shown)), [shown, setHighlightedIndex]);
+  const signature = shown.map((i) => `${i.value}${i.disabled ? '!' : ''}`).join('\n');
+  const shownRef = useRef(shown);
+  shownRef.current = shown;
+  useEffect(
+    () => setHighlightedIndex(firstEnabled(shownRef.current)),
+    [query, signature, setHighlightedIndex],
+  );
 
   const onCompositionEnd = (e: CompositionEvent<HTMLInputElement>) => {
     composing.current = false;
@@ -393,7 +419,11 @@ function PaletteBody({ items, label, placeholder, emptyText, onChoose }: BodyPro
         )}
       </ul>
       <VisuallyHidden role="status" aria-live="polite">
-        {choosable ? `${choosable}件のコマンドがあります` : emptyText}
+        {shown.length === 0
+          ? emptyText
+          : choosable
+            ? `${choosable}件のコマンドがあります`
+            : `選べるコマンドはありません（${shown.length}件は選べません）`}
       </VisuallyHidden>
       <div className="lv-command-palette-footer" aria-hidden>
         <span>
