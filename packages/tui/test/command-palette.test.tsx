@@ -376,15 +376,21 @@ describe('in a terminal (render)', () => {
   it('goes back to the first command when the items change while open', async () => {
     const runs: string[] = [];
     const t = start(() => {}, {}, <App onRun={(v) => runs.push(v)} initial={opened} />);
-    await wait(40);
-    t.stdin.press('\u001b[B');
-    t.stdin.press('\u001b[B');
+    // The highlight drawn last: the name after the bar.
+    const bar = () => [...t.all().matchAll(/▌(\S+)/g)].at(-1)?.[1];
+    /▌(\S+)/.exec(t.stdout.chunks.at(-1) ? plain(t.stdout.chunks.at(-1)!) : '')?.[1];
     await wait(60);
+    expect(bar()).toBe('ホームへ移動');
+    t.stdin.press('\u001b[B');
+    await wait(80);
+    expect(bar()).toBe('設定を開く');
+    // Same commands in another order: the highlight goes back to the first one, not where it was.
     const reordered = [items[4], ...items.slice(0, 4)];
     t.rerender(<App onRun={(v) => runs.push(v)} initial={opened} list={reordered} />);
-    await wait(60);
+    await wait(80);
+    expect(bar()).toBe('ＣＳＶで書き出す');
     t.stdin.press('\r');
-    await wait(60);
+    await wait(80);
     expect(runs).toEqual(['export']);
   });
 
