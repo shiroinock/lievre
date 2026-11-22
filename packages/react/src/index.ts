@@ -13,5 +13,6 @@ export * from './components/disclosure';
 export * from './components/format';
 export * from './components/normalize';
 export * from './components/combobox';
+export * from './components/date';
 export * from './components/stepper';
 export * from './components/command-palette';
