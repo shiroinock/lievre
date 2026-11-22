@@ -18,6 +18,7 @@ export type SearchFieldProps = {
   onValueChange?: (value: string) => void;
   /** Enter で呼びます（前後の空白を除いた文字）。変換を確定する Enter では呼びません。 */
   onSearch?: (value: string) => void;
+  /** 欄の中に薄く出す例（「名前か読み」）。ラベルの代わりにはしません。 */
   placeholder?: string;
   /** 補助文。入力の下に出し、aria-describedby で結びます。 */
   hint?: string;
@@ -30,7 +31,7 @@ export type SearchFieldProps = {
   id?: string;
   /** 高さは TextField と同じ段です。表の上の絞り込みには 'sm'。 */
   controlSize?: 'sm' | 'md' | 'lg';
-  /** 文字を消すボタンの名前。既定は「文字を消す」。 */
+  /** 文字を消すボタンの名前。 */
   clearLabel?: string;
 };
 
@@ -207,6 +208,7 @@ export type NumberFieldProps = {
   hint?: string;
   /** エラー文。渡すと、部品が確かめた文の代わりに出します。 */
   error?: string;
+  /** ラベルの横に「必須」の文字を出し、入力に required を付けます。空のときに文を出すのは呼び出す側です（error で伝えます）。 */
   required?: boolean;
   disabled?: boolean;
   /** フォームで送るときの名前。確かめて通った数を、桁区切りのない形（1234.5）で送ります。 */
@@ -217,6 +219,7 @@ export type NumberFieldProps = {
   chars?: number;
   /** 高さは TextField と同じ段です。 */
   controlSize?: 'sm' | 'md' | 'lg';
+  /** 欄の中に薄く出す例。ラベルや単位の代わりにはしません。 */
   placeholder?: string;
 };
 
@@ -279,8 +282,10 @@ export function NumberField({
     // From the number typed, even one that does not pass (150 over a max of 100 steps down to
     // 100); from min, or 0, only when nothing readable is there.
     const base = 'value' in check ? check.value : (min ?? 0);
-    // Round to the step's own decimals: 0.1 + 0.2 is 0.30000000000000004.
-    const places = Math.max(String(step).split('.')[1]?.length ?? 0, fractionDigits ?? 0);
+    // Round to the decimals of the step and of the number (0.1 + 0.2 is 0.30000000000000004),
+    // never fewer than either: 12.5 steps by 1 to 13.5.
+    const decimals = (n: number) => String(n).split('.')[1]?.length ?? 0;
+    const places = Math.max(decimals(step), decimals(base), fractionDigits ?? 0);
     let next = Number((base + (up ? step : -step)).toFixed(places));
     if (min !== undefined) next = Math.max(min, next);
     if (max !== undefined) next = Math.min(max, next);

@@ -891,14 +891,14 @@ props は DateField と同じで、min・max はカレンダーでも選べな�
 - `defaultValue?: string` — 既定 ''。外で持たないときの、はじめの文字。
 - `onValueChange?: ((value: string) => void)` — 文字が変わったときに呼びます。日本語の変換中は呼ばず、確定したときに呼びます（打ちながら絞り込むときに、変換前のかなで絞らないため）。
 - `onSearch?: ((value: string) => void)` — Enter で呼びます（前後の空白を除いた文字）。変換を確定する Enter では呼びません。
-- `placeholder?: string`
+- `placeholder?: string` — 欄の中に薄く出す例（「名前か読み」）。ラベルの代わりにはしません。
 - `hint?: string` — 補助文。入力の下に出し、aria-describedby で結びます。
 - `error?: string` — エラー文。補助文の下に記号を添えて出します。
 - `disabled?: boolean`
 - `name?: string` — フォームで送るときの名前。
 - `id?: string` — input の id。省くと部品が作ります。
 - `controlSize?: 'sm' | 'md' | 'lg'` — 既定 'md'。高さは TextField と同じ段です。表の上の絞り込みには 'sm'。
-- `clearLabel?: string` — 既定 '文字を消す'。文字を消すボタンの名前。既定は「文字を消す」。
+- `clearLabel?: string` — 既定 '文字を消す'。文字を消すボタンの名前。
 
 ### NumberField
 
@@ -917,13 +917,13 @@ type="number" は使いません（ホイールで値が変わる・全角を受
 - `unit?: string` — 数の後ろに出す単位（「円」「個」）。値には含めず、読み上げでは入力と結びます。
 - `hint?: string` — 補助文（「1から99まで」）。
 - `error?: string` — エラー文。渡すと、部品が確かめた文の代わりに出します。
-- `required?: boolean`
+- `required?: boolean` — ラベルの横に「必須」の文字を出し、入力に required を付けます。空のときに文を出すのは呼び出す側です（error で伝えます）。
 - `disabled?: boolean`
 - `name?: string` — フォームで送るときの名前。確かめて通った数を、桁区切りのない形（1234.5）で送ります。
 - `id?: string` — input の id。
 - `chars?: number` — 入る文字の数（半角で数えます）。入力欄の幅をこの文字数に合わせます。
 - `controlSize?: 'sm' | 'md' | 'lg'` — 高さは TextField と同じ段です。
-- `placeholder?: string`
+- `placeholder?: string` — 欄の中に薄く出す例。ラベルや単位の代わりにはしません。
 
 ## フック
 

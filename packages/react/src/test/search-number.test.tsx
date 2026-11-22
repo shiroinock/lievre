@@ -135,6 +135,12 @@ describe('NumberField', () => {
     rerender(<NumberField label="数量" min={-10} />);
     expect(box()).not.toHaveAttribute('inputmode');
   });
+  it('keeps the decimals typed when stepping by a whole number', async () => {
+    render(<NumberField label="数量" step={1} />);
+    await userEvent.type(box(), '12.5');
+    await userEvent.keyboard('{ArrowUp}');
+    expect(box()).toHaveValue('13.5');
+  });
   it('steps by decimals without float noise', async () => {
     render(<NumberField label="数量" step={0.1} defaultValue={0.2} />);
     await userEvent.click(box());
