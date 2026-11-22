@@ -5,7 +5,7 @@ const widths = { narrow: 4, wide: 8 };
 
 describe('Try fix CI', () => {
   it('doubles the narrow width', () => {
-    const double: number = widths.narow * 2;
+    const double: number = widths.narrow * 2;
     expect(double).toBe(widths.wide);
   });
 });
