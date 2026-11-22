@@ -118,11 +118,32 @@ describe('formatDate', () => {
       );
     // Counted as that time in the given zone.
     const now = new Date('2026-11-22T00:08:00Z');
-    expect(formatRelativeTime('2026-11-22T09:05', { now, timeZone: 'Asia/Tokyo' })).toBe(
-      '3 分前',
-    );
+    expect(formatRelativeTime('2026-11-22T09:05', { now, timeZone: 'Asia/Tokyo' })).toBe('3 分前');
     expect(formatRelativeTime('2026-11-21T19:05', { now, timeZone: 'America/New_York' })).toBe(
       '3 分前',
+    );
+  });
+  it('counts a time without a zone right just after a daylight-saving change', () => {
+    // New York leaves daylight saving at 06:00 UTC on 2026-11-01; 03:00 there is 08:00 UTC.
+    const timeZone = 'America/New_York';
+    expect(
+      formatRelativeTime('2026-11-01T03:00', { now: new Date('2026-11-01T08:03:00Z'), timeZone }),
+    ).toBe('3 分前');
+    // And enters it at 07:00 UTC on 2026-03-08; 04:00 there is 08:00 UTC.
+    expect(
+      formatRelativeTime('2026-03-08T04:00', { now: new Date('2026-03-08T08:03:00Z'), timeZone }),
+    ).toBe('3 分前');
+  });
+  it('reads microseconds and a zone without a colon', () => {
+    const style = 'datetime';
+    expect(formatDate('2026-11-22T09:05:00.123456+09:00', { style, timeZone: 'Asia/Tokyo' })).toBe(
+      '2026/11/22 9:05',
+    );
+    expect(formatDate('2026-11-22T09:05:00+0900', { style, timeZone: 'Asia/Tokyo' })).toBe(
+      '2026/11/22 9:05',
+    );
+    expect(formatDate('2026-11-22T00:05:00.5Z', { style, timeZone: 'UTC' })).toBe(
+      '2026/11/22 0:05',
     );
   });
   it('counts weeks, months and years without calendar words that could be wrong', () => {
