@@ -17,6 +17,8 @@ import { readBound } from './date-bound';
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
 const WEEKDAY_NAMES = WEEKDAYS.map((d) => `${d}曜日`);
 
+const RANGE_WORDS = { start: '、期間の始め', end: '、期間の終わり', middle: '、期間の中' };
+
 const clamp = (date: CalendarDate, min?: CalendarDate, max?: CalendarDate) =>
   min && date.compare(min) < 0 ? min : max && date.compare(max) > 0 ? max : date;
 
@@ -43,6 +45,8 @@ export type CalendarProps = {
   max?: string;
   /** 今日として印を付ける日（'2026-11-22' の形）。省くと端末の今日です。 */
   today?: string;
+  /** 期間として示す日（開始日と終了日。'2026-11-22' の形）。間の日に面を敷き、読み上げでも「期間の中」と伝えます。片方だけなら、その日だけに印を付けます。 */
+  range?: { start?: string | null; end?: string | null };
   /** 表の名前。省くと表示している年月（「2026年11月」）です。 */
   label?: string;
   /** 描いたときに、選んだ日（なければ今日）へフォーカスを移します。ポップオーバーの中で開いたときに使います。 */
@@ -62,6 +66,7 @@ export function Calendar({
   min,
   max,
   today,
+  range,
   label,
   autoFocus = false,
   className,
@@ -72,6 +77,15 @@ export function Calendar({
   const low = readBound(min);
   const high = readBound(max);
   const now = readBound(today) ?? todayIn(getLocalTimeZone());
+  const from = readBound(range?.start);
+  const to = readBound(range?.end);
+  /** Where a day sits in the range: its ends, between them, or not in it. */
+  const place = (day: CalendarDate) => {
+    if (from && day.compare(from) === 0) return 'start';
+    if (to && day.compare(to) === 0) return 'end';
+    if (from && to && day.compare(from) > 0 && day.compare(to) < 0) return 'middle';
+    return undefined;
+  };
   const [focused, setFocused] = useState(() => clamp(selected ?? now, low, high));
   // A new value from outside shows its month.
   const [seen, setSeen] = useState(current);
@@ -177,13 +191,14 @@ export function Calendar({
                 const iso = day.toString();
                 const isSelected = !!selected && day.compare(selected) === 0;
                 const disabled = outside(day);
+                const inRange = place(day);
                 return (
-                  <td key={col} role="gridcell" aria-selected={isSelected}>
+                  <td key={col} role="gridcell" aria-selected={isSelected} data-range={inRange}>
                     <button
                       type="button"
                       className="lv-calendar-day"
                       tabIndex={day.compare(focused) === 0 ? 0 : -1}
-                      aria-label={`${formatDate(iso, { weekday: true })}${isSelected ? '、選択中' : ''}${disabled ? '、選べません' : ''}`}
+                      aria-label={`${formatDate(iso, { weekday: true })}${isSelected ? '、選択中' : ''}${inRange ? RANGE_WORDS[inRange] : ''}${disabled ? '、選べません' : ''}`}
                       aria-current={day.compare(now) === 0 ? 'date' : undefined}
                       aria-disabled={disabled || undefined}
                       onClick={() => choose(day)}

@@ -1134,6 +1134,30 @@
   .lv-calendar-day[aria-disabled='true']:hover {
     background: transparent;
   }
+  /* A range: a soft band under the days between the ends, the ends ringed. The words in the
+     day's name say the same, so the band is not the only sign. */
+  .lv-calendar-grid td[data-range] {
+    background: var(--lv-accent-soft);
+  }
+  .lv-calendar-grid td[data-range='start'] {
+    border-start-start-radius: var(--lv-radius-md);
+    border-end-start-radius: var(--lv-radius-md);
+  }
+  .lv-calendar-grid td[data-range='end'] {
+    border-start-end-radius: var(--lv-radius-md);
+    border-end-end-radius: var(--lv-radius-md);
+  }
+  .lv-calendar-grid td:is([data-range='start'], [data-range='end']) .lv-calendar-day {
+    box-shadow: inset 0 0 0 2px var(--lv-accent);
+  }
+
+  /* DateRangePicker: the start and the end side by side, wrapping when narrow. */
+  .lv-date-range-parts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--lv-space-6);
+  }
+
   @media (forced-colors: active) {
     .lv-calendar-grid td[aria-selected='true'] .lv-calendar-day {
       forced-color-adjust: none;
@@ -1142,6 +1166,21 @@
     }
     .lv-calendar-day[aria-disabled='true'] {
       color: GrayText;
+    }
+    /* Forced colors drop the band and the ring (box-shadow): an outline stays. The ends are
+       ringed solid, the days between dashed. */
+    .lv-calendar-grid td:is([data-range='start'], [data-range='end']) .lv-calendar-day {
+      outline: 2px solid CanvasText;
+      outline-offset: -2px;
+    }
+    .lv-calendar-grid td[data-range='middle'] .lv-calendar-day {
+      outline: 1px dashed CanvasText;
+      outline-offset: -4px;
+    }
+    /* The focus ring wins over the range's outline, as it does everywhere else. */
+    .lv-calendar-grid td[data-range] .lv-calendar-day:focus-visible {
+      outline: 2px solid var(--lv-focus);
+      outline-offset: 2px;
     }
   }
 
