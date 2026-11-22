@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import axe from 'axe-core';
 import {
   CommandPalette,
@@ -261,33 +261,56 @@ describe('CommandPalette', () => {
     await userEvent.keyboard('{Enter}');
     expect(onSelect).toHaveBeenCalledWith('settings');
   });
-  it('does not run a choice the parent kept open on a later close', async () => {
+  // A parent that holds open: the choice asks it to close, and the parent closes later, from
+  // its own button (after confirming, say) — or the person gives up with Esc first.
+  function Holder({ run }: { run: () => void }) {
+    const [open, setOpen] = useState(true);
+    const asked = useRef(0);
+    return (
+      <>
+        <CommandPalette
+          items={items.map((i) => (i.value === 'home' ? { ...i, onSelect: run } : i))}
+          open={open}
+          onOpenChange={(next) => {
+            asked.current += 1;
+            // The first close (the choice) waits for the parent's button; later ones close now.
+            if (asked.current > 1) setOpen(next);
+          }}
+          trigger={null}
+        />
+        <button onClick={() => setOpen(false)}>確かめて閉じる</button>
+      </>
+    );
+  }
+  it('runs a choice when a parent that holds open closes it later', async () => {
     const run = vi.fn();
-    function Keeper() {
-      const [open, setOpen] = useState(true);
-      return (
-        <>
-          <CommandPalette
-            items={items.map((i) => (i.value === 'home' ? { ...i, onSelect: run } : i))}
-            open={open}
-            // The parent ignores the close that a choice asks for.
-            onOpenChange={() => {}}
-            trigger={null}
-          />
-          <button onClick={() => setOpen(false)}>外から閉じる</button>
-        </>
-      );
-    }
-    render(<Keeper />);
-    expect(input()).toHaveFocus();
-    expect(highlighted()).toContain('ホームへ移動');
+    render(<Holder run={run} />);
     await userEvent.keyboard('{Enter}');
     expect(screen.getByRole('dialog')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: '外から閉じる', hidden: true }));
-    // Radix hands the focus back (and the palette runs its command) after a tick.
+    // Long after the choice (several tasks later), the parent closes.
+    await act(() => new Promise((r) => setTimeout(r, 50)));
+    fireEvent.click(screen.getByRole('button', { name: '確かめて閉じる', hidden: true }));
+    await act(() => new Promise((r) => setTimeout(r, 20)));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(run).toHaveBeenCalledTimes(1);
+  });
+  it('does not run a choice the parent kept open when Esc closes it', async () => {
+    const run = vi.fn();
+    render(<Holder run={run} />);
+    await userEvent.keyboard('{Enter}');
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+    // Radix hands the focus back (and the palette would run its command) after a tick.
     await act(() => new Promise((r) => setTimeout(r, 20)));
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(run).not.toHaveBeenCalled();
+  });
+  it('does not open on a key the page already handled', () => {
+    setup();
+    const editor = screen.getByRole('button', { name: '前の場所' });
+    editor.addEventListener('keydown', (e) => e.preventDefault());
+    fireEvent.keyDown(editor, { key: 'k', code: 'KeyK', ctrlKey: true });
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
   it('reads the count of commands that cannot be chosen', async () => {
     setup({ defaultOpen: true });

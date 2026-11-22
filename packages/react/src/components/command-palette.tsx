@@ -198,7 +198,8 @@ export function CommandPalette({
     if (!listening) return;
     const onKeyDown = (e: globalThis.KeyboardEvent) => {
       const keys = hotkeyRef.current;
-      if (!keys || e.repeat || !matchesHotkey(e, keys, isMac())) return;
+      // A key the page already handled (an editor's own Ctrl+K, say) is not the palette's.
+      if (!keys || e.defaultPrevented || e.repeat || !matchesHotkey(e, keys, isMac())) return;
       // The browser's own ⌘K / Ctrl+K (the address bar's search) gives way to the palette.
       e.preventDefault();
       setOpenRef.current(!openRef.current);
@@ -265,13 +266,10 @@ export function CommandPalette({
               emptyText={emptyText}
               onChoose={(item) => {
                 setOpen(false);
+                // It runs when the palette closes, however late a parent that holds open closes
+                // it. Any other close (Esc, outside, the hotkey) goes through setOpen and drops it,
+                // and so does opening again.
                 pending.current = item;
-                // A parent that holds open and does not close for this choice (it keeps the
-                // palette up to confirm, say) drops it: a later Esc or outside close must not
-                // run it.
-                setTimeout(() => {
-                  if (openRef.current && pending.current === item) pending.current = null;
-                });
               }}
             />
           </DialogPrimitive.Content>
