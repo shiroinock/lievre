@@ -770,6 +770,28 @@ selected・onSelectedChange で押して入り切りする絞り込みの札に�
 - `mono?: boolean` — 既定 false。等幅の書体にする（表の日付の列で桁をそろえるとき）。false では本文の書体のまま、数字の幅だけをそろえます。
 - `className?: string`
 
+### Combobox
+
+候補を打って絞り込み、1つを選ぶ入力（取引先・担当者・品目など、Select では探しにくい数のとき）。
+絞り込みは全角と半角・カタカナとひらがな・大文字と小文字の違いを無視し、読み（kana）でも探せます。
+日本語の変換中は絞り込みも確定もしません。矢印キーで候補を移り、Enter で選び、Esc で一覧を閉じます（もう一度で文字を消します）。
+選べる候補の数を読み上げます。離れたときに文字が選んだ候補と合わなければ、選んだ候補の名前に戻します。props の名前は Select と同じで、未選択は null です。
+
+- `label: string`
+- `options: ComboboxOption[]`
+- `value?: string | null` — 選んでいる値。未選択は null。渡すと外で持ちます。
+- `defaultValue?: string | null` — 既定 null。外で持たないときの、はじめの値。
+- `onValueChange?: ((value: string | null) => void)` — 選んだ値が変わったときに呼びます。文字を消して空にすると null で呼びます。
+- `placeholder?: string` — 何も入れていないときの文字。
+- `hint?: string` — 補助文。入力欄の下に出し、aria-describedby で結びます。
+- `error?: string` — エラー文。記号を添えて出し、aria-invalid と aria-describedby を付けます。
+- `required?: boolean` — ラベルの横に「必須」の文字を出し、aria-required を付けます。
+- `disabled?: boolean`
+- `name?: string` — フォームで送るときの名前。選んだ値を隠した入力で送ります。
+- `id?: string` — 入力欄の id。省くと部品が作ります。
+- `controlSize?: 'sm' | 'md' | 'lg'` — 既定 'md'。高さは Select・TextField と同じ段です。
+- `emptyText?: string` — 既定 '一致する候補がありません'。一致する候補がないときの文。
+
 ### DateField
 
 年・月・日を3つの欄に直接入れる日付の入力（生年月日・届け出の日など、カレンダーでは選びにくい日）。
@@ -959,6 +981,11 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `symbols?: boolean` — 全角の記号（！〜～のうち数字と英字のほか。＠・＃・（）など）を半角に。既定は true。
   - `space?: boolean` — 全角の空白（U+3000）を半角の空白に。既定は true。
   - `dashes?: boolean` — 横棒の仲間（‐ ‑ ‒ – — ― − ー ｰ －）をハイフンに。電話番号・郵便番号のように、数字の間の横棒だけを扱う欄で使います。言葉の長音（ー）も変わるので、既定は false。
+- `type ComboboxOption`
+  - `value: string`
+  - `label: string`
+  - `kana?: string` — 読み（ひらがな）。漢字の名前を、読みでも探せるようにします（「とうきょう」で「東京商事」）。
+  - `disabled?: boolean`
 - `type DateCheck = | { kind: 'empty' } | { kind: 'partial' } | { kind: 'not-number' } | { kind: 'no-such-day'; year: number; month: number; day: number } | { kind: 'before-min'; min: string } | { kind: 'after-max'; max: string } | { kind: 'ok'; value: string };`
 - `type StepperStep`
   - `label: string` — 段の名前（「入力」「確認」「完了」）。
@@ -984,5 +1011,6 @@ keys にないキーの決定は数えません。
 - `toFullWidthKana`: `(text: string) => string` — 半角のカタカナ（ｶﾞﾝﾀﾞﾑ）を全角（ガンダム）に直します。濁点・半濁点は前の字と合わせます。ほかの字は変えません。
 - `toSearchKey`: `(text: string) => string` — 探すときに比べる形に直します。全角と半角（NFKC）、カタカナとひらがな、大文字と小文字、空白の違いを無視します。
 候補の絞り込みなどで、候補と入力の両方をこの形にしてから比べます。表示には使いません。
+- `filterOptions`: `(options: ComboboxOption[], query: string) => ComboboxOption[]` — 打った文字で候補を絞ります（Combobox の中と同じ絞り込み）。全角と半角・カタカナとひらがな・大文字と小文字・空白の違いを無視し、名前（label）か読み（kana）に含むものを返します。空の文字なら全件を返します。
 - `checkDate`: `(parts: { year: string; month: string; day: string; }, range?: { min?: string | undefined; max?: string | undefined; }) => DateCheck` — 年・月・日の文字を確かめ、ISO 8601 の日付（'2026-11-22'）にします。全角の数字も受けます。存在しない日（2月30日）や、min・max の外は、その理由を返します。
 - `dateCheckMessage`: `(check: DateCheck) => string | undefined` — 確かめた結果を、直し方のわかる文にします。DateField が出す文と同じです。

@@ -107,7 +107,7 @@ lievre の層で、次の守りを入れました（`useImeGuard`）。3つの�
 - React Aria と Ariakit は `isComposing` を見ますが、`keyCode` 229 は見ません。React Aria は Safari の順で、確定の Enter を「候補を選ばずに確定」と受け取り、入力した文字を消しました。
 - Downshift は変換中かどうかを何も見ません。守りで補います。
 
-Chromium の IME の経路（CDP の `Input.imeSetComposition`。イベントはブラウザ自身が出す）でも確かめました（[spikes/combobox/test/ime-cdp.md](../spikes/combobox/test/ime-cdp.md)）。ここで Downshift の注意点が1つ見つかりました。**`inputValue` を外から制御すると、変換中の値の書き戻しが1回遅れて変換の範囲が崩れ、入力欄が「ととうとうきょう東京」のように重なります。** `inputValue` を Downshift に持たせ、絞り込みの文字は `onInputValueChange` で受け取る形にすると直りました。lievre の部品ではこの形に決め、Chromium の IME の経路の検査で止めます。
+Chromium の IME の経路（CDP の `Input.imeSetComposition`。イベントはブラウザ自身が出す）でも確かめました（[spikes/combobox/test/ime-cdp.md](../spikes/combobox/test/ime-cdp.md)）。ここで Downshift の注意点が1つ見つかりました。**`inputValue` を外から制御すると、変換中の値の書き戻しが1回遅れて変換の範囲が崩れ、入力欄が「ととうとうきょう東京」のように重なります。** `inputValue` を Downshift に持たせ、絞り込みの文字は `onInputValueChange` で受け取る形にすると直りました。lievre の部品ではこの形に決め、Chromium の IME の経路の検査（`packages/react/src/test/layout/combobox-ime.layout.tsx`。`npm run test:layout` で流れます）で止めます。
 
 OS の日本語入力を使った手での確認は、この試作ではしていません（[9](#9-残っている確認)）。
 
