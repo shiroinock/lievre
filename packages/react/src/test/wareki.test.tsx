@@ -22,14 +22,20 @@ describe('DateField in the Japanese era', () => {
   it('adds the era under the fields once the date passes', async () => {
     render(<DateField label="生年月日" calendar="japanese" />);
     const reading = () => document.querySelector('.lv-date-field-reading');
-    expect(reading()).toBeEmptyDOMElement();
+    expect(reading()).toBeNull();
     await userEvent.type(screen.getByRole('textbox', { name: '年' }), '1989');
     await userEvent.type(screen.getByRole('textbox', { name: '月' }), '1');
     await userEvent.type(screen.getByRole('textbox', { name: '日' }), '8');
     expect(reading()).toHaveTextContent('和暦：平成元年1月8日');
-    expect(reading()).toHaveAttribute('aria-live', 'polite');
+    // Read with each field, not announced while typing.
+    expect(reading()).not.toHaveAttribute('aria-live');
+    for (const name of ['年', '月', '日'])
+      expect(screen.getByRole('textbox', { name })).toHaveAccessibleDescription(
+        /和暦：平成元年1月8日/,
+      );
     await userEvent.clear(screen.getByRole('textbox', { name: '日' }));
-    expect(reading()).toBeEmptyDOMElement();
+    expect(reading()).toBeNull();
+    expect(screen.getByRole('textbox', { name: '年' })).not.toHaveAccessibleDescription(/和暦/);
   });
   it('is the same Gregorian date in the fields and the value', () => {
     render(<DateField label="生年月日" calendar="japanese" defaultValue="2019-05-01" />);

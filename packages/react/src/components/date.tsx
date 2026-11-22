@@ -1,6 +1,6 @@
 // Dates typed in as year, month and day (the GOV.UK date input pattern). The calendar arithmetic
 // is @internationalized/date's; the fields are lievre's own TextFields in a Fieldset.
-import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 import { CalendarDate, parseDate } from '@internationalized/date';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { CalendarDays } from 'lucide-react';
@@ -196,6 +196,11 @@ function DateFieldBody({
       if (!group.current?.contains(active) && !keeps?.(active)) setChecked(true);
     }, 0);
   };
+  const readingId = useId();
+  const reading =
+    calendar === 'japanese' && check.kind === 'ok'
+      ? `和暦：${formatDate(check.value, { calendar: 'japanese' })}`
+      : undefined;
   const field = (key: keyof Parts, text: string, chars: number, fieldId?: string) => (
     <TextField
       id={fieldId}
@@ -210,6 +215,8 @@ function DateFieldBody({
       disabled={disabled}
       aria-required={required || undefined}
       aria-invalid={shown ? true : undefined}
+      // Each field reads the era of the date as its description, as it reads the hint.
+      aria-describedby={reading ? readingId : undefined}
     />
   );
   return (
@@ -221,10 +228,11 @@ function DateFieldBody({
           {field('day', '日', 2)}
           {trailing}
         </div>
-        {calendar === 'japanese' && (
-          // Shown once the date passes, and read out when it changes.
-          <p className="lv-date-field-reading" aria-live="polite">
-            {check.kind === 'ok' && `和暦：${formatDate(check.value, { calendar: 'japanese' })}`}
+        {reading && (
+          // Not a live region: announcing at each keystroke that makes a date would talk over
+          // the typing. Every field takes it as its description instead.
+          <p id={readingId} className="lv-date-field-reading">
+            {reading}
           </p>
         )}
       </Fieldset>

@@ -1043,16 +1043,12 @@
     gap: var(--lv-space-3);
   }
 
-  /* The Japanese era of the date typed in, under the fields. Empty until the date passes, it
-     keeps no room then, yet stays in the page so the live region is heard when it fills. */
+  /* The Japanese era of the date typed in, under the fields, once the date passes. */
   .lv-date-field-reading {
     margin: var(--lv-space-2) 0 0;
     color: var(--lv-muted);
     font-size: var(--lv-text-md);
     line-height: var(--lv-line-tight);
-  }
-  .lv-date-field-reading:empty {
-    margin: 0;
   }
 
   /* DatePicker: the calendar button sits after the day field, at the fields' height. */
