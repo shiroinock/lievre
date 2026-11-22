@@ -42,7 +42,8 @@ export const USAGE = {
   skeleton: '読み込み中の Skeleton の面。',
   overlay: 'ダイアログの後ろを覆う半透明の幕。',
   focus: 'フォーカスの輪郭。lv-accent と同じ色で、どの面の上でも 3:1 以上。必ず残す。',
-  'font-sans': '見出し・本文・ラベルの書体（IBM Plex Sans JP）。',
+  'font-sans':
+    '見出し・本文・ラベルの書体（Lievre Sans：IBM Plex Sans JP を行の中央に置き直したもの）。',
   'font-mono':
     '数値・時刻・ID・コードの書体。英数字は Lievre Mono で 0.5em 幅、日本語は Plex Sans JP の 1em 幅で、ちょうど 1:2。',
   'text-xs': '補助の文字（12px）。これより小さい文字は使わない。',

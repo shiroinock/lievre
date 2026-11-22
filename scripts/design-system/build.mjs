@@ -363,18 +363,25 @@ async function buildBundle() {
 
 function buildCss() {
   const css = readFileSync(`${REACT}/lib/lievre.css`, 'utf8');
-  // fonts.css, with the files beside the system: tried from the stylesheet (../fonts) and, when
-  // the page inlines it, from the preview (../../fonts).
-  const faces = readFileSync(`${REACT}/src/styles/fonts.css`, 'utf8')
-    .replace(/^@import[^\n]*\n/gm, '')
-    .replace(/\/\*[\s\S]*?\*\//g, '')
+  // Lievre Mono's faces from fonts.css, with the files beside the system: tried from the stylesheet
+  // (../fonts) and, when the page inlines it, from the preview (../../fonts). Not Lievre Sans: it
+  // points at 369 fontsource subsets, too many files for the artifact, so the system shows IBM
+  // Plex Sans JP from Google Fonts (uncorrected, the glyphs sit 0.07em high) until it ships the
+  // single-file faces of @lievre/fonts.
+  const faces = [
+    ...readFileSync(`${REACT}/src/styles/fonts.css`, 'utf8').matchAll(
+      /@font-face \{[^}]*font-family: 'Lievre Mono';[^}]*\}/g,
+    ),
+  ]
+    .map(([face]) => face)
+    .join('\n')
     .replace(
       /url\('@fontsource\/ibm-plex-mono\/files\/([^']+)'\) format\('woff2'\)/g,
       "url('../fonts/$1') format('woff2'), url('../../fonts/$1') format('woff2')",
     )
     .trim();
   const head = [
-    "/* @lievre/react styles.css, with the faces lievre expects: IBM Plex Sans JP from Google Fonts and Lievre Mono from the system's fonts. */",
+    "/* @lievre/react styles.css, with the faces lievre expects: IBM Plex Sans JP from Google Fonts (standing in for Lievre Sans) and Lievre Mono from the system's fonts. */",
     "@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@400;500;600&display=swap');",
     faces,
   ].join('\n');
