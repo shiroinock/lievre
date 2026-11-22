@@ -1832,12 +1832,8 @@
   }
 
   /* Skeleton */
-  /* In a line of text, centred on the line: middle puts it half an x-height above the baseline,
-     and fonts.css puts the line's middle 0.38em above it, so it moves up by the difference. */
   .lv-skeleton {
     display: inline-block;
-    position: relative;
-    top: calc(0.5ex - 0.38em);
     max-width: 100%;
     vertical-align: middle;
     border-radius: var(--lv-radius-sm);
@@ -2708,6 +2704,13 @@
   }
   .lv-table td > .lv-badge:has(> .lv-status-dot:first-child) {
     vertical-align: calc(0.38 * var(--lv-text-md) - 3px);
+  }
+  /* A placeholder in a cell sits in its line: middle puts it half an x-height above the
+     baseline, and fonts.css puts the line's middle 0.38em above it, so it moves up by the
+     difference. Only here: in flex and grid, vertical-align does nothing and top would shift it. */
+  .lv-table td > .lv-skeleton {
+    position: relative;
+    top: calc(0.5ex - 0.38em);
   }
   .lv-table tbody tr:last-child td {
     border-bottom: 0;
