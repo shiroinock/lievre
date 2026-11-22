@@ -145,14 +145,14 @@ function machineValue(value: Date | string, options: DateFormatOptions, exact: b
   if (!moment) return undefined;
   if (moment.written) return moment.written;
   // A relative time keeps the exact moment, whatever the style.
-  if (exact || (options.style ?? 'date') !== 'date') return value.toISOString();
+  if (exact || (options.style ?? 'date') !== 'date') return moment.date.toISOString();
   // en-CA writes YYYY-MM-DD.
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: options.timeZone,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
-  }).format(value);
+  }).format(moment.date);
 }
 
 const DAY = 24 * 3600 * 1000;
