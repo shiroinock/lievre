@@ -41,11 +41,20 @@ function utcDay(year: number, month: number, day: number, hour = 0, minute = 0, 
   return date;
 }
 /** An ISO 8601 date-time: other text is read differently by each engine (V8 reads '12' as
- * 2001-12-01), so it is not read as a date at all. The zone (Z or +09:00) may be left out. */
-const ISO_DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})?$/;
-const ZONED = /(Z|[+-]\d{2}:\d{2})$/;
-/** The moment a wall-clock time (held as if it were UTC) names in a time zone. */
-function inZone(wall: Date, timeZone: string | undefined) {
+ * 2001-12-01), so it is not read as a date at all. The zone (Z, +09:00 or +0900) may be left out,
+ * and the seconds may carry any number of decimals. */
+const ISO_DATE_TIME =
+  /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?)(?:\.(\d+))?(Z|[+-]\d{2}:?\d{2})?$/;
+/** The same date-time in the form every engine reads: milliseconds at most and +09:00 with a colon. */
+function plainIso(match: RegExpExecArray) {
+  const [, head, fraction, zone] = match;
+  const ms = fraction ? `.${fraction.slice(0, 3).padEnd(3, '0')}` : '';
+  const offset =
+    zone && zone !== 'Z' && !zone.includes(':') ? `${zone.slice(0, 3)}:${zone.slice(3)}` : zone;
+  return `${head}${ms}${offset ?? 'Z'}`;
+}
+/** How far a time zone's clock runs ahead of UTC at a moment, in milliseconds. */
+function offsetAt(moment: Date, timeZone: string | undefined) {
   const parts = Object.fromEntries(
     new Intl.DateTimeFormat('en-US', {
       timeZone,
@@ -57,13 +66,18 @@ function inZone(wall: Date, timeZone: string | undefined) {
       minute: 'numeric',
       second: 'numeric',
     })
-      .formatToParts(wall)
+      .formatToParts(moment)
       .map((part) => [part.type, Number(part.value)]),
   );
   const seen = utcDay(parts.year, parts.month, parts.day, parts.hour, parts.minute, parts.second);
-  // The zone's offset at that moment: how far its clock runs ahead of UTC.
-  const offset = seen.getTime() - Math.floor(wall.getTime() / 1000) * 1000;
-  return new Date(wall.getTime() - offset);
+  return seen.getTime() - Math.floor(moment.getTime() / 1000) * 1000;
+}
+/** The moment a wall-clock time (held as if it were UTC) names in a time zone. The offset is
+ * measured again at the moment found, since near a daylight-saving change the offset at the
+ * wall-clock reading taken as UTC can be the other one. */
+function inZone(wall: Date, timeZone: string | undefined) {
+  const guess = wall.getTime() - offsetAt(wall, timeZone);
+  return new Date(wall.getTime() - offsetAt(new Date(guess), timeZone));
 }
 const DATE_HEAD = /^(\d{4})-(\d{2})-(\d{2})/;
 /** Whether the year, month and day written at the head of the text exist on the calendar:
@@ -82,15 +96,15 @@ function writtenDayExists(text: string) {
  * written in UTC, so they read as written in every time zone, on the server as in the browser. */
 function read(value: Date | string) {
   const day = typeof value === 'string' ? DATE_ONLY.exec(value) : null;
-  const iso = typeof value === 'string' && ISO_DATE_TIME.test(value);
-  const floating = iso && !ZONED.test(value);
+  const iso = typeof value === 'string' ? ISO_DATE_TIME.exec(value) : null;
+  const floating = !!iso && !iso[3];
   const date =
     value instanceof Date
       ? value
       : day
         ? utcDay(Number(day[1]), Number(day[2]), Number(day[3]))
         : iso
-          ? new Date(floating ? `${value}Z` : value)
+          ? new Date(plainIso(iso))
           : new Date(NaN);
   if (Number.isNaN(date.getTime())) return null;
   // A day that does not exist is not a date, in a date-time as in a bare date.
