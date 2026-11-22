@@ -217,6 +217,16 @@ describe('FormatNumber and FormatDate', () => {
     render(<FormatDate value={new Date('2026-11-21T20:00:00Z')} timeZone="Asia/Tokyo" />);
     expect(screen.getByText('2026年11月22日')).toHaveAttribute('datetime', '2026-11-22');
   });
+  it('writes datetime in the form HTML takes', () => {
+    render(
+      <>
+        <FormatDate value="2026-11-22T09:05:00.123456+0900" style="time" timeZone="Asia/Tokyo" />
+        <FormatDate value="2026-11-22T10:05" style="time" />
+      </>,
+    );
+    expect(screen.getByText('9:05')).toHaveAttribute('datetime', '2026-11-22T09:05:00.123+09:00');
+    expect(screen.getByText('10:05')).toHaveAttribute('datetime', '2026-11-22T10:05');
+  });
   it('leaves out datetime for a value it cannot read', () => {
     render(<FormatDate value="未定" />);
     expect(screen.getByText('未定')).not.toHaveAttribute('datetime');
