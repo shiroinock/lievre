@@ -989,4 +989,4 @@ keys にないキーの決定は数えません。
 - `toFullWidthKana`: `(text: string) => string` — 半角のカタカナ（ｶﾞﾝﾀﾞﾑ）を全角（ガンダム）に直します。濁点・半濁点は前の字と合わせます。ほかの字は変えません。
 - `toSearchKey`: `(text: string) => string` — 探すときに比べる形に直します。全角と半角（NFKC）、カタカナとひらがな、大文字と小文字、空白の違いを無視します。
 候補の絞り込みなどで、候補と入力の両方をこの形にしてから比べます。表示には使いません。
-- `filterOptions`: `(options: ComboboxOption[], query: string) => ComboboxOption[]`
+- `filterOptions`: `(options: ComboboxOption[], query: string) => ComboboxOption[]` — 打った文字で候補を絞ります（Combobox の中と同じ絞り込み）。全角と半角・カタカナとひらがな・大文字と小文字・空白の違いを無視し、名前（label）か読み（kana）に含むものを返します。空の文字なら全件を返します。

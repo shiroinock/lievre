@@ -59,6 +59,7 @@ export type ComboboxProps = {
 const fromIme = (e: { isComposing?: boolean; keyCode?: number }) =>
   !!e.isComposing || e.keyCode === 229;
 
+/** 打った文字で候補を絞ります（Combobox の中と同じ絞り込み）。全角と半角・カタカナとひらがな・大文字と小文字・空白の違いを無視し、名前（label）か読み（kana）に含むものを返します。空の文字なら全件を返します。 */
 export function filterOptions(options: ComboboxOption[], query: string) {
   const q = toSearchKey(query);
   if (!q) return options;
@@ -123,10 +124,11 @@ export function Combobox({
           anchor={anchor}
           composing={composing}
           onCompositionEnd={onCompositionEnd}
-          onQuery={(text) => {
+          onQuery={(text, typed) => {
             if (!composing.current) setQuery(text);
-            // Emptying the field clears the choice.
-            if (text === '') choose(null);
+            // Emptying the field by typing clears the choice. Downshift also empties it when the
+            // value from outside names no option: that is not the user's doing, so nothing is sent.
+            if (typed && text === '') choose(null);
           }}
           onSelect={(option) => choose(option?.value ?? null)}
         />
@@ -152,7 +154,7 @@ type ControlProps = {
   anchor: RefObject<HTMLDivElement | null>;
   composing: RefObject<boolean>;
   onCompositionEnd: (e: CompositionEvent<HTMLInputElement>) => void;
-  onQuery: (text: string) => void;
+  onQuery: (text: string, typed: boolean) => void;
   onSelect: (option: ComboboxOption | null) => void;
 };
 function ComboboxControl({
@@ -190,7 +192,8 @@ function ComboboxControl({
     onSelectedItemChange: ({ selectedItem }) => onSelect(selectedItem ?? null),
     // Downshift keeps the text. Controlling it delays the write-back during conversion by one
     // render and breaks the IME's range (「ととうとうきょう東京」).
-    onInputValueChange: ({ inputValue }) => onQuery(inputValue ?? ''),
+    onInputValueChange: ({ inputValue, type }) =>
+      onQuery(inputValue ?? '', type === useCombobox.stateChangeTypes.InputChange),
     inputId: id,
     labelId: `${id}-label`,
     menuId: `${id}-list`,

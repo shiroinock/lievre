@@ -114,6 +114,38 @@ describe('Combobox', () => {
     await userEvent.click(screen.getByRole('button', { name: '変える' }));
     expect(input()).toHaveValue('ＡＢＣ物流');
   });
+  it('keeps a value from outside that no option names yet', async () => {
+    const onValueChange = vi.fn();
+    function Controlled() {
+      const [value, setValue] = useState<string | null>('osaka');
+      const [list, setList] = useState(options);
+      return (
+        <>
+          <Combobox
+            label="取引先"
+            options={list}
+            value={value}
+            onValueChange={(next) => {
+              onValueChange(next);
+              setValue(next);
+            }}
+          />
+          <button onClick={() => setValue('new')}>作る</button>
+          <button onClick={() => setList([...options, { value: 'new', label: '新しい取引先' }])}>
+            足す
+          </button>
+          <output data-testid="value">{value ?? 'なし'}</output>
+        </>
+      );
+    }
+    render(<Controlled />);
+    await userEvent.click(screen.getByRole('button', { name: '作る' }));
+    expect(input()).toHaveValue('');
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(screen.getByTestId('value')).toHaveTextContent('new');
+    await userEvent.click(screen.getByRole('button', { name: '足す' }));
+    expect(input()).toHaveValue('新しい取引先');
+  });
   it('keeps the typed text when a parent with inline options draws again', async () => {
     function Parent() {
       const [tick, setTick] = useState(0);
