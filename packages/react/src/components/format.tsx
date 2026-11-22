@@ -45,13 +45,14 @@ function utcDay(year: number, month: number, day: number, hour = 0, minute = 0, 
  * and the seconds may carry any number of decimals. */
 const ISO_DATE_TIME =
   /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?)(?:\.(\d+))?(Z|[+-]\d{2}:?\d{2})?$/;
-/** The same date-time in the form every engine reads: milliseconds at most and +09:00 with a colon. */
+/** The same date-time in the form every engine reads, and that HTML takes for <time datetime>:
+ * milliseconds at most and +09:00 with a colon. Without a zone it stays without one. */
 function plainIso(match: RegExpExecArray) {
   const [, head, fraction, zone] = match;
   const ms = fraction ? `.${fraction.slice(0, 3).padEnd(3, '0')}` : '';
   const offset =
     zone && zone !== 'Z' && !zone.includes(':') ? `${zone.slice(0, 3)}:${zone.slice(3)}` : zone;
-  return `${head}${ms}${offset ?? 'Z'}`;
+  return `${head}${ms}${offset ?? ''}`;
 }
 /** How far a time zone's clock runs ahead of UTC at a moment, in milliseconds. */
 function offsetAt(moment: Date, timeZone: string | undefined) {
@@ -104,12 +105,14 @@ function read(value: Date | string) {
       : day
         ? utcDay(Number(day[1]), Number(day[2]), Number(day[3]))
         : iso
-          ? new Date(plainIso(iso))
+          ? new Date(floating ? `${plainIso(iso)}Z` : plainIso(iso))
           : new Date(NaN);
   if (Number.isNaN(date.getTime())) return null;
   // A day that does not exist is not a date, in a date-time as in a bare date.
   if (typeof value === 'string' && !writtenDayExists(value)) return null;
-  return { date, dayOnly: !!day, floating };
+  // The value as <time datetime> takes it.
+  const written = iso ? plainIso(iso) : typeof value === 'string' ? value : undefined;
+  return { date, dayOnly: !!day, floating, written };
 }
 /** 日付・日時を日本語の書式の文字にします。FormatDate と同じ書式を、文の中に使うときに。'YYYY-MM-DD' と ISO 8601 の日時（'2026-11-22T09:05:00+09:00'）のほかの文字は、日付として読まずにそのまま返します。時間帯のない日時（'2026-11-22T09:05'）は、書いた時刻のまま出します。 */
 export function formatDate(value: Date | string, options: DateFormatOptions = {}) {
@@ -140,7 +143,7 @@ export function formatDate(value: Date | string, options: DateFormatOptions = {}
 function machineValue(value: Date | string, options: DateFormatOptions, exact: boolean) {
   const moment = read(value);
   if (!moment) return undefined;
-  if (typeof value === 'string') return value;
+  if (moment.written) return moment.written;
   // A relative time keeps the exact moment, whatever the style.
   if (exact || (options.style ?? 'date') !== 'date') return value.toISOString();
   // en-CA writes YYYY-MM-DD.
