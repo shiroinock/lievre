@@ -1,8 +1,9 @@
 # The owner's @claude in an issue, a PR comment or a review runs Claude Code.
 # The job lives in shiroinock/workflows; change it there, not here.
 # Pinned to a commit that was read, not @main: the job gets CLAUDE_CODE_OAUTH_TOKEN, so a change
-# there must not reach this public repository unseen. To update, read the new commit and replace
-# the SHA in all three workflows (claude.yml, claude-code-review.yml, merge-reservation.yml).
+# there must not reach this public repository unseen. Changes there are read in their own PRs;
+# Renovate then raises the SHA in all four workflows together (claude.yml, claude-code-review.yml,
+# claude-fix-ci.yml and merge-reservation.yml, whose workflows_ref too).
 name: Claude
 
 on:
@@ -19,7 +20,7 @@ permissions: {}
 
 jobs:
   claude:
-    uses: shiroinock/workflows/.github/workflows/claude.yml@eb1ef0dc284c9b116968b388815528b17e3df135
+    uses: shiroinock/workflows/.github/workflows/claude.yml@7f2176f9c91b3e7c87549fe318d239f89281fb7e
     permissions:
       contents: read
       pull-requests: read

@@ -14,6 +14,7 @@ import {
   Link,
   RadioGroup,
   Stack,
+  Stepper,
   Text,
   TextField,
 } from '../index';
@@ -288,13 +289,11 @@ export function RegistrationExample() {
         <Text tone="muted">
           入力 → 確認 → 完了を試せるサンプルです。アカウント作成・外部送信は行いません。
         </Text>
-        <ol className="everyday-steps" aria-label="登録の進み具合">
-          {['入力', '確認', '完了'].map((label, i) => (
-            <li key={label} aria-current={step === i + 1 ? 'step' : undefined}>
-              {i + 1} · {label}
-            </li>
-          ))}
-        </ol>
+        <Stepper
+          label="登録の進み具合"
+          steps={[{ label: '入力' }, { label: '確認' }, { label: '完了' }]}
+          current={step - 1}
+        />
         {step === 1 ? (
           <form
             ref={formRef}
