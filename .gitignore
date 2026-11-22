@@ -22,3 +22,6 @@ result-*
 # Copied from the repository root by prepack (packages/react)
 packages/react/DESIGN.md
 packages/react/MIGRATION.md
+
+# Design System の見本集の書き出し（npm run design-system）
+.design-system/
