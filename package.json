@@ -25,7 +25,8 @@
     "wear:font": "npm run wear:font -w packages/react",
     "wear:setup": "npm run wear:setup -w packages/react",
     "wear:tune": "npm run wear:tune -w packages/react",
-    "bench:agent": "npm run bench:agent -w packages/react"
+    "bench:agent": "npm run bench:agent -w packages/react",
+    "design-system": "node scripts/design-system/build.mjs"
   },
   "devDependencies": {
     "prettier": "^3.3.3"

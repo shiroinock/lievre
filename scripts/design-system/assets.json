@@ -1,0 +1,32 @@
+{
+  "Logos": {
+    "lievre-tui.svg": {
+      "name": "lievre-tui.svg",
+      "blob": "20836a7354023bd29053ade9cbdb3758",
+      "size": 5706,
+      "type": "image/svg+xml",
+      "source": "d7499e303abfdecc2be42af9a8422e60aa713e5c34dd55601ba420e3eb2fab70"
+    },
+    "lievre-web-small.svg": {
+      "name": "lievre-web-small.svg",
+      "blob": "bc8d8091054c17ea4ead242ce8bd2b77",
+      "size": 4909,
+      "type": "image/svg+xml",
+      "source": "63faee05a6c313bd369b3e4bf106379244fe45b33829e0a451e9d50c2c8c5fc4"
+    },
+    "lievre-web-tile-light.svg": {
+      "name": "lievre-web-tile-light.svg",
+      "blob": "af17ff004bc303607cea8ebf3e24c8ee",
+      "size": 5093,
+      "type": "image/svg+xml",
+      "source": "520e4db3f7252cae95bd116475a0c2921bc2cfcc9ba0196bc3d6d1989602a018"
+    },
+    "lievre-web.svg": {
+      "name": "lievre-web.svg",
+      "blob": "de86ab89c568c6de4802f920c3020170",
+      "size": 5014,
+      "type": "image/svg+xml",
+      "source": "618a75937cc9e49050da64519534bddbf91d4a139734507c45a82fb2e2c0274f"
+    }
+  }
+}
