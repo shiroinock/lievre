@@ -95,6 +95,14 @@ describe('formatDate', () => {
   it('keeps the years 0 to 99 as written', () => {
     expect(formatDate('0050-03-01')).toBe('50年3月1日');
     expect(formatDate('0099-12-31')).not.toMatch(/1999/);
+    expect(formatRelativeTime('0050-03-01', { now: new Date(2026, 10, 22) })).toMatch(
+      /^1,97\d 年前$/,
+    );
+  });
+  it('reads only ISO 8601, not what one engine happens to read', () => {
+    expect(formatDate('12')).toBe('12');
+    expect(formatDate('2026/11/22')).toBe('2026/11/22');
+    expect(formatDate('2026-11-22T09:05', { style: 'time' })).toBe('9:05');
   });
   it('counts weeks, months and years without calendar words that could be wrong', () => {
     const now = new Date(2027, 0, 1, 12);
