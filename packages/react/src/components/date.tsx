@@ -358,11 +358,11 @@ export type DateRangePickerProps = {
   defaultValue?: DateRange;
   /** 開始日か終了日が、確かめて通る日になったとき、またはそうでなくなったとき（null）に呼びます。 */
   onValueChange?: (value: DateRange) => void;
-  /** 開始日の欄の名前。既定は「開始日」。 */
+  /** 開始日の欄の名前。 */
   startLabel?: string;
-  /** 終了日の欄の名前。既定は「終了日」。 */
+  /** 終了日の欄の名前。 */
   endLabel?: string;
-  /** 補助文。2つの欄の上に出し、まとまりに aria-describedby で結びます。 */
+  /** 補助文。2つの欄の下に出し、まとまりに aria-describedby で結びます。 */
   hint?: string;
   /** エラー文。2つの欄のまとまりに出します（それぞれの欄の確かめは、欄の下に出ます）。 */
   error?: string;
@@ -430,7 +430,14 @@ export function DateRangePicker({
           value={current.start}
           min={min}
           name={name?.start}
-          onValueChange={(next) => set({ ...latest.current, start: next })}
+          onValueChange={(next) => {
+            // A start past the end lets go of the end in the same change, so the caller never
+            // hears a range the wrong way round, and the end's fields empty with the value.
+            const end = readBound(latest.current.end);
+            const start = readBound(next);
+            const past = !!start && !!end && start.compare(end) > 0;
+            set({ start: next, end: past ? null : latest.current.end });
+          }}
         />
         <DatePickerBody
           {...shared}

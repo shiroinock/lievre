@@ -70,7 +70,7 @@ describe('DateRangePicker', () => {
       await screen.findByText('2026年12月10日以降の日付を入れてください。'),
     ).toBeInTheDocument();
   });
-  it('lets go of the end when the start moves past it', async () => {
+  it('lets go of the end when the start moves past it, never reporting it the wrong way round', async () => {
     const onValueChange = vi.fn();
     render(
       <DateRangePicker
@@ -84,6 +84,13 @@ describe('DateRangePicker', () => {
     await userEvent.clear(day);
     await userEvent.type(day, '8');
     expect(onValueChange).toHaveBeenLastCalledWith({ start: '2026-12-08', end: null });
+    for (const [range] of onValueChange.mock.calls as [
+      { start: string | null; end: string | null },
+    ][])
+      if (range.start && range.end) expect(range.start <= range.end).toBe(true);
+    // The end's fields empty with its value.
+    const end = screen.getByRole('group', { name: '終了日' });
+    expect(within(end).getByRole('textbox', { name: '日' })).toHaveValue('');
   });
   it('sends both ends with their names', () => {
     const { container } = render(

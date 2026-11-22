@@ -844,9 +844,9 @@ props は DateField と同じで、min・max はカレンダーでも選べな�
 - `value?: DateRange` — 期間。渡すと外で持ちます。
 - `defaultValue?: DateRange` — 既定 { start: null, end: null }。外で持たないときの、はじめの期間。
 - `onValueChange?: ((value: DateRange) => void)` — 開始日か終了日が、確かめて通る日になったとき、またはそうでなくなったとき（null）に呼びます。
-- `startLabel?: string` — 既定 '開始日'。開始日の欄の名前。既定は「開始日」。
-- `endLabel?: string` — 既定 '終了日'。終了日の欄の名前。既定は「終了日」。
-- `hint?: string` — 補助文。2つの欄の上に出し、まとまりに aria-describedby で結びます。
+- `startLabel?: string` — 既定 '開始日'。開始日の欄の名前。
+- `endLabel?: string` — 既定 '終了日'。終了日の欄の名前。
+- `hint?: string` — 補助文。2つの欄の下に出し、まとまりに aria-describedby で結びます。
 - `error?: string` — エラー文。2つの欄のまとまりに出します（それぞれの欄の確かめは、欄の下に出ます）。
 - `required?: boolean` — 2つの欄のラベルの横に「必須」の文字を出し、欄に aria-required を付けます。
 - `disabled?: boolean`
