@@ -231,6 +231,24 @@ describe('FormatNumber and FormatDate', () => {
     render(<FormatDate value="未定" />);
     expect(screen.getByText('未定')).not.toHaveAttribute('datetime');
   });
+  it('does not cut the formatted text to find the day, which engines write differently', () => {
+    // Chrome 110 wrote en-CA as 11/22/2026: whatever format() gives, days come from the parts.
+    // format is a getter that hands back a bound function.
+    const proto = Intl.DateTimeFormat.prototype;
+    const original = Object.getOwnPropertyDescriptor(proto, 'format')!;
+    Object.defineProperty(proto, 'format', { configurable: true, get: () => () => '11/22/2026' });
+    try {
+      const now = new Date('2026-11-22T03:00:00Z');
+      expect(formatRelativeTime('2026-11-21', { now, timeZone: 'UTC' })).toBe('昨日');
+      expect(formatRelativeTime(new Date('2026-11-19T03:00:00Z'), { now, timeZone: 'UTC' })).toBe(
+        '3 日前',
+      );
+      render(<FormatDate value={new Date('2026-11-22T03:00:00Z')} timeZone="Asia/Tokyo" />);
+      expect(document.querySelector('time')).toHaveAttribute('datetime', '2026-11-22');
+    } finally {
+      Object.defineProperty(proto, 'format', original);
+    }
+  });
   it('keeps the exact moment when relative', () => {
     render(
       <FormatDate
