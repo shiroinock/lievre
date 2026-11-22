@@ -22,6 +22,18 @@ export function describeTermHotkey(hotkey: TermHotkey = DEFAULT_TERM_HOTKEY) {
     .join('+');
 }
 
+/** Cuts text to a width in cells (kana and kanji count 2), ending with "..." when cut. "…" is
+ * East Asian Width Ambiguous, so it would break the frame where ambiguous characters are wide. */
+function fit(text: string, width: number) {
+  if (stringWidth(text) <= width) return text;
+  let out = '';
+  for (const ch of text) {
+    if (stringWidth(out + ch) > width - 3) break;
+    out += ch;
+  }
+  return out + '...';
+}
+
 /** A key and what it does: the key in bold, the words after it, never the key alone. */
 function Hint({ keys, label }: { keys: string; label: string }) {
   const { p } = useLievre();
@@ -83,6 +95,13 @@ export function CommandPalette({
   visible.forEach((item, i) => {
     const index = start + i;
     const name = item.group ?? '';
+    // Leaving a group for items without one: a rule, so they don't read as part of it.
+    if (!name && group)
+      lines.push(
+        <Text key={`r-${index}`} color={p.border} backgroundColor={p.surface} aria-hidden>
+          {' ' + g.rule.repeat(inner - 1)}
+        </Text>,
+      );
     if (name && name !== group)
       lines.push(
         <Text key={`g-${index}`} color={p.muted} backgroundColor={p.surface} bold>
@@ -93,10 +112,14 @@ export function CommandPalette({
     group = name;
     const on = index === state.highlighted;
     const bg = on ? p.selected : p.surface;
-    const note = [item.description, item.disabled && '使えません'].filter(Boolean).join('・');
     const key = item.shortcut ?? '';
     const room = inner - 1 - (key ? stringWidth(key) + 2 : 0);
-    const text = note ? `${item.label}  ${note}` : item.label;
+    // 「使えません」 always stays: it says in words what the muted colour only repeats. The name
+    // is cut to fit first, then the description is dropped if there is no room for it.
+    const off = item.disabled ? '  使えません' : '';
+    const label = fit(item.label, room - stringWidth(off));
+    const note = item.description ? `  ${item.description}` : '';
+    const text = stringWidth(label + note + off) <= room ? label + note + off : label + off;
     lines.push(
       <Box
         key={item.value}
@@ -108,7 +131,7 @@ export function CommandPalette({
           {on ? g.selectedBar : ' '}
         </Text>
         <Text color={item.disabled ? p.muted : p.text} backgroundColor={bg} bold={on && !p.paints}>
-          {pad(stringWidth(text) > room ? item.label : text, room)}
+          {pad(text, room)}
         </Text>
         {key && (
           <Text color={on ? p.text : p.muted} backgroundColor={bg} aria-hidden>

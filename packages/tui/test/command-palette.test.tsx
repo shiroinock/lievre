@@ -13,6 +13,7 @@ import {
   glyphs,
   isHotkey,
   palette,
+  paletteCount,
   paletteKey,
   useCommandPaletteInput,
   type Level,
@@ -105,6 +106,22 @@ describe('palette keys', () => {
     expect(state.highlighted).toBe(-1);
     expect(paletteKey(items, state, '', { return: true })).toBeUndefined();
   });
+  it('types a plain-key hotkey into the text while open', () => {
+    const slash = { key: '/' };
+    let state = paletteKey(items, closedPalette, '/', {}, slash)!.state;
+    for (const ch of 'a/b') state = paletteKey(items, state, ch, {}, slash)!.state;
+    expect(state).toMatchObject({ open: true, query: 'a/b' });
+    // A hotkey with Ctrl still closes it.
+    expect(paletteKey(items, state, 'k', { ctrl: true })?.state).toEqual(closedPalette);
+  });
+  it('says so when only commands that cannot be chosen match', () => {
+    expect(paletteCount(items, 'しまう', '一致するコマンドがありません')).toBe(
+      '選べるコマンドはありません（1件は選べません）',
+    );
+    expect(paletteCount(items, 'ぞぞ', '一致するコマンドがありません')).toBe(
+      '一致するコマンドがありません',
+    );
+  });
   it('takes another hotkey, or none', () => {
     const hotkey = { key: 'p', mod: true, shift: true };
     expect(paletteKey(items, closedPalette, 'k', { ctrl: true }, hotkey)).toBeUndefined();
@@ -192,6 +209,49 @@ describe('the palette', () => {
     expect(text).toMatch(/^\+-+\+$/m);
     expect(text).toContain('>ホームへ移動');
     expect(text).not.toMatch(/[╭│▌]/);
+  });
+  it('cuts a long name to the row and keeps 「使えません」 in words', () => {
+    const long: TermCommand[] = [
+      { value: 'a', label: '表示中の一覧をすべてCSVで書き出して保存する', shortcut: 'E' },
+      {
+        value: 'b',
+        label: '選んだ作業をまとめてしまって一覧から外す',
+        description: '作業を選ぶと使えます',
+        disabled: true,
+      },
+    ];
+    const lines = plain(
+      renderToString(
+        <Lievre.Provider value={{ p: palette('none', 'paper'), g: glyphs({}) }}>
+          <CommandPalette
+            items={long}
+            state={{ open: true, query: '', highlighted: 0 }}
+            width={40}
+          />
+        </Lievre.Provider>,
+        { columns: 60 },
+      ),
+    ).split('\n');
+    const framed = lines.filter((line) => /^[│╭╰]/.test(line));
+    expect(new Set(framed.map((line) => stringWidth(line))).size).toBe(1);
+    expect(lines.some((l) => /表示中の一覧.*\.\.\.\s+E\s+│$/.test(l))).toBe(true);
+    expect(lines.some((l) => /選んだ作業.*\.\.\.  使えません\s+│$/.test(l))).toBe(true);
+  });
+  it('rules off the commands without a group after a group', () => {
+    const mixed: TermCommand[] = [
+      { value: 'a', label: 'テーマを変える', group: '表示' },
+      { value: 'b', label: '使い方を開く' },
+    ];
+    const lines = plain(
+      renderToString(
+        <Lievre.Provider value={{ p: palette('truecolor', 'paper'), g: glyphs({}) }}>
+          <CommandPalette items={mixed} state={{ open: true, query: '', highlighted: 0 }} />
+        </Lievre.Provider>,
+        { columns: 60 },
+      ),
+    ).split('\n');
+    const at = lines.findIndex((l) => l.includes('使い方を開く'));
+    expect(lines[at - 1]).toMatch(/^│\s+─{10,}\s+│$/);
   });
   it('paints no color without one', () => {
     expect(draw(opened, 'none')).not.toMatch(/\u001b\[(3|4)8;/);

@@ -127,7 +127,10 @@ export function paletteKey(
       state: { open: true, query: '', highlighted: firstEnabled(filterCommands(items, '')) },
     };
   }
-  if (pressedHotkey || key.escape) return { state: closedPalette };
+  // A hotkey without Ctrl / ⌘ / Alt is a character while the palette is open: it goes into the
+  // text instead of closing (as on the web, where such a key never fires inside a field).
+  const closes = pressedHotkey && !!hotkey && (hotkey.mod || hotkey.alt);
+  if (closes || key.escape) return { state: closedPalette };
   const shown = filterCommands(items, state.query);
   const at = (highlighted: number) => ({ state: { ...state, highlighted } });
   if (key.downArrow) return at(step(shown, state.highlighted, 1));
@@ -147,8 +150,12 @@ export function paletteKey(
   return { state: { open: true, query, highlighted: firstEnabled(filterCommands(items, query)) } };
 }
 
-/** 選べる項目の数の言葉。読み上げと画面で同じものを出します。 */
+/** 項目の数の言葉（Web の読み上げと同じ）。一致したのが選べない項目だけなら、そう言います。 */
 export function paletteCount(items: readonly TermCommand[], query: string, emptyText: string) {
-  const n = filterCommands(items, query).filter((i) => !i.disabled).length;
-  return n ? `${n}件のコマンドがあります` : emptyText;
+  const shown = filterCommands(items, query);
+  const n = shown.filter((i) => !i.disabled).length;
+  if (shown.length === 0) return emptyText;
+  return n
+    ? `${n}件のコマンドがあります`
+    : `選べるコマンドはありません（${shown.length}件は選べません）`;
 }
