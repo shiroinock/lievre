@@ -385,6 +385,8 @@ describe('CommandPalette', () => {
     // ⌥/ is "÷". The character of the Slash key comes from the layout: the browser's map, or a
     // key typed without modifiers.
     fireEvent.keyDown(document, { key: '/', code: 'Slash' });
+    // "?" is ⇧ on the same key: it must not replace "/".
+    fireEvent.keyDown(document, { key: '?', code: 'Slash', shiftKey: true });
     expect(screen.queryByRole('dialog')).toBeNull();
     act(() => void fireEvent.keyDown(document, { key: '÷', code: 'Slash', altKey: true }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();

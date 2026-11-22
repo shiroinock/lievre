@@ -120,7 +120,8 @@ function learnLayout() {
     .catch(() => {});
 }
 function noteKey(e: globalThis.KeyboardEvent) {
-  if (e.code && e.key.length === 1 && !e.altKey && !e.ctrlKey && !e.metaKey)
+  // Only what the key types with no modifier at all: with ⇧ the Slash key types "?", not "/".
+  if (e.code && e.key.length === 1 && !e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey)
     layout.set(e.code, e.key);
 }
 const plainKey = (code: string) =>
