@@ -36,6 +36,9 @@ function utcDay(year: number, month: number, day: number) {
   date.setUTCFullYear(year, month - 1, day);
   return date;
 }
+/** An ISO 8601 date-time: other text is read differently by each engine (V8 reads '12' as
+ * 2001-12-01), so it is not read as a date at all. */
+const ISO_DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})?$/;
 const DATE_HEAD = /^(\d{4})-(\d{2})-(\d{2})/;
 /** Whether the year, month and day written at the head of the text exist on the calendar:
  * Date.UTC (and V8's own parsing) roll 2026-02-30 over to March and 2026-13-01 into the next year. */
@@ -57,13 +60,15 @@ function read(value: Date | string) {
       ? value
       : day
         ? utcDay(Number(day[1]), Number(day[2]), Number(day[3]))
-        : new Date(value);
+        : ISO_DATE_TIME.test(value)
+          ? new Date(value)
+          : new Date(NaN);
   if (Number.isNaN(date.getTime())) return null;
   // A day that does not exist is not a date, in a date-time as in a bare date.
   if (typeof value === 'string' && !writtenDayExists(value)) return null;
   return { date, dayOnly: !!day };
 }
-/** 日付・日時を日本語の書式の文字にします。FormatDate と同じ書式を、文の中に使うときに。日付として読めない文字は、そのまま返します。 */
+/** 日付・日時を日本語の書式の文字にします。FormatDate と同じ書式を、文の中に使うときに。'YYYY-MM-DD' と ISO 8601 の日時（'2026-11-22T09:05:00+09:00'）のほかの文字は、日付として読まずにそのまま返します。 */
 export function formatDate(value: Date | string, options: DateFormatOptions = {}) {
   const { style = 'date', calendar = 'gregory', weekday = false } = options;
   const moment = read(value);
@@ -117,7 +122,7 @@ function dayNumber(date: Date, timeZone: string | undefined) {
     .format(date)
     .split('-')
     .map(Number);
-  return Date.UTC(year, month - 1, day) / DAY;
+  return utcDay(year, month, day).getTime() / DAY;
 }
 /**
  * 今との差を言葉にします（3分前・昨日・2日後）。1日より近い時刻は時間・分・秒で、それより離れた日は暦の日の差（昨日・一昨日・3日前）で、
