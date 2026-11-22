@@ -106,6 +106,31 @@ export function isHotkey(input: string, key: TermKey, hotkey: TermHotkey = DEFAU
   return input.toLowerCase() === hotkey.key.toLowerCase();
 }
 
+/** 開いた状態。開くキーを使わずに開くとき（hotkey を false にしたとき）に使います。最初に選べる項目を選びかけにします。 */
+export function openPalette(items: readonly TermCommand[]): PaletteState {
+  return { open: true, query: '', highlighted: firstEnabled(filterCommands(items, '')) };
+}
+
+/**
+ * 選びかけを、今出ている項目に合わせます。選びかけがない・一覧の外・選べない項目のときは、最初の選べる項目にします。
+ * 外から state を作ったときや、開いているあいだに items が変わったときにも、Enter で実行できるようにします。
+ */
+export function settleHighlight(items: readonly TermCommand[], state: PaletteState): PaletteState {
+  if (!state.open) return state;
+  const shown = filterCommands(items, state.query);
+  const at = shown[state.highlighted];
+  if (at && !at.disabled) return state;
+  const first = firstEnabled(shown);
+  return first === state.highlighted ? state : { ...state, highlighted: first };
+}
+
+/** 今出ている項目の並び（値と選べるか）。これが変わったら、選びかけを最初の選べる項目に戻します（Web と同じ）。 */
+export function shownSignature(items: readonly TermCommand[], query: string) {
+  return filterCommands(items, query)
+    .map((i) => `${i.value}${i.disabled ? '!' : ''}`)
+    .join('\n');
+}
+
 export type PaletteStep = { state: PaletteState; run?: string };
 
 /**
@@ -123,10 +148,10 @@ export function paletteKey(
   const pressedHotkey = hotkey !== false && isHotkey(input, key, hotkey);
   if (!state.open) {
     if (!pressedHotkey) return undefined;
-    return {
-      state: { open: true, query: '', highlighted: firstEnabled(filterCommands(items, '')) },
-    };
+    return { state: openPalette(items) };
   }
+  // A state made outside (opened without the hotkey) or items that changed while open.
+  state = settleHighlight(items, state);
   // A hotkey without Ctrl / ⌘ / Alt is a character while the palette is open: it goes into the
   // text instead of closing (as on the web, where such a key never fires inside a field).
   const closes = pressedHotkey && !!hotkey && (hotkey.mod || hotkey.alt);

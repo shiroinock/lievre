@@ -15,6 +15,8 @@ import {
   palette,
   paletteCount,
   paletteKey,
+  openPalette,
+  settleHighlight,
   useCommandPaletteInput,
   type Level,
   type PaletteState,
@@ -105,6 +107,16 @@ describe('palette keys', () => {
     const { state } = press(opened, 'ぞぞ');
     expect(state.highlighted).toBe(-1);
     expect(paletteKey(items, state, '', { return: true })).toBeUndefined();
+  });
+  it('highlights the first command for a state opened from outside', () => {
+    expect(openPalette(items)).toEqual(opened);
+    const outside = { open: true, query: '', highlighted: -1 };
+    expect(settleHighlight(items, outside).highlighted).toBe(0);
+    expect(paletteKey(items, outside, '', { return: true }, false)?.run).toBe('home');
+    // On a command that cannot be chosen, or past the end of the list.
+    expect(settleHighlight(items, { ...outside, highlighted: 3 }).highlighted).toBe(0);
+    expect(settleHighlight(items, { ...outside, highlighted: 9 }).highlighted).toBe(0);
+    expect(settleHighlight(items, { ...outside, highlighted: 2 }).highlighted).toBe(2);
   });
   it('types a plain-key hotkey into the text while open', () => {
     const slash = { key: '/' };
@@ -292,12 +304,22 @@ function terminal() {
 }
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-function App({ onRun }: { onRun: (value: string) => void }) {
-  const [state, setState] = useState(closedPalette);
-  useCommandPaletteInput({ items, state, onStateChange: setState, onRun });
+function App({
+  onRun,
+  list = items,
+  initial = closedPalette,
+  hotkey,
+}: {
+  onRun: (value: string) => void;
+  list?: TermCommand[];
+  initial?: PaletteState;
+  hotkey?: false;
+}) {
+  const [state, setState] = useState(initial);
+  useCommandPaletteInput({ items: list, state, onStateChange: setState, onRun, hotkey });
   return (
     <Lievre.Provider value={{ p: palette('truecolor', 'paper'), g: glyphs({}) }}>
-      <CommandPalette items={items} state={state} />
+      <CommandPalette items={list} state={state} />
     </Lievre.Provider>
   );
 }
@@ -308,9 +330,10 @@ describe('in a terminal (render)', () => {
   function start(
     onRun: (value: string) => void,
     options: { isScreenReaderEnabled?: boolean } = {},
+    node = <App onRun={onRun} />,
   ) {
     const t = terminal();
-    const app = render(<App onRun={onRun} />, {
+    const app = render(node, {
       stdout: t.stdout as unknown as NodeJS.WriteStream,
       stdin: t.stdin as unknown as NodeJS.ReadStream,
       patchConsole: false,
@@ -319,7 +342,7 @@ describe('in a terminal (render)', () => {
       ...options,
     });
     unmount = () => app.unmount();
-    return { ...t, all: () => plain(t.stdout.chunks.join('')) };
+    return { ...t, all: () => plain(t.stdout.chunks.join('')), rerender: app.rerender };
   }
 
   it('opens with Ctrl+K, filters, and runs the command with Enter', async () => {
@@ -329,6 +352,36 @@ describe('in a terminal (render)', () => {
     await wait(60);
     expect(t.all()).toContain('4件のコマンドがあります');
     t.stdin.press('csv');
+    await wait(60);
+    t.stdin.press('\r');
+    await wait(60);
+    expect(runs).toEqual(['export']);
+  });
+
+  it('runs the first command on Enter when opened from outside without a hotkey', async () => {
+    const runs: string[] = [];
+    const outside = { open: true, query: '', highlighted: -1 };
+    const t = start(
+      () => {},
+      {},
+      <App onRun={(v) => runs.push(v)} initial={outside} hotkey={false} />,
+    );
+    await wait(60);
+    expect(t.all()).toMatch(/▌ホームへ移動/);
+    t.stdin.press('\r');
+    await wait(60);
+    expect(runs).toEqual(['home']);
+  });
+
+  it('goes back to the first command when the items change while open', async () => {
+    const runs: string[] = [];
+    const t = start(() => {}, {}, <App onRun={(v) => runs.push(v)} initial={opened} />);
+    await wait(40);
+    t.stdin.press('\u001b[B');
+    t.stdin.press('\u001b[B');
+    await wait(60);
+    const reordered = [items[4], ...items.slice(0, 4)];
+    t.rerender(<App onRun={(v) => runs.push(v)} initial={opened} list={reordered} />);
     await wait(60);
     t.stdin.press('\r');
     await wait(60);

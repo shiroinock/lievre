@@ -1,6 +1,7 @@
 // The command palette in the terminal: a card with the search line, the count, the commands in
 // their groups and the keys. The state and the keys live in core/command.ts.
 import { Box, Text, useInput } from 'ink';
+import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import stringWidth from 'string-width';
 import { Card, pad, useLievre } from './components.js';
@@ -9,6 +10,8 @@ import {
   filterCommands,
   paletteCount,
   paletteKey,
+  settleHighlight,
+  shownSignature,
   type PaletteState,
   type TermCommand,
   type TermHotkey,
@@ -77,6 +80,8 @@ export function CommandPalette({
 }: CommandPaletteProps) {
   const { p, g } = useLievre();
   if (!state.open) return null;
+  // Draw the highlight that Enter will use, even for a state made outside.
+  state = settleHighlight(items, state);
   const shown = filterCommands(items, state.query);
   // The card's frame (2) and padding (2 + 2) come off the width.
   const inner = Math.max(10, width - 6);
@@ -200,6 +205,21 @@ export function useCommandPaletteInput({
   hotkey?: TermHotkey | false;
   active?: boolean;
 }) {
+  // When the commands shown change (opened from outside, items replaced while open), the highlight
+  // goes back to the first one that can be chosen, as on the web. Moving with the arrows changes
+  // nothing shown, so it stays.
+  const signature = state.open ? shownSignature(items, state.query) : undefined;
+  const seen = useRef<string | undefined>(undefined);
+  const latest = useRef({ items, state, onStateChange });
+  latest.current = { items, state, onStateChange };
+  useEffect(() => {
+    const before = seen.current;
+    seen.current = signature;
+    if (signature === undefined || signature === before) return;
+    const now = latest.current;
+    const first = settleHighlight(now.items, { ...now.state, highlighted: -1 });
+    if (first.highlighted !== now.state.highlighted) now.onStateChange(first);
+  }, [signature]);
   useInput(
     (input, key) => {
       const next = paletteKey(items, state, input, key, hotkey);
