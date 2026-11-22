@@ -132,8 +132,18 @@ export function Calendar({
     onValueChange?.(iso);
   };
   const month = startOfMonth(focused);
-  const prev = month.subtract({ months: 1 });
-  const next = month.add({ months: 1 });
+  // Whether a month has no month before (after) it within min and max.
+  const firstMonth = (day: CalendarDate) =>
+    !!low && startOfMonth(day).subtract({ days: 1 }).compare(low) < 0;
+  const lastMonth = (day: CalendarDate) =>
+    !!high && startOfMonth(day).add({ months: 1 }).compare(high) > 0;
+  const turn = (target: CalendarDate, ends: (day: CalendarDate) => boolean) => {
+    const day = clamp(target, low, high);
+    // The button pressed is about to be disabled, and a disabled button drops the focus to
+    // the page: hand it to the day in the grid instead.
+    if (ends(day)) follow.current = true;
+    setFocused(day);
+  };
   const title = `${month.year}年${month.month}月`;
   return (
     <div className={cx('lv-calendar', className)}>
@@ -142,8 +152,8 @@ export function Calendar({
           size="sm"
           label="前の月"
           icon={<ChevronLeft />}
-          disabled={!!low && prev.add({ months: 1 }).subtract({ days: 1 }).compare(low) < 0}
-          onClick={() => setFocused(clamp(focused.subtract({ months: 1 }), low, high))}
+          disabled={firstMonth(month)}
+          onClick={() => turn(focused.subtract({ months: 1 }), firstMonth)}
         />
         <div id={titleId} className="lv-calendar-title" aria-live="polite">
           {title}
@@ -152,8 +162,8 @@ export function Calendar({
           size="sm"
           label="次の月"
           icon={<ChevronRight />}
-          disabled={!!high && next.compare(high) > 0}
-          onClick={() => setFocused(clamp(focused.add({ months: 1 }), low, high))}
+          disabled={lastMonth(month)}
+          onClick={() => turn(focused.add({ months: 1 }), lastMonth)}
         />
       </div>
       <table

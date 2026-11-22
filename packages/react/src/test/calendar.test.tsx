@@ -74,6 +74,17 @@ describe('Calendar', () => {
     expect(focusedName()).toMatch(/^2026年12月5日/);
     expect(screen.getByRole('button', { name: '次の月' })).toBeDisabled();
   });
+  it('hands the focus to the day when a month button reaches the end and is disabled', async () => {
+    render(<Calendar today="2026-11-22" min="2026-10-15" max="2026-12-31" />);
+    await userEvent.click(screen.getByRole('button', { name: '次の月' }));
+    expect(screen.getByRole('button', { name: '次の月' })).toBeDisabled();
+    expect(focusedName()).toMatch(/^2026年12月22日/);
+    await userEvent.click(screen.getByRole('button', { name: '前の月' }));
+    expect(screen.getByRole('button', { name: '前の月' })).toHaveFocus();
+    await userEvent.click(screen.getByRole('button', { name: '前の月' }));
+    expect(screen.getByRole('button', { name: '前の月' })).toBeDisabled();
+    expect(focusedName()).toMatch(/^2026年10月22日/);
+  });
   it('turns the month with the buttons without taking the focus', async () => {
     render(<Calendar today="2026-11-22" />);
     await userEvent.click(screen.getByRole('button', { name: '次の月' }));
