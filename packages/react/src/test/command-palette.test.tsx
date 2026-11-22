@@ -375,6 +375,27 @@ describe('CommandPalette', () => {
       expect(highlighted()).toContain('設定を開く');
     }
   });
+  it('opens on ⌥ with a digit or a symbol, by the physical key', () => {
+    const { unmount } = setup({ hotkey: { key: '1', alt: true } });
+    // A Mac types "¡" for ⌥1; the code names the digit.
+    act(() => void fireEvent.keyDown(document, { key: '¡', code: 'Digit1', altKey: true }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    unmount();
+    setup({ hotkey: { key: '/', alt: true } });
+    // ⌥/ is "÷". The character of the Slash key comes from the layout: the browser's map, or a
+    // key typed without modifiers.
+    fireEvent.keyDown(document, { key: '/', code: 'Slash' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    act(() => void fireEvent.keyDown(document, { key: '÷', code: 'Slash', altKey: true }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+  it('does not take ⌥ with another physical key', () => {
+    setup({ hotkey: { key: 'k', alt: true } });
+    fireEvent.keyDown(document, { key: '∆', code: 'KeyJ', altKey: true });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    act(() => void fireEvent.keyDown(document, { key: '˚', code: 'KeyK', altKey: true }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
   it('has no axe violations while open', async () => {
     const { container } = setup({ defaultOpen: true });
     const results = await axe.run(container.ownerDocument.body, {

@@ -1021,7 +1021,7 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `key: string` — 文字のキー（e.key の値。大文字と小文字は区別しません）。既定のパレットは 'k'。
   - `mod?: boolean` — Mac では ⌘、ほかでは Ctrl を押しながら。1文字のキーを document 全体で受けないように、mod か alt のどちらかは付けます。
   - `shift?: boolean` — ⇧（Shift）を押しながら。修飾キーはちょうど一致したときだけ反応するので、⌘⇧K は ⌘K の開くキーには反応しません。
-  - `alt?: boolean` — ⌥（Mac）/ Alt を押しながら。mod の代わりにもなります（⌥K など）。Mac では ⌥ で別の字が入るので、そのときだけ物理キーの位置で見ます。
+  - `alt?: boolean` — ⌥（Mac）/ Alt を押しながら。mod の代わりにもなります（⌥K など）。Mac では ⌥ で別の字が入る（⌥1 は「¡」）ので、同じ物理キーが修飾キーなしで打つ字と比べます。英字と数字はいつでも、記号（⌥/ など）はブラウザがキー配列を教える場合（Chromium）か、その字を一度修飾キーなしで打ったあとで分かります。
 - `WearConfig`: `any`
 - `cx`: `(...values: (string | false | null | undefined)[]) => string`
 - `getQueueSnapshot`: `(keys: readonly string[], state: DecisionState) => DecisionQueueSnapshot` — 列の今の姿を組みます。keys は出す順（システムが決めた順）に並べて渡します。
