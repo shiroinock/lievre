@@ -1043,6 +1043,108 @@
     gap: var(--lv-space-3);
   }
 
+  /* DatePicker: the calendar button sits after the day field, at the fields' height. */
+  .lv-popover.lv-date-picker-popover {
+    width: auto;
+    padding: var(--lv-space-3);
+  }
+
+  /* Calendar: a month of 40px days (32px when compact), Sunday first. */
+  .lv-calendar {
+    --day: 40px;
+    display: grid;
+    gap: var(--lv-space-2);
+    justify-content: start;
+  }
+  .lievre[data-density='compact'] .lv-calendar {
+    --day: 32px;
+  }
+  /* On a touch screen the days reach 44px, as the other controls do, in every density. */
+  @media (pointer: coarse) {
+    .lievre .lv-calendar,
+    .lievre[data-density='compact'] .lv-calendar {
+      --day: 44px;
+    }
+  }
+  .lv-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lv-space-2);
+  }
+  .lv-calendar-title {
+    font-size: var(--lv-text-md);
+    font-weight: var(--lv-weight-bold);
+    line-height: var(--lv-line-tight);
+    font-variant-numeric: tabular-nums;
+  }
+  .lv-calendar-grid {
+    border-collapse: collapse;
+  }
+  .lv-calendar-grid th {
+    width: var(--day);
+    height: 32px;
+    padding: 0;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-sm);
+    font-weight: var(--lv-weight-regular);
+    text-align: center;
+  }
+  .lv-calendar-grid td {
+    padding: 0;
+    text-align: center;
+  }
+  .lv-calendar-day {
+    width: var(--day);
+    height: var(--day);
+    padding: 0;
+    border: 0;
+    border-radius: var(--lv-radius-md);
+    background: transparent;
+    color: var(--lv-text);
+    font: inherit;
+    /* Days are figures: the mono face, whose digits sit on the middle of the line. */
+    font-family: var(--lv-font-mono);
+    font-size: max(var(--lv-text-md), var(--lv-text-mono-min));
+    cursor: pointer;
+  }
+  .lv-calendar-day:hover {
+    background: var(--lv-surface-sunken);
+  }
+  /* Today is underlined, not only colored. */
+  .lv-calendar-day[aria-current='date'] {
+    font-weight: var(--lv-weight-bold);
+    text-decoration: underline 2px;
+    text-underline-offset: 4px;
+  }
+  .lv-calendar-grid td[aria-selected='true'] .lv-calendar-day {
+    background: var(--lv-accent);
+    color: var(--lv-on-accent);
+  }
+  /* Days outside min and max are struck through as well as faint. */
+  .lv-calendar-day[aria-disabled='true'] {
+    color: var(--lv-subtle);
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+  /* Today outside min and max keeps its underline under the strike. */
+  .lv-calendar-day[aria-current='date'][aria-disabled='true'] {
+    text-decoration-line: underline line-through;
+  }
+  .lv-calendar-day[aria-disabled='true']:hover {
+    background: transparent;
+  }
+  @media (forced-colors: active) {
+    .lv-calendar-grid td[aria-selected='true'] .lv-calendar-day {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+    }
+    .lv-calendar-day[aria-disabled='true'] {
+      color: GrayText;
+    }
+  }
+
   /* Checkbox, Switch, Radio — "on" is always the accent, never a status color. */
   /* Controls beside text sit on the centre of its first line: (1lh − size) / 2 from the top. */
   .lv-check-field {
