@@ -1,0 +1,229 @@
+// Dates typed in as year, month and day (the GOV.UK date input pattern). The calendar arithmetic
+// is @internationalized/date's; the fields are lievre's own TextFields in a Fieldset.
+import { useEffect, useRef, useState } from 'react';
+import { CalendarDate, parseDate } from '@internationalized/date';
+import { cx } from './system';
+import { Fieldset } from './form';
+import { TextField } from './primitives';
+import { toHalfWidth } from './normalize';
+import { formatDate } from './format';
+
+type Parts = { year: string; month: string; day: string };
+const EMPTY: Parts = { year: '', month: '', day: '' };
+
+function partsOf(value: string | null | undefined): Parts {
+  if (!value) return EMPTY;
+  try {
+    const date = parseDate(value);
+    // The year keeps four digits (0999), as checkDate asks for them.
+    return {
+      year: String(date.year).padStart(4, '0'),
+      month: String(date.month),
+      day: String(date.day),
+    };
+  } catch {
+    return EMPTY;
+  }
+}
+
+export type DateCheck =
+  | { kind: 'empty' }
+  | { kind: 'partial' }
+  | { kind: 'not-number' }
+  | { kind: 'no-such-day'; year: number; month: number; day: number }
+  | { kind: 'before-min'; min: string }
+  | { kind: 'after-max'; max: string }
+  | { kind: 'ok'; value: string };
+
+/** A bound from 'YYYY-MM-DD' or the date part of an ISO date-time; anything else is ignored. */
+function readBound(text: string | undefined) {
+  const day = text && /^\d{4}-\d{2}-\d{2}/.exec(text)?.[0];
+  if (!day) return undefined;
+  try {
+    return parseDate(day);
+  } catch {
+    return undefined;
+  }
+}
+
+/** 年・月・日の文字を確かめ、ISO 8601 の日付（'2026-11-22'）にします。全角の数字も受けます。存在しない日（2月30日）や、min・max の外は、その理由を返します。 */
+export function checkDate(
+  parts: { year: string; month: string; day: string },
+  range: { min?: string; max?: string } = {},
+): DateCheck {
+  const raw = [parts.year, parts.month, parts.day].map((p) => toHalfWidth(p).trim());
+  if (raw.every((p) => p === '')) return { kind: 'empty' };
+  if (raw.some((p) => p === '')) return { kind: 'partial' };
+  if (!/^\d{4}$/.test(raw[0]) || raw.slice(1).some((p) => !/^\d{1,2}$/.test(p)))
+    return { kind: 'not-number' };
+  const [year, month, day] = raw.map(Number);
+  if (year < 1) return { kind: 'not-number' };
+  // CalendarDate clamps what does not exist (2月30日 → 2月28日); a changed field means no such day.
+  const date = new CalendarDate(year, month, day);
+  if (month < 1 || date.month !== month || date.day !== day)
+    return { kind: 'no-such-day', year, month, day };
+  const min = readBound(range.min);
+  const max = readBound(range.max);
+  if (min && date.compare(min) < 0) return { kind: 'before-min', min: min.toString() };
+  if (max && date.compare(max) > 0) return { kind: 'after-max', max: max.toString() };
+  return { kind: 'ok', value: date.toString() };
+}
+
+/** 確かめた結果を、直し方のわかる文にします。DateField が出す文と同じです。 */
+export function dateCheckMessage(check: DateCheck): string | undefined {
+  switch (check.kind) {
+    case 'partial':
+      return '年・月・日をすべて入れてください。';
+    case 'not-number':
+      return '年は4桁、月と日は数字で入れてください。';
+    case 'no-such-day':
+      return `${check.year}年${check.month}月${check.day}日はありません。日付を確かめてください。`;
+    case 'before-min':
+      return `${formatDate(check.min)}以降の日付を入れてください。`;
+    case 'after-max':
+      return `${formatDate(check.max)}以前の日付を入れてください。`;
+    default:
+      return undefined;
+  }
+}
+
+export type DateFieldProps = {
+  /** 問いの名前（「生年月日」）。年・月・日の3つの欄をまとめる legend になります。 */
+  label: string;
+  /** 日付（'2026-11-22' の形）。未入力や、確かめて通らないあいだは null。渡すと外で持ちます。空を '' で持っても null と同じに扱います。打っている途中の欄を外から空にするときは、key を変えて作り直します（null から null では変わったことが分からないため）。 */
+  value?: string | null;
+  /** 外で持たないときの、はじめの日付。 */
+  defaultValue?: string | null;
+  /** 確かめて通る日付になったとき、またはそうでなくなったとき（null）に呼びます。打っている途中の文字では呼びません。 */
+  onValueChange?: (value: string | null) => void;
+  /** 補助文（「例：1990 4 1」）。欄の下に出し、まとまりに aria-describedby で結びます。 */
+  hint?: string;
+  /** エラー文。渡すと、部品が確かめた文の代わりに出します。 */
+  error?: string;
+  /** ラベルの横に「必須」の文字を出し、3つの欄に aria-required を付けます。 */
+  required?: boolean;
+  disabled?: boolean;
+  /** これより前の日を通さない（'2026-12-01' の形。日時の文字なら日付の部分を使い、読めない文字は無視します）。 */
+  min?: string;
+  /** これより後の日を通さない（'2026-12-31' の形。日時の文字なら日付の部分を使い、読めない文字は無視します）。 */
+  max?: string;
+  /** フォームで送るときの名前。確かめて通った日付を隠した入力で送ります。 */
+  name?: string;
+  /** 年の欄の id。ErrorSummary から移るときは、ここで決めた id を使います。 */
+  id?: string;
+  /** 'bday' で、ブラウザの自動入力に生年月日（年・月・日）を伝えます。 */
+  autoComplete?: 'bday';
+  className?: string;
+};
+/**
+ * 年・月・日を3つの欄に直接入れる日付の入力（生年月日・届け出の日など、カレンダーでは選びにくい日）。
+ * 数字は等幅で、全角の数字も受け、欄を離れると半角に直します。
+ * まとまりを離れたときに、足りない欄・存在しない日（2月30日）・min と max の外を確かめ、直し方のわかる文を出します。
+ */
+export function DateField({
+  label,
+  value,
+  defaultValue = null,
+  onValueChange,
+  hint,
+  error,
+  required,
+  disabled,
+  min,
+  max,
+  name,
+  id,
+  autoComplete,
+  className,
+}: DateFieldProps) {
+  const [parts, setParts] = useState<Parts>(() =>
+    partsOf(value !== undefined ? value : defaultValue),
+  );
+  const [checked, setChecked] = useState(false);
+  // The value prop as last seen, and the value this field last reported: a new prop rewrites the
+  // fields, unless it is only our own report coming back.
+  // A parent may hold "no date" as '' (a form library's empty field): that is the same as null,
+  // so our own null coming back as '' leaves the fields being typed in.
+  const given = value === '' ? null : value;
+  const [seen, setSeen] = useState(given);
+  const [reported, setReported] = useState<string | null>(
+    given !== undefined ? given : defaultValue || null,
+  );
+  if (given !== seen) {
+    setSeen(given);
+    if (given !== undefined && given !== reported) {
+      setReported(given);
+      setParts(partsOf(given));
+    }
+  }
+  const check = checkDate(parts, { min, max });
+  const valid = check.kind === 'ok' ? check.value : null;
+  // What the fields hold now may stop passing without any typing: a starting value outside
+  // min and max, a bound that moves, or a value from outside that does not pass (while nothing
+  // passed before, so valid itself stays null). Tell the caller then too.
+  useEffect(() => {
+    if (valid !== reported) {
+      setReported(valid);
+      onValueChange?.(valid);
+    }
+    // onValueChange follows; a new function each render must not report again.
+  }, [valid, reported]);
+  const shown = error ?? (checked ? dateCheckMessage(check) : undefined);
+  const update = (key: keyof Parts, text: string) => {
+    const next = { ...parts, [key]: text };
+    setParts(next);
+    const result = checkDate(next, { min, max });
+    const nextValue = result.kind === 'ok' ? result.value : null;
+    if (nextValue !== reported) {
+      setReported(nextValue);
+      onValueChange?.(nextValue);
+    }
+  };
+  // Check once the focus has settled outside the three fields. Pressing a label, the legend or
+  // the gap blurs a field with no relatedTarget before the next field takes the focus, so wait
+  // for that rather than reading relatedTarget.
+  const group = useRef<HTMLDivElement>(null);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  const onBlur = () => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      if (!group.current?.contains(group.current.ownerDocument.activeElement)) setChecked(true);
+    }, 0);
+  };
+  const field = (key: keyof Parts, text: string, chars: number, fieldId?: string) => (
+    <TextField
+      id={fieldId}
+      label={text}
+      value={parts[key]}
+      onChange={(e) => update(key, e.target.value)}
+      inputMode="numeric"
+      autoComplete={autoComplete ? `bday-${key}` : undefined}
+      chars={chars}
+      mono
+      halfWidth
+      disabled={disabled}
+      aria-required={required || undefined}
+      aria-invalid={shown ? true : undefined}
+    />
+  );
+  return (
+    <div ref={group} onBlur={onBlur} className={cx('lv-date-field', className)}>
+      <Fieldset legend={label} hint={hint} error={shown} required={required} disabled={disabled}>
+        <div className="lv-date-field-parts">
+          {field('year', '年', 4, id)}
+          {field('month', '月', 2)}
+          {field('day', '日', 2)}
+        </div>
+      </Fieldset>
+      {name && (
+        <input
+          type="hidden"
+          name={name}
+          value={check.kind === 'ok' ? check.value : ''}
+          disabled={disabled}
+        />
+      )}
+    </div>
+  );
+}
