@@ -159,3 +159,21 @@ export const CharsWithSuffix: Story = {
 export const WithCount: Story = {
   args: { label: '件名', maxCount: 30, hint: undefined, defaultValue: '接続の確認' },
 };
+/** 入力欄を離れたときに、全角の数字と横棒を半角に直す欄（電話番号）。直すことを補助文に書きます。 */
+export const HalfWidth: Story = {
+  args: {
+    label: '電話番号',
+    hint: '全角で入れても、欄を離れたときに半角に直します（例：０９０ー１２３４ → 090-1234）。',
+    halfWidth: { dashes: true },
+    inputMode: 'tel',
+    chars: 13,
+    mono: true,
+  },
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    const input = c.getByRole('textbox', { name: '電話番号' });
+    await userEvent.type(input, '０９０ー１２３４ー５６７８');
+    await userEvent.tab();
+    await expect(input).toHaveValue('090-1234-5678');
+  },
+};

@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type ChangeEvent,
+  type FocusEvent,
   type CSSProperties,
   type ButtonHTMLAttributes,
   type HTMLAttributes,
@@ -36,7 +37,9 @@ import {
 } from 'lucide-react';
 import { cx, PortalSurface } from './system';
 import { Field } from './form';
+import { flushSync } from 'react-dom';
 import { pageItems } from './paging';
+import { toHalfWidth, type HalfWidthOptions } from './normalize';
 import {
   CharacterCount,
   countCharacters,
@@ -263,6 +266,8 @@ export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id' | 
     chars?: number;
     /** 等幅の書体にします。番号・ID・コード・金額など、桁をそろえて読む値に使います。 */
     mono?: boolean;
+    /** 入力欄を離れたときに、全角の数字・英字・記号を半角に直します（toHalfWidth）。true か、直す範囲（dashes など）を渡します。変換中の文字は直しません。直した値は onChange に届き、onBlur はそのあと、直した値を描いてから呼びます。直すことは黙って行わず、hint に例を書きます（「全角で入れても半角に直します」）。 */
+    halfWidth?: boolean | HalfWidthOptions;
   };
 type CountProps = {
   /** 文字数の上限。入力の下に「12 / 100」を出し、上限を超えても入力は止めず、超えた数を言葉と記号で示します。読み上げでは上限を一度伝え、入力が止まってから残りの数を知らせます。送信を止めるかどうかは呼び出す側で決め、error で伝えます。 */
@@ -270,6 +275,15 @@ type CountProps = {
   /** 数え方。'grapheme'（既定）は見た目の1文字を1と数えます（絵文字の組み合わせも1）。'width' は全角を2、半角を1と数えます（全角換算の制度に合わせるとき）。 */
   countBy?: 'grapheme' | 'width';
 };
+/** Rewrites the field's value the way typing would, so onChange fires for controlled fields too. */
+function straighten(input: HTMLInputElement, options: HalfWidthOptions) {
+  // A field the user cannot change is never changed for them.
+  if (input.readOnly || input.disabled) return;
+  const next = toHalfWidth(input.value, options);
+  if (next === input.value) return;
+  Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set?.call(input, next);
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+}
 /** Tracks the value only when a count is shown, so the field stays uncontrolled otherwise. */
 function useCount<E extends HTMLInputElement | HTMLTextAreaElement>(
   maxCount: number | undefined,
@@ -306,6 +320,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     countBy = 'grapheme',
     chars,
     mono,
+    halfWidth,
     className,
     style,
     ...props
@@ -313,6 +328,17 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
   ref,
 ) {
   const count = useCount(maxCount, props.value, props.defaultValue, props.onChange);
+  // The caller's onBlur runs after the straightened value has been rendered, so a controlled
+  // field's onBlur reads the new state: the latest onBlur is the one from that render.
+  const latestOnBlur = useRef(props.onBlur);
+  latestOnBlur.current = props.onBlur;
+  const onBlur = halfWidth
+    ? (event: FocusEvent<HTMLInputElement>) => {
+        const input = event.currentTarget;
+        flushSync(() => straighten(input, halfWidth === true ? {} : halfWidth));
+        latestOnBlur.current?.(event);
+      }
+    : props.onBlur;
   const uid = useId();
   const fieldId = id ?? uid;
   return (
@@ -336,6 +362,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
             {...props}
             {...control}
             onChange={count.onChange}
+            onBlur={onBlur}
             aria-describedby={joinIds(
               prefix && `${control.id}-prefix`,
               suffix && `${control.id}-suffix`,

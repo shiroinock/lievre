@@ -10,4 +10,6 @@ export * from './components/queue';
 export * from './components/stream';
 export * from './components/chip';
 export * from './components/disclosure';
+export * from './components/format';
+export * from './components/normalize';
 export * from './components/stepper';
