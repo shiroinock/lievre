@@ -57,7 +57,7 @@ export type CalendarProps = {
 /**
  * 月の表から日付を選びます。週は日曜から始まります。
  * 矢印で日、PageUp / PageDown で月、Shift と合わせて年、Home / End で週の端へ移り、Enter か Space で選びます。
- * 今日は下線、選んだ日は塗りで示し、min・max の外の日は薄くして選べなくします（読み上げでも「選べません」と伝えます）。
+ * 今日は下線、選んだ日は塗りで示し（読み上げでは「選択中」）、min・max の外の日は薄くして選べなくします（読み上げでも「選べません」と伝えます）。
  */
 export function Calendar({
   value,
@@ -198,7 +198,7 @@ export function Calendar({
                       type="button"
                       className="lv-calendar-day"
                       tabIndex={day.compare(focused) === 0 ? 0 : -1}
-                      aria-label={`${formatDate(iso, { weekday: true })}${inRange ? RANGE_WORDS[inRange] : ''}${disabled ? '、選べません' : ''}`}
+                      aria-label={`${formatDate(iso, { weekday: true })}${isSelected ? '、選択中' : ''}${inRange ? RANGE_WORDS[inRange] : ''}${disabled ? '、選べません' : ''}`}
                       aria-current={day.compare(now) === 0 ? 'date' : undefined}
                       aria-disabled={disabled || undefined}
                       onClick={() => choose(day)}

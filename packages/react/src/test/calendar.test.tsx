@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import axe from 'axe-core';
 import { Calendar, DatePicker, Dialog, Button } from '../index';
@@ -22,6 +22,9 @@ describe('Calendar', () => {
     expect(day(/^2026年11月22日/)).toHaveAttribute('aria-current', 'date');
     expect(day(/^2026年11月10日/).closest('td')).toHaveAttribute('aria-selected', 'true');
     expect(day(/^2026年11月10日/)).toHaveAttribute('tabindex', '0');
+    // The name says so too: readers seldom read the selection of the cell around the button.
+    expect(day(/^2026年11月10日\(火\)、選択中$/)).toBeVisible();
+    expect(screen.getAllByRole('button', { name: /選択中/ })).toHaveLength(1);
   });
   it('moves by day, week, month, year and to the ends of the week', async () => {
     render(<Calendar today="2026-11-22" autoFocus />);
@@ -126,6 +129,18 @@ describe('DatePicker', () => {
     await userEvent.click(screen.getByRole('button', { name: '予約の日をカレンダーから選ぶ' }));
     await screen.findByRole('dialog');
     await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(screen.queryByText('年・月・日をすべて入れてください。')).toBeNull();
+  });
+  it('does not check the fields when the button is pressed without taking the focus, as in Safari', async () => {
+    render(<DatePicker label="予約の日" today="2026-11-22" />);
+    await userEvent.type(screen.getByRole('textbox', { name: '年' }), '2026');
+    const button = screen.getByRole('button', { name: '予約の日をカレンダーから選ぶ' });
+    // Safari: pressing blurs the field to the page, and the button never takes the focus.
+    fireEvent.pointerDown(button);
+    (document.activeElement as HTMLElement).blur();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    fireEvent.click(button);
+    await screen.findByRole('dialog');
     expect(screen.queryByText('年・月・日をすべて入れてください。')).toBeNull();
   });
   it('closes only the calendar on Esc inside a dialog', async () => {

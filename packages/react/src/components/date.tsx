@@ -1,6 +1,6 @@
 // Dates typed in as year, month and day (the GOV.UK date input pattern). The calendar arithmetic
 // is @internationalized/date's; the fields are lievre's own TextFields in a Fieldset.
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { CalendarDate, parseDate } from '@internationalized/date';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { CalendarDays } from 'lucide-react';
@@ -113,8 +113,8 @@ export type DateFieldProps = {
  * 数字は等幅で、全角の数字も受け、欄を離れると半角に直します。
  * まとまりを離れたときに、足りない欄・存在しない日（2月30日）・min と max の外を確かめ、直し方のわかる文を出します。
  */
-export function DateField(props: DateFieldProps) {
-  return <DateFieldBody {...props} />;
+export function DateField({ defaultValue = null, ...props }: DateFieldProps) {
+  return <DateFieldBody defaultValue={defaultValue} {...props} />;
 }
 
 /** DateField's body; DatePicker puts its calendar button after the day field. */
@@ -134,8 +134,8 @@ function DateFieldBody({
   autoComplete,
   className,
   trailing,
-  layer,
-}: DateFieldProps & { trailing?: ReactNode; layer?: RefObject<HTMLElement | null> }) {
+  keeps,
+}: DateFieldProps & { trailing?: ReactNode; keeps?: (active: Element | null) => boolean }) {
   const [parts, setParts] = useState<Parts>(() =>
     partsOf(value !== undefined ? value : defaultValue),
   );
@@ -190,7 +190,7 @@ function DateFieldBody({
     timer.current = setTimeout(() => {
       const active = group.current?.ownerDocument.activeElement ?? null;
       // DatePicker's calendar sits in a portal, outside the group, yet still belongs to it.
-      if (!group.current?.contains(active) && !layer?.current?.contains(active)) setChecked(true);
+      if (!group.current?.contains(active) && !keeps?.(active)) setChecked(true);
     }, 0);
   };
   const field = (key: keyof Parts, text: string, chars: number, fieldId?: string) => (
@@ -240,17 +240,18 @@ export type DatePickerProps = DateFieldProps & {
  * 打っても、カレンダーで選んでもかまいません。カレンダーは選んだ日（なければ今日）の月で開き、日を選ぶと欄に書いて閉じ、フォーカスをボタンに戻します。
  * props は DateField と同じで、min・max はカレンダーでも選べない日になります。
  */
-export function DatePicker(props: DatePickerProps) {
-  return <DatePickerBody {...props} />;
+export function DatePicker({ defaultValue = null, ...props }: DatePickerProps) {
+  return <DatePickerBody defaultValue={defaultValue} {...props} />;
 }
 
 /** DatePicker's body; DateRangePicker shows the range in each calendar. */
 function DatePickerBody({
   today,
   range,
+  defaultValue = null,
   ...props
 }: DatePickerProps & { range?: { start?: string | null; end?: string | null } }) {
-  const { value, defaultValue = null, onValueChange, label, min, max, disabled } = props;
+  const { value, onValueChange, label, min, max, disabled } = props;
   const [inner, setInner] = useState<string | null>(defaultValue);
   const current = value !== undefined ? (value === '' ? null : value) : inner;
   const set = (next: string | null) => {
@@ -259,15 +260,23 @@ function DatePickerBody({
   };
   const [open, setOpen] = useState(false);
   const layer = useRef<HTMLDivElement>(null);
+  // From pressing the button until the calendar closes, the fields are not checked. Safari
+  // doesn't focus a pressed button: the fields blur to the page before the calendar opens.
+  const holding = useRef(false);
+  const onOpenChange = (next: boolean) => {
+    holding.current = next;
+    setOpen(next);
+  };
   return (
     <DateFieldBody
       {...props}
       className={cx('lv-date-picker', props.className)}
       value={current}
       onValueChange={set}
-      layer={layer}
+      defaultValue={defaultValue}
+      keeps={(active) => holding.current || !!layer.current?.contains(active)}
       trailing={
-        <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+        <PopoverPrimitive.Root open={open} onOpenChange={onOpenChange}>
           <PopoverPrimitive.Trigger asChild>
             <IconButton
               variant="secondary"
@@ -275,6 +284,9 @@ function DatePickerBody({
               label={`${label}をカレンダーから選ぶ`}
               icon={<CalendarDays />}
               disabled={disabled}
+              onPointerDown={() => {
+                holding.current = true;
+              }}
             />
           </PopoverPrimitive.Trigger>
           <PopoverPrimitive.Portal>
@@ -301,7 +313,7 @@ function DatePickerBody({
                   value={current}
                   onValueChange={(next) => {
                     set(next);
-                    setOpen(false);
+                    onOpenChange(false);
                   }}
                   min={min}
                   max={max}
