@@ -106,6 +106,8 @@ export type DateFieldProps = {
   id?: string;
   /** 'bday' で、ブラウザの自動入力に生年月日（年・月・日）を伝えます。 */
   autoComplete?: 'bday';
+  /** 'japanese' で、欄の下に入れた日の和暦（令和8年11月22日）を添えます。入れるのは西暦のままです。DatePicker ではカレンダーも和暦にします。 */
+  calendar?: 'gregory' | 'japanese';
   className?: string;
 };
 /**
@@ -132,6 +134,7 @@ function DateFieldBody({
   name,
   id,
   autoComplete,
+  calendar = 'gregory',
   className,
   trailing,
   keeps,
@@ -218,6 +221,12 @@ function DateFieldBody({
           {field('day', '日', 2)}
           {trailing}
         </div>
+        {calendar === 'japanese' && (
+          // Shown once the date passes, and read out when it changes.
+          <p className="lv-date-field-reading" aria-live="polite">
+            {check.kind === 'ok' && `和暦：${formatDate(check.value, { calendar: 'japanese' })}`}
+          </p>
+        )}
       </Fieldset>
       {name && (
         <input
@@ -251,7 +260,7 @@ function DatePickerBody({
   defaultValue = null,
   ...props
 }: DatePickerProps & { range?: { start?: string | null; end?: string | null } }) {
-  const { value, onValueChange, label, min, max, disabled } = props;
+  const { value, onValueChange, label, min, max, disabled, calendar } = props;
   const [inner, setInner] = useState<string | null>(defaultValue);
   const current = value !== undefined ? (value === '' ? null : value) : inner;
   const set = (next: string | null) => {
@@ -333,6 +342,7 @@ function DatePickerBody({
                   max={max}
                   today={today}
                   range={range}
+                  calendar={calendar}
                 />
               </PopoverPrimitive.Content>
             </PortalSurface>
@@ -377,6 +387,8 @@ export type DateRangePickerProps = {
   name?: { start: string; end: string };
   /** カレンダーで今日として印を付ける日（'2026-11-22' の形）。省くと端末の今日です。 */
   today?: string;
+  /** 'japanese' で、それぞれの欄の下に和暦を添え、カレンダーも和暦にします。 */
+  calendar?: 'gregory' | 'japanese';
   className?: string;
 };
 /**
@@ -398,6 +410,7 @@ export function DateRangePicker({
   max,
   name,
   today,
+  calendar,
   className,
 }: DateRangePickerProps) {
   const [inner, setInner] = useState<DateRange>(defaultValue);
@@ -414,7 +427,7 @@ export function DateRangePicker({
   const start = readBound(current.start);
   const low = readBound(min);
   const endMin = start && (!low || start.compare(low) > 0) ? current.start! : min;
-  const shared = { required, disabled, max, today, range: current };
+  const shared = { required, disabled, max, today, calendar, range: current };
   return (
     <Fieldset
       legend={label}
