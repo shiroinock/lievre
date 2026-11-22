@@ -34,7 +34,7 @@ const HERE = import.meta.dirname;
 const NAMESPACE = 'Lievre';
 const REPO = 'shiroinock/lievre';
 /** The artifact's index was first written at this time. Keep it: the page reads it as a marker. */
-const CREATED_ON_FILES = { v: 1, at: '2026-11-23T00:00:00Z' };
+const CREATED_ON_FILES = { v: 1, at: '2026-11-22T15:53:00Z' };
 /** React for the previews, loaded by the page from jsDelivr. lievre supports 18.3 and 19. */
 const LIBRARIES = [
   { name: 'react', version: '18.3.1' },
@@ -85,7 +85,7 @@ if (problems.length) {
 
 const sha = git('rev-parse', '--short=7', 'HEAD');
 const date = git('log', '-1', '--format=%cI', 'HEAD');
-const ref = `main@${sha}`;
+const ref = `${git('rev-parse', '--abbrev-ref', 'HEAD')}@${sha}`;
 const dirty = git('status', '--porcelain', '--', 'packages', 'logo', 'scripts/design-system');
 if (dirty) console.warn(`手元に未コミットの変更があります。内容は ${ref} と違うかもしれません。`);
 
@@ -818,6 +818,8 @@ if (stale.length)
 if (opts.against) {
   const before = JSON.parse(readFileSync(resolve(opts.against), 'utf8')).files ?? {};
   const changed = Object.keys(listing).filter((p) => before[p] !== listing[p]);
+  // files.json itself changes with them; it is what the next sync compares against.
+  if (changed.length) changed.push('project/sync/files.json');
   const removed = Object.keys(before).filter((p) => !(p in listing));
   writeFileSync(join(OUT, 'changed.json'), json({ changed, removed, logos: stale }));
   console.log(
