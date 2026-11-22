@@ -131,6 +131,18 @@ describe('DateField', () => {
     expect(screen.getByTestId('value')).toHaveTextContent('なし');
     expect(box('日')).toHaveValue('22');
   });
+  it('keeps partial typing when the parent holds no date as an empty string', async () => {
+    function Controlled() {
+      const [value, setValue] = useState<string>('2026-11-22');
+      return (
+        <DateField label="届け出の日" value={value} onValueChange={(v) => setValue(v ?? '')} />
+      );
+    }
+    render(<Controlled />);
+    await userEvent.clear(box('日'));
+    expect(box('年')).toHaveValue('2026');
+    expect(box('月')).toHaveValue('11');
+  });
   it('reports null for a starting value outside the range', () => {
     const onValueChange = vi.fn();
     render(

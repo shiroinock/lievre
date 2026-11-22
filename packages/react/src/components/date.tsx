@@ -90,7 +90,7 @@ export function dateCheckMessage(check: DateCheck): string | undefined {
 export type DateFieldProps = {
   /** 問いの名前（「生年月日」）。年・月・日の3つの欄をまとめる legend になります。 */
   label: string;
-  /** 日付（'2026-11-22' の形）。未入力や、確かめて通らないあいだは null。渡すと外で持ちます。打っている途中の欄を外から空にするときは、key を変えて作り直します（null から null では変わったことが分からないため）。 */
+  /** 日付（'2026-11-22' の形）。未入力や、確かめて通らないあいだは null。渡すと外で持ちます。空を '' で持っても null と同じに扱います。打っている途中の欄を外から空にするときは、key を変えて作り直します（null から null では変わったことが分からないため）。 */
   value?: string | null;
   /** 外で持たないときの、はじめの日付。 */
   defaultValue?: string | null;
@@ -142,15 +142,18 @@ export function DateField({
   const [checked, setChecked] = useState(false);
   // The value prop as last seen, and the value this field last reported: a new prop rewrites the
   // fields, unless it is only our own report coming back.
-  const [seen, setSeen] = useState(value);
+  // A parent may hold "no date" as '' (a form library's empty field): that is the same as null,
+  // so our own null coming back as '' leaves the fields being typed in.
+  const given = value === '' ? null : value;
+  const [seen, setSeen] = useState(given);
   const [reported, setReported] = useState<string | null>(
-    value !== undefined ? value : defaultValue,
+    given !== undefined ? given : defaultValue || null,
   );
-  if (value !== seen) {
-    setSeen(value);
-    if (value !== undefined && value !== reported) {
-      setReported(value);
-      setParts(partsOf(value));
+  if (given !== seen) {
+    setSeen(given);
+    if (given !== undefined && given !== reported) {
+      setReported(given);
+      setParts(partsOf(given));
     }
   }
   const check = checkDate(parts, { min, max });
