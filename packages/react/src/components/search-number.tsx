@@ -72,7 +72,8 @@ export function SearchField({
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (fromIme(e.nativeEvent)) return;
     if (e.key === 'Enter') onSearch?.(text.trim());
-    if (e.key === 'Escape' && text) {
+    // Esc that a Dialog around has already taken closes it, and leaves the text alone.
+    if (e.key === 'Escape' && text && !e.nativeEvent.defaultPrevented) {
       // The browser's own clearing of a search field would skip onValueChange.
       e.preventDefault();
       clear();
@@ -249,7 +250,17 @@ export function NumberField({
   placeholder,
 }: NumberFieldProps) {
   const start = value !== undefined ? value : defaultValue;
-  const [text, setText] = useState(start === null ? '' : written(start, fractionDigits));
+  // A number given from outside is shown as it is: rounding one with more decimals than
+  // fractionDigits would pass on a different number; shown whole, it is checked and refused.
+  const given = (n: number | null) => {
+    if (n === null) return '';
+    const decimals = String(n).split('.')[1]?.length ?? 0;
+    return written(
+      n,
+      fractionDigits !== undefined && decimals > fractionDigits ? undefined : fractionDigits,
+    );
+  };
+  const [text, setText] = useState(() => given(start));
   const [checked, setChecked] = useState(false);
   const [seen, setSeen] = useState(value);
   const [reported, setReported] = useState<number | null>(start);
@@ -257,7 +268,7 @@ export function NumberField({
     setSeen(value);
     if (value !== undefined && value !== reported) {
       setReported(value);
-      setText(value === null ? '' : written(value, fractionDigits));
+      setText(given(value));
     }
   }
   const rules = { min, max, fractionDigits };

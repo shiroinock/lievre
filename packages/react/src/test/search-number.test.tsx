@@ -3,7 +3,14 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import axe from 'axe-core';
-import { NumberField, SearchField, checkNumber, numberCheckMessage } from '../index';
+import {
+  Button,
+  Dialog,
+  NumberField,
+  SearchField,
+  checkNumber,
+  numberCheckMessage,
+} from '../index';
 
 describe('SearchField', () => {
   const box = () => screen.getByRole('searchbox', { name: '取引先を探す' });
@@ -46,6 +53,19 @@ describe('SearchField', () => {
     expect(onValueChange).toHaveBeenLastCalledWith('');
     await userEvent.type(box(), 'xyz{Escape}');
     expect(box()).toHaveValue('');
+  });
+  it('leaves the text alone when Esc closes a dialog around it', async () => {
+    const onValueChange = vi.fn();
+    render(
+      <Dialog trigger={<Button>開く</Button>} title="取引先" description="探して選びます。">
+        <SearchField label="取引先を探す" defaultValue="東京" onValueChange={onValueChange} />
+      </Dialog>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: '開く' }));
+    await userEvent.click(box());
+    await userEvent.keyboard('{Escape}');
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(onValueChange).not.toHaveBeenCalled();
   });
   it('follows a controlled value', async () => {
     function Controlled() {
@@ -207,6 +227,20 @@ describe('NumberField', () => {
     expect(onValueChange).toHaveBeenLastCalledWith(null);
     expect(screen.getByTestId('value')).toHaveTextContent('なし');
     expect(box()).toHaveValue('150');
+  });
+  it('does not round a given number with more decimals than it takes', () => {
+    const onValueChange = vi.fn();
+    render(
+      <NumberField
+        label="数量"
+        fractionDigits={0}
+        defaultValue={1234.5}
+        onValueChange={onValueChange}
+      />,
+    );
+    expect(box()).toHaveValue('1,234.5');
+    expect(onValueChange).toHaveBeenCalledWith(null);
+    expect(onValueChange).not.toHaveBeenCalledWith(1235);
   });
   it('reports null for a starting value beyond max', () => {
     const onValueChange = vi.fn();
