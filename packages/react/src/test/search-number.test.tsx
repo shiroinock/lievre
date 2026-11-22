@@ -182,6 +182,37 @@ describe('NumberField', () => {
     await userEvent.click(screen.getByRole('button', { name: '変える' }));
     expect(box()).toHaveValue('5');
   });
+  it('reports null for a starting or outside value that does not pass', async () => {
+    const onValueChange = vi.fn();
+    function Controlled() {
+      const [value, setValue] = useState<number | null>(null);
+      return (
+        <>
+          <NumberField
+            label="数量"
+            max={100}
+            value={value}
+            onValueChange={(next) => {
+              onValueChange(next);
+              setValue(next);
+            }}
+          />
+          <button onClick={() => setValue(150)}>入れる</button>
+          <output data-testid="value">{value ?? 'なし'}</output>
+        </>
+      );
+    }
+    render(<Controlled />);
+    await userEvent.click(screen.getByRole('button', { name: '入れる' }));
+    expect(onValueChange).toHaveBeenLastCalledWith(null);
+    expect(screen.getByTestId('value')).toHaveTextContent('なし');
+    expect(box()).toHaveValue('150');
+  });
+  it('reports null for a starting value beyond max', () => {
+    const onValueChange = vi.fn();
+    render(<NumberField label="数量" max={10} defaultValue={50} onValueChange={onValueChange} />);
+    expect(onValueChange).toHaveBeenCalledWith(null);
+  });
   it('sends the plain number with name and nothing when it does not pass', async () => {
     const { container } = render(
       <form>

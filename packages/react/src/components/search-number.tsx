@@ -1,5 +1,5 @@
 // A field for words to search and a field for numbers: lievre's own, on Field and TextField.
-import { useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { Search, X } from 'lucide-react';
 import { cx } from './system';
 import { Field } from './form';
@@ -262,6 +262,16 @@ export function NumberField({
   }
   const rules = { min, max, fractionDigits };
   const check = checkNumber(text, rules);
+  const valid = check.kind === 'ok' ? check.value : null;
+  // What the field holds may not pass without any typing: a starting value or one from outside
+  // beyond min, max or the decimals, or a bound that moves. Tell the caller then too.
+  useEffect(() => {
+    if (valid !== reported) {
+      setReported(valid);
+      onValueChange?.(valid);
+    }
+    // onValueChange follows; a new function each render must not report again.
+  }, [valid, reported]);
   const report = (next: string) => {
     const result = checkNumber(next, rules);
     const nextValue = result.kind === 'ok' ? result.value : null;
