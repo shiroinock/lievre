@@ -46,7 +46,9 @@ export const NoSuchDay: Story = {
     await userEvent.type(c.getByRole('textbox', { name: '月' }), '2');
     await userEvent.type(c.getByRole('textbox', { name: '日' }), '30');
     await userEvent.tab();
-    await expect(c.getByText('2026年2月30日はありません。日付を確かめてください。')).toBeVisible();
+    await expect(
+      await c.findByText('2026年2月30日はありません。日付を確かめてください。'),
+    ).toBeVisible();
     await expect(c.getByRole('textbox', { name: '年' })).toHaveValue('2026');
   },
 };
@@ -63,6 +65,6 @@ export const OutOfRange: Story = {
     const c = within(canvasElement);
     await userEvent.click(c.getByRole('textbox', { name: '日' }));
     await userEvent.tab();
-    await expect(c.getByText('2026年12月1日以降の日付を入れてください。')).toBeVisible();
+    await expect(await c.findByText('2026年12月1日以降の日付を入れてください。')).toBeVisible();
   },
 };

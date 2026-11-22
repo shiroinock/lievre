@@ -1,10 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { DateField, checkDate, dateCheckMessage } from '../index';
 
 const box = (name: string) => screen.getByRole('textbox', { name });
+// The group checks once the focus has settled, after the blur.
+const settle = () => act(() => new Promise((resolve) => setTimeout(resolve, 0)));
 
 describe('checkDate', () => {
   it('turns parts into an ISO date, taking full-width digits', () => {
@@ -68,15 +70,52 @@ describe('DateField', () => {
     render(<DateField label="生年月日" />);
     await userEvent.type(box('年'), '2026');
     await userEvent.tab();
+    await settle();
     expect(screen.queryByText('年・月・日をすべて入れてください。')).toBeNull();
     await userEvent.tab();
     await userEvent.tab();
-    expect(screen.getByText('年・月・日をすべて入れてください。')).toBeInTheDocument();
+    expect(await screen.findByText('年・月・日をすべて入れてください。')).toBeInTheDocument();
     for (const name of ['年', '月', '日'])
       expect(box(name)).toHaveAttribute('aria-invalid', 'true');
     expect(screen.getByRole('group', { name: '生年月日' })).toHaveAccessibleDescription(
       /すべて入れてください/,
     );
+  });
+  it('does not check when a label is pressed to move between the fields', async () => {
+    render(<DateField label="生年月日" />);
+    await userEvent.type(box('年'), '2026');
+    await userEvent.click(screen.getByText('月', { selector: 'label' }));
+    await settle();
+    expect(box('月')).toHaveFocus();
+    expect(screen.queryByText('年・月・日をすべて入れてください。')).toBeNull();
+  });
+  it('tells the caller when the date stops passing without typing', () => {
+    const onValueChange = vi.fn();
+    const { rerender } = render(
+      <DateField label="終わり" defaultValue="2026-12-10" onValueChange={onValueChange} />,
+    );
+    expect(onValueChange).not.toHaveBeenCalled();
+    rerender(
+      <DateField
+        label="終わり"
+        defaultValue="2026-12-10"
+        min="2026-12-15"
+        onValueChange={onValueChange}
+      />,
+    );
+    expect(onValueChange).toHaveBeenLastCalledWith(null);
+  });
+  it('reports null for a starting value outside the range', () => {
+    const onValueChange = vi.fn();
+    render(
+      <DateField
+        label="希望日"
+        defaultValue="2026-11-22"
+        min="2026-12-01"
+        onValueChange={onValueChange}
+      />,
+    );
+    expect(onValueChange).toHaveBeenCalledWith(null);
   });
   it('straightens full-width digits when leaving a field', async () => {
     render(<DateField label="生年月日" />);

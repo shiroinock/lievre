@@ -1,6 +1,6 @@
 // Dates typed in as year, month and day (the GOV.UK date input pattern). The calendar arithmetic
 // is @internationalized/date's; the fields are lievre's own TextFields in a Fieldset.
-import { useState, type FocusEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CalendarDate, parseDate } from '@internationalized/date';
 import { cx } from './system';
 import { Fieldset } from './form';
@@ -149,6 +149,16 @@ export function DateField({
     }
   }
   const check = checkDate(parts, { min, max });
+  const valid = check.kind === 'ok' ? check.value : null;
+  // What the fields hold now may stop passing without any typing: a starting value outside
+  // min and max, or a bound that moves. Tell the caller then too.
+  useEffect(() => {
+    if (valid !== reported) {
+      setReported(valid);
+      onValueChange?.(valid);
+    }
+    // Only a change in what passes should report; reported and onValueChange follow it.
+  }, [valid]);
   const shown = error ?? (checked ? dateCheckMessage(check) : undefined);
   const update = (key: keyof Parts, text: string) => {
     const next = { ...parts, [key]: text };
@@ -160,9 +170,17 @@ export function DateField({
       onValueChange?.(nextValue);
     }
   };
-  // Check once the focus leaves the three fields, not while moving between them.
-  const onBlur = (e: FocusEvent<HTMLDivElement>) => {
-    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setChecked(true);
+  // Check once the focus has settled outside the three fields. Pressing a label, the legend or
+  // the gap blurs a field with no relatedTarget before the next field takes the focus, so wait
+  // for that rather than reading relatedTarget.
+  const group = useRef<HTMLDivElement>(null);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  const onBlur = () => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      if (!group.current?.contains(group.current.ownerDocument.activeElement)) setChecked(true);
+    }, 0);
   };
   const field = (key: keyof Parts, text: string, chars: number, fieldId?: string) => (
     <TextField
@@ -181,7 +199,7 @@ export function DateField({
     />
   );
   return (
-    <div onBlur={onBlur} className={cx('lv-date-field', className)}>
+    <div ref={group} onBlur={onBlur} className={cx('lv-date-field', className)}>
       <Fieldset legend={label} hint={hint} error={shown} required={required} disabled={disabled}>
         <div className="lv-date-field-parts">
           {field('year', '年', 4, id)}
