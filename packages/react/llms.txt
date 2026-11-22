@@ -821,6 +821,7 @@ selected・onSelectedChange で押して入り切りする絞り込みの札に�
 - `name?: string` — フォームで送るときの名前。確かめて通った日付を隠した入力で送ります。
 - `id?: string` — 年の欄の id。ErrorSummary から移るときは、ここで決めた id を使います。
 - `autoComplete?: 'bday'` — 'bday' で、ブラウザの自動入力に生年月日（年・月・日）を伝えます。
+- `calendar?: 'gregory' | 'japanese'` — 'japanese' で、欄の下に入れた日の和暦（令和8年11月22日）を添えます。入れるのは西暦のままです。DatePicker ではカレンダーも和暦にします。
 - `className?: string`
 
 ### DatePicker
@@ -842,8 +843,31 @@ props は DateField と同じで、min・max はカレンダーでも選べな�
 - `name?: string` — フォームで送るときの名前。確かめて通った日付を隠した入力で送ります。
 - `id?: string` — 年の欄の id。ErrorSummary から移るときは、ここで決めた id を使います。
 - `autoComplete?: 'bday'` — 'bday' で、ブラウザの自動入力に生年月日（年・月・日）を伝えます。
+- `calendar?: 'gregory' | 'japanese'` — 'japanese' で、欄の下に入れた日の和暦（令和8年11月22日）を添えます。入れるのは西暦のままです。DatePicker ではカレンダーも和暦にします。
 - `className?: string`
 - `today?: string` — カレンダーで今日として印を付ける日（'2026-11-22' の形）。省くと端末の今日です。
+
+### DateRangePicker
+
+開始日と終了日を選ぶ期間の入力。2つの DatePicker を1つの問いにまとめます。予約・絞り込みの期間などに使います。
+どちらのカレンダーにも開始日から終了日までの期間を示します。終了日は開始日より前にできず、前の日を入れると、直し方のわかる文を出して null にします。
+
+- `label: string` — 問いの名前（「宿泊の期間」）。開始日と終了日の2つをまとめる legend になります。
+- `value?: DateRange` — 期間。渡すと外で持ちます。
+- `defaultValue?: DateRange` — 既定 { start: null, end: null }。外で持たないときの、はじめの期間。
+- `onValueChange?: ((value: DateRange) => void)` — 開始日か終了日が、確かめて通る日になったとき、またはそうでなくなったとき（null）に呼びます。
+- `startLabel?: string` — 既定 '開始日'。開始日の欄の名前。
+- `endLabel?: string` — 既定 '終了日'。終了日の欄の名前。
+- `hint?: string` — 補助文。2つの欄の下に出し、まとまりに aria-describedby で結びます。
+- `error?: string` — エラー文。2つの欄のまとまりに出します（それぞれの欄の確かめは、欄の下に出ます）。
+- `required?: boolean` — 2つの欄のラベルの横に「必須」の文字を出し、欄に aria-required を付けます。
+- `disabled?: boolean`
+- `min?: string` — 開始日・終了日とも、これより前の日を通さない（'2026-12-01' の形）。
+- `max?: string` — 開始日・終了日とも、これより後の日を通さない（'2026-12-31' の形）。
+- `name?: { start: string; end: string; }` — フォームで送るときの名前。開始日と終了日を、それぞれ隠した入力で送ります。
+- `today?: string` — カレンダーで今日として印を付ける日（'2026-11-22' の形）。省くと端末の今日です。
+- `calendar?: 'gregory' | 'japanese'` — 'japanese' で、それぞれの欄の下に和暦を添え、カレンダーも和暦にします。
+- `className?: string`
 
 ### Calendar
 
@@ -857,6 +881,8 @@ props は DateField と同じで、min・max はカレンダーでも選べな�
 - `min?: string` — これより前の日は選べません（'2026-12-01' の形）。前の月へも、この日の月より前には移りません。
 - `max?: string` — これより後の日は選べません（'2026-12-31' の形）。
 - `today?: string` — 今日として印を付ける日（'2026-11-22' の形）。省くと端末の今日です。
+- `range?: { start?: string | null | undefined; end?: string | null | undefined; }` — 期間として示す日（開始日と終了日。'2026-11-22' の形）。間の日に面を敷き、読み上げでも「期間の中」と伝えます。片方だけなら、その日だけに印を付けます。
+- `calendar?: 'gregory' | 'japanese'` — 既定 'gregory'。'japanese' で、見出しと日の名前を和暦（令和8年11月）で出します。年号の切り替わりの月も、その日の年号で出します。
 - `label?: string` — 表の名前。省くと表示している年月（「2026年11月」）です。
 - `autoFocus?: boolean` — 既定 false。描いたときに、選んだ日（なければ今日）へフォーカスを移します。ポップオーバーの中で開いたときに使います。
 - `className?: string`
@@ -890,6 +916,50 @@ props は DateField と同じで、min・max はカレンダーでも選べな�
 - `onOpenChange?: ((open: boolean) => void)` — 開いた・閉じたときに呼びます。
 - `onSelect?: ((value: string) => void)` — 項目を選んだときに、項目の onSelect のあとで呼びます。
 - `emptyText?: string` — 既定 '一致するコマンドがありません'。一致する項目がないときの文。
+
+### SearchField
+
+探す言葉を入れる欄（type="search"、先頭に虫眼鏡）。Enter で onSearch を呼びます。日本語の変換を確定する Enter では呼びません。
+文字があるときは右端に消すボタンを出し、Esc でも消します。消したあとも、フォーカスは入力欄に残ります。
+
+- `label: string` — 見える名前（「取引先を探す」）。placeholder の代わりにはしません。
+- `value?: string` — 入っている文字。渡すと外で持ちます。
+- `defaultValue?: string` — 既定 ''。外で持たないときの、はじめの文字。
+- `onValueChange?: ((value: string) => void)` — 文字が変わったときに呼びます。日本語の変換中は呼ばず、確定したときに呼びます（打ちながら絞り込むときに、変換前のかなで絞らないため）。
+- `onSearch?: ((value: string) => void)` — Enter で呼びます（前後の空白を除いた文字）。変換を確定する Enter では呼びません。
+- `placeholder?: string` — 欄の中に薄く出す例（「名前か読み」）。ラベルの代わりにはしません。
+- `hint?: string` — 補助文。入力の下に出し、aria-describedby で結びます。
+- `error?: string` — エラー文。補助文の下に記号を添えて出します。
+- `disabled?: boolean`
+- `name?: string` — フォームで送るときの名前。
+- `id?: string` — input の id。省くと部品が作ります。
+- `controlSize?: 'sm' | 'md' | 'lg'` — 既定 'md'。高さは TextField と同じ段です。表の上の絞り込みには 'sm'。
+- `clearLabel?: string` — 既定 '文字を消す'。文字を消すボタンの名前。
+
+### NumberField
+
+数を入れる欄。数字は等幅で、全角の数字・記号も受け、離れると半角に直して桁区切りの書式（1,234.5）にします。
+step を決めると ↑・↓ で増減し、min・max で止まります。数でない文字・小数の桁の超え・min と max の外は、離れたときに直し方のわかる文を出し、値は null にします。
+type="number" は使いません（ホイールで値が変わる・全角を受けない・読み上げが揃わないため）。
+
+- `label: string` — 見える名前（「数量」「金額」）。
+- `value?: number | null` — 数。渡すと外で持ちます。未入力や、確かめて通らないあいだは null。
+- `defaultValue?: number | null` — 既定 null。外で持たないときの、はじめの数。
+- `onValueChange?: ((value: number | null) => void)` — 確かめて通る数になったとき、またはそうでなくなったとき（null）に呼びます。
+- `min?: number` — これより小さい数を通しません。↓ もここで止まります。
+- `max?: number` — これより大きい数を通しません。↑ もここで止まります。
+- `step?: number` — ↑・↓ で増やす・減らす幅。省くと矢印では変わりません。
+- `fractionDigits?: number` — 小数の桁。決めると、それより多い桁を通さず、離れたときにその桁まで0を埋めて出します（1.5 → 1.50）。0 で整数だけ。
+- `unit?: string` — 数の後ろに出す単位（「円」「個」）。値には含めず、読み上げでは入力と結びます。
+- `hint?: string` — 補助文（「1から99まで」）。
+- `error?: string` — エラー文。渡すと、部品が確かめた文の代わりに出します。
+- `required?: boolean` — ラベルの横に「必須」の文字を出し、入力に required を付けます。空のときに文を出すのは呼び出す側です（error で伝えます）。
+- `disabled?: boolean`
+- `name?: string` — フォームで送るときの名前。確かめて通った数を、桁区切りのない形（1234.5）で送ります。
+- `id?: string` — input の id。
+- `chars?: number` — 入る文字の数（半角で数えます）。入力欄の幅をこの文字数に合わせます。
+- `controlSize?: 'sm' | 'md' | 'lg'` — 高さは TextField と同じ段です。
+- `placeholder?: string` — 欄の中に薄く出す例。ラベルや単位の代わりにはしません。
 
 ## フック
 
@@ -1054,6 +1124,9 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `kana?: string` — 読み（ひらがな）。漢字の名前を、読みでも探せるようにします（「とうきょう」で「東京商事」）。
   - `disabled?: boolean`
 - `type DateCheck = | { kind: 'empty' } | { kind: 'partial' } | { kind: 'not-number' } | { kind: 'no-such-day'; year: number; month: number; day: number } | { kind: 'before-min'; min: string } | { kind: 'after-max'; max: string } | { kind: 'ok'; value: string };`
+- `type DateRange`
+  - `start: string | null` — 開始日（'2026-11-22' の形）。未入力や、確かめて通らないあいだは null。
+  - `end: string | null` — 終了日（'2026-11-30' の形）。未入力や、確かめて通らないあいだ（開始日より前を含む）は null。
 - `type StepperStep`
   - `label: string` — 段の名前（「入力」「確認」「完了」）。
 - `type CommandItem`
@@ -1071,6 +1144,7 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `mod?: boolean` — Mac では ⌘、ほかでは Ctrl を押しながら。1文字のキーを document 全体で受けないように、mod か alt のどちらかは付けます。
   - `shift?: boolean` — ⇧（Shift）を押しながら。修飾キーはちょうど一致したときだけ反応するので、⌘⇧K は ⌘K の開くキーには反応しません。
   - `alt?: boolean` — ⌥（Mac）/ Alt を押しながら。mod の代わりにもなります（⌥K など）。Mac では ⌥ で別の字が入る（⌥1 は「¡」）ので、同じ物理キーが修飾キーなしで打つ字と比べます。英字と数字はいつでも、記号（⌥/ など）はブラウザがキー配列を教える場合（Chromium）か、その字を一度修飾キーなしで打ったあとで分かります。
+- `type NumberCheck = | { kind: 'empty' } | { kind: 'not-number' } | { kind: 'too-many-decimals'; fractionDigits: number; value: number } | { kind: 'below-min'; min: number; value: number } | { kind: 'above-max'; max: number; value: number } | { kind: 'ok'; value: number };`
 - `WearConfig`: `any`
 - `cx`: `(...values: (string | false | null | undefined)[]) => string`
 - `getQueueSnapshot`: `(keys: readonly string[], state: DecisionState) => DecisionQueueSnapshot` — 列の今の姿を組みます。keys は出す順（システムが決めた順）に並べて渡します。
@@ -1101,3 +1175,5 @@ keys にないキーの決定は数えません。
 - `filterCommands`: `(items: CommandItem[], query: string) => CommandItem[]` — 項目を絞り込みます（実行はしません）。group ごとの順を保ち、全角と半角・カタカナとひらがな・大文字と小文字の違いを無視して、
 名前・読み・探し言葉・補足で絞り込みます。
 - `DEFAULT_COMMAND_HOTKEY`: `CommandHotkey`
+- `checkNumber`: `(text: string, rules?: { min?: number | undefined; max?: number | undefined; fractionDigits?: number | undefined; }) => NumberCheck` — 入れた文字を確かめて数にします。全角の数字・記号と桁区切り（1,234）も受けます。数でない文字や、小数の桁の超え、min・max の外は、その理由を返します。
+- `numberCheckMessage`: `(check: NumberCheck, unit?: string) => string | undefined` — checkNumber の結果を、直し方のわかる文にします。通ったとき（ok）と空（empty）は undefined です。

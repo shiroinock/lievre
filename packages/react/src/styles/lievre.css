@@ -718,6 +718,37 @@
     /* stylelint-disable-next-line lievre/padding-symmetry -- 先頭のアイコン（16px）と間（8px）の分だけ空けて、文字をアイコンの後ろから始める */
     padding-inline-start: calc(var(--input-x) + 16px + var(--lv-space-2));
   }
+  /* SearchField: the clear button sits where Combobox's arrow sits, a 24px button whose icon
+     is the field's inner padding from the right edge. The browser's own clear button goes. */
+  .lv-search-field-input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+  .lv-input.lv-search-field-input {
+    /* stylelint-disable-next-line lievre/padding-symmetry -- 右端の消すボタンのアイコン（16px）と間（8px）の分だけ空けて、文字がボタンの下に入らないようにする */
+    padding-inline-end: calc(var(--input-x) + 16px + var(--lv-space-2));
+  }
+  .lv-search-field-clear {
+    position: absolute;
+    top: 50%;
+    /* 1px border + the inner padding to the icon, less the button's 4px around the icon. */
+    right: calc(var(--input-x) + 1px - 4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--lv-radius-sm);
+    background: transparent;
+    color: var(--lv-muted);
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+  .lv-search-field-clear:hover {
+    background: var(--lv-surface-sunken);
+    color: var(--lv-text);
+  }
   .lv-textarea {
     min-height: 104px;
     line-height: var(--lv-line-body);
@@ -1075,6 +1106,14 @@
     gap: var(--lv-space-3);
   }
 
+  /* The Japanese era of the date typed in, under the fields, once the date passes. */
+  .lv-date-field-reading {
+    margin: var(--lv-space-2) 0 0;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-tight);
+  }
+
   /* DatePicker: the calendar button sits after the day field, at the fields' height. */
   .lv-popover.lv-date-picker-popover {
     width: auto;
@@ -1166,6 +1205,30 @@
   .lv-calendar-day[aria-disabled='true']:hover {
     background: transparent;
   }
+  /* A range: a soft band under the days between the ends, the ends ringed. The words in the
+     day's name say the same, so the band is not the only sign. */
+  .lv-calendar-grid td[data-range] {
+    background: var(--lv-accent-soft);
+  }
+  .lv-calendar-grid td[data-range='start'] {
+    border-start-start-radius: var(--lv-radius-md);
+    border-end-start-radius: var(--lv-radius-md);
+  }
+  .lv-calendar-grid td[data-range='end'] {
+    border-start-end-radius: var(--lv-radius-md);
+    border-end-end-radius: var(--lv-radius-md);
+  }
+  .lv-calendar-grid td:is([data-range='start'], [data-range='end']) .lv-calendar-day {
+    box-shadow: inset 0 0 0 2px var(--lv-accent);
+  }
+
+  /* DateRangePicker: the start and the end side by side, wrapping when narrow. */
+  .lv-date-range-parts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--lv-space-6);
+  }
+
   @media (forced-colors: active) {
     .lv-calendar-grid td[aria-selected='true'] .lv-calendar-day {
       forced-color-adjust: none;
@@ -1174,6 +1237,21 @@
     }
     .lv-calendar-day[aria-disabled='true'] {
       color: GrayText;
+    }
+    /* Forced colors drop the band and the ring (box-shadow): an outline stays. The ends are
+       ringed solid, the days between dashed. */
+    .lv-calendar-grid td:is([data-range='start'], [data-range='end']) .lv-calendar-day {
+      outline: 2px solid CanvasText;
+      outline-offset: -2px;
+    }
+    .lv-calendar-grid td[data-range='middle'] .lv-calendar-day {
+      outline: 1px dashed CanvasText;
+      outline-offset: -4px;
+    }
+    /* The focus ring wins over the range's outline, as it does everywhere else. */
+    .lv-calendar-grid td[data-range] .lv-calendar-day:focus-visible {
+      outline: 2px solid var(--lv-focus);
+      outline-offset: 2px;
     }
   }
 

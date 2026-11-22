@@ -27,10 +27,11 @@
     /* Worn faces for the distorted kinds (wear/baked.css picks them). The faces come from
        `npm run wear:font`; until then these names fall through to the plain ones. */
     .lievre[data-wear='baked'] {
-      --lv-wear-sans: 'Lievre Worn Sans', 'IBM Plex Sans JP', system-ui, -apple-system,
-        'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+      --lv-wear-sans: 'Lievre Worn Sans', 'Lievre Sans', 'IBM Plex Sans JP', system-ui,
+        -apple-system, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
       --lv-wear-mono: 'Lievre Worn Mono', 'Lievre Mono', 'PlemolJP', 'IBM Plex Mono',
-        'Lievre Worn Sans', 'IBM Plex Sans JP', ui-monospace, 'SF Mono', Menlo, monospace;
+        'Lievre Worn Sans', 'Lievre Sans', 'IBM Plex Sans JP', ui-monospace, 'SF Mono', Menlo,
+        monospace;
     }
 
     /* Grain and stains sit on the working surface and on panels, as a background image over the

@@ -17,3 +17,4 @@ export * from './components/date';
 export * from './components/calendar';
 export * from './components/stepper';
 export * from './components/command-palette';
+export * from './components/search-number';

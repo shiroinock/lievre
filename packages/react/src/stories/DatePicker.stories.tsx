@@ -26,6 +26,11 @@ const meta = {
         },
         { name: '日のボタン', selector: '.lv-calendar-day', checks: ['square', 'control-height'] },
         {
+          name: '月の送りのボタン',
+          selector: '.lv-calendar-header .lv-icon-button',
+          checks: ['square', 'control-height'],
+        },
+        {
           name: 'カレンダーの枠',
           selector: '.lv-date-picker-popover',
           checks: ['fits', 'padding-equal'],
@@ -64,5 +69,14 @@ export const ChooseFromCalendar: Story = {
     await screen.findByRole('grid');
     await userEvent.keyboard('{ArrowDown}{Enter}');
     await expect(c.getByRole('textbox', { name: '日' })).toHaveValue('29');
+  },
+};
+/** 和暦（calendar="japanese"）。欄の下に和暦を添え、カレンダーも和暦にします。入れるのは西暦です。 */
+export const Japanese: Story = {
+  args: { calendar: 'japanese', defaultValue: '2026-12-10' },
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await userEvent.click(c.getByRole('button', { name: '予約の日をカレンダーから選ぶ' }));
+    await expect(await screen.findByRole('grid', { name: '令和8年12月' })).toBeVisible();
   },
 };

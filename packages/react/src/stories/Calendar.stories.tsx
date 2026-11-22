@@ -51,3 +51,5 @@ export const Keyboard: Story = {
     );
   },
 };
+/** 和暦（calendar="japanese"）。年号の切り替わりの月も、その日の年号で出します。 */
+export const Japanese: Story = { args: { calendar: 'japanese' } };

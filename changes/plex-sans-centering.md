@@ -2,7 +2,7 @@
 
 #### 見た目が変わる
 
-- `--lv-font-sans` の先頭に `'Lievre Sans'` を、`--lv-font-mono` の日本語の前に `'Lievre Sans'` を足した。`@lievre/react/fonts.css` を読み込むと、本文の字が行の中央に来る。（#55）
+- `--lv-font-sans` の先頭に `'Lievre Sans'` を、`--lv-font-mono` の日本語の前に `'Lievre Sans'` を足した。`@lievre/react/fonts.css` を読み込むと、本文の字が行の中央に来る。質感の試作の書体の並び（`--lv-wear-sans`・`--lv-wear-mono`）にも足した。（#55）
 
 ### @lievre/react
 
