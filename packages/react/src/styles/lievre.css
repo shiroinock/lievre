@@ -1832,8 +1832,12 @@
   }
 
   /* Skeleton */
+  /* In a line of text, centred on the line: middle puts it half an x-height above the baseline,
+     and fonts.css puts the line's middle 0.38em above it, so it moves up by the difference. */
   .lv-skeleton {
     display: inline-block;
+    position: relative;
+    top: calc(0.5ex - 0.38em);
     max-width: 100%;
     vertical-align: middle;
     border-radius: var(--lv-radius-sm);
@@ -2695,9 +2699,15 @@
     line-height: var(--lv-line-body);
     vertical-align: middle;
   }
-  /* A badge alone in a cell sits on the middle of the line, not on its baseline (1.5px low). */
+  /* A badge alone in a cell sits on the middle of the line. It shares the cell's baseline, and
+     fonts.css puts each line's middle 0.38em above its baseline, so the badge is raised by the
+     size difference of the text, or, with a dot first (its bottom edge is then the badge's
+     baseline), from the dot's middle, 3px above its bottom. */
   .lv-table td > .lv-badge {
-    vertical-align: middle;
+    vertical-align: calc(0.38 * (var(--lv-text-md) - var(--lv-text-xs)));
+  }
+  .lv-table td > .lv-badge:has(> .lv-status-dot:first-child) {
+    vertical-align: calc(0.38 * var(--lv-text-md) - 3px);
   }
   .lv-table tbody tr:last-child td {
     border-bottom: 0;
@@ -2730,12 +2740,14 @@
     background-repeat: no-repeat;
     background-size: 4px 100%;
   }
-  /* The same 20px as the Checkbox component. */
+  /* The same 20px as the Checkbox component, centred on the line: its bottom edge is its
+     baseline, raised so its middle (10px up) is the line's middle, 0.38em above the baseline
+     (fonts.css). */
   .lv-table input[type='checkbox'] {
     width: 20px;
     height: 20px;
     margin: 0;
-    vertical-align: middle;
+    vertical-align: calc(0.38em - 10px);
     accent-color: var(--lv-accent);
     cursor: pointer;
   }
