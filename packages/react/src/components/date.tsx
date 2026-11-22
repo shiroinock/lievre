@@ -260,12 +260,21 @@ function DatePickerBody({
   };
   const [open, setOpen] = useState(false);
   const layer = useRef<HTMLDivElement>(null);
-  // From pressing the button until the calendar closes, the fields are not checked. Safari
-  // doesn't focus a pressed button: the fields blur to the page before the calendar opens.
+  // While the calendar is open, the fields are not checked; nor on the one blur that pressing
+  // the button causes. Safari doesn't focus a pressed button (nor a pressed day): the fields
+  // blur to the page before the calendar opens. A press that opens nothing (a right click, a
+  // touch that turns into a scroll) lets go of that one blur, and the next one checks.
   const holding = useRef(false);
+  const pressed = useRef(false);
   const onOpenChange = (next: boolean) => {
     holding.current = next;
+    pressed.current = false;
     setOpen(next);
+  };
+  const keeps = (active: Element | null) => {
+    const press = pressed.current;
+    pressed.current = false;
+    return press || holding.current || !!layer.current?.contains(active);
   };
   return (
     <DateFieldBody
@@ -274,7 +283,7 @@ function DatePickerBody({
       value={current}
       onValueChange={set}
       defaultValue={defaultValue}
-      keeps={(active) => holding.current || !!layer.current?.contains(active)}
+      keeps={keeps}
       trailing={
         <PopoverPrimitive.Root open={open} onOpenChange={onOpenChange}>
           <PopoverPrimitive.Trigger asChild>
@@ -285,7 +294,7 @@ function DatePickerBody({
               icon={<CalendarDays />}
               disabled={disabled}
               onPointerDown={() => {
-                holding.current = true;
+                pressed.current = true;
               }}
             />
           </PopoverPrimitive.Trigger>

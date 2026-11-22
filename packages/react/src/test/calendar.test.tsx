@@ -143,6 +143,20 @@ describe('DatePicker', () => {
     await screen.findByRole('dialog');
     expect(screen.queryByText('年・月・日をすべて入れてください。')).toBeNull();
   });
+  it('checks again on leaving after a press that opened nothing', async () => {
+    render(<DatePicker label="予約の日" today="2026-11-22" />);
+    await userEvent.type(screen.getByRole('textbox', { name: '年' }), '2026');
+    const button = screen.getByRole('button', { name: '予約の日をカレンダーから選ぶ' });
+    // A right click: the press blurs the field, and no calendar opens.
+    fireEvent.pointerDown(button, { button: 2 });
+    (document.activeElement as HTMLElement).blur();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    // Back into the fields and out again: now it checks.
+    screen.getByRole('textbox', { name: '月' }).focus();
+    (document.activeElement as HTMLElement).blur();
+    expect(await screen.findByText('年・月・日をすべて入れてください。')).toBeInTheDocument();
+  });
   it('closes only the calendar on Esc inside a dialog', async () => {
     render(
       <Dialog trigger={<Button>開く</Button>} title="予約" description="日を選びます。">

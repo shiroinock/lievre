@@ -1120,6 +1120,10 @@
     text-decoration: line-through;
     cursor: not-allowed;
   }
+  /* Today outside min and max keeps its underline under the strike. */
+  .lv-calendar-day[aria-current='date'][aria-disabled='true'] {
+    text-decoration-line: underline line-through;
+  }
   .lv-calendar-day[aria-disabled='true']:hover {
     background: transparent;
   }
