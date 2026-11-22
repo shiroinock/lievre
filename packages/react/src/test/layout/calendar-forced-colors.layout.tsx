@@ -46,4 +46,29 @@ describe('Calendar in forced colors', () => {
     expect(getComputedStyle(day(13)).outlineStyle).toBe('dashed');
     expect(plain.outlineStyle).toBe('none');
   });
+  it('shows the focus ring on a day in the range as on any other', async () => {
+    await cdp().send('Emulation.setEmulatedMedia', {
+      features: [{ name: 'forced-colors', value: 'active' }],
+    });
+    const host = document.body.appendChild(document.createElement('div'));
+    root = createRoot(host);
+    flushSync(() =>
+      root!.render(
+        <LievreProvider>
+          <Calendar today="2026-11-22" range={{ start: '2026-11-12', end: '2026-11-15' }} />
+        </LievreProvider>,
+      ),
+    );
+    const ring = (n: number) => {
+      const style = getComputedStyle(day(n));
+      return [style.outlineStyle, style.outlineWidth, style.outlineOffset];
+    };
+    day(20).focus({ focusVisible: true } as FocusOptions);
+    const plain = ring(20);
+    for (const n of [12, 13]) {
+      day(n).focus({ focusVisible: true } as FocusOptions);
+      expect(day(n).matches(':focus-visible')).toBe(true);
+      expect(ring(n)).toEqual(plain);
+    }
+  });
 });

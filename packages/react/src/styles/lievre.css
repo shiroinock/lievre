@@ -1189,6 +1189,11 @@
       outline: 1px dashed CanvasText;
       outline-offset: -4px;
     }
+    /* The focus ring wins over the range's outline, as it does everywhere else. */
+    .lv-calendar-grid td[data-range] .lv-calendar-day:focus-visible {
+      outline: 2px solid var(--lv-focus);
+      outline-offset: 2px;
+    }
   }
 
   /* Checkbox, Switch, Radio — "on" is always the accent, never a status color. */
