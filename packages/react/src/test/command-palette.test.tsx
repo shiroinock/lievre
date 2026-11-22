@@ -306,6 +306,52 @@ describe('CommandPalette', () => {
     act(() => void fireEvent.keyDown(document, { key: 'л', code: 'KeyK', ctrlKey: true }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
+  it('keeps the focus a command moved, when the palette opened from the page body', async () => {
+    const target = document.createElement('input');
+    target.setAttribute('aria-label', '移り先');
+    document.body.appendChild(target);
+    render(
+      <CommandPalette
+        items={[{ value: 'go', label: '移り先へ', onSelect: () => target.focus() }]}
+      />,
+    );
+    (document.activeElement as HTMLElement | null)?.blur();
+    expect(document.activeElement).toBe(document.body);
+    act(() => void ctrlK());
+    await userEvent.keyboard('{Enter}');
+    await act(() => new Promise((r) => setTimeout(r, 20)));
+    expect(target).toHaveFocus();
+    target.remove();
+  });
+  it('returns the focus to the trigger when the palette opened from the page body', async () => {
+    render(<CommandPalette items={items} />);
+    (document.activeElement as HTMLElement | null)?.blur();
+    act(() => void ctrlK());
+    await userEvent.keyboard('{Escape}');
+    await act(() => new Promise((r) => setTimeout(r, 20)));
+    expect(screen.getByRole('button', { name: 'コマンドを探す' })).toHaveFocus();
+  });
+  it('keeps the highlight when the pointer leaves the list', async () => {
+    const onSelect = vi.fn();
+    setup({ defaultOpen: true, onSelect });
+    const option = screen.getByRole('option', { name: /新しい作業を作る/ });
+    fireEvent.mouseMove(option);
+    expect(highlighted()).toContain('新しい作業を作る');
+    fireEvent.mouseLeave(screen.getByRole('listbox'));
+    expect(highlighted()).toContain('新しい作業を作る');
+    await userEvent.keyboard('{Enter}');
+    expect(onSelect).toHaveBeenCalledWith('new');
+  });
+  it('leaves Home and End to the field', () => {
+    setup({ defaultOpen: true });
+    fireEvent.keyDown(input(), { key: 'ArrowDown' });
+    expect(highlighted()).toContain('設定を開く');
+    for (const key of ['Home', 'End']) {
+      // fireEvent returns false when the default (moving the caret) was prevented.
+      expect(fireEvent.keyDown(input(), { key })).toBe(true);
+      expect(highlighted()).toContain('設定を開く');
+    }
+  });
   it('has no axe violations while open', async () => {
     const { container } = setup({ defaultOpen: true });
     const results = await axe.run(container.ownerDocument.body, {
