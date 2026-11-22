@@ -244,7 +244,9 @@ function ComboboxControl({
             onCompositionEnd,
             // Leaving with the list closed: Downshift does nothing then, so put the chosen name
             // back here. With the list open, Downshift's own blur (the reducer above) does it.
-            onBlur: () => {
+            onBlur: (e) => {
+              // Moving within the combobox (its button, its list) is not leaving it.
+              if (inside(e.relatedTarget)) return;
               const label = selected?.label ?? '';
               if (!cb.isOpen && cb.inputValue !== label) cb.setInputValue(label);
             },
@@ -262,12 +264,18 @@ function ComboboxControl({
           className="lv-combobox-button"
           aria-label="候補を開く"
           disabled={disabled}
-          {...cb.getToggleButtonProps()}
+          {...cb.getToggleButtonProps({
+            // Keep the focus in the input: pressing the button would move it there in Chrome
+            // and Firefox on Windows, and the input's blur would put back the chosen name.
+            onMouseDown: (e) => e.preventDefault(),
+          })}
         >
           <ChevronDown size={16} aria-hidden />
         </button>
       </div>
-      {name && <input type="hidden" name={name} value={selected?.value ?? ''} />}
+      {name && (
+        <input type="hidden" name={name} value={selected?.value ?? ''} disabled={disabled} />
+      )}
       <VisuallyHidden role="status" aria-live="polite">
         {cb.isOpen ? (choosable ? `${choosable}件の候補があります` : emptyText) : ''}
       </VisuallyHidden>
@@ -284,6 +292,9 @@ function ComboboxControl({
               ref={content}
               // The list inside is the listbox; the layer itself is not a dialog.
               role="presentation"
+              // Pressing the list's padding or the empty line would focus the layer (it has
+              // tabIndex -1) and take the focus out of the input; keep it there.
+              onMouseDown={(e) => e.preventDefault()}
               className="lv-select-content lv-combobox-content"
               data-size={controlSize}
               sideOffset={5}

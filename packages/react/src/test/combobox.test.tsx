@@ -174,6 +174,30 @@ describe('Combobox', () => {
     expect(names()).toEqual(['福岡システムズ']);
     expect(screen.getByRole('status')).toHaveTextContent('一致する候補がありません');
   });
+  it('keeps the typed text when the button is pressed after Esc', async () => {
+    render(<Combobox label="取引先" options={options} />);
+    await userEvent.type(input(), 'おお');
+    await userEvent.keyboard('{Escape}');
+    await userEvent.click(screen.getByRole('button', { name: '候補を開く' }));
+    expect(input()).toHaveValue('おお');
+    expect(input()).toHaveFocus();
+    expect(names()).toEqual(['大阪精機']);
+  });
+  it('keeps the focus in the input when the empty line is pressed', async () => {
+    render(<Combobox label="取引先" options={options} defaultValue="tokyo" />);
+    await userEvent.clear(input());
+    await userEvent.type(input(), 'ぞぞ');
+    await userEvent.click(screen.getByText('一致する候補がありません', { selector: 'li' }));
+    expect(input()).toHaveFocus();
+  });
+  it('does not send the value while disabled', () => {
+    const { container } = render(
+      <form>
+        <Combobox label="取引先" options={options} name="partner" disabled defaultValue="osaka" />
+      </form>,
+    );
+    expect(new FormData(container.querySelector('form')!).get('partner')).toBeNull();
+  });
   it('sends the chosen value with name', async () => {
     const { container } = render(
       <form>
