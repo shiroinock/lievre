@@ -12,7 +12,7 @@ permissions: {}
 
 jobs:
   review:
-    uses: shiroinock/workflows/.github/workflows/claude-review.yml@eb1ef0dc284c9b116968b388815528b17e3df135
+    uses: shiroinock/workflows/.github/workflows/claude-review.yml@c40329d99e08e33dfd93fa0a067ebe1f905b0305
     # The most any of its jobs needs; each job narrows it to its own.
     permissions:
       contents: write

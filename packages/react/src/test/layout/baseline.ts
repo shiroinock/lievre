@@ -56,6 +56,5 @@ export const NOT_A_PART: Record<string, string> = {
   LievreProvider: '配色・密度・文字の範囲を決める入れ物。すべての Story の外側で使っている。',
   PortalSurface: 'ポータルにテーマを引き継ぐ入れ物。Dialog・Select・Tooltip の中で測っている。',
   DialogClose: 'Radix の Close をそのまま出したもの。見た目は中に置くボタンが決める。',
-  DEFAULT_COMMAND_HOTKEY:
-    'CommandPalette を開くキーの既定値（{ key, mod }）。部品ではなく、描くものがない。',
+  DEFAULT_COMMAND_HOTKEY: 'CommandPalette を開くキーの既定値（ただの値）。描くものはない。',
 };

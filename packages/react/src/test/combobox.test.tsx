@@ -114,6 +114,38 @@ describe('Combobox', () => {
     await userEvent.click(screen.getByRole('button', { name: '変える' }));
     expect(input()).toHaveValue('ＡＢＣ物流');
   });
+  it('keeps a value from outside that no option names yet', async () => {
+    const onValueChange = vi.fn();
+    function Controlled() {
+      const [value, setValue] = useState<string | null>('osaka');
+      const [list, setList] = useState(options);
+      return (
+        <>
+          <Combobox
+            label="取引先"
+            options={list}
+            value={value}
+            onValueChange={(next) => {
+              onValueChange(next);
+              setValue(next);
+            }}
+          />
+          <button onClick={() => setValue('new')}>作る</button>
+          <button onClick={() => setList([...options, { value: 'new', label: '新しい取引先' }])}>
+            足す
+          </button>
+          <output data-testid="value">{value ?? 'なし'}</output>
+        </>
+      );
+    }
+    render(<Controlled />);
+    await userEvent.click(screen.getByRole('button', { name: '作る' }));
+    expect(input()).toHaveValue('');
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(screen.getByTestId('value')).toHaveTextContent('new');
+    await userEvent.click(screen.getByRole('button', { name: '足す' }));
+    expect(input()).toHaveValue('新しい取引先');
+  });
   it('keeps the typed text when a parent with inline options draws again', async () => {
     function Parent() {
       const [tick, setTick] = useState(0);
@@ -173,6 +205,30 @@ describe('Combobox', () => {
     await userEvent.type(input(), 'しすてむ');
     expect(names()).toEqual(['福岡システムズ']);
     expect(screen.getByRole('status')).toHaveTextContent('一致する候補がありません');
+  });
+  it('keeps the typed text when the button is pressed after Esc', async () => {
+    render(<Combobox label="取引先" options={options} />);
+    await userEvent.type(input(), 'おお');
+    await userEvent.keyboard('{Escape}');
+    await userEvent.click(screen.getByRole('button', { name: '候補を開く' }));
+    expect(input()).toHaveValue('おお');
+    expect(input()).toHaveFocus();
+    expect(names()).toEqual(['大阪精機']);
+  });
+  it('keeps the focus in the input when the empty line is pressed', async () => {
+    render(<Combobox label="取引先" options={options} defaultValue="tokyo" />);
+    await userEvent.clear(input());
+    await userEvent.type(input(), 'ぞぞ');
+    await userEvent.click(screen.getByText('一致する候補がありません', { selector: 'li' }));
+    expect(input()).toHaveFocus();
+  });
+  it('does not send the value while disabled', () => {
+    const { container } = render(
+      <form>
+        <Combobox label="取引先" options={options} name="partner" disabled defaultValue="osaka" />
+      </form>,
+    );
+    expect(new FormData(container.querySelector('form')!).get('partner')).toBeNull();
   });
   it('sends the chosen value with name', async () => {
     const { container } = render(

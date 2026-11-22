@@ -55,6 +55,13 @@ describe('formatNumber', () => {
     expect(formatNumber(12, { sign: true })).toBe('+12');
     expect(formatNumber(0, { sign: true })).toBe('0');
   });
+  it('never writes a minus on zero', () => {
+    expect(formatNumber(-0)).toBe('0');
+    expect(formatNumber(-0.001, { fractionDigits: 2 })).toBe('0.00');
+    expect(formatNumber(-0.0001, { percent: true })).toBe('0%');
+    expect(formatNumber(-0.001, { fractionDigits: 2, sign: true })).toBe('0.00');
+    expect(formatNumber(-3)).toBe('-3');
+  });
 });
 
 describe('formatDate', () => {
@@ -95,6 +102,49 @@ describe('formatDate', () => {
   it('keeps the years 0 to 99 as written', () => {
     expect(formatDate('0050-03-01')).toBe('50年3月1日');
     expect(formatDate('0099-12-31')).not.toMatch(/1999/);
+    expect(formatRelativeTime('0050-03-01', { now: new Date(2026, 10, 22) })).toMatch(
+      /^1,97\d 年前$/,
+    );
+  });
+  it('reads only ISO 8601, not what one engine happens to read', () => {
+    expect(formatDate('12')).toBe('12');
+    expect(formatDate('2026/11/22')).toBe('2026/11/22');
+    expect(formatDate('2026-11-22T09:05', { style: 'time' })).toBe('9:05');
+  });
+  it('writes a date-time without a zone as written, whatever the time zone', () => {
+    for (const timeZone of ['Asia/Tokyo', 'America/New_York', 'UTC'])
+      expect(formatDate('2026-11-22T09:05', { style: 'datetime', timeZone })).toBe(
+        '2026/11/22 9:05',
+      );
+    // Counted as that time in the given zone.
+    const now = new Date('2026-11-22T00:08:00Z');
+    expect(formatRelativeTime('2026-11-22T09:05', { now, timeZone: 'Asia/Tokyo' })).toBe('3 分前');
+    expect(formatRelativeTime('2026-11-21T19:05', { now, timeZone: 'America/New_York' })).toBe(
+      '3 分前',
+    );
+  });
+  it('counts a time without a zone right just after a daylight-saving change', () => {
+    // New York leaves daylight saving at 06:00 UTC on 2026-11-01; 03:00 there is 08:00 UTC.
+    const timeZone = 'America/New_York';
+    expect(
+      formatRelativeTime('2026-11-01T03:00', { now: new Date('2026-11-01T08:03:00Z'), timeZone }),
+    ).toBe('3 分前');
+    // And enters it at 07:00 UTC on 2026-03-08; 04:00 there is 08:00 UTC.
+    expect(
+      formatRelativeTime('2026-03-08T04:00', { now: new Date('2026-03-08T08:03:00Z'), timeZone }),
+    ).toBe('3 分前');
+  });
+  it('reads microseconds and a zone without a colon', () => {
+    const style = 'datetime';
+    expect(formatDate('2026-11-22T09:05:00.123456+09:00', { style, timeZone: 'Asia/Tokyo' })).toBe(
+      '2026/11/22 9:05',
+    );
+    expect(formatDate('2026-11-22T09:05:00+0900', { style, timeZone: 'Asia/Tokyo' })).toBe(
+      '2026/11/22 9:05',
+    );
+    expect(formatDate('2026-11-22T00:05:00.5Z', { style, timeZone: 'UTC' })).toBe(
+      '2026/11/22 0:05',
+    );
   });
   it('counts weeks, months and years without calendar words that could be wrong', () => {
     const now = new Date(2027, 0, 1, 12);
