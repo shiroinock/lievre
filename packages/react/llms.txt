@@ -998,8 +998,8 @@ altText には、通知の外で同じ操作ができる場所を書きます（
 - `type CommandHotkey`
   - `key: string` — 文字のキー（e.key の値。大文字と小文字は区別しません）。既定のパレットは 'k'。
   - `mod?: boolean` — Mac では ⌘、ほかでは Ctrl を押しながら。1文字のキーを document 全体で受けないように、mod か alt のどちらかは付けます。
-  - `shift?: boolean`
-  - `alt?: boolean`
+  - `shift?: boolean` — ⇧（Shift）を押しながら。修飾キーはちょうど一致したときだけ反応するので、⌘⇧K は ⌘K の開くキーには反応しません。
+  - `alt?: boolean` — ⌥（Mac）/ Alt を押しながら。mod の代わりにもなります（⌥K など）。Mac では ⌥ で別の字が入るので、そのときだけ物理キーの位置で見ます。
 - `WearConfig`: `any`
 - `cx`: `(...values: (string | false | null | undefined)[]) => string`
 - `getQueueSnapshot`: `(keys: readonly string[], state: DecisionState) => DecisionQueueSnapshot` — 列の今の姿を組みます。keys は出す順（システムが決めた順）に並べて渡します。
@@ -1025,6 +1025,6 @@ keys にないキーの決定は数えません。
 - `filterOptions`: `(options: ComboboxOption[], query: string) => ComboboxOption[]` — 打った文字で候補を絞ります（Combobox の中と同じ絞り込み）。全角と半角・カタカナとひらがな・大文字と小文字・空白の違いを無視し、名前（label）か読み（kana）に含むものを返します。空の文字なら全件を返します。
 - `describeHotkey`: `(hotkey: CommandHotkey, mac?: boolean) => { label: string; aria: string; }` — キーの近道を、見せる文字（「⌘K」「Ctrl+K」）と aria-keyshortcuts の値（「Meta+K」「Control+K」）にします。
 自前の開くボタンにキーを添えるときに使います。mac を省くと、いまの環境で決めます。
-- `filterCommands`: `(items: CommandItem[], query: string) => CommandItem[]` — 項目を探して実行する。group ごとの順を保ち、全角と半角・カタカナとひらがな・大文字と小文字の違いを無視して、
+- `filterCommands`: `(items: CommandItem[], query: string) => CommandItem[]` — 項目を絞り込みます（実行はしません）。group ごとの順を保ち、全角と半角・カタカナとひらがな・大文字と小文字の違いを無視して、
 名前・読み・探し言葉・補足で絞り込みます。
 - `DEFAULT_COMMAND_HOTKEY`: `CommandHotkey`

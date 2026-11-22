@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import axe from 'axe-core';
 import {
   CommandPalette,
@@ -237,6 +238,73 @@ describe('CommandPalette', () => {
     rerender(<CommandPalette items={items} open onOpenChange={onOpenChange} trigger={null} />);
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'コマンドを探す' })).toBeNull();
+  });
+  it('keeps the highlight when the parent passes a new array', async () => {
+    const { rerender } = render(
+      <CommandPalette items={items.map((i) => ({ ...i }))} defaultOpen />,
+    );
+    await userEvent.keyboard('{ArrowDown}{ArrowDown}');
+    expect(highlighted()).toContain('新しい作業を作る');
+    rerender(<CommandPalette items={items.map((i) => ({ ...i }))} defaultOpen />);
+    expect(highlighted()).toContain('新しい作業を作る');
+  });
+  it('keeps the highlight when a conversion ends on the same text', async () => {
+    const onSelect = vi.fn();
+    setup({ defaultOpen: true, onSelect });
+    await userEvent.type(input(), 'せ');
+    const field = input();
+    fireEvent.compositionStart(field);
+    fireEvent.change(field, { target: { value: 'せっ' } });
+    fireEvent.change(field, { target: { value: 'せ' } });
+    act(() => void fireEvent.compositionEnd(field, { target: { value: 'せ' } }));
+    expect(highlighted()).toContain('設定を開く');
+    await userEvent.keyboard('{Enter}');
+    expect(onSelect).toHaveBeenCalledWith('settings');
+  });
+  it('does not run a choice the parent kept open on a later close', async () => {
+    const run = vi.fn();
+    function Keeper() {
+      const [open, setOpen] = useState(true);
+      return (
+        <>
+          <CommandPalette
+            items={items.map((i) => (i.value === 'home' ? { ...i, onSelect: run } : i))}
+            open={open}
+            // The parent ignores the close that a choice asks for.
+            onOpenChange={() => {}}
+            trigger={null}
+          />
+          <button onClick={() => setOpen(false)}>外から閉じる</button>
+        </>
+      );
+    }
+    render(<Keeper />);
+    expect(input()).toHaveFocus();
+    expect(highlighted()).toContain('ホームへ移動');
+    await userEvent.keyboard('{Enter}');
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: '外から閉じる', hidden: true }));
+    // Radix hands the focus back (and the palette runs its command) after a tick.
+    await act(() => new Promise((r) => setTimeout(r, 20)));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(run).not.toHaveBeenCalled();
+  });
+  it('reads the count of commands that cannot be chosen', async () => {
+    setup({ defaultOpen: true });
+    await userEvent.type(input(), 'しまう');
+    expect(names()).toEqual(['作業をしまう']);
+    expect(screen.getByRole('status')).toHaveTextContent(
+      '選べるコマンドはありません（1件は選べません）',
+    );
+  });
+  it("does not open on another layout's letter at the K position", () => {
+    setup();
+    // Dvorak: Ctrl+T is on the key QWERTY calls K.
+    fireEvent.keyDown(document, { key: 't', code: 'KeyK', ctrlKey: true });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    // A layout with no Latin letter there still finds K by its place.
+    act(() => void fireEvent.keyDown(document, { key: 'л', code: 'KeyK', ctrlKey: true }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
   it('has no axe violations while open', async () => {
     const { container } = setup({ defaultOpen: true });

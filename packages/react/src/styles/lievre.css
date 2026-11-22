@@ -983,6 +983,13 @@
     padding: 0;
     list-style: none;
   }
+  /* An item without a group after a group: the rule closes the group above it, so the row keeps
+     its own padding and stays centred. */
+  .lv-command-palette-group:has(+ .lv-command-palette-item) {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--lv-border);
+  }
   .lv-command-palette-group + .lv-command-palette-group,
   .lv-command-palette-item + .lv-command-palette-group {
     margin-top: 4px;
