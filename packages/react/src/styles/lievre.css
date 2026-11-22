@@ -26,6 +26,30 @@
   .lievre[data-theme='ink'] {
     color-scheme: dark;
   }
+  /* Monospace screens (LievreProvider family="mono") and ranges (.lv-family-mono, the mono prop
+     of Text and Card): Japanese included, every part inside follows (the parts draw with
+     --lv-font-sans), and no text drops below the mono floor, where the narrowed Latin reads as
+     12px. Japanese stays 1em wide and Latin 0.5em, so the columns line up 1:2. */
+  .lievre[data-family='mono'],
+  .lievre .lv-family-mono {
+    --lv-font-sans: var(--lv-font-mono);
+    --lv-text-xs: var(--lv-text-mono-min);
+    --lv-text-sm: var(--lv-text-mono-min);
+    --lv-text-md: var(--lv-text-mono-min);
+    font-family: var(--lv-font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  /* 14px body at the mono floor: 14.4px × 24 / 14.4 keeps inherited body lines at 24px. */
+  .lievre[data-family='mono'][data-typography='interface'] {
+    --lv-leading-body: calc(24 / 14.4);
+  }
+  .lievre[data-typography='interface'] .lv-family-mono {
+    --lv-body: var(--lv-text-mono-min);
+  }
+  .lievre .lv-family-mono {
+    font-size: max(1em, var(--lv-text-mono-min));
+    line-height: var(--lv-line-body);
+  }
   .lievre-portal {
     background: transparent;
   }
@@ -2225,6 +2249,8 @@
     padding: 0;
     list-style: none;
     font-size: var(--lv-text-sm);
+    /* On the grid at any size: 13px and the 14.4px mono floor both give 24px lines. */
+    line-height: var(--lv-line-body);
     color: var(--lv-muted);
   }
   .lv-breadcrumb li {

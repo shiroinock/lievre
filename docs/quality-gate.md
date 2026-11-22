@@ -63,11 +63,14 @@ line-height は `--lv-line-body` / `--lv-line-tight` で 4px の倍数にして�
 
 ### 測る組み合わせ
 
-すべての Story を次の 8 通りで描画して測ります。
+すべての Story を次の 8 通りと、等幅の画面の 2 通り（計 10 通り）で描画して測ります。
 
 - 配色：Paper / Ink
 - 密度：comfortable / compact
 - 文字：standard（本文16px）/ interface（本文14px）
+- 等幅の画面（`family="mono"`）：Paper・comfortable・standard と、Ink・compact・interface（14px の本文が 14.4px に引き上がる側）
+
+等幅の範囲と画面そのものは `family.layout.tsx` が確かめます。Card・Text の `mono`、クラス `lv-family-mono`、`family="mono"` の画面で、中の文字がすべて Lievre Mono になり、14.4px（`--lv-text-mono-min`）より小さくならず、行の高さが 4px の倍数で、英数字 12 字と日本語 6 字の幅が 12/64px 以内で同じになること、入れ子が指定しない値を引き継ぎ `family="sans"` で戻せることを見ます。
 
 画面の幅は 1280px、動きを減らす設定（`prefers-reduced-motion: reduce`）で測ります。タッチの画面（`pointer: coarse`）は今は測っていません。
 

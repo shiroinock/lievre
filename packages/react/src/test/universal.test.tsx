@@ -4,9 +4,9 @@ import { expect, it } from 'vitest';
 import axe from 'axe-core';
 import { ActionLink, Button, Dialog, EmptyState, LievreProvider, RadioGroup, Text } from '../index';
 import { RegistrationExample, ResourceLibrary, ArticleExample } from '../patterns/Everyday';
-it('inherits theme, density and typography independently through nested providers and portals', async () => {
+it('inherits theme, density, typography and family independently through nested providers and portals', async () => {
   render(
-    <LievreProvider theme="ink" density="compact">
+    <LievreProvider theme="ink" density="compact" family="mono">
       <LievreProvider typography="interface">
         <Dialog trigger={<Button>開く</Button>} title="詳細" description="読み物の補足">
           <Text>説明</Text>
@@ -19,7 +19,20 @@ it('inherits theme, density and typography independently through nested provider
   expect(scope).toHaveAttribute('data-theme', 'ink');
   expect(scope).toHaveAttribute('data-density', 'compact');
   expect(scope).toHaveAttribute('data-typography', 'interface');
+  expect(scope).toHaveAttribute('data-family', 'mono');
   expect(screen.queryByText('WORKSPACE / EDIT')).not.toBeInTheDocument();
+});
+it('marks monospace ranges with lv-family-mono', () => {
+  const { container } = render(
+    <LievreProvider>
+      <Text mono>$ npm test</Text>
+      <Text>本文</Text>
+    </LievreProvider>,
+  );
+  const [mono, plain] = container.querySelectorAll('.lv-text');
+  expect(mono).toHaveClass('lv-family-mono');
+  expect(plain).not.toHaveClass('lv-family-mono');
+  expect(container.querySelector('.lievre')).toHaveAttribute('data-family', 'sans');
 });
 it('keeps navigation links semantic and supports native radio keyboard selection', async () => {
   render(

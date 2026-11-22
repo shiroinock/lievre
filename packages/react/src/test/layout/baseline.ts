@@ -5,6 +5,7 @@ export type Combo = {
   theme: 'paper' | 'ink';
   density: 'comfortable' | 'compact';
   typography: 'standard' | 'interface';
+  family: 'sans' | 'mono';
 };
 export type KnownIssue = {
   /** Story の meta.title */

@@ -17,6 +17,7 @@ export function Text({
   tone = 'default',
   weight,
   maxLines,
+  mono = false,
   className,
   style,
   ...props
@@ -30,6 +31,8 @@ export function Text({
   weight?: 'regular' | 'medium' | 'bold';
   /** この行数で切り、末尾に「…」を出します。表の長い件名やカードの説明に使います。切った分は読み上げでは読まれますが、目では見えないので、全文は詳細の画面などで読めるようにします。 */
   maxLines?: number;
+  /** 日本語も含めて等幅にします。ログ・コマンドの出力・コードのように、字の桁をそろえて読む文に使います。英数字 1 対日本語 2 の幅でそろい、14.4px より小さくしません。中に置いた部品も等幅になります。 */
+  mono?: boolean;
 }): ReactElement {
   return createElement(as, {
     ...props,
@@ -40,6 +43,7 @@ export function Text({
       tone === 'muted' && 'lv-muted',
       weight && `lv-weight--${weight}`,
       !!maxLines && 'lv-text--clamp',
+      mono && 'lv-family-mono',
       className,
     ),
   });

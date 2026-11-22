@@ -50,6 +50,21 @@ export const WithActionTitleOnly: Story = {
 export const WithoutHeading: Story = { args: { title: undefined, eyebrow: undefined } };
 /** 線のない、凹んだ面だけの形。 */
 export const Plain: Story = { args: { variant: 'plain' } };
+/** カード1枚を、見出しも中の部品も日本語ごと等幅にします（差分・ログ）。 */
+export const Mono: Story = {
+  args: {
+    mono: true,
+    title: '同期の記録',
+    eyebrow: '夜間の処理',
+    action: <Badge tone="success">完了</Badge>,
+    children: (
+      <>
+        <p>01:42 取り込み 128 件</p>
+        <p>01:43 書き出し 128 件　失敗 0 件</p>
+      </>
+    ),
+  },
+};
 /** 押せるカード。見出しのリンクがカード全体に広がります。 */
 export const Link: Story = {
   args: { href: '#detail', action: undefined },

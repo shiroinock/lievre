@@ -671,6 +671,8 @@ export type CardProps = HTMLAttributes<HTMLElement> & {
   href?: string;
   /** 選べるカード。見出しの横にチェックボックスを出し、その当たり判定をカード全体に広げます。選んだカードは線と面とチェックの3つで示します。中にほかの操作を置かないでください。 */
   selection?: { checked: boolean; onCheckedChange: (checked: boolean) => void; disabled?: boolean };
+  /** カードの中を、見出しも中の部品も含めて日本語ごと等幅にします。差分・ログ・桁をそろえる表など、カード1枚分を端末のように見せるときに使います。画面全体なら LievreProvider の family="mono"。 */
+  mono?: boolean;
 };
 /** 1つのまとまりの入れ物。見出し・本文・見出しの右の操作を持ちます。 */
 export function Card({
@@ -680,6 +682,7 @@ export function Card({
   variant = 'outline',
   href,
   selection,
+  mono = false,
   children,
   className,
   ...props
@@ -692,6 +695,7 @@ export function Card({
         'lv-card',
         variant === 'plain' && 'lv-card--plain',
         (href || selection) && 'lv-card--interactive',
+        mono && 'lv-family-mono',
         className,
       )}
       data-selected={selection?.checked || undefined}

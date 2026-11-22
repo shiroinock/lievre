@@ -48,7 +48,7 @@ export function App() {
 
 - スタイルは `@layer lievre.*` に入っています。層に入っていない CSS は層の中より強いため、アプリのリセット（`button { background: none }` や Tailwind の preflight など）は `@layer` に入れて、lievre より先に宣言してください（例：`@layer reset, lievre.tokens, lievre.base, lievre.components, lievre.utilities;`）。
 - スタイルは `.lievre` の内側に限定されます。ページ全体のリセットやアプリのナビゲーションは含みません。
-- `theme`（paper / ink）、`density`（comfortable / compact）、`typography`（standard / interface）はそれぞれ独立して指定できます。
+- `theme`（paper / ink）、`density`（comfortable / compact）、`typography`（standard / interface）、`family`（sans / mono）はそれぞれ独立して指定できます。`family="mono"` は画面全体を日本語ごと等幅にします。範囲だけなら `Text`・`Card` の `mono` か、クラス `lv-family-mono` で囲みます。
 
 ## lint
 
