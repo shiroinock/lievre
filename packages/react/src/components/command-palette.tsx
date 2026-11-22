@@ -49,7 +49,7 @@ export type CommandHotkey = {
   mod?: boolean;
   /** ⇧（Shift）を押しながら。修飾キーはちょうど一致したときだけ反応するので、⌘⇧K は ⌘K の開くキーには反応しません。 */
   shift?: boolean;
-  /** ⌥（Mac）/ Alt を押しながら。mod の代わりにもなります（⌥K など）。Mac では ⌥ で別の字が入るので、そのときだけ物理キーの位置で見ます。 */
+  /** ⌥（Mac）/ Alt を押しながら。mod の代わりにもなります（⌥K など）。Mac では ⌥ で別の字が入る（⌥1 は「¡」）ので、同じ物理キーが修飾キーなしで打つ字と比べます。英字と数字はいつでも、記号（⌥/ など）はブラウザがキー配列を教える場合（Chromium）か、その字を一度修飾キーなしで打ったあとで分かります。 */
   alt?: boolean;
 };
 
@@ -103,6 +103,29 @@ export function describeHotkey(hotkey: CommandHotkey, mac = isMac()) {
   return { label, aria };
 }
 
+/** The character each physical key (e.code) types with no modifiers, as far as this page knows:
+ * the browser's layout map where it has one (Chromium), the keys typed so far without modifiers,
+ * and the name of the code itself (KeyK, Digit1, Numpad1). */
+const layout = new Map<string, string>();
+let layoutAsked = false;
+function learnLayout() {
+  if (layoutAsked || typeof navigator === 'undefined') return;
+  layoutAsked = true;
+  const keyboard = (
+    navigator as { keyboard?: { getLayoutMap?: () => Promise<Map<string, string>> } }
+  ).keyboard;
+  keyboard
+    ?.getLayoutMap?.()
+    .then((map) => map.forEach((key, code) => layout.set(code, key)))
+    .catch(() => {});
+}
+function noteKey(e: globalThis.KeyboardEvent) {
+  if (e.code && e.key.length === 1 && !e.altKey && !e.ctrlKey && !e.metaKey)
+    layout.set(e.code, e.key);
+}
+const plainKey = (code: string) =>
+  layout.get(code)?.toLowerCase() ?? /^(?:Key|Digit|Numpad)(.)$/.exec(code)?.[1].toLowerCase();
+
 /** Whether a keydown is the hotkey. ⌘ on a Mac and Ctrl elsewhere, never both; the other
  * modifiers must match exactly so ⌘⇧K doesn't open a palette bound to ⌘K. */
 function matchesHotkey(e: globalThis.KeyboardEvent, hotkey: CommandHotkey, mac: boolean) {
@@ -117,10 +140,13 @@ function matchesHotkey(e: globalThis.KeyboardEvent, hotkey: CommandHotkey, mac: 
   if (!!hotkey.shift !== e.shiftKey || !!hotkey.alt !== e.altKey) return false;
   const want = hotkey.key.toLowerCase();
   if (e.key.toLowerCase() === want) return true;
-  // With ⌥ a Mac types another character (⌥K is "˚"), so fall back to the physical key — but only
-  // then, or when the layout gives no Latin letter: on Dvorak, Ctrl+T sits where QWERTY has K.
+  // With ⌥ a Mac types another character (⌥K is "˚", ⌥1 "¡", ⌥/ "÷"), so compare the character the
+  // same physical key types without modifiers. A layout with no Latin letters (Cyrillic) is read
+  // by the code's name, so Ctrl+K still works there. Otherwise e.key decides: on Dvorak, Ctrl+T
+  // sits where QWERTY has K and is not Ctrl+K.
+  if (hotkey.alt) return plainKey(e.code) === want;
   const latin = /^[a-z]$/i.test(e.key);
-  return want.length === 1 && (hotkey.alt || !latin) && e.code === `Key${want.toUpperCase()}`;
+  return !latin && /^Key(.)$/.exec(e.code)?.[1].toLowerCase() === want;
 }
 
 /**
@@ -196,7 +222,9 @@ export function CommandPalette({
   const listening = !!hotkey;
   useEffect(() => {
     if (!listening) return;
+    learnLayout();
     const onKeyDown = (e: globalThis.KeyboardEvent) => {
+      noteKey(e);
       const keys = hotkeyRef.current;
       // A key the page already handled (an editor's own Ctrl+K, say) is not the palette's.
       if (!keys || e.defaultPrevented || e.repeat || !matchesHotkey(e, keys, isMac())) return;
