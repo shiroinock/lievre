@@ -792,6 +792,27 @@ selected・onSelectedChange で押して入り切りする絞り込みの札に�
 - `controlSize?: 'sm' | 'md' | 'lg'` — 既定 'md'。高さは Select・TextField と同じ段です。
 - `emptyText?: string` — 既定 '一致する候補がありません'。一致する候補がないときの文。
 
+### DateField
+
+年・月・日を3つの欄に直接入れる日付の入力（生年月日・届け出の日など、カレンダーでは選びにくい日）。
+数字は等幅で、全角の数字も受け、欄を離れると半角に直します。
+まとまりを離れたときに、足りない欄・存在しない日（2月30日）・min と max の外を確かめ、直し方のわかる文を出します。
+
+- `label: string` — 問いの名前（「生年月日」）。年・月・日の3つの欄をまとめる legend になります。
+- `value?: string | null` — 日付（'2026-11-22' の形）。未入力や、確かめて通らないあいだは null。渡すと外で持ちます。空を '' で持っても null と同じに扱います。打っている途中の欄を外から空にするときは、key を変えて作り直します（null から null では変わったことが分からないため）。
+- `defaultValue?: string | null` — 既定 null。外で持たないときの、はじめの日付。
+- `onValueChange?: ((value: string | null) => void)` — 確かめて通る日付になったとき、またはそうでなくなったとき（null）に呼びます。打っている途中の文字では呼びません。
+- `hint?: string` — 補助文（「例：1990 4 1」）。欄の下に出し、まとまりに aria-describedby で結びます。
+- `error?: string` — エラー文。渡すと、部品が確かめた文の代わりに出します。
+- `required?: boolean` — ラベルの横に「必須」の文字を出し、3つの欄に aria-required を付けます。
+- `disabled?: boolean`
+- `min?: string` — これより前の日を通さない（'2026-12-01' の形。日時の文字なら日付の部分を使い、読めない文字は無視します）。
+- `max?: string` — これより後の日を通さない（'2026-12-31' の形。日時の文字なら日付の部分を使い、読めない文字は無視します）。
+- `name?: string` — フォームで送るときの名前。確かめて通った日付を隠した入力で送ります。
+- `id?: string` — 年の欄の id。ErrorSummary から移るときは、ここで決めた id を使います。
+- `autoComplete?: 'bday'` — 'bday' で、ブラウザの自動入力に生年月日（年・月・日）を伝えます。
+- `className?: string`
+
 ### Stepper
 
 申し込みのように画面を分けた手順の、今どこにいるかを示す並び。`<ol>` で順番を伝え、今の段に aria-current="step" を付けます。
@@ -983,6 +1004,7 @@ altText には、通知の外で同じ操作ができる場所を書きます（
   - `label: string`
   - `kana?: string` — 読み（ひらがな）。漢字の名前を、読みでも探せるようにします（「とうきょう」で「東京商事」）。
   - `disabled?: boolean`
+- `type DateCheck = | { kind: 'empty' } | { kind: 'partial' } | { kind: 'not-number' } | { kind: 'no-such-day'; year: number; month: number; day: number } | { kind: 'before-min'; min: string } | { kind: 'after-max'; max: string } | { kind: 'ok'; value: string };`
 - `type StepperStep`
   - `label: string` — 段の名前（「入力」「確認」「完了」）。
 - `type CommandItem`
@@ -1023,6 +1045,8 @@ keys にないキーの決定は数えません。
 - `toSearchKey`: `(text: string) => string` — 探すときに比べる形に直します。全角と半角（NFKC）、カタカナとひらがな、大文字と小文字、空白の違いを無視します。
 候補の絞り込みなどで、候補と入力の両方をこの形にしてから比べます。表示には使いません。
 - `filterOptions`: `(options: ComboboxOption[], query: string) => ComboboxOption[]` — 打った文字で候補を絞ります（Combobox の中と同じ絞り込み）。全角と半角・カタカナとひらがな・大文字と小文字・空白の違いを無視し、名前（label）か読み（kana）に含むものを返します。空の文字なら全件を返します。
+- `checkDate`: `(parts: { year: string; month: string; day: string; }, range?: { min?: string | undefined; max?: string | undefined; }) => DateCheck` — 年・月・日の文字を確かめ、ISO 8601 の日付（'2026-11-22'）にします。全角の数字も受けます。存在しない日（2月30日）や、min・max の外は、その理由を返します。
+- `dateCheckMessage`: `(check: DateCheck) => string | undefined` — 確かめた結果を、直し方のわかる文にします。DateField が出す文と同じです。
 - `describeHotkey`: `(hotkey: CommandHotkey, mac?: boolean) => { label: string; aria: string; }` — キーの近道を、見せる文字（「⌘K」「Ctrl+K」）と aria-keyshortcuts の値（「Meta+K」「Control+K」）にします。
 自前の開くボタンにキーを添えるときに使います。mac を省くと、いまの環境で決めます。
 - `filterCommands`: `(items: CommandItem[], query: string) => CommandItem[]` — 項目を絞り込みます（実行はしません）。group ごとの順を保ち、全角と半角・カタカナとひらがな・大文字と小文字の違いを無視して、
