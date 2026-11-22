@@ -18,11 +18,11 @@ permissions: {}
 
 jobs:
   reserve:
-    uses: shiroinock/workflows/.github/workflows/merge-reservation.yml@5ad8d52b02821fb6c1838929dc32f9805b74822a
+    uses: shiroinock/workflows/.github/workflows/merge-reservation.yml@c94cc2e32578cdb6fbda58826638cc8253b9d1b7
     permissions:
       contents: write
       pull-requests: write
       actions: write
     with:
       ci_workflow: ci.yml # accepts workflow_dispatch
-      workflows_ref: 5ad8d52b02821fb6c1838929dc32f9805b74822a
+      workflows_ref: c94cc2e32578cdb6fbda58826638cc8253b9d1b7
