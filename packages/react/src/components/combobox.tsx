@@ -18,6 +18,7 @@ import { cx, PortalSurface } from './system';
 import { Field } from './form';
 import { VisuallyHidden } from './primitives';
 import { toSearchKey } from './normalize';
+import { fromIme } from './ime';
 
 export type ComboboxOption = {
   value: string;
@@ -64,11 +65,6 @@ function reveal(layer: HTMLElement | null) {
   if (box.top < view.top) list.scrollTop -= view.top - box.top;
   else if (box.bottom > view.bottom) list.scrollTop += box.bottom - view.bottom;
 }
-
-/** Whether a key belongs to the IME: Chrome sends the committing Enter with isComposing,
- * Safari sends it after compositionend with keyCode 229. */
-const fromIme = (e: { isComposing?: boolean; keyCode?: number }) =>
-  !!e.isComposing || e.keyCode === 229;
 
 /** 打った文字で候補を絞ります（Combobox の中と同じ絞り込み）。全角と半角・カタカナとひらがな・大文字と小文字・空白の違いを無視し、名前（label）か読み（kana）に含むものを返します。空の文字なら全件を返します。 */
 export function filterOptions(options: ComboboxOption[], query: string) {

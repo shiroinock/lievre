@@ -952,6 +952,89 @@
     font-size: var(--lv-text-base);
   }
 
+  /* CommandPalette: a Dialog with the search field on top, Select's rows under it and a band of
+     keys at the foot. It hangs from a fixed line near the top instead of the centre, so the field
+     stays put while the list grows and shrinks with the text. */
+  .lv-dialog.lv-command-palette {
+    top: min(12vh, 96px);
+    display: flex;
+    flex-direction: column;
+    width: min(640px, calc(100vw - 32px));
+    max-height: calc(100dvh - 2 * min(12vh, 96px));
+    overflow: hidden;
+    transform: translateX(-50%);
+    animation-name: lv-drop;
+  }
+  .lv-command-palette-search {
+    padding: 12px;
+    border-bottom: 1px solid var(--lv-border);
+  }
+  .lv-command-palette-list {
+    flex: 1;
+    min-height: 0;
+    margin: 0;
+    padding: 4px;
+    overflow-y: auto;
+    list-style: none;
+  }
+  /* The list's 4px plus the row's 8px puts the text on the field's 12px line. */
+  .lv-command-palette-list ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* An item without a group after a group: the rule closes the group above it, so the row keeps
+     its own padding and stays centred. */
+  .lv-command-palette-group:has(+ .lv-command-palette-item) {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--lv-border);
+  }
+  .lv-command-palette-group + .lv-command-palette-group,
+  .lv-command-palette-item + .lv-command-palette-group {
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid var(--lv-border);
+  }
+  .lv-command-palette-text {
+    display: grid;
+    min-width: 0;
+  }
+  .lv-command-palette-description {
+    color: var(--lv-muted);
+    font-size: var(--lv-text-xs);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-command-palette-item[data-disabled] .lv-command-palette-description {
+    color: inherit;
+  }
+  .lv-command-palette-key {
+    display: inline-flex;
+    flex-shrink: 0;
+    gap: var(--lv-space-1);
+  }
+  .lv-command-palette-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--lv-space-4);
+    padding: 8px 12px;
+    border-top: 1px solid var(--lv-border);
+    color: var(--lv-muted);
+    font-size: var(--lv-text-xs);
+    line-height: var(--lv-line-tight);
+  }
+  .lv-command-palette-footer > span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lv-space-1);
+  }
+  @keyframes lv-drop {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -6px);
+    }
+  }
+
   /* DateField: year, month and day side by side, each as wide as its digits. */
   .lv-date-field-parts {
     display: flex;
@@ -2840,6 +2923,10 @@
        need the row's own HighlightText. */
     .lv-menu-item:is([data-highlighted], [data-state='open'])
       :is(.lv-menu-description, .lv-menu-lead, .lv-menu-sub-icon, .lv-menu-shortcut) {
+      color: HighlightText;
+    }
+    .lv-command-palette-item[data-highlighted] :is(.lv-command-palette-description, .lv-kbd) {
+      border-color: HighlightText;
       color: HighlightText;
     }
     /* Rows keep forced colours for their contents; the selection becomes an outline. */
