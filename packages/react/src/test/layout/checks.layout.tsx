@@ -1,8 +1,12 @@
 // Each layout check must still catch the mistake it was written for, and pass the right way.
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeAll } from 'vitest';
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
 import { Button, ButtonGroup, IconButton, LievreProvider, Sparkline } from '../../index';
+// fonts.css defines Lievre Sans, not IBM Plex Sans JP itself. The checks below that name the
+// uncorrected face load it from fontsource, so CI does not measure a system fallback instead.
+import '@fontsource/ibm-plex-sans-jp/400.css';
+import '@fontsource/ibm-plex-sans-jp/600.css';
 import '../../styles/fonts.css';
 import '../../styles/lievre.css';
 import { inset } from '../../../scripts/measure-alignment.js';
@@ -14,6 +18,8 @@ host.className = 'lievre';
 host.style.cssText = 'font: 14px / 20px var(--lv-font-sans); width: 600px';
 document.body.append(host);
 afterEach(() => host.replaceChildren());
+// The host's text is in Lievre Sans: wait for it, or the first checks measure a fallback face.
+beforeAll(() => document.fonts.load("14px 'Lievre Sans'", '保存する更新時に通知する読み込み中'));
 
 function messages(html: string, check: LayoutCheck) {
   host.innerHTML = html;
