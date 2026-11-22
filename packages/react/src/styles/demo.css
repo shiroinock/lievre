@@ -1045,25 +1045,6 @@ body:has(.lievre-app) {
 .everyday-prose li + li {
   margin-top: 8px;
 }
-.everyday-steps {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin: 0;
-  padding: 0 0 16px;
-  border-bottom: 1px solid var(--lv-border);
-  list-style: none;
-  font-size: var(--lv-text-md);
-  color: var(--lv-muted);
-}
-.everyday-steps [aria-current='step'] {
-  color: var(--lv-accent);
-  font-weight: var(--lv-weight-bold);
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 8px;
-}
-
 /* ------------------------------------------------------------- storybook */
 
 .lievre-story {

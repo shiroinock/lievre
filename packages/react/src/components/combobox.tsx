@@ -55,6 +55,7 @@ export type ComboboxProps = {
   emptyText?: string;
 };
 
+/** 打った文字で候補を絞ります（Combobox の中と同じ絞り込み）。全角と半角・カタカナとひらがな・大文字と小文字・空白の違いを無視し、名前（label）か読み（kana）に含むものを返します。空の文字なら全件を返します。 */
 export function filterOptions(options: ComboboxOption[], query: string) {
   const q = toSearchKey(query);
   if (!q) return options;
@@ -119,10 +120,11 @@ export function Combobox({
           anchor={anchor}
           composing={composing}
           onCompositionEnd={onCompositionEnd}
-          onQuery={(text) => {
+          onQuery={(text, typed) => {
             if (!composing.current) setQuery(text);
-            // Emptying the field clears the choice.
-            if (text === '') choose(null);
+            // Emptying the field by typing clears the choice. Downshift also empties it when the
+            // value from outside names no option: that is not the user's doing, so nothing is sent.
+            if (typed && text === '') choose(null);
           }}
           onSelect={(option) => choose(option?.value ?? null)}
         />
@@ -148,7 +150,7 @@ type ControlProps = {
   anchor: RefObject<HTMLDivElement | null>;
   composing: RefObject<boolean>;
   onCompositionEnd: (e: CompositionEvent<HTMLInputElement>) => void;
-  onQuery: (text: string) => void;
+  onQuery: (text: string, typed: boolean) => void;
   onSelect: (option: ComboboxOption | null) => void;
 };
 function ComboboxControl({
@@ -186,7 +188,8 @@ function ComboboxControl({
     onSelectedItemChange: ({ selectedItem }) => onSelect(selectedItem ?? null),
     // Downshift keeps the text. Controlling it delays the write-back during conversion by one
     // render and breaks the IME's range (「ととうとうきょう東京」).
-    onInputValueChange: ({ inputValue }) => onQuery(inputValue ?? ''),
+    onInputValueChange: ({ inputValue, type }) =>
+      onQuery(inputValue ?? '', type === useCombobox.stateChangeTypes.InputChange),
     inputId: id,
     labelId: `${id}-label`,
     menuId: `${id}-list`,
@@ -240,7 +243,9 @@ function ComboboxControl({
             onCompositionEnd,
             // Leaving with the list closed: Downshift does nothing then, so put the chosen name
             // back here. With the list open, Downshift's own blur (the reducer above) does it.
-            onBlur: () => {
+            onBlur: (e) => {
+              // Moving within the combobox (its button, its list) is not leaving it.
+              if (inside(e.relatedTarget)) return;
               const label = selected?.label ?? '';
               if (!cb.isOpen && cb.inputValue !== label) cb.setInputValue(label);
             },
@@ -258,12 +263,18 @@ function ComboboxControl({
           className="lv-combobox-button"
           aria-label="候補を開く"
           disabled={disabled}
-          {...cb.getToggleButtonProps()}
+          {...cb.getToggleButtonProps({
+            // Keep the focus in the input: pressing the button would move it there in Chrome
+            // and Firefox on Windows, and the input's blur would put back the chosen name.
+            onMouseDown: (e) => e.preventDefault(),
+          })}
         >
           <ChevronDown size={16} aria-hidden />
         </button>
       </div>
-      {name && <input type="hidden" name={name} value={selected?.value ?? ''} />}
+      {name && (
+        <input type="hidden" name={name} value={selected?.value ?? ''} disabled={disabled} />
+      )}
       <VisuallyHidden role="status" aria-live="polite">
         {cb.isOpen ? (choosable ? `${choosable}件の候補があります` : emptyText) : ''}
       </VisuallyHidden>
@@ -280,6 +291,9 @@ function ComboboxControl({
               ref={content}
               // The list inside is the listbox; the layer itself is not a dialog.
               role="presentation"
+              // Pressing the list's padding or the empty line would focus the layer (it has
+              // tabIndex -1) and take the focus out of the input; keep it there.
+              onMouseDown={(e) => e.preventDefault()}
               className="lv-select-content lv-combobox-content"
               data-size={controlSize}
               sideOffset={5}

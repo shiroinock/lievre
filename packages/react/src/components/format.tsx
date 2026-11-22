@@ -11,12 +11,15 @@ export type NumberFormatOptions = {
 /** 数を日本語の書式（桁区切り）の文字にします。FormatNumber と同じ書式を、文の中や aria-label に使うときに。 */
 export function formatNumber(value: number, options: NumberFormatOptions = {}) {
   const { fractionDigits, percent = false, sign = false } = options;
-  return new Intl.NumberFormat('ja-JP', {
+  // exceptZero drops the sign of a zero, also of -0 and of a negative that rounds to zero
+  // ('auto' writes them -0 and -0.00). Without sign, the plus is taken off again.
+  const text = new Intl.NumberFormat('ja-JP', {
     style: percent ? 'percent' : 'decimal',
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits ?? (percent ? 1 : 3),
-    signDisplay: sign ? 'exceptZero' : 'auto',
+    signDisplay: 'exceptZero',
   }).format(value);
+  return sign ? text : text.replace(/^\+/, '');
 }
 
 export type DateFormatOptions = {
@@ -31,10 +34,50 @@ export type DateFormatOptions = {
 };
 const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/;
 /** Midnight UTC of a written day. Not Date.UTC, which reads the years 0 to 99 as 1900 to 1999. */
-function utcDay(year: number, month: number, day: number) {
+function utcDay(year: number, month: number, day: number, hour = 0, minute = 0, second = 0) {
   const date = new Date(0);
   date.setUTCFullYear(year, month - 1, day);
+  date.setUTCHours(hour, minute, second);
   return date;
+}
+/** An ISO 8601 date-time: other text is read differently by each engine (V8 reads '12' as
+ * 2001-12-01), so it is not read as a date at all. The zone (Z, +09:00 or +0900) may be left out,
+ * and the seconds may carry any number of decimals. */
+const ISO_DATE_TIME =
+  /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?)(?:\.(\d+))?(Z|[+-]\d{2}:?\d{2})?$/;
+/** The same date-time in the form every engine reads: milliseconds at most and +09:00 with a colon. */
+function plainIso(match: RegExpExecArray) {
+  const [, head, fraction, zone] = match;
+  const ms = fraction ? `.${fraction.slice(0, 3).padEnd(3, '0')}` : '';
+  const offset =
+    zone && zone !== 'Z' && !zone.includes(':') ? `${zone.slice(0, 3)}:${zone.slice(3)}` : zone;
+  return `${head}${ms}${offset ?? 'Z'}`;
+}
+/** How far a time zone's clock runs ahead of UTC at a moment, in milliseconds. */
+function offsetAt(moment: Date, timeZone: string | undefined) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      hourCycle: 'h23',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+    })
+      .formatToParts(moment)
+      .map((part) => [part.type, Number(part.value)]),
+  );
+  const seen = utcDay(parts.year, parts.month, parts.day, parts.hour, parts.minute, parts.second);
+  return seen.getTime() - Math.floor(moment.getTime() / 1000) * 1000;
+}
+/** The moment a wall-clock time (held as if it were UTC) names in a time zone. The offset is
+ * measured again at the moment found, since near a daylight-saving change the offset at the
+ * wall-clock reading taken as UTC can be the other one. */
+function inZone(wall: Date, timeZone: string | undefined) {
+  const guess = wall.getTime() - offsetAt(wall, timeZone);
+  return new Date(wall.getTime() - offsetAt(new Date(guess), timeZone));
 }
 const DATE_HEAD = /^(\d{4})-(\d{2})-(\d{2})/;
 /** Whether the year, month and day written at the head of the text exist on the calendar:
@@ -48,28 +91,33 @@ function writtenDayExists(text: string) {
     date.getUTCFullYear() === year && date.getUTCMonth() + 1 === month && date.getUTCDate() === day
   );
 }
-/** A moment from the value, or null when it is not a date. 'YYYY-MM-DD' becomes midnight UTC
- * and is always written in UTC: it names a calendar day, not a moment, so no time zone moves it. */
+/** A moment from the value, or null when it is not a date. 'YYYY-MM-DD' and a date-time without
+ * a zone ('2026-11-22T09:05') are wall-clock values: they are held as if in UTC and always
+ * written in UTC, so they read as written in every time zone, on the server as in the browser. */
 function read(value: Date | string) {
   const day = typeof value === 'string' ? DATE_ONLY.exec(value) : null;
+  const iso = typeof value === 'string' ? ISO_DATE_TIME.exec(value) : null;
+  const floating = !!iso && !iso[3];
   const date =
     value instanceof Date
       ? value
       : day
         ? utcDay(Number(day[1]), Number(day[2]), Number(day[3]))
-        : new Date(value);
+        : iso
+          ? new Date(plainIso(iso))
+          : new Date(NaN);
   if (Number.isNaN(date.getTime())) return null;
   // A day that does not exist is not a date, in a date-time as in a bare date.
   if (typeof value === 'string' && !writtenDayExists(value)) return null;
-  return { date, dayOnly: !!day };
+  return { date, dayOnly: !!day, floating };
 }
-/** 日付・日時を日本語の書式の文字にします。FormatDate と同じ書式を、文の中に使うときに。日付として読めない文字は、そのまま返します。 */
+/** 日付・日時を日本語の書式の文字にします。FormatDate と同じ書式を、文の中に使うときに。'YYYY-MM-DD' と ISO 8601 の日時（'2026-11-22T09:05:00+09:00'）のほかの文字は、日付として読まずにそのまま返します。時間帯のない日時（'2026-11-22T09:05'）は、書いた時刻のまま出します。 */
 export function formatDate(value: Date | string, options: DateFormatOptions = {}) {
   const { style = 'date', calendar = 'gregory', weekday = false } = options;
   const moment = read(value);
   if (!moment) return value instanceof Date ? '' : value;
-  const { date, dayOnly } = moment;
-  const timeZone = dayOnly ? 'UTC' : options.timeZone;
+  const { date, dayOnly, floating } = moment;
+  const timeZone = dayOnly || floating ? 'UTC' : options.timeZone;
   if (style === 'time')
     return new Intl.DateTimeFormat('ja-JP', { timeStyle: 'short', timeZone }).format(date);
   if (style === 'datetime')
@@ -117,7 +165,7 @@ function dayNumber(date: Date, timeZone: string | undefined) {
     .format(date)
     .split('-')
     .map(Number);
-  return Date.UTC(year, month - 1, day) / DAY;
+  return utcDay(year, month, day).getTime() / DAY;
 }
 /**
  * 今との差を言葉にします（3分前・昨日・2日後）。1日より近い時刻は時間・分・秒で、それより離れた日は暦の日の差（昨日・一昨日・3日前）で、
@@ -136,7 +184,9 @@ export function formatRelativeTime(
   const moment = read(value);
   if (!moment) return value instanceof Date ? '' : value;
   const words = new Intl.RelativeTimeFormat('ja', { numeric: 'auto' });
-  const ms = moment.date.getTime() - now.getTime();
+  // A wall-clock time without a zone is that time in the given time zone.
+  const date = moment.floating ? inZone(moment.date, timeZone) : moment.date;
+  const ms = date.getTime() - now.getTime();
   if (!moment.dayOnly && Math.abs(ms) < DAY) {
     const seconds = ms / 1000;
     if (Math.abs(seconds) >= 3600) return words.format(Math.round(seconds / 3600), 'hour');
@@ -144,7 +194,7 @@ export function formatRelativeTime(
     return words.format(Math.round(seconds), 'second');
   }
   // Calendar days, not elapsed hours: 39 hours ago late at night is still yesterday.
-  const days = dayNumber(moment.date, moment.dayOnly ? 'UTC' : timeZone) - dayNumber(now, timeZone);
+  const days = dayNumber(date, moment.dayOnly ? 'UTC' : timeZone) - dayNumber(now, timeZone);
   if (Math.abs(days) < 7) return words.format(days, 'day');
   // Weeks, months and years are rounded counts, so say the count (「1 か月前」), never a
   // calendar word (「先月」) that may name the wrong month.
