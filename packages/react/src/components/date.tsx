@@ -240,7 +240,16 @@ export type DatePickerProps = DateFieldProps & {
  * 打っても、カレンダーで選んでもかまいません。カレンダーは選んだ日（なければ今日）の月で開き、日を選ぶと欄に書いて閉じ、フォーカスをボタンに戻します。
  * props は DateField と同じで、min・max はカレンダーでも選べない日になります。
  */
-export function DatePicker({ today, ...props }: DatePickerProps) {
+export function DatePicker(props: DatePickerProps) {
+  return <DatePickerBody {...props} />;
+}
+
+/** DatePicker's body; DateRangePicker shows the range in each calendar. */
+function DatePickerBody({
+  today,
+  range,
+  ...props
+}: DatePickerProps & { range?: { start?: string | null; end?: string | null } }) {
   const { value, defaultValue = null, onValueChange, label, min, max, disabled } = props;
   const [inner, setInner] = useState<string | null>(defaultValue);
   const current = value !== undefined ? (value === '' ? null : value) : inner;
@@ -297,6 +306,7 @@ export function DatePicker({ today, ...props }: DatePickerProps) {
                   min={min}
                   max={max}
                   today={today}
+                  range={range}
                 />
               </PopoverPrimitive.Content>
             </PortalSurface>
@@ -304,5 +314,107 @@ export function DatePicker({ today, ...props }: DatePickerProps) {
         </PopoverPrimitive.Root>
       }
     />
+  );
+}
+
+export type DateRange = {
+  /** 開始日（'2026-11-22' の形）。未入力や、確かめて通らないあいだは null。 */
+  start: string | null;
+  /** 終了日（'2026-11-30' の形）。未入力や、確かめて通らないあいだ（開始日より前を含む）は null。 */
+  end: string | null;
+};
+export type DateRangePickerProps = {
+  /** 問いの名前（「宿泊の期間」）。開始日と終了日の2つをまとめる legend になります。 */
+  label: string;
+  /** 期間。渡すと外で持ちます。 */
+  value?: DateRange;
+  /** 外で持たないときの、はじめの期間。 */
+  defaultValue?: DateRange;
+  /** 開始日か終了日が、確かめて通る日になったとき、またはそうでなくなったとき（null）に呼びます。 */
+  onValueChange?: (value: DateRange) => void;
+  /** 開始日の欄の名前。既定は「開始日」。 */
+  startLabel?: string;
+  /** 終了日の欄の名前。既定は「終了日」。 */
+  endLabel?: string;
+  /** 補助文。2つの欄の上に出し、まとまりに aria-describedby で結びます。 */
+  hint?: string;
+  /** エラー文。2つの欄のまとまりに出します（それぞれの欄の確かめは、欄の下に出ます）。 */
+  error?: string;
+  /** 2つの欄のラベルの横に「必須」の文字を出し、欄に aria-required を付けます。 */
+  required?: boolean;
+  disabled?: boolean;
+  /** 開始日・終了日とも、これより前の日を通さない（'2026-12-01' の形）。 */
+  min?: string;
+  /** 開始日・終了日とも、これより後の日を通さない（'2026-12-31' の形）。 */
+  max?: string;
+  /** フォームで送るときの名前。開始日と終了日を、それぞれ隠した入力で送ります。 */
+  name?: { start: string; end: string };
+  /** カレンダーで今日として印を付ける日（'2026-11-22' の形）。省くと端末の今日です。 */
+  today?: string;
+  className?: string;
+};
+/**
+ * 開始日と終了日を選ぶ期間の入力。2つの DatePicker を1つの問いにまとめます。予約・絞り込みの期間などに使います。
+ * どちらのカレンダーにも開始日から終了日までの期間を示します。終了日は開始日より前にできず、前の日を入れると、直し方のわかる文を出して null にします。
+ */
+export function DateRangePicker({
+  label,
+  value,
+  defaultValue = { start: null, end: null },
+  onValueChange,
+  startLabel = '開始日',
+  endLabel = '終了日',
+  hint,
+  error,
+  required,
+  disabled,
+  min,
+  max,
+  name,
+  today,
+  className,
+}: DateRangePickerProps) {
+  const [inner, setInner] = useState<DateRange>(defaultValue);
+  const current = value ?? inner;
+  // The latest range as of this event, so two changes in one event both land.
+  const latest = useRef(current);
+  latest.current = current;
+  const set = (next: DateRange) => {
+    latest.current = next;
+    if (value === undefined) setInner(next);
+    onValueChange?.(next);
+  };
+  // The end may not come before the start, nor before min.
+  const start = readBound(current.start);
+  const low = readBound(min);
+  const endMin = start && (!low || start.compare(low) > 0) ? current.start! : min;
+  const shared = { required, disabled, max, today, range: current };
+  return (
+    <Fieldset
+      legend={label}
+      hint={hint}
+      error={error}
+      disabled={disabled}
+      className={cx('lv-date-range', className)}
+    >
+      <div className="lv-date-range-parts">
+        <DatePickerBody
+          {...shared}
+          label={startLabel}
+          value={current.start}
+          min={min}
+          name={name?.start}
+          onValueChange={(next) => set({ ...latest.current, start: next })}
+        />
+        <DatePickerBody
+          {...shared}
+          label={endLabel}
+          value={current.end}
+          min={endMin}
+          name={name?.end}
+          onValueChange={(next) => set({ ...latest.current, end: next })}
+        />
+      </div>
+    </Fieldset>
   );
 }

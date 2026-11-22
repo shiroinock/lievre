@@ -26,6 +26,11 @@ const meta = {
         },
         { name: '日のボタン', selector: '.lv-calendar-day', checks: ['square', 'control-height'] },
         {
+          name: '月の送りのボタン',
+          selector: '.lv-calendar-header .lv-icon-button',
+          checks: ['square', 'control-height'],
+        },
+        {
           name: 'カレンダーの枠',
           selector: '.lv-date-picker-popover',
           checks: ['fits', 'padding-equal'],
