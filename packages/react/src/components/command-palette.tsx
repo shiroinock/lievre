@@ -179,6 +179,7 @@ export function CommandPalette({
   // Where the focus was before opening, and the command to run once it is back there.
   const opener = useRef<HTMLElement | null>(null);
   const pending = useRef<CommandItem | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   // Before Radix moves the focus into the palette (its effects run after this layout effect).
   useLayoutEffect(() => {
     if (!isOpen) return;
@@ -221,19 +222,23 @@ export function CommandPalette({
 
   return (
     <DialogPrimitive.Root open={isOpen} onOpenChange={setOpen}>
-      {shownTrigger && <DialogPrimitive.Trigger asChild>{shownTrigger}</DialogPrimitive.Trigger>}
+      {shownTrigger && (
+        <DialogPrimitive.Trigger asChild ref={triggerRef}>
+          {shownTrigger}
+        </DialogPrimitive.Trigger>
+      )}
       <DialogPrimitive.Portal>
         <PortalSurface>
           <DialogPrimitive.Overlay className="lv-dialog-overlay" />
           <DialogPrimitive.Content
             className="lv-dialog lv-command-palette"
             onCloseAutoFocus={(e) => {
+              // The focus goes back here, before the command runs: Radix would otherwise move it
+              // to the trigger after this handler and take away a focus the command moved.
+              e.preventDefault();
               const back = opener.current;
-              if (back && back.isConnected && back !== document.body) {
-                e.preventDefault();
-                back.focus();
-              }
-              // Otherwise Radix puts the focus on the trigger.
+              if (back && back.isConnected && back !== document.body) back.focus();
+              else triggerRef.current?.focus();
               const command = pending.current;
               pending.current = null;
               if (command) {
@@ -300,10 +305,11 @@ function PaletteBody({ items, label, placeholder, emptyText, onChoose }: BodyPro
     isItemDisabled: (i) => !!i?.disabled,
     initialHighlightedIndex: firstEnabled(shown),
     stateReducer: (state, { type, changes }) => {
-      const { InputBlur, InputClick } = useCombobox.stateChangeTypes;
+      const { InputBlur, InputClick, MenuMouseLeave } = useCombobox.stateChangeTypes;
       // The list never closes, so pressing the field toggles nothing; and leaving it (closing
       // the palette, the window losing focus) neither runs a command nor writes one's name in.
-      if (type === InputBlur || type === InputClick) return state;
+      // The pointer leaving the list keeps the highlight too, so Enter still runs it.
+      if (type === InputBlur || type === InputClick || type === MenuMouseLeave) return state;
       // Typing keeps the highlight where it is; the effect below moves it once the committed text
       // narrows the list. (Downshift would drop it on every input, conversions included.)
       if (type === useCombobox.stateChangeTypes.InputChange)
@@ -387,8 +393,9 @@ function PaletteBody({ items, label, placeholder, emptyText, onChoose }: BodyPro
               onCompositionEnd,
               onKeyDown: (e) => {
                 // Radix's layer closed the palette on this Esc already; Downshift needn't also
-                // clear the text.
-                if (e.key === 'Escape')
+                // clear the text. Home and End stay the field's: they move the caret, not the
+                // highlight (the list is always open, so Downshift would take them).
+                if (e.key === 'Escape' || e.key === 'Home' || e.key === 'End')
                   (
                     e.nativeEvent as unknown as { preventDownshiftDefault?: boolean }
                   ).preventDownshiftDefault = true;
