@@ -800,7 +800,7 @@ selected・onSelectedChange で押して入り切りする絞り込みの札に�
 
 - `label: string` — 問いの名前（「生年月日」）。年・月・日の3つの欄をまとめる legend になります。
 - `value?: string | null` — 日付（'2026-11-22' の形）。未入力や、確かめて通らないあいだは null。渡すと外で持ちます。空を '' で持っても null と同じに扱います。打っている途中の欄を外から空にするときは、key を変えて作り直します（null から null では変わったことが分からないため）。
-- `defaultValue?: string | null` — 既定 null。外で持たないときの、はじめの日付。
+- `defaultValue?: string | null` — 外で持たないときの、はじめの日付。
 - `onValueChange?: ((value: string | null) => void)` — 確かめて通る日付になったとき、またはそうでなくなったとき（null）に呼びます。打っている途中の文字では呼びません。
 - `hint?: string` — 補助文（「例：1990 4 1」）。欄の下に出し、まとまりに aria-describedby で結びます。
 - `error?: string` — エラー文。渡すと、部品が確かめた文の代わりに出します。
@@ -811,6 +811,44 @@ selected・onSelectedChange で押して入り切りする絞り込みの札に�
 - `name?: string` — フォームで送るときの名前。確かめて通った日付を隠した入力で送ります。
 - `id?: string` — 年の欄の id。ErrorSummary から移るときは、ここで決めた id を使います。
 - `autoComplete?: 'bday'` — 'bday' で、ブラウザの自動入力に生年月日（年・月・日）を伝えます。
+- `className?: string`
+
+### DatePicker
+
+年・月・日の直接入力（DateField）の右に、カレンダーを開くボタンを添えた日付の入力。予約の日・締め切りなど、曜日や近さを見て選ぶ日に使います。
+打っても、カレンダーで選んでもかまいません。カレンダーは選んだ日（なければ今日）の月で開き、日を選ぶと欄に書いて閉じ、フォーカスをボタンに戻します。
+props は DateField と同じで、min・max はカレンダーでも選べない日になります。
+
+- `label: string` — 問いの名前（「生年月日」）。年・月・日の3つの欄をまとめる legend になります。
+- `value?: string | null` — 日付（'2026-11-22' の形）。未入力や、確かめて通らないあいだは null。渡すと外で持ちます。空を '' で持っても null と同じに扱います。打っている途中の欄を外から空にするときは、key を変えて作り直します（null から null では変わったことが分からないため）。
+- `defaultValue?: string | null` — 外で持たないときの、はじめの日付。
+- `onValueChange?: ((value: string | null) => void)` — 確かめて通る日付になったとき、またはそうでなくなったとき（null）に呼びます。打っている途中の文字では呼びません。
+- `hint?: string` — 補助文（「例：1990 4 1」）。欄の下に出し、まとまりに aria-describedby で結びます。
+- `error?: string` — エラー文。渡すと、部品が確かめた文の代わりに出します。
+- `required?: boolean` — ラベルの横に「必須」の文字を出し、3つの欄に aria-required を付けます。
+- `disabled?: boolean`
+- `min?: string` — これより前の日を通さない（'2026-12-01' の形。日時の文字なら日付の部分を使い、読めない文字は無視します）。
+- `max?: string` — これより後の日を通さない（'2026-12-31' の形。日時の文字なら日付の部分を使い、読めない文字は無視します）。
+- `name?: string` — フォームで送るときの名前。確かめて通った日付を隠した入力で送ります。
+- `id?: string` — 年の欄の id。ErrorSummary から移るときは、ここで決めた id を使います。
+- `autoComplete?: 'bday'` — 'bday' で、ブラウザの自動入力に生年月日（年・月・日）を伝えます。
+- `className?: string`
+- `today?: string` — カレンダーで今日として印を付ける日（'2026-11-22' の形）。省くと端末の今日です。
+
+### Calendar
+
+月の表から日付を選びます。週は日曜から始まります。
+矢印で日、PageUp / PageDown で月、Shift と合わせて年、Home / End で週の端へ移り、Enter か Space で選びます。
+今日は下線、選んだ日は塗りで示し、min・max の外の日は薄くして選べなくします（読み上げでも「選べません」と伝えます）。
+
+- `value?: string | null` — 選んだ日（'2026-11-22' の形）。渡すと外で持ちます。選んでいないときは null。
+- `defaultValue?: string | null` — 既定 null。外で持たないときの、はじめに選んでおく日。
+- `onValueChange?: ((value: string) => void)` — 日を選んだときに呼びます（'2026-11-22' の形）。
+- `min?: string` — これより前の日は選べません（'2026-12-01' の形）。前の月へも、この日の月より前には移りません。
+- `max?: string` — これより後の日は選べません（'2026-12-31' の形）。
+- `today?: string` — 今日として印を付ける日（'2026-11-22' の形）。省くと端末の今日です。
+- `label?: string` — 表の名前。省くと表示している年月（「2026年11月」）です。
+- `autoFocus?: boolean` — 既定 false。描いたときに、選んだ日（なければ今日）へフォーカスを移します。ポップオーバーの中で開いたときに使います。
 - `className?: string`
 
 ### Stepper

@@ -1,12 +1,16 @@
 // Dates typed in as year, month and day (the GOV.UK date input pattern). The calendar arithmetic
 // is @internationalized/date's; the fields are lievre's own TextFields in a Fieldset.
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { CalendarDate, parseDate } from '@internationalized/date';
-import { cx } from './system';
+import { Popover as PopoverPrimitive } from 'radix-ui';
+import { CalendarDays } from 'lucide-react';
+import { cx, PortalSurface } from './system';
+import { Calendar } from './calendar';
 import { Fieldset } from './form';
-import { TextField } from './primitives';
+import { IconButton, TextField } from './primitives';
 import { toHalfWidth } from './normalize';
 import { formatDate } from './format';
+import { readBound } from './date-bound';
 
 type Parts = { year: string; month: string; day: string };
 const EMPTY: Parts = { year: '', month: '', day: '' };
@@ -34,17 +38,6 @@ export type DateCheck =
   | { kind: 'before-min'; min: string }
   | { kind: 'after-max'; max: string }
   | { kind: 'ok'; value: string };
-
-/** A bound from 'YYYY-MM-DD' or the date part of an ISO date-time; anything else is ignored. */
-function readBound(text: string | undefined) {
-  const day = text && /^\d{4}-\d{2}-\d{2}/.exec(text)?.[0];
-  if (!day) return undefined;
-  try {
-    return parseDate(day);
-  } catch {
-    return undefined;
-  }
-}
 
 /** 年・月・日の文字を確かめ、ISO 8601 の日付（'2026-11-22'）にします。全角の数字も受けます。存在しない日（2月30日）や、min・max の外は、その理由を返します。 */
 export function checkDate(
@@ -120,7 +113,12 @@ export type DateFieldProps = {
  * 数字は等幅で、全角の数字も受け、欄を離れると半角に直します。
  * まとまりを離れたときに、足りない欄・存在しない日（2月30日）・min と max の外を確かめ、直し方のわかる文を出します。
  */
-export function DateField({
+export function DateField(props: DateFieldProps) {
+  return <DateFieldBody {...props} />;
+}
+
+/** DateField's body; DatePicker puts its calendar button after the day field. */
+function DateFieldBody({
   label,
   value,
   defaultValue = null,
@@ -135,7 +133,9 @@ export function DateField({
   id,
   autoComplete,
   className,
-}: DateFieldProps) {
+  trailing,
+  layer,
+}: DateFieldProps & { trailing?: ReactNode; layer?: RefObject<HTMLElement | null> }) {
   const [parts, setParts] = useState<Parts>(() =>
     partsOf(value !== undefined ? value : defaultValue),
   );
@@ -188,7 +188,9 @@ export function DateField({
   const onBlur = () => {
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      if (!group.current?.contains(group.current.ownerDocument.activeElement)) setChecked(true);
+      const active = group.current?.ownerDocument.activeElement ?? null;
+      // DatePicker's calendar sits in a portal, outside the group, yet still belongs to it.
+      if (!group.current?.contains(active) && !layer?.current?.contains(active)) setChecked(true);
     }, 0);
   };
   const field = (key: keyof Parts, text: string, chars: number, fieldId?: string) => (
@@ -214,6 +216,7 @@ export function DateField({
           {field('year', '年', 4, id)}
           {field('month', '月', 2)}
           {field('day', '日', 2)}
+          {trailing}
         </div>
       </Fieldset>
       {name && (
@@ -225,5 +228,81 @@ export function DateField({
         />
       )}
     </div>
+  );
+}
+
+export type DatePickerProps = DateFieldProps & {
+  /** カレンダーで今日として印を付ける日（'2026-11-22' の形）。省くと端末の今日です。 */
+  today?: string;
+};
+/**
+ * 年・月・日の直接入力（DateField）の右に、カレンダーを開くボタンを添えた日付の入力。予約の日・締め切りなど、曜日や近さを見て選ぶ日に使います。
+ * 打っても、カレンダーで選んでもかまいません。カレンダーは選んだ日（なければ今日）の月で開き、日を選ぶと欄に書いて閉じ、フォーカスをボタンに戻します。
+ * props は DateField と同じで、min・max はカレンダーでも選べない日になります。
+ */
+export function DatePicker({ today, ...props }: DatePickerProps) {
+  const { value, defaultValue = null, onValueChange, label, min, max, disabled } = props;
+  const [inner, setInner] = useState<string | null>(defaultValue);
+  const current = value !== undefined ? (value === '' ? null : value) : inner;
+  const set = (next: string | null) => {
+    if (value === undefined) setInner(next);
+    onValueChange?.(next);
+  };
+  const [open, setOpen] = useState(false);
+  const layer = useRef<HTMLDivElement>(null);
+  return (
+    <DateFieldBody
+      {...props}
+      className={cx('lv-date-picker', props.className)}
+      value={current}
+      onValueChange={set}
+      layer={layer}
+      trailing={
+        <PopoverPrimitive.Root open={open} onOpenChange={setOpen}>
+          <PopoverPrimitive.Trigger asChild>
+            <IconButton
+              variant="secondary"
+              className="lv-date-picker-button"
+              label={`${label}をカレンダーから選ぶ`}
+              icon={<CalendarDays />}
+              disabled={disabled}
+            />
+          </PopoverPrimitive.Trigger>
+          <PopoverPrimitive.Portal>
+            <PortalSurface>
+              <PopoverPrimitive.Content
+                ref={layer}
+                className="lv-popover lv-date-picker-popover"
+                aria-label={`${label}をカレンダーから選ぶ`}
+                side="bottom"
+                align="end"
+                sideOffset={4}
+                collisionPadding={8}
+                // The focus goes to the chosen day (or today), not to the first button. Here and
+                // not in the calendar's own effect: a Dialog around would take back a focus
+                // moved before this layer has told it to step aside.
+                onOpenAutoFocus={(e) => {
+                  e.preventDefault();
+                  layer.current
+                    ?.querySelector<HTMLElement>('.lv-calendar-day[tabindex="0"]')
+                    ?.focus();
+                }}
+              >
+                <Calendar
+                  value={current}
+                  onValueChange={(next) => {
+                    set(next);
+                    setOpen(false);
+                  }}
+                  min={min}
+                  max={max}
+                  today={today}
+                />
+              </PopoverPrimitive.Content>
+            </PortalSurface>
+          </PopoverPrimitive.Portal>
+        </PopoverPrimitive.Root>
+      }
+    />
   );
 }
