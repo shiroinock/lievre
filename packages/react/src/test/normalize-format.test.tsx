@@ -55,6 +55,13 @@ describe('formatNumber', () => {
     expect(formatNumber(12, { sign: true })).toBe('+12');
     expect(formatNumber(0, { sign: true })).toBe('0');
   });
+  it('never writes a minus on zero', () => {
+    expect(formatNumber(-0)).toBe('0');
+    expect(formatNumber(-0.001, { fractionDigits: 2 })).toBe('0.00');
+    expect(formatNumber(-0.0001, { percent: true })).toBe('0%');
+    expect(formatNumber(-0.001, { fractionDigits: 2, sign: true })).toBe('0.00');
+    expect(formatNumber(-3)).toBe('-3');
+  });
 });
 
 describe('formatDate', () => {
@@ -103,6 +110,20 @@ describe('formatDate', () => {
     expect(formatDate('12')).toBe('12');
     expect(formatDate('2026/11/22')).toBe('2026/11/22');
     expect(formatDate('2026-11-22T09:05', { style: 'time' })).toBe('9:05');
+  });
+  it('writes a date-time without a zone as written, whatever the time zone', () => {
+    for (const timeZone of ['Asia/Tokyo', 'America/New_York', 'UTC'])
+      expect(formatDate('2026-11-22T09:05', { style: 'datetime', timeZone })).toBe(
+        '2026/11/22 9:05',
+      );
+    // Counted as that time in the given zone.
+    const now = new Date('2026-11-22T00:08:00Z');
+    expect(formatRelativeTime('2026-11-22T09:05', { now, timeZone: 'Asia/Tokyo' })).toBe(
+      '3 分前',
+    );
+    expect(formatRelativeTime('2026-11-21T19:05', { now, timeZone: 'America/New_York' })).toBe(
+      '3 分前',
+    );
   });
   it('counts weeks, months and years without calendar words that could be wrong', () => {
     const now = new Date(2027, 0, 1, 12);
