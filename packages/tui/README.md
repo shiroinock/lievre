@@ -2,17 +2,19 @@
 
 lievre のデザイン言語を端末に広げる部品です。描画には Ink 8 を使います。比較と判断は [docs/tui-foundation.md](../../docs/tui-foundation.md) にあります。
 
-| 場所                     | 内容                                                                                                                |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| `src/core/palette.ts`    | `@lievre/tokens` の `tokens.json` から端末の色を作る。色の段階の判定、256色への落とし方、コントラストの計算         |
-| `src/core/glyphs.ts`     | 字の組（標準の文字・Lievre Term・ASCII）                                                                            |
-| `src/ink/components.tsx` | Card・Button・Table・Status                                                                                         |
-| `src/core/queue.ts`      | 1件ずつ判断する列の状態とキー（`@lievre/react` と同じ決まり。一致はテストで確かめる）                               |
-| `src/ink/queue.tsx`      | Queue・QueueProgress・useQueueInput（Y / N / L / Z）                                                                |
-| `src/ink/screen.tsx`     | 見本の画面                                                                                                          |
-| `src/core/motion`        | 動き：トークンからの長さと曲線、役割の名前で持つ絵（Grid）、入り方と光の帯、濃淡の字、動かすかの判定                |
-| `src/ink/motion.tsx`     | Banner・Loading・Animation・Frame・useFrames（入り方は Enter・Esc・空白で飛ばし、動き続けるものは P・空白で止める） |
-| `skills/tui-motion`      | エージェント向けの手引き（`SKILL.md`）。動かしてよいかの判断の順、使い方、確かめること。npm の配布物にも入る        |
+| 場所                          | 内容                                                                                                                |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `src/core/palette.ts`         | `@lievre/tokens` の `tokens.json` から端末の色を作る。色の段階の判定、256色への落とし方、コントラストの計算         |
+| `src/core/glyphs.ts`          | 字の組（標準の文字・Lievre Term・ASCII）                                                                            |
+| `src/ink/components.tsx`      | Card・Button・Table・Status                                                                                         |
+| `src/core/queue.ts`           | 1件ずつ判断する列の状態とキー（`@lievre/react` と同じ決まり。一致はテストで確かめる）                               |
+| `src/ink/queue.tsx`           | Queue・QueueProgress・useQueueInput（Y / N / L / Z）                                                                |
+| `src/core/command.ts`         | コマンドパレットの状態・絞り込み・キー（`@lievre/react` と同じ絞り込み。一致はテストで確かめる）。開くキーは Ctrl+K |
+| `src/ink/command-palette.tsx` | CommandPalette・useCommandPaletteInput                                                                              |
+| `src/ink/screen.tsx`          | 見本の画面                                                                                                          |
+| `src/core/motion`             | 動き：トークンからの長さと曲線、役割の名前で持つ絵（Grid）、入り方と光の帯、濃淡の字、動かすかの判定                |
+| `src/ink/motion.tsx`          | Banner・Loading・Animation・Frame・useFrames（入り方は Enter・Esc・空白で飛ばし、動き続けるものは P・空白で止める） |
+| `skills/tui-motion`           | エージェント向けの手引き（`SKILL.md`）。動かしてよいかの判断の順、使い方、確かめること。npm の配布物にも入る        |
 
 `src/core` は Ink に依りません。描画の道具を替えるときは `src/ink` だけを書き直します。
 
