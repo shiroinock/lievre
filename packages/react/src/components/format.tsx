@@ -138,6 +138,21 @@ export function formatDate(value: Date | string, options: DateFormatOptions = {}
     timeZone,
   }).format(date);
 }
+/** The year, month and day a moment falls on in a time zone. Read from the parts, never by
+ * cutting formatted text: what a locale writes (en-CA's YYYY-MM-DD) differs between engines. */
+function calendarDay(moment: Date, timeZone: string | undefined) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+    })
+      .formatToParts(moment)
+      .map((part) => [part.type, Number(part.value)]),
+  );
+  return { year: parts.year, month: parts.month, day: parts.day };
+}
 /** The machine-readable value for <time datetime>, in the same time zone as the text; none when
  * the value is not a date. */
 function machineValue(value: Date | string, options: DateFormatOptions, exact: boolean) {
@@ -146,28 +161,16 @@ function machineValue(value: Date | string, options: DateFormatOptions, exact: b
   if (moment.written) return moment.written;
   // A relative time keeps the exact moment, whatever the style.
   if (exact || (options.style ?? 'date') !== 'date') return moment.date.toISOString();
-  // en-CA writes YYYY-MM-DD.
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: options.timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(moment.date);
+  const { year, month, day } = calendarDay(moment.date, options.timeZone);
+  const pad = (n: number, width: number) => String(n).padStart(width, '0');
+  return `${pad(year, 4)}-${pad(month, 2)}-${pad(day, 2)}`;
 }
 
 const DAY = 24 * 3600 * 1000;
 /** Days since the epoch of the calendar day a moment falls on: in UTC for a 'YYYY-MM-DD' day,
  * in the viewer's time zone otherwise. */
 function dayNumber(date: Date, timeZone: string | undefined) {
-  const [year, month, day] = new Intl.DateTimeFormat('en-CA', {
-    timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
-    .format(date)
-    .split('-')
-    .map(Number);
+  const { year, month, day } = calendarDay(date, timeZone);
   return utcDay(year, month, day).getTime() / DAY;
 }
 /**
