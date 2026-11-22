@@ -54,8 +54,6 @@ export type ComboboxProps = {
   emptyText?: string;
 };
 
-/** Whether a key belongs to the IME: Chrome sends the committing Enter with isComposing,
- * Safari sends it after compositionend with keyCode 229. */
 /** Scrolls the list just enough to show the highlighted option, without moving the page. */
 function reveal(layer: HTMLElement | null) {
   const list = layer?.querySelector<HTMLElement>('.lv-combobox-list');
@@ -67,6 +65,8 @@ function reveal(layer: HTMLElement | null) {
   else if (box.bottom > view.bottom) list.scrollTop += box.bottom - view.bottom;
 }
 
+/** Whether a key belongs to the IME: Chrome sends the committing Enter with isComposing,
+ * Safari sends it after compositionend with keyCode 229. */
 const fromIme = (e: { isComposing?: boolean; keyCode?: number }) =>
   !!e.isComposing || e.keyCode === 229;
 
