@@ -156,14 +156,15 @@ export function DateField({
   const check = checkDate(parts, { min, max });
   const valid = check.kind === 'ok' ? check.value : null;
   // What the fields hold now may stop passing without any typing: a starting value outside
-  // min and max, or a bound that moves. Tell the caller then too.
+  // min and max, a bound that moves, or a value from outside that does not pass (while nothing
+  // passed before, so valid itself stays null). Tell the caller then too.
   useEffect(() => {
     if (valid !== reported) {
       setReported(valid);
       onValueChange?.(valid);
     }
-    // Only a change in what passes should report; reported and onValueChange follow it.
-  }, [valid]);
+    // onValueChange follows; a new function each render must not report again.
+  }, [valid, reported]);
   const shown = error ?? (checked ? dateCheckMessage(check) : undefined);
   const update = (key: keyof Parts, text: string) => {
     const next = { ...parts, [key]: text };

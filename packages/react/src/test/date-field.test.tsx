@@ -105,6 +105,32 @@ describe('DateField', () => {
     );
     expect(onValueChange).toHaveBeenLastCalledWith(null);
   });
+  it('reports null when a value from outside falls outside the range while nothing passes', async () => {
+    const onValueChange = vi.fn();
+    function Controlled() {
+      const [value, setValue] = useState<string | null>(null);
+      return (
+        <>
+          <DateField
+            label="希望日"
+            min="2026-12-01"
+            value={value}
+            onValueChange={(next) => {
+              onValueChange(next);
+              setValue(next);
+            }}
+          />
+          <button onClick={() => setValue('2026-11-22')}>入れる</button>
+          <output data-testid="value">{value ?? 'なし'}</output>
+        </>
+      );
+    }
+    render(<Controlled />);
+    await userEvent.click(screen.getByRole('button', { name: '入れる' }));
+    expect(onValueChange).toHaveBeenLastCalledWith(null);
+    expect(screen.getByTestId('value')).toHaveTextContent('なし');
+    expect(box('日')).toHaveValue('22');
+  });
   it('reports null for a starting value outside the range', () => {
     const onValueChange = vi.fn();
     render(
