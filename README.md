@@ -1,5 +1,7 @@
 # Lièvre
 
+[![dept](https://raw.githubusercontent.com/shiroinock/lievre/dept-badge/dept.svg)](https://github.com/shiroinock/lievre/blob/dept-badge/dept.md)
+
 <img src="logo/lievre-web-tile-light.svg" alt="" width="160" />
 
 日本語の画面を読みやすく組み立てるためのデザインシステムです。作者個人の実験的なデザインシステムで、特定の用途に絞らず、質感や経年のような表現も試しています。どの試みでも、WCAG 2.x AA などの Web 標準の基準は守ります。設計の考え方は [DESIGN.md](DESIGN.md) にまとめています。
