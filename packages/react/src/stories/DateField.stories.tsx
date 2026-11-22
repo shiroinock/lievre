@@ -68,3 +68,5 @@ export const OutOfRange: Story = {
     await expect(await c.findByText('2026年12月1日以降の日付を入れてください。')).toBeVisible();
   },
 };
+/** 和暦を添える（calendar="japanese"）。入れるのは西暦のままです。 */
+export const Japanese: Story = { args: { calendar: 'japanese', defaultValue: '1989-01-08' } };

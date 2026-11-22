@@ -47,6 +47,8 @@ export type CalendarProps = {
   today?: string;
   /** 期間として示す日（開始日と終了日。'2026-11-22' の形）。間の日に面を敷き、読み上げでも「期間の中」と伝えます。片方だけなら、その日だけに印を付けます。 */
   range?: { start?: string | null; end?: string | null };
+  /** 'japanese' で、見出しと日の名前を和暦（令和8年11月）で出します。年号の切り替わりの月も、その日の年号で出します。 */
+  calendar?: 'gregory' | 'japanese';
   /** 表の名前。省くと表示している年月（「2026年11月」）です。 */
   label?: string;
   /** 描いたときに、選んだ日（なければ今日）へフォーカスを移します。ポップオーバーの中で開いたときに使います。 */
@@ -67,6 +69,7 @@ export function Calendar({
   max,
   today,
   range,
+  calendar = 'gregory',
   label,
   autoFocus = false,
   className,
@@ -144,7 +147,15 @@ export function Calendar({
     if (ends(day)) follow.current = true;
     setFocused(day);
   };
-  const title = `${month.year}年${month.month}月`;
+  const title =
+    calendar === 'japanese'
+      ? new Intl.DateTimeFormat('ja-JP-u-ca-japanese', {
+          era: 'long',
+          year: 'numeric',
+          month: 'long',
+          timeZone: 'UTC',
+        }).format(month.toDate('UTC'))
+      : `${month.year}年${month.month}月`;
   return (
     <div className={cx('lv-calendar', className)}>
       <div className="lv-calendar-header">
@@ -198,7 +209,7 @@ export function Calendar({
                       type="button"
                       className="lv-calendar-day"
                       tabIndex={day.compare(focused) === 0 ? 0 : -1}
-                      aria-label={`${formatDate(iso, { weekday: true })}${isSelected ? '、選択中' : ''}${inRange ? RANGE_WORDS[inRange] : ''}${disabled ? '、選べません' : ''}`}
+                      aria-label={`${formatDate(iso, { weekday: true, calendar })}${isSelected ? '、選択中' : ''}${inRange ? RANGE_WORDS[inRange] : ''}${disabled ? '、選べません' : ''}`}
                       aria-current={day.compare(now) === 0 ? 'date' : undefined}
                       aria-disabled={disabled || undefined}
                       onClick={() => choose(day)}

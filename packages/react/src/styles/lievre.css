@@ -1043,6 +1043,14 @@
     gap: var(--lv-space-3);
   }
 
+  /* The Japanese era of the date typed in, under the fields, once the date passes. */
+  .lv-date-field-reading {
+    margin: var(--lv-space-2) 0 0;
+    color: var(--lv-muted);
+    font-size: var(--lv-text-md);
+    line-height: var(--lv-line-tight);
+  }
+
   /* DatePicker: the calendar button sits after the day field, at the fields' height. */
   .lv-popover.lv-date-picker-popover {
     width: auto;

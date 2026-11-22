@@ -71,3 +71,12 @@ export const ChooseFromCalendar: Story = {
     await expect(c.getByRole('textbox', { name: '日' })).toHaveValue('29');
   },
 };
+/** 和暦（calendar="japanese"）。欄の下に和暦を添え、カレンダーも和暦にします。入れるのは西暦です。 */
+export const Japanese: Story = {
+  args: { calendar: 'japanese', defaultValue: '2026-12-10' },
+  play: async ({ canvasElement }) => {
+    const c = within(canvasElement);
+    await userEvent.click(c.getByRole('button', { name: '予約の日をカレンダーから選ぶ' }));
+    await expect(await screen.findByRole('grid', { name: '令和8年12月' })).toBeVisible();
+  },
+};

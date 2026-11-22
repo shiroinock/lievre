@@ -1,6 +1,6 @@
 // Dates typed in as year, month and day (the GOV.UK date input pattern). The calendar arithmetic
 // is @internationalized/date's; the fields are lievre's own TextFields in a Fieldset.
-import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 import { CalendarDate, parseDate } from '@internationalized/date';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { CalendarDays } from 'lucide-react';
@@ -106,6 +106,8 @@ export type DateFieldProps = {
   id?: string;
   /** 'bday' で、ブラウザの自動入力に生年月日（年・月・日）を伝えます。 */
   autoComplete?: 'bday';
+  /** 'japanese' で、欄の下に入れた日の和暦（令和8年11月22日）を添えます。入れるのは西暦のままです。DatePicker ではカレンダーも和暦にします。 */
+  calendar?: 'gregory' | 'japanese';
   className?: string;
 };
 /**
@@ -132,6 +134,7 @@ function DateFieldBody({
   name,
   id,
   autoComplete,
+  calendar = 'gregory',
   className,
   trailing,
   keeps,
@@ -193,6 +196,11 @@ function DateFieldBody({
       if (!group.current?.contains(active) && !keeps?.(active)) setChecked(true);
     }, 0);
   };
+  const readingId = useId();
+  const reading =
+    calendar === 'japanese' && check.kind === 'ok'
+      ? `和暦：${formatDate(check.value, { calendar: 'japanese' })}`
+      : undefined;
   const field = (key: keyof Parts, text: string, chars: number, fieldId?: string) => (
     <TextField
       id={fieldId}
@@ -207,6 +215,8 @@ function DateFieldBody({
       disabled={disabled}
       aria-required={required || undefined}
       aria-invalid={shown ? true : undefined}
+      // Each field reads the era of the date as its description, as it reads the hint.
+      aria-describedby={reading ? readingId : undefined}
     />
   );
   return (
@@ -218,6 +228,13 @@ function DateFieldBody({
           {field('day', '日', 2)}
           {trailing}
         </div>
+        {reading && (
+          // Not a live region: announcing at each keystroke that makes a date would talk over
+          // the typing. Every field takes it as its description instead.
+          <p id={readingId} className="lv-date-field-reading">
+            {reading}
+          </p>
+        )}
       </Fieldset>
       {name && (
         <input
@@ -251,7 +268,7 @@ function DatePickerBody({
   defaultValue = null,
   ...props
 }: DatePickerProps & { range?: { start?: string | null; end?: string | null } }) {
-  const { value, onValueChange, label, min, max, disabled } = props;
+  const { value, onValueChange, label, min, max, disabled, calendar } = props;
   const [inner, setInner] = useState<string | null>(defaultValue);
   const current = value !== undefined ? (value === '' ? null : value) : inner;
   const set = (next: string | null) => {
@@ -333,6 +350,7 @@ function DatePickerBody({
                   max={max}
                   today={today}
                   range={range}
+                  calendar={calendar}
                 />
               </PopoverPrimitive.Content>
             </PortalSurface>
@@ -377,6 +395,8 @@ export type DateRangePickerProps = {
   name?: { start: string; end: string };
   /** カレンダーで今日として印を付ける日（'2026-11-22' の形）。省くと端末の今日です。 */
   today?: string;
+  /** 'japanese' で、それぞれの欄の下に和暦を添え、カレンダーも和暦にします。 */
+  calendar?: 'gregory' | 'japanese';
   className?: string;
 };
 /**
@@ -398,6 +418,7 @@ export function DateRangePicker({
   max,
   name,
   today,
+  calendar,
   className,
 }: DateRangePickerProps) {
   const [inner, setInner] = useState<DateRange>(defaultValue);
@@ -414,7 +435,7 @@ export function DateRangePicker({
   const start = readBound(current.start);
   const low = readBound(min);
   const endMin = start && (!low || start.compare(low) > 0) ? current.start! : min;
-  const shared = { required, disabled, max, today, range: current };
+  const shared = { required, disabled, max, today, calendar, range: current };
   return (
     <Fieldset
       legend={label}
