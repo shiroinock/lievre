@@ -1,6 +1,6 @@
 // Dates typed in as year, month and day (the GOV.UK date input pattern). The calendar arithmetic
 // is @internationalized/date's; the fields are lievre's own TextFields in a Fieldset.
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 import { CalendarDate, parseDate } from '@internationalized/date';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { CalendarDays } from 'lucide-react';
@@ -250,21 +250,28 @@ export function DatePicker({ today, defaultValue = null, ...props }: DatePickerP
   };
   const [open, setOpen] = useState(false);
   const layer = useRef<HTMLDivElement>(null);
-  // While the calendar is open, the fields are not checked; nor on the one blur that pressing
-  // the button causes. Safari doesn't focus a pressed button (nor a pressed day): the fields
-  // blur to the page before the calendar opens. A press that opens nothing (a right click, a
-  // touch that turns into a scroll) lets go of that one blur, and the next one checks.
+  // While the calendar is open, the fields are not checked; nor while the button is held down.
+  // Safari doesn't focus a pressed button (nor a pressed day): the fields blur to the page
+  // before the calendar opens. Letting go ends the hold however the press ends (a click, a
+  // right click, a drag away, a touch that turns into a scroll).
   const holding = useRef(false);
   const pressed = useRef(false);
   const onOpenChange = (next: boolean) => {
     holding.current = next;
-    pressed.current = false;
     setOpen(next);
   };
-  const keeps = (active: Element | null) => {
-    const press = pressed.current;
-    pressed.current = false;
-    return press || holding.current || !!layer.current?.contains(active);
+  const keeps = (active: Element | null) =>
+    pressed.current || holding.current || !!layer.current?.contains(active);
+  const press = (e: PointerEvent<HTMLButtonElement>) => {
+    pressed.current = true;
+    const release = () => {
+      pressed.current = false;
+      doc.removeEventListener('pointerup', release, true);
+      doc.removeEventListener('pointercancel', release, true);
+    };
+    const doc = e.currentTarget.ownerDocument;
+    doc.addEventListener('pointerup', release, true);
+    doc.addEventListener('pointercancel', release, true);
   };
   return (
     <DateFieldBody
@@ -283,9 +290,7 @@ export function DatePicker({ today, defaultValue = null, ...props }: DatePickerP
               label={`${label}をカレンダーから選ぶ`}
               icon={<CalendarDays />}
               disabled={disabled}
-              onPointerDown={() => {
-                pressed.current = true;
-              }}
+              onPointerDown={press}
             />
           </PopoverPrimitive.Trigger>
           <PopoverPrimitive.Portal>

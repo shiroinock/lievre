@@ -151,10 +151,24 @@ describe('DatePicker', () => {
     fireEvent.pointerDown(button, { button: 2 });
     (document.activeElement as HTMLElement).blur();
     await new Promise((resolve) => setTimeout(resolve, 0));
+    fireEvent.pointerUp(document.body, { button: 2 });
     expect(screen.queryByRole('dialog')).toBeNull();
     // Back into the fields and out again: now it checks.
     screen.getByRole('textbox', { name: '月' }).focus();
     (document.activeElement as HTMLElement).blur();
+    expect(await screen.findByText('年・月・日をすべて入れてください。')).toBeInTheDocument();
+  });
+  it('checks again after a press dragged away or cancelled, which blurs nothing', async () => {
+    render(<DatePicker label="予約の日" today="2026-11-22" />);
+    const year = screen.getByRole('textbox', { name: '年' });
+    await userEvent.type(year, '2026');
+    const button = screen.getByRole('button', { name: '予約の日をカレンダーから選ぶ' });
+    // Chrome focuses the button it presses, inside the group: no check runs then.
+    fireEvent.pointerDown(button);
+    button.focus();
+    fireEvent.pointerCancel(document.body);
+    year.focus();
+    year.blur();
     expect(await screen.findByText('年・月・日をすべて入れてください。')).toBeInTheDocument();
   });
   it('closes only the calendar on Esc inside a dialog', async () => {
