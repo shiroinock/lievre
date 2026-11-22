@@ -16,3 +16,4 @@ export * from './components/combobox';
 export * from './components/date';
 export * from './components/stepper';
 export * from './components/command-palette';
+export * from './components/search-number';

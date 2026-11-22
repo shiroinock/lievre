@@ -686,6 +686,37 @@
     /* stylelint-disable-next-line lievre/padding-symmetry -- 先頭のアイコン（16px）と間（8px）の分だけ空けて、文字をアイコンの後ろから始める */
     padding-inline-start: calc(var(--input-x) + 16px + var(--lv-space-2));
   }
+  /* SearchField: the clear button sits where Combobox's arrow sits, a 24px button whose icon
+     is the field's inner padding from the right edge. The browser's own clear button goes. */
+  .lv-search-field-input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+  .lv-input.lv-search-field-input {
+    /* stylelint-disable-next-line lievre/padding-symmetry -- 右端の消すボタンのアイコン（16px）と間（8px）の分だけ空けて、文字がボタンの下に入らないようにする */
+    padding-inline-end: calc(var(--input-x) + 16px + var(--lv-space-2));
+  }
+  .lv-search-field-clear {
+    position: absolute;
+    top: 50%;
+    /* 1px border + the inner padding to the icon, less the button's 4px around the icon. */
+    right: calc(var(--input-x) + 1px - 4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--lv-radius-sm);
+    background: transparent;
+    color: var(--lv-muted);
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+  .lv-search-field-clear:hover {
+    background: var(--lv-surface-sunken);
+    color: var(--lv-text);
+  }
   .lv-textarea {
     min-height: 104px;
     line-height: var(--lv-line-body);
