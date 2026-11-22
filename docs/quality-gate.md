@@ -70,7 +70,7 @@ line-height は `--lv-line-body` / `--lv-line-tight` で 4px の倍数にして�
 - 文字：standard（本文16px）/ interface（本文14px）
 - 等幅の画面（`family="mono"`）：Paper・comfortable・standard と、Ink・compact・interface（14px の本文が 14.4px に引き上がる側）
 
-等幅の範囲と画面そのものは `family.layout.tsx` が確かめます。Card・Text の `mono`、クラス `lv-family-mono`、`family="mono"` の画面で、中の文字がすべて Lievre Mono になり、14.4px（`--lv-text-mono-min`）より小さくならず、行の高さが 4px の倍数で、英数字 12 字と日本語 6 字の幅が 12/64px 以内で同じになること、入れ子が指定しない値を引き継ぎ `family="sans"` で戻せることを見ます。
+等幅の範囲と画面そのものは `family.layout.tsx` が確かめます。Card・Text の `mono`、クラス `lv-family-mono`、`family="mono"` の画面で、中の文字がすべて Lievre Mono になり、14.4px（`--lv-text-mono-min`）より小さくならず、行の高さが 4px の倍数で、文字を持つ要素ごとにその中で、英数字 14 字と日本語 7 字（仮名を含む）の幅が 14/64px 以内で同じになること、入れ子が指定しない値を引き継ぎ `family="sans"` で戻せることを見ます。
 
 画面の幅は 1280px、動きを減らす設定（`prefers-reduced-motion: reduce`）で測ります。タッチの画面（`pointer: coarse`）は今は測っていません。
 

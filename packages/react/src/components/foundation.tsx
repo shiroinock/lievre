@@ -48,7 +48,7 @@ export function Text({
       className,
     ),
   });
-  return mono ? <FamilyScope family="mono">{text}</FamilyScope> : text;
+  return <FamilyScope mono={mono}>{text}</FamilyScope>;
 }
 export type HeadingSize = 'minor' | 'subsection' | 'section' | 'title' | 'display';
 export const Heading = forwardRef<

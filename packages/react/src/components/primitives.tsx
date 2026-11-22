@@ -676,11 +676,7 @@ export type CardProps = HTMLAttributes<HTMLElement> & {
   mono?: boolean;
 };
 /** 1つのまとまりの入れ物。見出し・本文・見出しの右の操作を持ちます。 */
-export function Card(props: CardProps) {
-  const card = <CardSection {...props} />;
-  return props.mono ? <FamilyScope family="mono">{card}</FamilyScope> : card;
-}
-function CardSection({
+export function Card({
   title,
   eyebrow,
   action,
@@ -694,51 +690,53 @@ function CardSection({
 }: CardProps) {
   const titleId = useId();
   return (
-    <section
-      {...props}
-      className={cx(
-        'lv-card',
-        variant === 'plain' && 'lv-card--plain',
-        (href || selection) && 'lv-card--interactive',
-        mono && 'lv-family-mono',
-        className,
-      )}
-      data-selected={selection?.checked || undefined}
-    >
-      {(title || eyebrow || action || selection) && (
-        <header className="lv-card-header">
-          {selection && (
-            <CheckboxPrimitive.Root
-              className="lv-checkbox lv-card-check"
-              checked={selection.checked}
-              onCheckedChange={(c) => selection.onCheckedChange(c === true)}
-              disabled={selection.disabled}
-              aria-labelledby={titleId}
-            >
-              <CheckboxPrimitive.Indicator>
-                <Check size={14} strokeWidth={3} />
-              </CheckboxPrimitive.Indicator>
-            </CheckboxPrimitive.Root>
-          )}
-          <div className="lv-card-heading">
-            {eyebrow && <div className="lv-eyebrow">{eyebrow}</div>}
-            {title && (
-              <h2 id={titleId} className="lv-card-title">
-                {href ? (
-                  <a className="lv-card-link" href={href}>
-                    {title}
-                  </a>
-                ) : (
-                  title
-                )}
-              </h2>
+    <FamilyScope mono={mono}>
+      <section
+        {...props}
+        className={cx(
+          'lv-card',
+          variant === 'plain' && 'lv-card--plain',
+          (href || selection) && 'lv-card--interactive',
+          mono && 'lv-family-mono',
+          className,
+        )}
+        data-selected={selection?.checked || undefined}
+      >
+        {(title || eyebrow || action || selection) && (
+          <header className="lv-card-header">
+            {selection && (
+              <CheckboxPrimitive.Root
+                className="lv-checkbox lv-card-check"
+                checked={selection.checked}
+                onCheckedChange={(c) => selection.onCheckedChange(c === true)}
+                disabled={selection.disabled}
+                aria-labelledby={titleId}
+              >
+                <CheckboxPrimitive.Indicator>
+                  <Check size={14} strokeWidth={3} />
+                </CheckboxPrimitive.Indicator>
+              </CheckboxPrimitive.Root>
             )}
-          </div>
-          {action}
-        </header>
-      )}
-      <div className="lv-card-body">{children}</div>
-    </section>
+            <div className="lv-card-heading">
+              {eyebrow && <div className="lv-eyebrow">{eyebrow}</div>}
+              {title && (
+                <h2 id={titleId} className="lv-card-title">
+                  {href ? (
+                    <a className="lv-card-link" href={href}>
+                      {title}
+                    </a>
+                  ) : (
+                    title
+                  )}
+                </h2>
+              )}
+            </div>
+            {action}
+          </header>
+        )}
+        <div className="lv-card-body">{children}</div>
+      </section>
+    </FamilyScope>
   );
 }
 export type AlertProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {

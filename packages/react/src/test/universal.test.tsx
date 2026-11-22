@@ -48,6 +48,28 @@ it('carries a mono range to portals and nested providers inside it', async () =>
   await userEvent.click(screen.getByRole('button', { name: '開く' }));
   expect(screen.getByRole('dialog').closest('.lievre')).toHaveAttribute('data-family', 'mono');
 });
+it('keeps what is inside when mono or the screen family changes', async () => {
+  const view = (family: 'sans' | 'mono', mono: boolean) => (
+    <LievreProvider family={family}>
+      <Card title="記録" mono={mono}>
+        <input aria-label="メモ" />
+      </Card>
+      <Text mono={mono}>
+        <input aria-label="行" />
+      </Text>
+    </LievreProvider>
+  );
+  const { rerender } = render(view('sans', false));
+  const memo = screen.getByRole('textbox', { name: 'メモ' });
+  const line = screen.getByRole('textbox', { name: '行' });
+  await userEvent.type(memo, '途中');
+  rerender(view('sans', true));
+  rerender(view('mono', true));
+  rerender(view('mono', false));
+  expect(screen.getByRole('textbox', { name: 'メモ' })).toBe(memo);
+  expect(screen.getByRole('textbox', { name: '行' })).toBe(line);
+  expect(memo).toHaveValue('途中');
+});
 it('marks monospace ranges with lv-family-mono', () => {
   const { container } = render(
     <LievreProvider>
