@@ -64,15 +64,16 @@ function checkOne(el: Element, check: LayoutCheck): string | null {
   const fontSize = parseFloat(s.fontSize);
 
   if (check === 'inset-x' || check === 'inset-y') {
-    const m = inset(el);
-    if (!m) return null;
     if (check === 'inset-x') {
+      const m = inset(el);
+      if (!m) return null;
       if (Math.abs(m.dx) <= CRITERIA.insetX) return null;
       return `中身が左右の中央から ${px(Math.abs(m.dx))} ${m.dx > 0 ? '右' : '左'}に寄っています（左の余白 ${px(m.l)}・右の余白 ${px(m.r)}）。基準：左右の余白の差の半分が ${CRITERIA.insetX}px 以内。`;
     }
-    const limit = CRITERIA.insetYEm * fontSize;
-    if (Math.abs(m.dy) <= limit + 0.05) return null;
-    return `中身が上下の中央から ${px(Math.abs(m.dy))} ${m.dy > 0 ? '下' : '上'}に寄っています（上の余白 ${px(m.t)}・下の余白 ${px(m.b)}）。基準：上下の余白の差の半分が ${CRITERIA.insetYEm}em（${px(limit)}）以内。`;
+    const m = inset(el, { face: true });
+    if (!m) return null;
+    if (Math.abs(m.dy) <= CRITERIA.insetY) return null;
+    return `中身が上下の中央から ${px(Math.abs(m.dy))} ${m.dy > 0 ? '下' : '上'}に寄っています（文字は日本語の字面の枠で測って、上の余白 ${px(m.t)}・下の余白 ${px(m.b)}）。基準：上下の余白の差の半分が ${CRITERIA.insetY}px 以内。padding が上下で同じか、行の高さが 4px に乗っているか、書体が Lievre Sans・Lievre Mono（@lievre/react/fonts.css）か確かめてください。`;
   }
 
   if (check === 'control-height') {

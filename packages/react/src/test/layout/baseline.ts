@@ -25,31 +25,7 @@ export type KnownIssue = {
   reason: string;
 };
 
-export const BASELINE: KnownIssue[] = [
-  // 字形によるずれ。行の高さと padding は上下で同じ。
-  {
-    story: 'Components/Display/Kbd',
-    part: 'キー',
-    check: 'inset-y',
-    reason:
-      '記号（⌘ など）の字形が等幅の書体で上に寄り、上下の差の半分が 1.7px になる（基準 1.4px）。',
-  },
-  {
-    story: 'Components/Data/DataTable',
-    part: '表のセル',
-    check: 'inset-y',
-    reason:
-      'カタカナと英字（「ストレージC」「ゲートウェイB」）や漢字だけの長い名前が、上に 1.6〜1.7px 寄る（基準 1.4px）。セルは padding 12px・行の高さ 24px で上下同じ。IBM Plex Sans JP の字形が行の中央より上にあり、1x の画面で半行送りが整数に丸められる分が足される。',
-  },
-  ...['Patterns/Application', 'Patterns/Everyday'].map((story) => ({
-    story,
-    part: 'ボタン',
-    check: 'inset-y',
-    element: '「整える」',
-    reason:
-      '資料の絞り込みの「整える」ボタンで、文字の輪郭が上に 1.5px 寄る（基準 1.4px）。同じ大きさのボタンのほかのラベルは基準内なので、「整」の字形によるずれ。',
-  })),
-];
+export const BASELINE: KnownIssue[] = [];
 
 /** 公開しているが、配置を測る部品ではないもの。 */
 export const NOT_A_PART: Record<string, string> = {

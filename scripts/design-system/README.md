@@ -5,7 +5,7 @@
 - 画面全体を `LievreProvider` で包みます。スタイルは `.lievre` の内側でだけ効き、包み忘れても誤りは出ず見た目だけが崩れます。テーマは `theme="paper"`（明るい面）か `theme="ink"`（深い紺の面）。トークンの名前は共通で、値だけが入れ替わります。
 - 本文の大きさは `typography="standard"`（16px、読み物）と `"interface"`（14px、操作画面）、密度は `density="comfortable"` と `"compact"` から、それぞれ独立に選びます。
 - 通知（`useToast()`）を使うときは `ToastProvider` も置きます。
-- 書体は同梱していません。`IBM Plex Sans JP` と `IBM Plex Mono` を読み込み、等幅には `'Lievre Mono'`（Plex Mono を `size-adjust: 83.333%` で読み込んだもの）を用意します。
+- 書体のファイルは同梱していません。`@fontsource/ibm-plex-sans-jp` と `@fontsource/ibm-plex-mono` を入れ、`@lievre/react/fonts.css` を読み込みます。本文の `'Lievre Sans'`（Plex Sans JP の字を 0.07em 下げて行の中央に置いたもの）と、等幅の `'Lievre Mono'`（Plex Mono を 5/6 に縮め、英数字と日本語を 1:2 にしたもの）が定義されます。この見本集は、本文を Google Fonts の `IBM Plex Sans JP`（補正なし）で表示しています。
 
 ## 4つの約束
 
@@ -24,7 +24,7 @@
 
 ## 文字
 
-- 見出し・本文・ラベルは `IBM Plex Sans JP`（`lv-font-sans`）。ラベルは日本語で書き、英字の大文字や記号で飾りません。
+- 見出し・本文・ラベルは `'Lievre Sans'`（IBM Plex Sans JP を行の中央に置き直したもの、`lv-font-sans`）。ラベルは日本語で書き、英字の大文字や記号で飾りません。
 - 読み値・表の数値・時刻・ID・コードは等幅（`lv-font-mono`）。英数字を 0.5em 幅に縮め、日本語（1em 幅）とちょうど **1:2** になるようにしています。等幅の文字は `lv-text-mono-min`（英数字で 12px 相当）より小さくしません。
 - 大きさは `lv-text-xs`〜`lv-text-3xl`（12 / 13 / 14 / 16 / 18 / 22 / 28 / 36px）。太さは `lv-weight-regular`・`lv-weight-medium`・`lv-weight-bold` の3つ。
 - 行の高さは `lv-line-body`（1.7 倍）と `lv-line-tight`（1.45 倍）を使います。どちらも要素の文字の大きさから 4px の倍数に丸めるので、14px の本文は 24px、16px は 28px の行になります。

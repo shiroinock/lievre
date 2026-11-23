@@ -64,8 +64,13 @@ export type LayoutCheck =
 export const CRITERIA = {
   /** 中央揃えの部品の左右のずれ（左右の余白の差の半分）。 */
   insetX: 0.5,
-  /** 上下のずれ（上下の余白の差の半分）。IBM Plex Sans JP の漢字は行の中央より 0.06em 上に寄るため em で許す。 */
-  insetYEm: 0.1,
+  /**
+   * 上下のずれ（上下の余白の差の半分）。文字は墨ではなく日本語の字面の枠（1em）で測る。
+   * Lievre Sans・Lievre Mono は字面の枠を行の箱の中央に置くので（fonts.layout.tsx で確かめる）、
+   * 残るのは px への丸め。ブラウザは字の ascent・descent と半行送りを整数 px に丸めるため、行の高さが
+   * 整数 px でないところ（14.4px の等幅で line-height: 1 など）で 0.8px までずれる。
+   */
+  insetY: 0.8,
   /** アイコンの中心と1行目の行ボックスの中心の差。 */
   icon: 0.5,
   /** 高さ・余白の比べ合わせの許容差。 */

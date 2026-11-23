@@ -82,7 +82,17 @@ function baselineOf(textNode) {
   return first.top + m.fontBoundingBoxAscent;
 }
 
-function textInk(node) {
+// Text can also be placed by its face instead of its ink: the Japanese em box (1em tall, its
+// middle FACE_MIDDLE above the baseline). Lievre Sans and Lievre Mono put this box in the middle
+// of the line box (DESIGN.md「書体」), so a box whose face is off centre has uneven padding or a
+// font that lost its correction; the ink also moves with the glyphs (lowercase, figures).
+export const FACE_MIDDLE = 0.38;
+function faceOf(el, base) {
+  const size = parseFloat(getComputedStyle(el).fontSize);
+  return { top: base - (FACE_MIDDLE + 0.5) * size, bottom: base - (FACE_MIDDLE - 0.5) * size };
+}
+
+function textInk(node, face = false) {
   const text = node.textContent.replace(/\s+/g, ' ').trim();
   if (!text) return null;
   const range = document.createRange();
@@ -92,18 +102,21 @@ function textInk(node) {
   const m = measureText(node.parentElement, text);
   const base = baselineOf(node);
   const last = rects.at(-1);
+  const box = face
+    ? faceOf(node.parentElement, base)
+    : { top: base - m.actualBoundingBoxAscent, bottom: base + m.actualBoundingBoxDescent };
   // Later lines share the first line's ink metrics, shifted by their own offset.
   return {
     left: Math.min(...rects.map((r) => r.left)),
     right: Math.max(...rects.map((r) => r.right)),
-    top: base - m.actualBoundingBoxAscent,
-    bottom: base + m.actualBoundingBoxDescent + (last.top - rects[0].top),
+    top: box.top,
+    bottom: box.bottom + (last.top - rects[0].top),
     base,
   };
 }
 
 // Input values are not text nodes: place their line box from the content box instead.
-function inputInk(el) {
+function inputInk(el, face = false) {
   const text = el.value || el.placeholder;
   if (!text) return null;
   const s = getComputedStyle(el);
@@ -117,13 +130,10 @@ function inputInk(el) {
   const half = (lineH - (m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)) / 2;
   const base = lineTop + half + m.fontBoundingBoxAscent;
   const left = r.left + parseFloat(s.paddingLeft) + parseFloat(s.borderLeftWidth);
-  return {
-    left,
-    right: left + m.width,
-    top: base - m.actualBoundingBoxAscent,
-    bottom: base + m.actualBoundingBoxDescent,
-    base,
-  };
+  const box = face
+    ? faceOf(el, base)
+    : { top: base - m.actualBoundingBoxAscent, bottom: base + m.actualBoundingBoxDescent };
+  return { left, right: left + m.width, ...box, base };
 }
 
 const drawn = (el) => {
@@ -164,10 +174,10 @@ function union(a, b) {
   };
 }
 
-function inkInside(el) {
+function inkInside(el, face) {
   let ink = null;
   for (const child of el.childNodes) {
-    if (child.nodeType === Node.TEXT_NODE) ink = union(ink, textInk(child));
+    if (child.nodeType === Node.TEXT_NODE) ink = union(ink, textInk(child, face));
     else if (child.nodeType === Node.ELEMENT_NODE) {
       const s = getComputedStyle(child);
       if (s.display === 'none' || s.visibility === 'hidden' || s.position === 'absolute') continue;
@@ -175,7 +185,7 @@ function inkInside(el) {
       if (drawn(child)) {
         const r = svgInk(child) ?? child.getBoundingClientRect();
         if (r.width && r.height) ink = union(ink, r);
-      } else ink = union(ink, inkInside(child));
+      } else ink = union(ink, inkInside(child, face));
     }
   }
   return ink;
@@ -183,9 +193,10 @@ function inkInside(el) {
 
 const round = (n) => Math.round(n * 10) / 10;
 
-// Space from the padding edge to the ink on each side.
-export function inset(el) {
-  const ink = el.matches('input, textarea') ? inputInk(el) : inkInside(el);
+// Space from the padding edge to the ink on each side. With `{ face: true }`, text counts by
+// its Japanese em box instead of its ink (icons and other drawn boxes are the same either way).
+export function inset(el, { face = false } = {}) {
+  const ink = el.matches('input, textarea') ? inputInk(el, face) : inkInside(el, face);
   if (!ink) return null;
   const r = el.getBoundingClientRect();
   const s = getComputedStyle(el);
