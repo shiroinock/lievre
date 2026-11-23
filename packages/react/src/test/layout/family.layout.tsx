@@ -146,6 +146,25 @@ describe('範囲を等幅にする', () => {
   });
 });
 
+describe('範囲の本文の大きさ', () => {
+  it('いちばん近い provider の typography で決まる', async () => {
+    const host = await render(
+      <LievreProvider typography="interface">
+        <Text mono className="outer">
+          外は 14px なので等幅の最小の 14.4px
+        </Text>
+        <LievreProvider typography="standard">
+          <Text mono className="inner">
+            中は 16px のまま
+          </Text>
+        </LievreProvider>
+      </LievreProvider>,
+    );
+    expect(getComputedStyle(host.querySelector('.outer')!).fontSize).toBe(`${floor()}px`);
+    expect(getComputedStyle(host.querySelector('.inner')!).fontSize).toBe('16px');
+  });
+});
+
 describe('画面を等幅にする', () => {
   for (const typography of ['standard', 'interface'] as Typography[]) {
     it(`LievreProvider の family="mono"（${typography}）`, async () => {
