@@ -40,8 +40,6 @@ const LIBRARIES = [
   { name: 'react', version: '18.3.1' },
   { name: 'react-dom', version: '18.3.1' },
 ];
-/** The weights lievre ships faces for. */
-const WEIGHTS = ['400', '500', '600'];
 
 const { values: opts } = parseArgs({
   options: {

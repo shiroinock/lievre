@@ -48,7 +48,7 @@ export const USAGE = {
     '数値・時刻・ID・コードの書体。Lievre Term JP。英数字は 0.5em 幅、日本語は 1em 幅で、ちょうど 1:2。行の中央と英大文字の高さは本文と同じ。',
   'text-xs': '補助の文字（12px）。これより小さい文字は使わない。',
   'text-mono-min':
-    '等幅の文字の最小（14.4px）。英数字を 5/6 に縮めるので、読める大きさは 12px 相当。',
+    '等幅の文字の最小（14.4px）。英数字 1 字が 12px の Plex Mono と同じ 7.2px 幅になり、英大文字は 14px の本文と同じ高さ。',
   'text-sm': '小さめのラベル・表の補足（13px）。',
   'text-md': '操作画面の本文（14px）。typography="interface" の本文。',
   'text-base': '読み物の本文（16px）。typography="standard" の本文。',

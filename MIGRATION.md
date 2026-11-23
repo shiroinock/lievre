@@ -16,7 +16,7 @@ npm にはまだどちらの名前も公開していないので、移る必要�
 | CSS 変数             | `--k-accent` など                                              | `--lv-accent` など                                                      |
 | カスケードの層       | `kei.tokens`・`kei.base`・`kei.components`・`kei.utilities`    | `lievre.tokens`・`lievre.base`・`lievre.components`・`lievre.utilities` |
 | lint のルールと設定  | `kei/metric-unit`、`settings.kei`                              | `lievre/metric-unit`、`settings.lievre`                                 |
-| 等幅の書体の名前     | `'KEI Mono'`                                                   | `'Lievre Mono'`                                                         |
+| 等幅の書体の名前     | `'KEI Mono'`                                                   | `'Lievre Term JP'`（`@lievre/fonts`）                                   |
 | 質感の焼き込みの書体 | `'KEI Worn Sans'`・`'KEI Worn Mono'`                           | `'Lievre Worn Sans'`・`'Lievre Worn Mono'`                              |
 | 質感のソルトの既定値 | `kei`                                                          | `lievre`                                                                |
 
