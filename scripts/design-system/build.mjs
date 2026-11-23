@@ -367,13 +367,15 @@ function buildCss() {
   // (../fonts) and, when the page inlines it, from the preview (../../fonts). Not Lievre Sans: it
   // points at 369 fontsource subsets, too many files for the artifact, so the system shows IBM
   // Plex Sans JP from Google Fonts (uncorrected, the glyphs sit 0.07em high) until it ships the
-  // single-file faces of @lievre/fonts.
+  // single-file faces of @lievre/fonts. Lievre Mono drops its line-box overrides for the same
+  // reason: they put its middle where Lievre Sans has it (0.38em), and beside uncorrected Plex
+  // (0.31em) a line mixing the two would grow past its line-height.
   const faces = [
     ...readFileSync(`${REACT}/src/styles/fonts.css`, 'utf8').matchAll(
       /@font-face \{[^}]*font-family: 'Lievre Mono';[^}]*\}/g,
     ),
   ]
-    .map(([face]) => face)
+    .map(([face]) => face.replace(/\n\s*(ascent|descent|line-gap)-override: [^;]+;/g, ''))
     .join('\n')
     .replace(
       /url\('@fontsource\/ibm-plex-mono\/files\/([^']+)'\) format\('woff2'\)/g,
