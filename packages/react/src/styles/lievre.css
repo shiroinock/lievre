@@ -19,6 +19,9 @@
      inside it and a nested LievreProvider (family="sans") turns them back on. */
   .lievre {
     --lv-tracking: 1;
+    /* The body size a mono range inside uses: worked out on each provider (its own typography,
+       not any outer one's) and inherited, so 16px stays 16px and 14px rises to the mono floor. */
+    --lv-body-mono: max(var(--lv-body), var(--lv-text-mono-min));
     --lv-kerning: 'palt';
     color: var(--lv-text);
     background: var(--lv-bg);
@@ -51,10 +54,8 @@
   .lievre[data-family='mono'][data-typography='interface'] {
     --lv-leading-body: calc(24 / 14.4);
   }
-  .lievre[data-typography='interface'] .lv-family-mono {
-    --lv-body: var(--lv-text-mono-min);
-  }
   .lievre .lv-family-mono {
+    --lv-body: var(--lv-body-mono);
     font-size: max(1em, var(--lv-text-mono-min));
     line-height: var(--lv-line-body);
   }
