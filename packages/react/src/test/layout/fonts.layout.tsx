@@ -18,12 +18,12 @@ afterEach(() => {
 
 const FACES = [
   { name: '本文（--lv-font-sans）', family: 'Lievre Sans', className: '', height: 1.5 },
-  // Plex Mono's 1.3em at 5/6 size.
+  // Lievre Term JP: ascent 0.98em, descent 0.22em.
   {
     name: '等幅（--lv-font-mono）',
-    family: 'Lievre Mono',
+    family: 'Lievre Term JP',
     className: 'lv-mono',
-    height: 1.3 * (5 / 6),
+    height: 1.2,
   },
 ];
 

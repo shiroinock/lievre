@@ -44,13 +44,16 @@
     --lv-focus: var(--lv-accent);
 
     /* Type */
-    /* Lievre Sans is IBM Plex Sans JP centred in the line box (@lievre/react/fonts.css). */
+    /* Lievre Sans and Lievre Term JP come from @lievre/fonts (@lievre/react/fonts.css): Plex Sans JP
+       with its em box in the middle of the line box, and a monospace face whose Latin is half as
+       wide as its Japanese, on the same line middle. */
     --lv-font-sans: 'Lievre Sans', 'IBM Plex Sans JP', system-ui, -apple-system, 'Hiragino Sans',
       'Yu Gothic UI', sans-serif;
-    --lv-font-mono: 'Lievre Mono', 'PlemolJP', 'IBM Plex Mono', 'Lievre Sans', 'IBM Plex Sans JP',
+    --lv-font-mono: 'Lievre Term JP', 'PlemolJP', 'IBM Plex Mono', 'Lievre Sans', 'IBM Plex Sans JP',
       ui-monospace, 'SF Mono', Menlo, monospace;
     --lv-text-xs: 0.75rem;
-    /* Smallest size for monospace text: Lievre Mono draws Latin at 5/6 size, so 0.9rem reads as 12px. */
+    /* Smallest size for monospace text: Lievre Term's Latin is 0.5em wide, so 0.9rem gives it the
+       7.2px of a 12px Plex Mono letter, and its capitals stand as tall as 13px sans ones. */
     --lv-text-mono-min: 0.9rem;
     --lv-text-sm: 0.8125rem;
     --lv-text-md: 0.875rem;

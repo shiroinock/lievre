@@ -45,7 +45,7 @@ export const USAGE = {
   'font-sans':
     '見出し・本文・ラベルの書体（Lievre Sans：IBM Plex Sans JP を行の中央に置き直したもの）。',
   'font-mono':
-    '数値・時刻・ID・コードの書体。英数字は Lievre Mono で 0.5em 幅、日本語は Plex Sans JP の 1em 幅で、ちょうど 1:2。',
+    '数値・時刻・ID・コードの書体。Lievre Term JP。英数字は 0.5em 幅、日本語は 1em 幅で、ちょうど 1:2。行の中央と英大文字の高さは本文と同じ。',
   'text-xs': '補助の文字（12px）。これより小さい文字は使わない。',
   'text-mono-min':
     '等幅の文字の最小（14.4px）。英数字を 5/6 に縮めるので、読める大きさは 12px 相当。',

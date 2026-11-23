@@ -29,8 +29,9 @@
     .lievre[data-wear='baked'] {
       --lv-wear-sans: 'Lievre Worn Sans', 'Lievre Sans', 'IBM Plex Sans JP', system-ui,
         -apple-system, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
-      --lv-wear-mono: 'Lievre Worn Mono', 'Lievre Mono', 'PlemolJP', 'IBM Plex Mono',
-        'Lievre Worn Sans', 'Lievre Sans', 'IBM Plex Sans JP', ui-monospace, 'SF Mono', Menlo,
+      /* The worn mono covers Latin only: Japanese goes to the worn sans, the rest to Lievre Term JP. */
+      --lv-wear-mono: 'Lievre Worn Mono', 'Lievre Worn Sans', 'Lievre Term JP', 'PlemolJP',
+        'IBM Plex Mono', 'Lievre Sans', 'IBM Plex Sans JP', ui-monospace, 'SF Mono', Menlo,
         monospace;
     }
 

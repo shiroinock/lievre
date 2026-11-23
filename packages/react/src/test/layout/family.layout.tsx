@@ -31,7 +31,7 @@ async function render(node: ReactNode) {
   flushSync(() => root!.render(node));
   await document.fonts.ready;
   await Promise.all(
-    ['Lievre Sans', 'Lievre Mono'].flatMap((f) =>
+    ['Lievre Sans', 'Lievre Term JP'].flatMap((f) =>
       [400, 500, 600].map((w) => document.fonts.load(`${w} 16px '${f}'`, 'あ漢a0')),
     ),
   );
@@ -54,7 +54,7 @@ function expectMono(scope: Element) {
   for (const el of found) {
     const s = getComputedStyle(el);
     const what = `${el.tagName.toLowerCase()}.${[...el.classList].join('.')}「${el.textContent?.trim().slice(0, 12)}」`;
-    expect(face(el), `${what} の書体`).toBe('Lievre Mono');
+    expect(face(el), `${what} の書体`).toBe('Lievre Term JP');
     expect(parseFloat(s.fontSize), `${what} の大きさ`).toBeGreaterThanOrEqual(floor() - 0.01);
     const lh = parseFloat(s.lineHeight);
     if (!Number.isNaN(lh)) expect(lh % 4, `${what} の行の高さ ${lh}px`).toBeCloseTo(0, 1);
@@ -183,7 +183,7 @@ describe('画面を等幅にする', () => {
     const [, inner, back] = [...host.querySelectorAll('.lievre')];
     expect(inner!.getAttribute('data-family')).toBe('mono');
     expect(inner!.getAttribute('data-typography')).toBe('interface');
-    expect(face(host.querySelector('.inherited')!)).toBe('Lievre Mono');
+    expect(face(host.querySelector('.inherited')!)).toBe('Lievre Term JP');
     expect(back!.getAttribute('data-family')).toBe('sans');
     expect(back!.getAttribute('data-theme')).toBe('ink');
     expect(face(host.querySelector('.back')!)).toBe('Lievre Sans');

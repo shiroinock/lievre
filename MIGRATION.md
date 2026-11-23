@@ -38,7 +38,7 @@ npm にはまだどちらの名前も公開していないので、移る必要�
 
 3. **残りを lint で探す。** lint の設定に `lievre/no-legacy-prefix` を足します（`configs.recommended` には入っています）。文字列を組み立てて作ったクラス（`` `k-${name}` ``）のように、書き換えで拾えなかったものを知らせます。メッセージに直し方が書いてあります。アプリに `k-` で始まる自分のクラスがあるときは、移り終えたらこのルールを外してください。
 4. **CSS のリセットの層を直す。** アプリの CSS で層の順を宣言しているときは、`@layer reset, lievre.tokens, lievre.base, lievre.components, lievre.utilities;` にします（`lievre-migrate` が書き換えます）。
-5. **書体を自分で定義しているとき。** README の「別のプロジェクトで使う」のとおり、`@font-face` の `font-family` を `'Lievre Mono'` にします。
+5. **書体を自分で定義しているとき。** 自分で定義した `@font-face` は外し、README の「別のプロジェクトで使う」のとおり `@lievre/fonts` を入れて `@lievre/react/fonts.css` を読み込みます（本文は `'Lievre Sans'`、等幅は `'Lievre Term JP'`）。
 6. **質感（試作）の擦れの位置が変わります。** ソルトの既定値が変わったので、同梱の焼き込み（`wear="baked"`）の画像を作り直しました。強さなどの値は同じで、擦れの位置だけが違います。`wear="live"` で前と同じ位置にしたいときは `wearSeed="kei"` を渡します。
 
 ## このリポジトリで開発する人へ

@@ -66,7 +66,7 @@ export const CRITERIA = {
   insetX: 0.5,
   /**
    * 上下のずれ（上下の余白の差の半分）。文字は墨ではなく日本語の字面の枠（1em）で測る。
-   * Lievre Sans・Lievre Mono は字面の枠を行の箱の中央に置くので（fonts.layout.tsx で確かめる）、
+   * Lievre Sans・Lievre Term JP は字面の枠を行の箱の中央に置くので（fonts.layout.tsx で確かめる）、
    * 残るのは px への丸め。ブラウザは字の ascent・descent と半行送りを整数 px に丸めるため、行の高さが
    * 整数 px でないところ（14.4px の等幅で line-height: 1 など）で 0.8px までずれる。
    */

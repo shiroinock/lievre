@@ -33,10 +33,10 @@ export function App() {
 ```
 
 - React / ReactDOM は利用する側で用意します。
-- 書体のファイル（IBM Plex Sans JP / IBM Plex Mono）は同梱していません。fontsource から入れ、lievre の `@font-face` を読み込みます。
+- 書体のファイルは同梱していません。lievre の書体 [`@lievre/fonts`](https://github.com/shiroinock/lievre-fonts) を入れ、`fonts.css` を読み込みます。npm にはまだ出していないので、リリースの tgz を指定します。
 
   ```sh
-  npm i @fontsource/ibm-plex-sans-jp @fontsource/ibm-plex-mono
+  npm i https://github.com/shiroinock/lievre-fonts/releases/download/v0.1.0/lievre-fonts-0.1.0.tgz
   ```
 
   ```tsx
@@ -44,7 +44,7 @@ export function App() {
   import '@lievre/react/styles.css';
   ```
 
-  `fonts.css` は `'Lievre Sans'`（Plex Sans JP の字を 0.07em 下げて行の中央に置いたもの）と `'Lievre Mono'`（Plex Mono を 5/6 に縮め、英数字と日本語を 1:2 にしたもの）を、400・500・600 の太さで定義します。ファイルは `url('@fontsource/…')` で指すので、バンドラ（Vite・webpack など）が解決します。`--lv-font-sans` は `'Lievre Sans'` → `'IBM Plex Sans JP'` の順で探すので、fontsource の CSS をそのまま読み込んでも表示はできますが、字が行の中央より上に寄ります。`fonts.css` を読み込まず PlemolJP を入れた場合、等幅はそちらを使います。
+  `fonts.css` は `@lievre/fonts` を読み込み、`'Lievre Sans'`（本文。IBM Plex Sans JP の字面の枠を行の中央に置き直したもの）と `'Lievre Term JP'`（等幅。英数字は日本語のちょうど半分の幅で、行の中央と英大文字の高さは本文と同じ）を、400・500・600 の太さで定義します。woff2 は文字の範囲ごとに分かれていて、ページに出る字のファイルだけが読まれます。`fonts.css` を読み込まなくても、`--lv-font-sans` は `'IBM Plex Sans JP'`、`--lv-font-mono` は `PlemolJP`・`IBM Plex Mono` を次に探すので表示はできますが、字が行の中央より上に寄り、等幅の英数字と日本語は 1:2 になりません。
 
 - スタイルは `@layer lievre.*` に入っています。層に入っていない CSS は層の中より強いため、アプリのリセット（`button { background: none }` や Tailwind の preflight など）は `@layer` に入れて、lievre より先に宣言してください（例：`@layer reset, lievre.tokens, lievre.base, lievre.components, lievre.utilities;`）。
 - スタイルは `.lievre` の内側に限定されます。ページ全体のリセットやアプリのナビゲーションは含みません。
