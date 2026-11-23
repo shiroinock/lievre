@@ -7,3 +7,37 @@
  * Both in 400, 500 and 600, split by unicode-range so a page loads only the files it draws.
  */
 @import '@lievre/fonts';
+
+/*
+ * Japanese punctuation and marks in monospace text stay full width, as in Japanese typesetting:
+ * … ‥ ― ※ and the round, square, triangle, diamond and star marks come from Lievre Sans (1em) ahead
+ * of Lievre Term JP, which draws them half width like a terminal does. Arrows stay half width.
+ * “ ” ‘ ’ — are not full width in Lievre Sans either, so they stay in Lievre Term JP, on the grid.
+ */
+@font-face {
+  font-family: 'Lievre Wide Marks';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('@lievre/fonts/files/LievreSans-Regular.base.woff2') format('woff2');
+  unicode-range: U+2015, U+2025-2026, U+203B, U+25A0-25A1, U+25B2-25B3, U+25BC-25BD, U+25C6-25C7,
+    U+25CB, U+25CE-25CF, U+2605-2606;
+}
+@font-face {
+  font-family: 'Lievre Wide Marks';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('@lievre/fonts/files/LievreSans-Medium.base.woff2') format('woff2');
+  unicode-range: U+2015, U+2025-2026, U+203B, U+25A0-25A1, U+25B2-25B3, U+25BC-25BD, U+25C6-25C7,
+    U+25CB, U+25CE-25CF, U+2605-2606;
+}
+@font-face {
+  font-family: 'Lievre Wide Marks';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('@lievre/fonts/files/LievreSans-SemiBold.base.woff2') format('woff2');
+  unicode-range: U+2015, U+2025-2026, U+203B, U+25A0-25A1, U+25B2-25B3, U+25BC-25BD, U+25C6-25C7,
+    U+25CB, U+25CE-25CF, U+2605-2606;
+}

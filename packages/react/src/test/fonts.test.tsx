@@ -26,6 +26,6 @@ describe('fonts.css', () => {
 
   it('the tokens put Lievre Sans and Lievre Term JP first', () => {
     expect(tokens).toMatch(/--lv-font-sans: 'Lievre Sans',/);
-    expect(tokens).toMatch(/--lv-font-mono: 'Lievre Term JP',/);
+    expect(tokens).toMatch(/--lv-font-mono: 'Lievre Wide Marks', 'Lievre Term JP',/);
   });
 });

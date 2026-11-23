@@ -44,7 +44,12 @@ describe('書体の行の中央', () => {
         );
         const p = host.querySelector('p')!;
         const s = getComputedStyle(p);
-        expect(s.fontFamily.split(',')[0].replace(/['"]/g, '').trim()).toBe(face.family);
+        // Past the full-width marks, which only cover a few punctuation marks (fonts.css).
+        const first = s.fontFamily
+          .split(',')
+          .map((f) => f.replace(/['"]/g, '').trim())
+          .find((f) => f !== 'Lievre Wide Marks');
+        expect(first).toBe(face.family);
         await document.fonts.load(`${weight} 16px ${s.fontFamily}`, '日本語 ABC 0123');
         expect(document.fonts.check(`${weight} 16px '${face.family}'`, 'A')).toBe(true);
         // Large, so the browser's rounding of ascent and descent to whole pixels is negligible.

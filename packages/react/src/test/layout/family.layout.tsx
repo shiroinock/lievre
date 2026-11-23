@@ -38,8 +38,12 @@ async function render(node: ReactNode) {
   return host;
 }
 
+/** The face that draws the text: the first family, past the full-width marks (fonts.css). */
 const face = (el: Element) =>
-  getComputedStyle(el).fontFamily.split(',')[0].replace(/["']/g, '').trim();
+  getComputedStyle(el)
+    .fontFamily.split(',')
+    .map((f) => f.replace(/["']/g, '').trim())
+    .find((f) => f !== 'Lievre Wide Marks');
 /** The mono floor in px: --lv-text-mono-min is 0.9rem. */
 const floor = () => 0.9 * parseFloat(getComputedStyle(document.documentElement).fontSize);
 /** Every element that holds text of its own, inside `scope`. */
@@ -143,6 +147,27 @@ describe('範囲を等幅にする', () => {
     const range = host.querySelector('.lv-family-mono')!;
     expectMono(range);
     expectHalfWidth(range);
+  });
+});
+
+describe('等幅の中の約物', () => {
+  it('日本語の約物と記号は全角、矢印と引用符は半角', async () => {
+    const host = await render(
+      <LievreProvider family="mono">
+        <p className="probe">x</p>
+      </LievreProvider>,
+    );
+    const p = host.querySelector('.probe')!;
+    await document.fonts.load(`16px ${getComputedStyle(p).fontFamily}`, '…‥―※○●□■△▲▽▼◇◆☆★→“”‘’—a');
+    const em = parseFloat(getComputedStyle(p).fontSize);
+    const width = (text: string) => {
+      p.textContent = text;
+      const range = document.createRange();
+      range.selectNodeContents(p.firstChild!);
+      return range.getBoundingClientRect().width / em;
+    };
+    for (const ch of '…‥―※○◎●□■△▲▽▼◇◆☆★') expect(width(ch), `${ch} の幅（em）`).toBeCloseTo(1, 2);
+    for (const ch of '→“”‘’—a') expect(width(ch), `${ch} の幅（em）`).toBeCloseTo(0.5, 2);
   });
 });
 

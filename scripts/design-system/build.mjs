@@ -74,6 +74,17 @@ const FACES = [
     range: /unicode-range: ([^;]+);/.exec(body)[1],
   })),
 );
+// lievre's own faces in fonts.css (the full-width marks in monospace text), which point at the
+// same files of @lievre/fonts.
+for (const [, body] of readFileSync(`${REACT}/src/styles/fonts.css`, 'utf8').matchAll(
+  /@font-face \{([^}]*)\}/g,
+))
+  FACES.push({
+    family: /font-family: '([^']+)';/.exec(body)[1],
+    weight: /font-weight: (\d+);/.exec(body)[1],
+    file: /url\('@lievre\/fonts\/files\/([^']+)'\)/.exec(body)[1],
+    range: /unicode-range:\s*([^;]+);/.exec(body)[1].replace(/\s+/g, ' ').trim(),
+  });
 const esbuild = createRequire(requireReact.resolve('vite'))('esbuild');
 
 // ------------------------------------------------------------------ helpers
@@ -720,7 +731,7 @@ function storyNamesOf(card) {
 const { tokens, skipped } = buildTokens();
 put('project/tokens.json', json(tokens));
 put('project/tokens.css', buildTokensCss(tokens));
-for (const { file } of FACES)
+for (const file of new Set(FACES.map((f) => f.file)))
   put(`project/fonts/${file}`, readFileSync(join(FONTS, 'files', file)));
 
 const notSynced = [
