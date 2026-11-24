@@ -18,12 +18,12 @@ afterEach(() => {
 
 const FACES = [
   { name: '本文（--lv-font-sans）', family: 'Lievre Sans', className: '', height: 1.5 },
-  // Plex Mono's 1.3em at 5/6 size.
+  // Lievre Term JP: ascent 0.98em, descent 0.22em.
   {
     name: '等幅（--lv-font-mono）',
-    family: 'Lievre Mono',
+    family: 'Lievre Term JP',
     className: 'lv-mono',
-    height: 1.3 * (5 / 6),
+    height: 1.2,
   },
 ];
 
@@ -44,7 +44,12 @@ describe('書体の行の中央', () => {
         );
         const p = host.querySelector('p')!;
         const s = getComputedStyle(p);
-        expect(s.fontFamily.split(',')[0].replace(/['"]/g, '').trim()).toBe(face.family);
+        // Past the full-width marks, which only cover a few punctuation marks (fonts.css).
+        const first = s.fontFamily
+          .split(',')
+          .map((f) => f.replace(/['"]/g, '').trim())
+          .find((f) => f !== 'Lievre Wide Marks');
+        expect(first).toBe(face.family);
         await document.fonts.load(`${weight} 16px ${s.fontFamily}`, '日本語 ABC 0123');
         expect(document.fonts.check(`${weight} 16px '${face.family}'`, 'A')).toBe(true);
         // Large, so the browser's rounding of ascent and descent to whole pixels is negligible.

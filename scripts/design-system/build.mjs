@@ -40,8 +40,6 @@ const LIBRARIES = [
   { name: 'react', version: '18.3.1' },
   { name: 'react-dom', version: '18.3.1' },
 ];
-/** The faces of Lievre Mono: IBM Plex Mono's Latin files, shipped as the system's fonts. */
-const MONO_WEIGHTS = ['400', '500', '600'];
 
 const { values: opts } = parseArgs({
   options: {
@@ -54,6 +52,39 @@ const OUT = resolve(opts.out);
 const P = join(OUT, 'project');
 
 const requireReact = createRequire(`${REACT}/package.json`);
+/**
+ * The faces the system ships, from @lievre/fonts: Lievre Sans, and Lievre Term's Latin under the
+ * name the tokens use for mono ('Lievre Term JP'); its Japanese falls through to Lievre Sans, which
+ * is 1em wide on the same line middle. Lievre Term JP's own Japanese files would double the size.
+ */
+// The package exports its CSS, not the files: find them from its own directory.
+const FONTS = dirname(requireReact.resolve('@lievre/fonts/package.json'));
+const FACES = [
+  ['sans.css', 'Lievre Sans'],
+  ['term.css', 'Lievre Term JP'],
+].flatMap(([css, family]) =>
+  [
+    ...readFileSync(requireReact.resolve(`@lievre/fonts/${css}`), 'utf8').matchAll(
+      /@font-face \{([^}]*)\}/g,
+    ),
+  ].map(([, body]) => ({
+    family,
+    weight: /font-weight: (\d+);/.exec(body)[1],
+    file: /url\('files\/([^']+)'\)/.exec(body)[1],
+    range: /unicode-range: ([^;]+);/.exec(body)[1],
+  })),
+);
+// lievre's own faces in fonts.css (the full-width marks in monospace text), which point at the
+// same files of @lievre/fonts.
+for (const [, body] of readFileSync(`${REACT}/src/styles/fonts.css`, 'utf8').matchAll(
+  /@font-face \{([^}]*)\}/g,
+))
+  FACES.push({
+    family: /font-family: '([^']+)';/.exec(body)[1],
+    weight: /font-weight: (\d+);/.exec(body)[1],
+    file: /url\('@lievre\/fonts\/files\/([^']+)'\)/.exec(body)[1],
+    range: /unicode-range:\s*([^;]+);/.exec(body)[1].replace(/\s+/g, ' ').trim(),
+  });
 const esbuild = createRequire(requireReact.resolve('vite'))('esbuild');
 
 // ------------------------------------------------------------------ helpers
@@ -213,10 +244,13 @@ function buildTokens() {
       tokens: color,
     },
     type: {
-      fonts: MONO_WEIGHTS.map((w) => ({
-        family: 'IBM Plex Mono',
-        file: `fonts/ibm-plex-mono-latin-${w}-normal.woff2`,
-        weight: w,
+      // The Latin of the mono face: one file a weight, covering what the token samples draw.
+      fonts: FACES.filter(
+        (f) => f.family === 'Lievre Term JP' && f.file.endsWith('.base.woff2'),
+      ).map((f) => ({
+        family: f.family,
+        file: `fonts/${f.file}`,
+        weight: f.weight,
         style: 'normal',
       })),
       families: {
@@ -363,28 +397,14 @@ async function buildBundle() {
 
 function buildCss() {
   const css = readFileSync(`${REACT}/lib/lievre.css`, 'utf8');
-  // Lievre Mono's faces from fonts.css, with the files beside the system: tried from the stylesheet
-  // (../fonts) and, when the page inlines it, from the preview (../../fonts). Not Lievre Sans: it
-  // points at 369 fontsource subsets, too many files for the artifact, so the system shows IBM
-  // Plex Sans JP from Google Fonts (uncorrected, the glyphs sit 0.07em high) until it ships the
-  // single-file faces of @lievre/fonts. Lievre Mono drops its line-box overrides for the same
-  // reason: they put its middle where Lievre Sans has it (0.38em), and beside uncorrected Plex
-  // (0.31em) a line mixing the two would grow past its line-height.
-  const faces = [
-    ...readFileSync(`${REACT}/src/styles/fonts.css`, 'utf8').matchAll(
-      /@font-face \{[^}]*font-family: 'Lievre Mono';[^}]*\}/g,
-    ),
-  ]
-    .map(([face]) => face.replace(/\n\s*(ascent|descent|line-gap)-override: [^;]+;/g, ''))
-    .join('\n')
-    .replace(
-      /url\('@fontsource\/ibm-plex-mono\/files\/([^']+)'\) format\('woff2'\)/g,
-      "url('../fonts/$1') format('woff2'), url('../../fonts/$1') format('woff2')",
-    )
-    .trim();
+  // The faces of @lievre/fonts with the files beside the system: tried from the stylesheet
+  // (../fonts) and, when the page inlines it, from the preview (../../fonts).
+  const faces = FACES.map(
+    (f) =>
+      `@font-face { font-family: '${f.family}'; font-style: normal; font-weight: ${f.weight}; font-display: swap; src: url('../fonts/${f.file}') format('woff2'), url('../../fonts/${f.file}') format('woff2'); unicode-range: ${f.range}; }`,
+  ).join('\n');
   const head = [
-    "/* @lievre/react styles.css, with the faces lievre expects: IBM Plex Sans JP from Google Fonts (standing in for Lievre Sans) and Lievre Mono from the system's fonts. */",
-    "@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@400;500;600&display=swap');",
+    "/* @lievre/react styles.css, with the faces lievre expects: Lievre Sans and Lievre Term's Latin from @lievre/fonts, shipped as the system's fonts. */",
     faces,
   ].join('\n');
   return inlineSafe('components/bundle.css', `${head}\n${css}`);
@@ -711,13 +731,8 @@ function storyNamesOf(card) {
 const { tokens, skipped } = buildTokens();
 put('project/tokens.json', json(tokens));
 put('project/tokens.css', buildTokensCss(tokens));
-for (const w of MONO_WEIGHTS) {
-  const name = `ibm-plex-mono-latin-${w}-normal.woff2`;
-  put(
-    `project/fonts/${name}`,
-    readFileSync(requireReact.resolve(`@fontsource/ibm-plex-mono/files/${name}`)),
-  );
-}
+for (const file of new Set(FACES.map((f) => f.file)))
+  put(`project/fonts/${file}`, readFileSync(join(FONTS, 'files', file)));
 
 const notSynced = [
   '',

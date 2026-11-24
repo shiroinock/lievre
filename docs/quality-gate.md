@@ -29,7 +29,7 @@
 | `{ baseline }` ベースライン | 同じ行に並んだ文字（ラベルと値など）のベースラインがそろう。大きさや書体が違う文字を flex で並べるときは `align-items: baseline`。                                                                 | 0.5px           |
 | `line-grid` 行の箱の格子    | 文字の行の箱の高さ（padding と枠線を除いた高さ）が 4px の倍数。line-height を 4px に丸めていない場合と、等幅の数字と単位など書体や大きさの違う文字が同じ行に混ざって行の箱が広がる場合を見つける。 | 0.1px           |
 
-上下を字面の枠で測るのは、書体の上寄りと字形の違いを分けるためです。Lievre Sans と Lievre Mono は、日本語の字面の枠を行の箱の中央に置きます（DESIGN.md の「書体」）。字面の枠がずれていれば、padding か行の高さの誤りか、補正のない書体（`@lievre/react/fonts.css` を読み込んでいない、`'IBM Plex Sans JP'` を直に指定した）です。補正のない Plex Sans JP では字面の枠が 0.07em（14px で 1px）上に寄ります。書体の補正そのものは `fonts.layout.tsx` が、本文と等幅の書体を 400・500・600 で読み込み、行の中央がベースラインの 0.38em 上にあり行の箱の高さが変わっていないことを 0.01em まで確かめます。部品の検査の許容差 0.8px は、ブラウザが字の ascent・descent と半行送りを整数 px に丸める分です（14.4px の等幅に `line-height: 1` を当てた Stepper の円や Calendar の日で 0.7〜0.8px）。
+上下を字面の枠で測るのは、書体の上寄りと字形の違いを分けるためです。Lievre Sans と Lievre Term JP は、日本語の字面の枠を行の箱の中央に置きます（DESIGN.md の「書体」）。字面の枠がずれていれば、padding か行の高さの誤りか、補正のない書体（`@lievre/react/fonts.css` を読み込んでいない、`'IBM Plex Sans JP'` を直に指定した）です。補正のない Plex Sans JP では字面の枠が 0.07em（14px で 1px）上に寄ります。書体の補正そのものは `fonts.layout.tsx` が、本文と等幅の書体を 400・500・600 で読み込み、行の中央がベースラインの 0.38em 上にあり行の箱の高さが変わっていないことを 0.01em まで確かめます。部品の検査の許容差 0.8px は、ブラウザが字の ascent・descent と半行送りを整数 px に丸める分です（14.4px の等幅に `line-height: 1` を当てた Stepper の円や Calendar の日で 0.7〜0.8px）。
 
 墨で測ると、同じ箱でも字形でずれ方が変わります。Lievre Sans で測った墨の上下のずれ（上下の差の半分、負が上）は次のとおりで、英小文字や等幅の英数字は字面の枠より背が低いぶん下に出ます。これは書体の性質として許し、検査しません。
 
@@ -37,9 +37,9 @@
 | --------------------- | ---------------- | ---------------- | ---------------- | ---------------- |
 | IBM Plex Sans JP      | −0.076〜−0.078em | −0.074em         | −0.059〜−0.061em | +0.037〜+0.039em |
 | Lievre Sans           | −0.004〜−0.008em | −0.002〜−0.004em | +0.010em         | +0.104〜+0.107em |
-| Lievre Mono           | −0.002〜−0.006em | 0〜−0.002em      | +0.088〜+0.090em | +0.166em         |
+| Lievre Term JP        | −0.002〜−0.006em | 0〜−0.002em      | +0.012em         | +0.109em         |
 
-Lievre Mono の英数字が下に出るのは、Plex Mono を 5/6 に縮めて字の背が低くなるためです。日本語と同じ行の中央を使わないと、等幅と本文が混ざった行の箱が広がり（表のセルが 25px になる）、隣り合うセルのベースラインもそろいません。英数字の位置は、字形ごと縦の位置を補正する Lievre Term に置き換えるときに直します。
+Lievre Term JP は英大文字の高さを本文と同じ 0.733em にしているので、英数字のずれも Lievre Sans とほぼ同じです。等幅と本文が同じ行の中央（0.38em）を使わないと、等幅と本文の混ざった行の箱が広がり（表のセルが 25px になる）、隣り合うセルのベースラインもそろいません。
 
 アイコンは文字の字形ではなく**行ボックス**の中心に合わせます。svg は `height: 1lh`、20px の箱は `margin-top: calc((1lh - 20px) / 2)` で置くと、文字の大きさや行の高さが変わっても揃います。
 
@@ -53,7 +53,7 @@ Lievre Mono の英数字が下に出るのは、Plex Mono を 5/6 に縮めて�
 
 line-height は `--lv-line-body` / `--lv-line-tight` で 4px の倍数にしていますが、行の箱が 4px の倍数になるとは限りません。外れる原因は、これまでに次の3つがありました。
 
-- **大きさの違う文字を混ぜる**：Lievre Mono 36px の値に IBM Plex Sans JP 14px の単位を並べると、単位の文字も親の line-height（44px）を px のまま受け継ぎ、書体ごとのベースラインの位置の違いで行の箱が 51px に広がります。混ぜた側（単位）の `line-height` を `1` にして、行の箱を地の文字だけで決めます（Metric・Meter の単位）。同じ大きさの等幅の数字（表の `<span className="lv-mono">` など）は、行の箱を広げません。
+- **大きさの違う文字を混ぜる**：等幅 36px の値に本文の書体 14px の単位を並べると、単位の文字も親の line-height（44px）を px のまま受け継ぎ、書体ごとのベースラインの位置の違いで行の箱が 51px に広がります。混ぜた側（単位）の `line-height` を `1` にして、行の箱を地の文字だけで決めます（Metric・Meter の単位）。同じ大きさの等幅の数字（表の `<span className="lv-mono">` など）は、行の箱を広げません。
 - **line-height そのものが 4px に乗っていない**：`1.2` などの倍率は `round(1.2em, 4px)` にします。受け継いだ倍率（本文14px のときの 24 / 14）を 14.4px の等幅の文字に当てると 24.69px になり、ブラウザが半行送りを整数に丸めて中心がずれます。`--lv-line-tight` などのトークンを当てます（Pagination のページ番号）。
 - **表の罫線を `border-collapse: collapse` で引く**：罫線が隣り合う行に 0.5px ずつ割り振られ、行の高さが 48.5px・49px になります。lievre の表は `border-collapse: separate; border-spacing: 0` で、各セルが自分の罫線をまるごと持ちます。
 
@@ -70,7 +70,7 @@ line-height は `--lv-line-body` / `--lv-line-tight` で 4px の倍数にして�
 - 文字：standard（本文16px）/ interface（本文14px）
 - 等幅の画面（`family="mono"`）：Paper・comfortable・standard と、Ink・compact・interface（14px の本文が 14.4px に引き上がる側）
 
-等幅の範囲と画面そのものは `family.layout.tsx` が確かめます。Card・Text の `mono`、クラス `lv-family-mono`、`family="mono"` の画面で、中の文字がすべて Lievre Mono になり、14.4px（`--lv-text-mono-min`）より小さくならず、行の高さが 4px の倍数で、文字を持つ要素ごとにその中で、英数字 14 字と日本語 7 字（仮名を含む）の幅が 14/64px 以内で同じになること、入れ子が指定しない値を引き継ぎ `family="sans"` で戻せることを見ます。
+等幅の範囲と画面そのものは `family.layout.tsx` が確かめます。Card・Text の `mono`、クラス `lv-family-mono`、`family="mono"` の画面で、中の文字がすべて Lievre Term JP になり、14.4px（`--lv-text-mono-min`）より小さくならず、行の高さが 4px の倍数で、文字を持つ要素ごとにその中で、英数字 14 字と日本語 7 字（仮名を含む）の幅が 14/64px 以内で同じになること、入れ子が指定しない値を引き継ぎ `family="sans"` で戻せることを見ます。
 
 画面の幅は 1280px、動きを減らす設定（`prefers-reduced-motion: reduce`）で測ります。タッチの画面（`pointer: coarse`）は今は測っていません。
 

@@ -26,7 +26,9 @@ export function migrate(text, names) {
       .replaceAll('@kei-design/', '@lievre/')
       .replace(/(?<![\w$])KeiProvider(?![\w$])/g, 'LievreProvider')
       .replace(/(?<![\w$])useKeiTheme(?![\w$])/g, 'useLievreTheme')
-      .replace(/(?<![\w-])KEI (Mono|Worn Sans|Worn Mono)(?![\w-])/g, 'Lievre $1')
+      // The mono face is Lievre Term JP now (@lievre/fonts); the worn faces keep their names.
+      .replace(/(?<![\w-])KEI Mono(?![\w-])/g, 'Lievre Term JP')
+      .replace(/(?<![\w-])KEI (Worn Sans|Worn Mono)(?![\w-])/g, 'Lievre $1')
       // Cascade layers: @layer reset, kei.tokens, …
       .replace(/(?<![\w-])kei\.(tokens|base|components|utilities)\b/g, 'lievre.$1')
       // Lint: rule names and the plugin's settings.

@@ -26,7 +26,7 @@ export type Theme = 'paper' | 'ink';
 export type Wear = 'off' | 'baked' | 'live';
 export type Density = 'comfortable' | 'compact';
 export type Typography = 'standard' | 'interface';
-/** 書体の系統。sans は本文の書体（Lievre Sans）、mono は日本語も含めて等幅（Lievre Mono）。 */
+/** 書体の系統。sans は本文の書体（Lievre Sans）、mono は日本語も含めて等幅（Lievre Term JP）。 */
 export type Family = 'sans' | 'mono';
 export const cx = (...values: (string | false | undefined | null)[]) =>
   values.filter(Boolean).join(' ');

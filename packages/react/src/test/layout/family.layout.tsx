@@ -31,15 +31,19 @@ async function render(node: ReactNode) {
   flushSync(() => root!.render(node));
   await document.fonts.ready;
   await Promise.all(
-    ['Lievre Sans', 'Lievre Mono'].flatMap((f) =>
+    ['Lievre Sans', 'Lievre Term JP'].flatMap((f) =>
       [400, 500, 600].map((w) => document.fonts.load(`${w} 16px '${f}'`, 'あ漢a0')),
     ),
   );
   return host;
 }
 
+/** The face that draws the text: the first family, past the full-width marks (fonts.css). */
 const face = (el: Element) =>
-  getComputedStyle(el).fontFamily.split(',')[0].replace(/["']/g, '').trim();
+  getComputedStyle(el)
+    .fontFamily.split(',')
+    .map((f) => f.replace(/["']/g, '').trim())
+    .find((f) => f !== 'Lievre Wide Marks');
 /** The mono floor in px: --lv-text-mono-min is 0.9rem. */
 const floor = () => 0.9 * parseFloat(getComputedStyle(document.documentElement).fontSize);
 /** Every element that holds text of its own, inside `scope`. */
@@ -54,7 +58,7 @@ function expectMono(scope: Element) {
   for (const el of found) {
     const s = getComputedStyle(el);
     const what = `${el.tagName.toLowerCase()}.${[...el.classList].join('.')}「${el.textContent?.trim().slice(0, 12)}」`;
-    expect(face(el), `${what} の書体`).toBe('Lievre Mono');
+    expect(face(el), `${what} の書体`).toBe('Lievre Term JP');
     expect(parseFloat(s.fontSize), `${what} の大きさ`).toBeGreaterThanOrEqual(floor() - 0.01);
     const lh = parseFloat(s.lineHeight);
     if (!Number.isNaN(lh)) expect(lh % 4, `${what} の行の高さ ${lh}px`).toBeCloseTo(0, 1);
@@ -146,6 +150,27 @@ describe('範囲を等幅にする', () => {
   });
 });
 
+describe('等幅の中の約物', () => {
+  it('日本語の約物と記号は全角、矢印と引用符は半角', async () => {
+    const host = await render(
+      <LievreProvider family="mono">
+        <p className="probe">x</p>
+      </LievreProvider>,
+    );
+    const p = host.querySelector('.probe')!;
+    await document.fonts.load(`16px ${getComputedStyle(p).fontFamily}`, '…‥―※○●□■△▲▽▼◇◆☆★→“”‘’—a');
+    const em = parseFloat(getComputedStyle(p).fontSize);
+    const width = (text: string) => {
+      p.textContent = text;
+      const range = document.createRange();
+      range.selectNodeContents(p.firstChild!);
+      return range.getBoundingClientRect().width / em;
+    };
+    for (const ch of '…‥―※○◎●□■△▲▽▼◇◆☆★') expect(width(ch), `${ch} の幅（em）`).toBeCloseTo(1, 2);
+    for (const ch of '→“”‘’—a') expect(width(ch), `${ch} の幅（em）`).toBeCloseTo(0.5, 2);
+  });
+});
+
 describe('範囲の本文の大きさ', () => {
   it('いちばん近い provider の typography で決まる', async () => {
     const host = await render(
@@ -202,7 +227,7 @@ describe('画面を等幅にする', () => {
     const [, inner, back] = [...host.querySelectorAll('.lievre')];
     expect(inner!.getAttribute('data-family')).toBe('mono');
     expect(inner!.getAttribute('data-typography')).toBe('interface');
-    expect(face(host.querySelector('.inherited')!)).toBe('Lievre Mono');
+    expect(face(host.querySelector('.inherited')!)).toBe('Lievre Term JP');
     expect(back!.getAttribute('data-family')).toBe('sans');
     expect(back!.getAttribute('data-theme')).toBe('ink');
     expect(face(host.querySelector('.back')!)).toBe('Lievre Sans');

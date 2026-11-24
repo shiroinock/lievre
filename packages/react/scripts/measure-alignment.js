@@ -83,7 +83,7 @@ function baselineOf(textNode) {
 }
 
 // Text can also be placed by its face instead of its ink: the Japanese em box (1em tall, its
-// middle FACE_MIDDLE above the baseline). Lievre Sans and Lievre Mono put this box in the middle
+// middle FACE_MIDDLE above the baseline). Lievre Sans and Lievre Term JP put this box in the middle
 // of the line box (DESIGN.md「書体」), so a box whose face is off centre has uneven padding or a
 // font that lost its correction; the ink also moves with the glyphs (lowercase, figures).
 export const FACE_MIDDLE = 0.38;

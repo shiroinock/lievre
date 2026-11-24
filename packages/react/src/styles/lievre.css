@@ -11,7 +11,7 @@
 /* -------------------------------------------------------------------- base */
 
 @layer lievre.base {
-  /* Plain .lv-mono text never drops below --lv-text-mono-min, so the narrowed Latin stays readable. */
+  /* Plain .lv-mono text never drops below --lv-text-mono-min, so the half-width Latin stays readable. */
   .lv-mono {
     font-size: max(1em, var(--lv-text-mono-min));
   }
@@ -35,8 +35,8 @@
   }
   /* Monospace screens (LievreProvider family="mono") and ranges (.lv-family-mono, the mono prop
      of Text and Card): Japanese included, every part inside follows (the parts draw with
-     --lv-font-sans), and no text drops below the mono floor, where the narrowed Latin reads as
-     12px. Japanese stays 1em wide and Latin 0.5em, so the columns line up 1:2. */
+     --lv-font-sans), and no text drops below the mono floor, where the half-width Latin is as
+     wide as 12px Plex Mono. Japanese stays 1em wide and Latin 0.5em, so the columns line up 1:2. */
   .lievre[data-family='mono'],
   .lievre .lv-family-mono {
     --lv-font-sans: var(--lv-font-mono);
@@ -1865,7 +1865,7 @@
   }
 
   /* Progress */
-  /* The value mixes Lievre Mono (14.4px) with a sans %; baseline keeps it level with the label. */
+  /* The value mixes Lievre Term JP (14.4px) with a sans %; baseline keeps it level with the label. */
   .lv-progress-label {
     display: flex;
     align-items: baseline;

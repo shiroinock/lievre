@@ -15,7 +15,7 @@ import '@lievre/react/styles.css';
 
 - スタイルは `LievreProvider` が出す `.lievre` の内側でだけ効きます。包み忘れても誤りは出ず、見た目が崩れるだけです。
 - `useToast()` は `ToastProvider` の内側で呼びます。
-- 書体のファイルは同梱していません。`npm i @fontsource/ibm-plex-sans-jp @fontsource/ibm-plex-mono` で入れ、`import '@lievre/react/fonts.css'` で lievre の `@font-face`（行の中央に置き直した `'Lievre Sans'` と、1:2 の `'Lievre Mono'`）を読み込みます。fontsource の CSS を直接読み込むと、字が行の中央より上に寄ります。
+- 書体のファイルは同梱していません。lievre の書体 `@lievre/fonts` を `npm i https://github.com/shiroinock/lievre-fonts/releases/download/v0.1.1/lievre-fonts-0.1.1.tgz` で入れ、`import '@lievre/react/fonts.css'` で読み込みます（本文の `'Lievre Sans'` と、等幅の `'Lievre Term JP'`）。読み込まないと、字が行の中央より上に寄り、等幅の英数字と日本語が 1:2 になりません。
 
 ## 約束
 
@@ -755,7 +755,7 @@ selected・onSelectedChange で押して入り切りする絞り込みの札に�
 ### FormatNumber
 
 数を、桁をそろえた書式で出します（桁区切り・小数の桁・割合・符号）。
-数字は等幅（Lievre Mono）で、単位（円・件）は数字の後ろに本文の書体で添えます。表の列では右揃えの列に置くと、桁と小数点の位置がそろいます。
+数字は等幅（Lievre Term JP）で、単位（円・件）は数字の後ろに本文の書体で添えます。表の列では右揃えの列に置くと、桁と小数点の位置がそろいます。
 
 - `fractionDigits?: number` — 小数の桁。決めると、その桁で丸めて0も埋めます（1.5 → 1.50）。表の列で小数点の位置をそろえるときに。
 - `percent?: boolean` — 割合として出す（0.123 → 12.3%）。value は 1 を 100% として渡します。
@@ -1014,7 +1014,7 @@ accept() で取り込みます。消えた項目は、取り込みを待たず�
 live は wearSeed から SVG のフィルタを作り、文字も歪ませる。重い。
 - `type Density = 'comfortable' | 'compact';`
 - `type Typography = 'standard' | 'interface';`
-- `type Family = 'sans' | 'mono';` — 書体の系統。sans は本文の書体（Lievre Sans）、mono は日本語も含めて等幅（Lievre Mono）。
+- `type Family = 'sans' | 'mono';` — 書体の系統。sans は本文の書体（Lievre Sans）、mono は日本語も含めて等幅（Lievre Term JP）。
 - `type ToastMessage`
   - `title: string` — 何が起きたかを短く（「設定を保存しました」）。
   - `description?: string`

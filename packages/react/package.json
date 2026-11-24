@@ -52,22 +52,17 @@
     "wear:setup": "node scripts/wear/setup.mjs",
     "wear:tune": "vite --open /tune.html",
     "llms": "node scripts/build-llms.mjs",
-    "fonts": "node scripts/build-fonts.mjs",
     "bench:agent": "npm run build:lib && node bench/agent/misuse.mjs && node bench/agent/context.mjs",
     "prepack": "cp ../../DESIGN.md ../../MIGRATION.md .",
     "postpack": "rm DESIGN.md MIGRATION.md"
   },
   "peerDependencies": {
+    "@lievre/fonts": "^0.1.1",
     "react": "^18.3.0 || ^19.0.0",
-    "react-dom": "^18.3.0 || ^19.0.0",
-    "@fontsource/ibm-plex-mono": "^5.0.0",
-    "@fontsource/ibm-plex-sans-jp": "^5.0.0"
+    "react-dom": "^18.3.0 || ^19.0.0"
   },
   "peerDependenciesMeta": {
-    "@fontsource/ibm-plex-mono": {
-      "optional": true
-    },
-    "@fontsource/ibm-plex-sans-jp": {
+    "@lievre/fonts": {
       "optional": true
     }
   },
@@ -81,6 +76,7 @@
     "@biomejs/biome": "^2.6.2",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/ibm-plex-sans-jp": "^5.3.1",
+    "@lievre/fonts": "https://github.com/shiroinock/lievre-fonts/releases/download/v0.1.1/lievre-fonts-0.1.1.tgz",
     "@lievre/tokens": "0.2.0",
     "@storybook/addon-a11y": "10.6.7",
     "@storybook/addon-docs": "10.6.7",

@@ -213,12 +213,12 @@ describe('配置の検査：中身の広がりと文字のベースライン', (
 
   it('行の箱の格子', async () => {
     // A number in another face inherits the line height in px and pushes the line box past it.
-    await document.fonts.load('36px "Lievre Mono"', '42');
+    await document.fonts.load('36px "Lievre Term JP"', '42');
     await document.fonts.load('14px "IBM Plex Sans JP"', '%');
     const value = (unit: string) =>
-      `<div class="lv-x" style="font: 36px / 44px 'Lievre Mono'">42<span style="font-size: 14px; font-family: 'IBM Plex Sans JP'; ${unit}">%</span></div>`;
+      `<div class="lv-x" style="font: 36px / 44px 'Lievre Term JP'">42<span style="font-size: 14px; font-family: 'IBM Plex Sans JP'; ${unit}">%</span></div>`;
     expect(messages(value(''), 'line-grid')[0]).toMatch(
-      /行の箱の高さが [\d.]+px で、4px の倍数から [\d.]+px ずれています。.*line-height は 44px ですが、同じ行に Lievre Mono 36px・IBM Plex Sans JP 14px の文字が混ざり/,
+      /行の箱の高さが [\d.]+px で、4px の倍数から [\d.]+px ずれています。.*line-height は 44px ですが、同じ行に Lievre Term JP 36px・IBM Plex Sans JP 14px の文字が混ざり/,
     );
     expect(messages(value('line-height: 1'), 'line-grid')).toEqual([]);
     expect(

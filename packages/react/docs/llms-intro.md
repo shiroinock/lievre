@@ -15,7 +15,7 @@ import '@lievre/react/styles.css';
 
 - スタイルは `LievreProvider` が出す `.lievre` の内側でだけ効きます。包み忘れても誤りは出ず、見た目が崩れるだけです。
 - `useToast()` は `ToastProvider` の内側で呼びます。
-- 書体のファイルは同梱していません。`npm i @fontsource/ibm-plex-sans-jp @fontsource/ibm-plex-mono` で入れ、`import '@lievre/react/fonts.css'` で lievre の `@font-face`（行の中央に置き直した `'Lievre Sans'` と、1:2 の `'Lievre Mono'`）を読み込みます。fontsource の CSS を直接読み込むと、字が行の中央より上に寄ります。
+- 書体のファイルは同梱していません。lievre の書体 `@lievre/fonts` を `npm i https://github.com/shiroinock/lievre-fonts/releases/download/v0.1.1/lievre-fonts-0.1.1.tgz` で入れ、`import '@lievre/react/fonts.css'` で読み込みます（本文の `'Lievre Sans'` と、等幅の `'Lievre Term JP'`）。読み込まないと、字が行の中央より上に寄り、等幅の英数字と日本語が 1:2 になりません。
 
 ## 約束
 

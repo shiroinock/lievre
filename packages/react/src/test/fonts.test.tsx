@@ -1,31 +1,31 @@
+// @lievre/react/fonts.css brings in @lievre/fonts. The tokens name its families, so each one the
+// tokens use must be defined there, in every weight token.
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { describe, it, expect } from 'vitest';
-import { buildFonts, OUT, SANS_SHIFT, WEIGHTS, sansSubsets } from '../../scripts/build-fonts.mjs';
+
+const require = createRequire(import.meta.url);
+const own = readFileSync('src/styles/fonts.css', 'utf8');
+const tokens = readFileSync(require.resolve('@lievre/tokens/tokens.css'), 'utf8');
+const pkg = (path: string) => readFileSync(require.resolve(`@lievre/fonts/${path}`), 'utf8');
+const css = [pkg('sans.css'), pkg('term-jp.css')].join('\n');
+const weights = [...tokens.matchAll(/--lv-weight-\w+: (\d+);/g)].map(([, w]) => w);
 
 describe('fonts.css', () => {
-  it('matches what scripts/build-fonts.mjs writes', () => {
-    // Run `npm run fonts -w packages/react` after changing the script or updating fontsource.
-    expect(readFileSync(OUT, 'utf8')).toBe(buildFonts());
+  it('imports @lievre/fonts', () => {
+    expect(own).toMatch(/^@import '@lievre\/fonts';$/m);
   });
 
-  it('moves Plex Sans JP down by the em box offset, keeping the line box', () => {
-    expect(SANS_SHIFT).toBe(0.07);
-    const css = buildFonts();
-    expect(css).toContain('ascent-override: 113%;');
-    expect(css).toContain('descent-override: 37%;');
-  });
+  for (const family of ['Lievre Sans', 'Lievre Term JP'])
+    it(`${family} has a face for every weight token (${weights.join('・')})`, () => {
+      for (const weight of weights)
+        expect(css, `@lievre/fonts に ${family} の ${weight} がありません`).toMatch(
+          new RegExp(`font-family: '${family}';[^}]*font-weight: ${weight};`),
+        );
+    });
 
-  it('gives Lievre Mono the same line middle, so mixed lines keep their height', () => {
-    // 110.6% / 19.4% at 5/6 size: 0.9217em above and 0.1617em below, middle 0.38em up.
-    const mono = /font-family: 'Lievre Mono';[^}]*/.exec(buildFonts())![0];
-    expect(mono).toContain('ascent-override: 110.6%;');
-    expect(mono).toContain('descent-override: 19.4%;');
-  });
-
-  it('defines every subset of every weight', () => {
-    const css = buildFonts();
-    const faces = css.match(/font-family: 'Lievre Sans';/g) ?? [];
-    expect(faces.length).toBe(WEIGHTS.reduce((n, w) => n + sansSubsets(w).length, 0));
-    expect(css.match(/font-family: 'Lievre Mono';/g)?.length).toBe(WEIGHTS.length);
+  it('the tokens put Lievre Sans and Lievre Term JP first', () => {
+    expect(tokens).toMatch(/--lv-font-sans: 'Lievre Sans',/);
+    expect(tokens).toMatch(/--lv-font-mono: 'Lievre Wide Marks', 'Lievre Term JP',/);
   });
 });
