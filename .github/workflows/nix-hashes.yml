@@ -1,0 +1,22 @@
+# Fails a PR when npmDepsHash in flake.nix no longer matches package-lock.json (Renovate raises
+# the lockfile but not the hash). Fix it with
+# `nix run github:shiroinock/workflows#nix-hashes -- --fix .#default.npmDeps`.
+# The job lives in shiroinock/workflows; change it there, not here. Pinned to a commit that was
+# read, like the other workflows that call it; Renovate raises the SHA in all of them together.
+name: Nix のハッシュ
+
+on:
+  # Every PR: a required check has to report on all of them.
+  pull_request:
+
+permissions: {}
+
+jobs:
+  hashes:
+    uses: shiroinock/workflows/.github/workflows/nix-hashes.yml@ab11b6e68063615dc7c64fc2565cd88e8d3b72c8
+    permissions:
+      contents: read
+    with:
+      # Only the npm deps: fetching them is enough to compare the hash, and quicker than the build.
+      installables: .#default.npmDeps
+      workflows_ref: ab11b6e68063615dc7c64fc2565cd88e8d3b72c8
