@@ -42,6 +42,8 @@ const LIBRARIES = [
 ];
 
 const { values: opts } = parseArgs({
+  // `pnpm run design-system -- --out x` passes the `--` through; read the options after it too.
+  args: process.argv.slice(2).filter((arg, i) => !(i === 0 && arg === '--')),
   options: {
     out: { type: 'string', default: join(ROOT, '.design-system') },
     'skip-build': { type: 'boolean', default: false },

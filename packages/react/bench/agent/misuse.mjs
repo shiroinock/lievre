@@ -20,7 +20,8 @@ if (!existsSync(join(root, 'lib/index.d.ts'))) {
   process.exit(1);
 }
 
-// The installed tools: the checkout's own node_modules, or the repository root's in the workspaces.
+// The installed tools: the checkout's own node_modules (pnpm links each workspace's there), or the
+// repository root's.
 const modules = [join(root, 'node_modules'), join(root, '../../node_modules')].find((dir) =>
   existsSync(join(dir, 'react')),
 );
@@ -28,7 +29,7 @@ const modules = [join(root, 'node_modules'), join(root, '../../node_modules')].f
 // A throwaway consumer app whose only view of lievre is the published entry points.
 const app = join(tmpdir(), `lievre-agent-bench-${process.pid}`);
 rmSync(app, { recursive: true, force: true });
-mkdirSync(join(app, 'node_modules/@lievre-design'), { recursive: true });
+mkdirSync(join(app, 'node_modules/@lievre'), { recursive: true });
 mkdirSync(join(app, 'node_modules/@types'), { recursive: true });
 symlinkSync(root, join(app, 'node_modules/@lievre/react'));
 for (const dep of ['react', 'react-dom']) {
