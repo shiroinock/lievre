@@ -21,6 +21,7 @@ npm run typecheck && npm run lint && npm test
 
 - コマンドはリポジトリの直下で実行します。各パッケージに流れます（1つだけなら `-w packages/react` のように付けます）。
 - `tokens.css` を変えたら `npm run tokens`、部品の props や説明（`/** */`）を変えたら `npm run llms`。どちらも書き出し忘れは `npm test` が止めます。
+- `package-lock.json` を変えたら `nix run github:shiroinock/workflows#nix-hashes -- --fix .#default.npmDeps`（`flake.nix` の `npmDepsHash` を合わせる）。ずれは CI の「Nix のハッシュ」が止めます。
 - 作業の前に下書きの PR を開き、本文の「触るファイル」を書いてから `npm run check:overlap` を流す。ほかの開いた PR と重なるファイルが出たら、手を付ける前に分け方を決めるか、相手の枝に積む。
 - `npm run build` は react の lib・デモ・Storybook と、tui の lib まで作ります。`npm run check:pack -w packages/react` で `npm pack` の中身を確かめます。
 
