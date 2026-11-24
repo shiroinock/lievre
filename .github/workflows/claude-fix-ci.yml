@@ -7,7 +7,7 @@ name: Claude で CI を直す
 on:
   # Runs from main's copy of this file, with secrets; the job itself only takes branches of this
   # repository whose PR a person opened (not drafts, not bots).
-  workflow_run:
+  workflow_run: # zizmor: ignore[dangerous-triggers] the job takes only this repository's PR branches
     workflows: [CI]
     types: [completed]
 
