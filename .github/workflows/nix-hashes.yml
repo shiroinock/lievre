@@ -13,10 +13,10 @@ permissions: {}
 
 jobs:
   hashes:
-    uses: shiroinock/workflows/.github/workflows/nix-hashes.yml@ab11b6e68063615dc7c64fc2565cd88e8d3b72c8
+    uses: shiroinock/workflows/.github/workflows/nix-hashes.yml@b586023844ba16a3a650bfa3db021be733a5f8aa
     permissions:
       contents: read
     with:
       # Only the npm deps: fetching them is enough to compare the hash, and quicker than the build.
       installables: .#default.npmDeps
-      workflows_ref: ab11b6e68063615dc7c64fc2565cd88e8d3b72c8
+      workflows_ref: b586023844ba16a3a650bfa3db021be733a5f8aa
