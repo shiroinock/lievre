@@ -15,7 +15,7 @@ permissions: {}
 
 jobs:
   fix:
-    uses: shiroinock/workflows/.github/workflows/claude-fix-ci.yml@7121affa7ab001cce8bcd2f248185d9059305587
+    uses: shiroinock/workflows/.github/workflows/claude-fix-ci.yml@d910d91a634e6bf5f7e7a8be091255d69334980f
     permissions:
       contents: read
       pull-requests: write
