@@ -1,8 +1,12 @@
 // Each layout check must still catch the mistake it was written for, and pass the right way.
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeAll } from 'vitest';
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
 import { Button, ButtonGroup, IconButton, LievreProvider, Sparkline } from '../../index';
+// fonts.css defines Lievre Sans, not IBM Plex Sans JP itself. The checks below that name the
+// uncorrected face load it from fontsource, so CI does not measure a system fallback instead.
+import '@fontsource/ibm-plex-sans-jp/400.css';
+import '@fontsource/ibm-plex-sans-jp/600.css';
 import '../../styles/fonts.css';
 import '../../styles/lievre.css';
 import { inset } from '../../../scripts/measure-alignment.js';
@@ -11,9 +15,11 @@ import type { LayoutCheck } from './declare';
 
 const host = document.createElement('div');
 host.className = 'lievre';
-host.style.cssText = 'font: 14px / 1.4 sans-serif; width: 600px';
+host.style.cssText = 'font: 14px / 20px var(--lv-font-sans); width: 600px';
 document.body.append(host);
 afterEach(() => host.replaceChildren());
+// The host's text is in Lievre Sans: wait for it, or the first checks measure a fallback face.
+beforeAll(() => document.fonts.load("14px 'Lievre Sans'", '保存する更新時に通知する読み込み中'));
 
 function messages(html: string, check: LayoutCheck) {
   host.innerHTML = html;
@@ -36,7 +42,9 @@ describe('配置の検査', () => {
 
   it('上下の中央', () => {
     const [message] = messages(box('height: 40px; padding: 8px 0 0'), 'inset-y');
-    expect(message).toMatch(/下に寄っています.*基準：上下の余白の差の半分が 0.1em（1.4px）以内/);
+    expect(message).toMatch(
+      /下に寄っています（文字は日本語の字面の枠で測って.*基準：上下の余白の差の半分が 0.8px 以内/,
+    );
     expect(messages(box('height: 40px; padding: 0'), 'inset-y')).toEqual([]);
   });
 
@@ -97,7 +105,7 @@ describe('配置の検査', () => {
         <span>更新時に通知する</span>
       </label>`;
     expect(messages(row(0), { icon: '.lv-box' })[0]).toMatch(
-      /span\.lv-box の縦の中心が、文字「更新時に通知する」の1行目の行ボックスの中心より 4px 上にあります/,
+      /span\.lv-box の縦の中心が、文字「更新時に通知する」の1行目の行ボックスの中心より 3.5px 上にあります/,
     );
     expect(messages(row(4), { icon: '.lv-box' })).toEqual([]);
   });
@@ -117,7 +125,7 @@ describe('配置の検査', () => {
           icon: '.lv-box',
         },
       )[0],
-    ).toMatch(/文字「読み込み中」の1行目の行ボックスの中心より 4px 上にあります/);
+    ).toMatch(/文字「読み込み中」の1行目の行ボックスの中心より 3.5px 上にあります/);
   });
 
   it('並んだ部品の高さ', () => {
@@ -205,12 +213,12 @@ describe('配置の検査：中身の広がりと文字のベースライン', (
 
   it('行の箱の格子', async () => {
     // A number in another face inherits the line height in px and pushes the line box past it.
-    await document.fonts.load('36px "Lievre Mono"', '42');
+    await document.fonts.load('36px "Lievre Term JP"', '42');
     await document.fonts.load('14px "IBM Plex Sans JP"', '%');
     const value = (unit: string) =>
-      `<div class="lv-x" style="font: 36px / 44px 'Lievre Mono'">42<span style="font-size: 14px; font-family: 'IBM Plex Sans JP'; ${unit}">%</span></div>`;
+      `<div class="lv-x" style="font: 36px / 44px 'Lievre Term JP'">42<span style="font-size: 14px; font-family: 'IBM Plex Sans JP'; ${unit}">%</span></div>`;
     expect(messages(value(''), 'line-grid')[0]).toMatch(
-      /行の箱の高さが [\d.]+px で、4px の倍数から [\d.]+px ずれています。.*line-height は 44px ですが、同じ行に Lievre Mono 36px・IBM Plex Sans JP 14px の文字が混ざり/,
+      /行の箱の高さが [\d.]+px で、4px の倍数から [\d.]+px ずれています。.*line-height は 44px ですが、同じ行に Lievre Term JP 36px・IBM Plex Sans JP 14px の文字が混ざり/,
     );
     expect(messages(value('line-height: 1'), 'line-grid')).toEqual([]);
     expect(

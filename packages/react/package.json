@@ -13,6 +13,7 @@
       "import": "./lib/lievre.js"
     },
     "./styles.css": "./lib/lievre.css",
+    "./fonts.css": "./lib/fonts.css",
     "./tokens.json": "./lib/tokens.json",
     "./llms.txt": "./llms.txt",
     "./lint": {
@@ -38,7 +39,7 @@
     "storybook": "storybook dev -p 6006 --host 127.0.0.1 --no-open --disable-telemetry",
     "build:storybook": "storybook build -o dist/storybook --disable-telemetry",
     "build:demo": "vite build",
-    "build:lib": "vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json && cp src/wear/age.d.mts src/wear/presets.d.mts lib/wear/ && cp ../tokens/tokens.json lib/tokens.json",
+    "build:lib": "vite build --config vite.lib.config.ts && tsc -p tsconfig.lib.json && cp src/wear/age.d.mts src/wear/presets.d.mts lib/wear/ && cp ../tokens/tokens.json lib/tokens.json && cp src/styles/fonts.css lib/fonts.css",
     "check:pack": "node scripts/check-pack.mjs",
     "build": "npm run typecheck && npm run lint && npm run wear && npm run build:lib && npm run build:demo && npm run build:storybook",
     "typecheck": "tsc --noEmit",
@@ -56,23 +57,30 @@
     "postpack": "rm DESIGN.md MIGRATION.md"
   },
   "peerDependencies": {
+    "@lievre/fonts": "^0.1.1",
     "react": "^18.3.0 || ^19.0.0",
     "react-dom": "^18.3.0 || ^19.0.0"
   },
+  "peerDependenciesMeta": {
+    "@lievre/fonts": {
+      "optional": true
+    }
+  },
   "dependencies": {
     "@internationalized/date": "3.12.4",
-    "downshift": "9.4.0",
-    "lucide-react": "^0.468.0",
+    "downshift": "9.5.0",
+    "lucide-react": "^1.0.0",
     "radix-ui": "1.8.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.2",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/ibm-plex-sans-jp": "^5.3.1",
+    "@lievre/fonts": "https://github.com/shiroinock/lievre-fonts/releases/download/v0.1.1/lievre-fonts-0.1.1.tgz",
     "@lievre/tokens": "0.2.0",
-    "@storybook/addon-a11y": "10.6.3",
-    "@storybook/addon-docs": "10.6.3",
-    "@storybook/react-vite": "10.6.3",
+    "@storybook/addon-a11y": "10.6.7",
+    "@storybook/addon-docs": "10.6.7",
+    "@storybook/react-vite": "10.6.7",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -88,7 +96,7 @@
     "playwright": "^1.56.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "storybook": "10.6.3",
+    "storybook": "10.6.7",
     "stylelint": "^17.16.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.72.0",

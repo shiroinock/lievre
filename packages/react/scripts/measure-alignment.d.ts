@@ -8,7 +8,8 @@ export type Inset = {
   dx: number;
   dy: number;
 };
-export function inset(el: Element): Inset | null;
+export const FACE_MIDDLE: number;
+export function inset(el: Element, options?: { face?: boolean }): Inset | null;
 export function iconOffset(icon: Element, textEl: Element): { dy: number; size: number } | null;
 export const PARTS: string[];
 export function measure(selectors?: string[], root?: ParentNode): Record<string, unknown>[];

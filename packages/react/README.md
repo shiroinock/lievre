@@ -33,22 +33,22 @@ export function App() {
 ```
 
 - React / ReactDOM は利用する側で用意します。
-- 書体（IBM Plex Sans JP / IBM Plex Mono）は同梱していません。`npm i @fontsource/ibm-plex-sans-jp @fontsource/ibm-plex-mono` で入れ、Sans の 400・500・600 を読み込んでください。等幅は英数字と日本語を 1:2 にするため、次の `'Lievre Mono'` を 400・500・600 の太さごとに定義するか、PlemolJP を読み込みます。どちらもない場合、等幅の英数字は縮まず、周りより一回り大きく表示されます。
+- 書体のファイルは同梱していません。lievre の書体 [`@lievre/fonts`](https://github.com/shiroinock/lievre-fonts) を入れ、`fonts.css` を読み込みます。npm にはまだ出していないので、リリースの tgz を指定します。
 
-  ```css
-  @font-face {
-    font-family: 'Lievre Mono';
-    font-weight: 400;
-    font-display: swap;
-    size-adjust: 83.333%; /* 0.6em 幅を 0.5em 幅にする */
-    src: url('@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
-    unicode-range: U+0000-00FF, U+2010-2011, U+20AC, U+2122, U+2212;
-  }
+  ```sh
+  npm i https://github.com/shiroinock/lievre-fonts/releases/download/v0.1.1/lievre-fonts-0.1.1.tgz
   ```
+
+  ```tsx
+  import '@lievre/react/fonts.css';
+  import '@lievre/react/styles.css';
+  ```
+
+  `fonts.css` は `@lievre/fonts` を読み込み、`'Lievre Sans'`（本文。IBM Plex Sans JP の字面の枠を行の中央に置き直したもの）と `'Lievre Term JP'`（等幅。英数字は日本語のちょうど半分の幅で、行の中央と英大文字の高さは本文と同じ）を、400・500・600 の太さで定義します。woff2 は文字の範囲ごとに分かれていて、ページに出る字のファイルだけが読まれます。`fonts.css` を読み込まなくても、`--lv-font-sans` は `'IBM Plex Sans JP'`、`--lv-font-mono` は `PlemolJP`・`IBM Plex Mono` を次に探すので表示はできますが、字が行の中央より上に寄り、等幅の英数字と日本語は 1:2 になりません。
 
 - スタイルは `@layer lievre.*` に入っています。層に入っていない CSS は層の中より強いため、アプリのリセット（`button { background: none }` や Tailwind の preflight など）は `@layer` に入れて、lievre より先に宣言してください（例：`@layer reset, lievre.tokens, lievre.base, lievre.components, lievre.utilities;`）。
 - スタイルは `.lievre` の内側に限定されます。ページ全体のリセットやアプリのナビゲーションは含みません。
-- `theme`（paper / ink）、`density`（comfortable / compact）、`typography`（standard / interface）はそれぞれ独立して指定できます。
+- `theme`（paper / ink）、`density`（comfortable / compact）、`typography`（standard / interface）、`family`（sans / mono）はそれぞれ独立して指定できます。`family="mono"` は画面全体を日本語ごと等幅にします。範囲だけなら `Text`・`Card` の `mono` か、クラス `lv-family-mono` で囲みます。
 
 ## lint
 

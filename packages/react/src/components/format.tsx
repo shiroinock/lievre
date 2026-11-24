@@ -212,7 +212,7 @@ export function formatRelativeTime(
 
 /**
  * 数を、桁をそろえた書式で出します（桁区切り・小数の桁・割合・符号）。
- * 数字は等幅（Lievre Mono）で、単位（円・件）は数字の後ろに本文の書体で添えます。表の列では右揃えの列に置くと、桁と小数点の位置がそろいます。
+ * 数字は等幅（Lievre Term JP）で、単位（円・件）は数字の後ろに本文の書体で添えます。表の列では右揃えの列に置くと、桁と小数点の位置がそろいます。
  */
 export function FormatNumber({
   value,

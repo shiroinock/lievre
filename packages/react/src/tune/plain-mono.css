@@ -1,0 +1,38 @@
+/*
+ * The plain face the worn mono is made from (npm run wear:font): IBM Plex Mono's Latin at 5/6
+ * size, so a letter is half a Japanese one. lievre itself draws mono text in Lievre Term JP now;
+ * this page keeps the old 'Lievre Mono' only to compare the worn copy with its source.
+ */
+@font-face {
+  font-family: 'Lievre Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  size-adjust: 83.333%;
+  src: url('@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-200F, U+2010-2011, U+2022, U+2030, U+2039-203A, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lievre Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  size-adjust: 83.333%;
+  src: url('@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-200F, U+2010-2011, U+2022, U+2030, U+2039-203A, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lievre Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  size-adjust: 83.333%;
+  src: url('@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-200F, U+2010-2011, U+2022, U+2030, U+2039-203A, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}

@@ -616,10 +616,9 @@ function PreviewColumn({ theme, config }: { theme: Theme; config: WearConfig }) 
       ...faceVars(config),
     };
     if (preview.key) {
-      vars['--lv-wear-sans'] =
-        `'lievre Preview Sans ${preview.key}', 'IBM Plex Sans JP', sans-serif`;
+      vars['--lv-wear-sans'] = `'lievre Preview Sans ${preview.key}', 'Lievre Sans', sans-serif`;
       vars['--lv-wear-mono'] =
-        `'lievre Preview Mono ${preview.key}', 'Lievre Mono', 'lievre Preview Sans ${preview.key}', 'IBM Plex Sans JP', monospace`;
+        `'lievre Preview Mono ${preview.key}', 'Lievre Mono', 'lievre Preview Sans ${preview.key}', 'Lievre Sans', monospace`;
     }
     return vars as CSSProperties;
   }, [config, theme, preview.key]);

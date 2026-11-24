@@ -42,12 +42,13 @@ export const USAGE = {
   skeleton: '読み込み中の Skeleton の面。',
   overlay: 'ダイアログの後ろを覆う半透明の幕。',
   focus: 'フォーカスの輪郭。lv-accent と同じ色で、どの面の上でも 3:1 以上。必ず残す。',
-  'font-sans': '見出し・本文・ラベルの書体（IBM Plex Sans JP）。',
+  'font-sans':
+    '見出し・本文・ラベルの書体（Lievre Sans：IBM Plex Sans JP を行の中央に置き直したもの）。',
   'font-mono':
-    '数値・時刻・ID・コードの書体。英数字は Lievre Mono で 0.5em 幅、日本語は Plex Sans JP の 1em 幅で、ちょうど 1:2。',
+    '数値・時刻・ID・コードの書体。Lievre Term JP。英数字は 0.5em 幅、日本語は 1em 幅で、ちょうど 1:2。行の中央と英大文字の高さは本文と同じ。',
   'text-xs': '補助の文字（12px）。これより小さい文字は使わない。',
   'text-mono-min':
-    '等幅の文字の最小（14.4px）。英数字を 5/6 に縮めるので、読める大きさは 12px 相当。',
+    '等幅の文字の最小（14.4px）。英数字 1 字が 12px の Plex Mono と同じ 7.2px 幅になり、英大文字は 14px の本文と同じ高さ。',
   'text-sm': '小さめのラベル・表の補足（13px）。',
   'text-md': '操作画面の本文（14px）。typography="interface" の本文。',
   'text-base': '読み物の本文（16px）。typography="standard" の本文。',

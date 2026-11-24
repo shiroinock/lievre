@@ -16,7 +16,7 @@ permissions: {}
 
 jobs:
   dept:
-    uses: shiroinock/workflows/.github/workflows/dept.yml@a13818710c332940424aec34a30c6ed2db537ed9
+    uses: shiroinock/workflows/.github/workflows/dept.yml@d910d91a634e6bf5f7e7a8be091255d69334980f
     permissions:
       contents: write # push the badge branch
     # with:

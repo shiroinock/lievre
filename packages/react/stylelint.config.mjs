@@ -8,8 +8,6 @@ export default {
   reportDescriptionlessDisables: true,
   rules: {
     'lievre/utilities-no-size': true,
-    'lievre/mono-unicode-range': true,
-    'lievre/mono-weights': true,
     'lievre/forced-colors-state': true,
     'lievre/coarse-target': true,
     'lievre/forced-colors-border-style': true,
