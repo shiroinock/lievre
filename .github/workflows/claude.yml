@@ -20,7 +20,7 @@ permissions: {}
 
 jobs:
   claude:
-    uses: shiroinock/workflows/.github/workflows/claude.yml@b586023844ba16a3a650bfa3db021be733a5f8aa
+    uses: shiroinock/workflows/.github/workflows/claude.yml@37d94d049d54bbd7c8453ad4929d8afbd9fed472
     permissions:
       contents: read
       pull-requests: read
