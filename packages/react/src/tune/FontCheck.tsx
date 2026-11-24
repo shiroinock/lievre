@@ -9,10 +9,10 @@ const STRINGS = ['0123456789', 'SYN-20481', '12:34:56', '98.4%', '計測ラボ�
 const PAIRS = [
   {
     name: 'Lievre Mono',
-    plain: "'Lievre Mono', 'IBM Plex Sans JP'",
+    plain: "'Lievre Mono', 'Lievre Sans'",
     worn: "'Lievre Worn Mono', 'Lievre Worn Sans'",
   },
-  { name: 'Plex Sans JP', plain: "'IBM Plex Sans JP'", worn: "'Lievre Worn Sans'" },
+  { name: 'Lievre Sans', plain: "'Lievre Sans'", worn: "'Lievre Worn Sans'" },
 ];
 const INK = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 const SIZE = 64;
@@ -66,7 +66,7 @@ async function wornFacesReady() {
     if (sources.length && sources.every((src) => src.includes(folder))) break;
     await sleep(250);
   }
-  const families = ['Lievre Mono', ...WORN, 'IBM Plex Sans JP'];
+  const families = ['Lievre Mono', ...WORN, 'Lievre Sans'];
   const fonts = families.flatMap((f) => WEIGHTS.map((w) => `${w} 16px '${f}'`));
   await Promise.all(fonts.map((font) => document.fonts.load(font, MEASURED)));
   await document.fonts.ready;

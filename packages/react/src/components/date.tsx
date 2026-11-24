@@ -1,6 +1,6 @@
 // Dates typed in as year, month and day (the GOV.UK date input pattern). The calendar arithmetic
 // is @internationalized/date's; the fields are lievre's own TextFields in a Fieldset.
-import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type PointerEvent, type ReactNode } from 'react';
 import { CalendarDate, parseDate } from '@internationalized/date';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { CalendarDays } from 'lucide-react';
@@ -106,6 +106,8 @@ export type DateFieldProps = {
   id?: string;
   /** 'bday' で、ブラウザの自動入力に生年月日（年・月・日）を伝えます。 */
   autoComplete?: 'bday';
+  /** 'japanese' で、欄の下に入れた日の和暦（令和8年11月22日）を添えます。入れるのは西暦のままです。DatePicker ではカレンダーも和暦にします。 */
+  calendar?: 'gregory' | 'japanese';
   className?: string;
 };
 /**
@@ -132,6 +134,7 @@ function DateFieldBody({
   name,
   id,
   autoComplete,
+  calendar = 'gregory',
   className,
   trailing,
   keeps,
@@ -193,6 +196,11 @@ function DateFieldBody({
       if (!group.current?.contains(active) && !keeps?.(active)) setChecked(true);
     }, 0);
   };
+  const readingId = useId();
+  const reading =
+    calendar === 'japanese' && check.kind === 'ok'
+      ? `和暦：${formatDate(check.value, { calendar: 'japanese' })}`
+      : undefined;
   const field = (key: keyof Parts, text: string, chars: number, fieldId?: string) => (
     <TextField
       id={fieldId}
@@ -207,6 +215,8 @@ function DateFieldBody({
       disabled={disabled}
       aria-required={required || undefined}
       aria-invalid={shown ? true : undefined}
+      // Each field reads the era of the date as its description, as it reads the hint.
+      aria-describedby={reading ? readingId : undefined}
     />
   );
   return (
@@ -218,6 +228,13 @@ function DateFieldBody({
           {field('day', '日', 2)}
           {trailing}
         </div>
+        {reading && (
+          // Not a live region: announcing at each keystroke that makes a date would talk over
+          // the typing. Every field takes it as its description instead.
+          <p id={readingId} className="lv-date-field-reading">
+            {reading}
+          </p>
+        )}
       </Fieldset>
       {name && (
         <input
@@ -240,8 +257,18 @@ export type DatePickerProps = DateFieldProps & {
  * 打っても、カレンダーで選んでもかまいません。カレンダーは選んだ日（なければ今日）の月で開き、日を選ぶと欄に書いて閉じ、フォーカスをボタンに戻します。
  * props は DateField と同じで、min・max はカレンダーでも選べない日になります。
  */
-export function DatePicker({ today, defaultValue = null, ...props }: DatePickerProps) {
-  const { value, onValueChange, label, min, max, disabled } = props;
+export function DatePicker({ defaultValue = null, ...props }: DatePickerProps) {
+  return <DatePickerBody defaultValue={defaultValue} {...props} />;
+}
+
+/** DatePicker's body; DateRangePicker shows the range in each calendar. */
+function DatePickerBody({
+  today,
+  range,
+  defaultValue = null,
+  ...props
+}: DatePickerProps & { range?: { start?: string | null; end?: string | null } }) {
+  const { value, onValueChange, label, min, max, disabled, calendar } = props;
   const [inner, setInner] = useState<string | null>(defaultValue);
   const current = value !== undefined ? (value === '' ? null : value) : inner;
   const set = (next: string | null) => {
@@ -322,6 +349,8 @@ export function DatePicker({ today, defaultValue = null, ...props }: DatePickerP
                   min={min}
                   max={max}
                   today={today}
+                  range={range}
+                  calendar={calendar}
                 />
               </PopoverPrimitive.Content>
             </PortalSurface>
@@ -329,5 +358,117 @@ export function DatePicker({ today, defaultValue = null, ...props }: DatePickerP
         </PopoverPrimitive.Root>
       }
     />
+  );
+}
+
+export type DateRange = {
+  /** 開始日（'2026-11-22' の形）。未入力や、確かめて通らないあいだは null。 */
+  start: string | null;
+  /** 終了日（'2026-11-30' の形）。未入力や、確かめて通らないあいだ（開始日より前を含む）は null。 */
+  end: string | null;
+};
+export type DateRangePickerProps = {
+  /** 問いの名前（「宿泊の期間」）。開始日と終了日の2つをまとめる legend になります。 */
+  label: string;
+  /** 期間。渡すと外で持ちます。 */
+  value?: DateRange;
+  /** 外で持たないときの、はじめの期間。 */
+  defaultValue?: DateRange;
+  /** 開始日か終了日が、確かめて通る日になったとき、またはそうでなくなったとき（null）に呼びます。 */
+  onValueChange?: (value: DateRange) => void;
+  /** 開始日の欄の名前。 */
+  startLabel?: string;
+  /** 終了日の欄の名前。 */
+  endLabel?: string;
+  /** 補助文。2つの欄の下に出し、まとまりに aria-describedby で結びます。 */
+  hint?: string;
+  /** エラー文。2つの欄のまとまりに出します（それぞれの欄の確かめは、欄の下に出ます）。 */
+  error?: string;
+  /** 2つの欄のラベルの横に「必須」の文字を出し、欄に aria-required を付けます。 */
+  required?: boolean;
+  disabled?: boolean;
+  /** 開始日・終了日とも、これより前の日を通さない（'2026-12-01' の形）。 */
+  min?: string;
+  /** 開始日・終了日とも、これより後の日を通さない（'2026-12-31' の形）。 */
+  max?: string;
+  /** フォームで送るときの名前。開始日と終了日を、それぞれ隠した入力で送ります。 */
+  name?: { start: string; end: string };
+  /** カレンダーで今日として印を付ける日（'2026-11-22' の形）。省くと端末の今日です。 */
+  today?: string;
+  /** 'japanese' で、それぞれの欄の下に和暦を添え、カレンダーも和暦にします。 */
+  calendar?: 'gregory' | 'japanese';
+  className?: string;
+};
+/**
+ * 開始日と終了日を選ぶ期間の入力。2つの DatePicker を1つの問いにまとめます。予約・絞り込みの期間などに使います。
+ * どちらのカレンダーにも開始日から終了日までの期間を示します。終了日は開始日より前にできず、前の日を入れると、直し方のわかる文を出して null にします。
+ */
+export function DateRangePicker({
+  label,
+  value,
+  defaultValue = { start: null, end: null },
+  onValueChange,
+  startLabel = '開始日',
+  endLabel = '終了日',
+  hint,
+  error,
+  required,
+  disabled,
+  min,
+  max,
+  name,
+  today,
+  calendar,
+  className,
+}: DateRangePickerProps) {
+  const [inner, setInner] = useState<DateRange>(defaultValue);
+  const current = value ?? inner;
+  // The latest range as of this event, so two changes in one event both land.
+  const latest = useRef(current);
+  latest.current = current;
+  const set = (next: DateRange) => {
+    latest.current = next;
+    if (value === undefined) setInner(next);
+    onValueChange?.(next);
+  };
+  // The end may not come before the start, nor before min.
+  const start = readBound(current.start);
+  const low = readBound(min);
+  const endMin = start && (!low || start.compare(low) > 0) ? current.start! : min;
+  const shared = { required, disabled, max, today, calendar, range: current };
+  return (
+    <Fieldset
+      legend={label}
+      hint={hint}
+      error={error}
+      disabled={disabled}
+      className={cx('lv-date-range', className)}
+    >
+      <div className="lv-date-range-parts">
+        <DatePickerBody
+          {...shared}
+          label={startLabel}
+          value={current.start}
+          min={min}
+          name={name?.start}
+          onValueChange={(next) => {
+            // A start past the end lets go of the end in the same change, so the caller never
+            // hears a range the wrong way round, and the end's fields empty with the value.
+            const end = readBound(latest.current.end);
+            const start = readBound(next);
+            const past = !!start && !!end && start.compare(end) > 0;
+            set({ start: next, end: past ? null : latest.current.end });
+          }}
+        />
+        <DatePickerBody
+          {...shared}
+          label={endLabel}
+          value={current.end}
+          min={endMin}
+          name={name?.end}
+          onValueChange={(next) => set({ ...latest.current, end: next })}
+        />
+      </div>
+    </Fieldset>
   );
 }

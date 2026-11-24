@@ -1,6 +1,4 @@
 // lievre's own stylelint rules. Each one guards a mistake that review has caught before.
-import { readFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import stylelint from 'stylelint';
 
 const {
@@ -42,50 +40,6 @@ const utilitiesNoSize = rule(
     });
   },
 );
-
-// Punctuation that Japanese text sets full width must fall through to the Japanese face.
-const FULL_WIDTH = [0x2014, 0x2015, 0x2018, 0x2019, 0x201c, 0x201d, 0x2025, 0x2026, 0x3000];
-const monoUnicodeRange = rule(
-  'mono-unicode-range',
-  'Lievre Mono の unicode-range に、日本語で全角に組む約物（— ‘ ’ “ ” ‥ … など）を含めないでください。',
-  (root, fail) => {
-    root.walkAtRules('font-face', (face) => {
-      if (!face.some((d) => d.prop === 'font-family' && /Lievre Mono/.test(d.value))) return;
-      face.walkDecls('unicode-range', (decl) => {
-        const ranges = decl.value.split(',').map((r) => {
-          const [lo, hi = lo] = r.trim().replace(/^U\+/i, '').split('-');
-          return [parseInt(lo.replace(/\?/g, '0'), 16), parseInt(hi.replace(/\?/g, 'F'), 16)];
-        });
-        const hit = FULL_WIDTH.filter((c) => ranges.some(([lo, hi]) => c >= lo && c <= hi));
-        if (hit.length)
-          fail(
-            decl,
-            `Lievre Mono の unicode-range が全角の約物 ${hit.map((c) => String.fromCodePoint(c)).join(' ')} を含んでいます。`,
-          );
-      });
-    });
-  },
-);
-
-// Every --lv-weight-* token needs a real Lievre Mono face, or the browser fakes the weight.
-const monoWeights = rule('mono-weights', '', (root, fail) => {
-  const faces = [];
-  root.walkAtRules('font-face', (face) => {
-    if (face.some((d) => d.prop === 'font-family' && /Lievre Mono/.test(d.value)))
-      faces.push(face.nodes.find((d) => d.prop === 'font-weight')?.value ?? '400');
-  });
-  if (!faces.length) return;
-  const css = readFileSync(
-    createRequire(import.meta.url).resolve('@lievre/tokens/tokens.css'),
-    'utf8',
-  );
-  for (const [, weight] of css.matchAll(/--lv-weight-[\w-]+:\s*(\d+);/g))
-    if (!faces.includes(weight))
-      fail(
-        root.first ?? root,
-        `Lievre Mono に font-weight: ${weight} の @font-face がありません。`,
-      );
-});
 
 // A state shown only by a background colour disappears when the browser forces colours.
 const STATE =
@@ -293,8 +247,6 @@ const sideStripe = rule('side-stripe', '', (root, fail) => {
 
 export default [
   utilitiesNoSize,
-  monoUnicodeRange,
-  monoWeights,
   forcedColorsState,
   coarseTarget,
   forcedColorsBorderStyle,

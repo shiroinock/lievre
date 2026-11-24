@@ -72,6 +72,18 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    family: {
+      description: '書体の系統',
+      toolbar: {
+        title: '書体',
+        icon: 'markup',
+        items: [
+          { value: 'sans', title: '本文の書体' },
+          { value: 'mono', title: '等幅（画面全体）' },
+        ],
+        dynamicTitle: true,
+      },
+    },
     density: {
       description: '表示密度',
       toolbar: {
@@ -89,6 +101,7 @@ const preview: Preview = {
     theme: 'paper',
     density: 'comfortable',
     typography: 'standard',
+    family: 'sans',
     wear: 'off',
     wearSeed: 'lievre',
     age: 'none',
@@ -99,6 +112,7 @@ const preview: Preview = {
         theme={context.globals.theme}
         density={context.globals.density}
         typography={context.globals.typography}
+        family={context.globals.family}
         wear={context.globals.wear}
         wearSeed={context.globals.wearSeed}
         age={context.globals.age}

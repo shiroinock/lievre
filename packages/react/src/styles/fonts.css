@@ -1,48 +1,43 @@
 /*
- * IBM Plex for the docs site and Storybook. The package itself does not ship fonts:
- * apps load these (or their own) and the --lv-font-* stacks pick them up.
+ * Shipped as @lievre/react/fonts.css: the faces lievre's tokens name, from @lievre/fonts
+ * (https://github.com/shiroinock/lievre-fonts), which the app installs.
+ *
+ * Lievre Sans: IBM Plex Sans JP with the ideographic em box in the middle of the line box.
+ * Lievre Term JP: monospace, Latin half as wide as Japanese, on the same line middle.
+ * Both in 400, 500 and 600, split by unicode-range so a page loads only the files it draws.
  */
-@import '@fontsource/ibm-plex-sans-jp/400.css';
-@import '@fontsource/ibm-plex-sans-jp/500.css';
-@import '@fontsource/ibm-plex-sans-jp/600.css';
+@import '@lievre/fonts';
 
 /*
- * Lievre Mono: IBM Plex Mono scaled from 0.6em to 0.5em wide, so one Latin character is
- * exactly half of a Japanese one (the same 1:2 grid as PlemolJP). Japanese falls
- * through to IBM Plex Sans JP, whose kana and kanji are 1em wide.
+ * Japanese punctuation and marks in monospace text stay full width, as in Japanese typesetting:
+ * … ‥ ― ※ and the round, square, triangle, diamond and star marks come from Lievre Sans (1em) ahead
+ * of Lievre Term JP, which draws them half width like a terminal does. Arrows stay half width.
+ * “ ” ‘ ’ — are not full width in Lievre Sans either, so they stay in Lievre Term JP, on the grid.
  */
 @font-face {
-  font-family: 'Lievre Mono';
+  font-family: 'Lievre Wide Marks';
   font-style: normal;
-  font-display: swap;
   font-weight: 400;
-  size-adjust: 83.333%;
-  src: url('@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
-    U+0308, U+0329, U+2000-200F, U+2010-2011, U+2022, U+2030, U+2039-203A, U+20AC, U+2122, U+2191,
-    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'Lievre Mono';
-  font-style: normal;
   font-display: swap;
+  src: url('@lievre/fonts/files/LievreSans-Regular.base.woff2') format('woff2');
+  unicode-range: U+2015, U+2025-2026, U+203B, U+25A0-25A1, U+25B2-25B3, U+25BC-25BD, U+25C6-25C7,
+    U+25CB, U+25CE-25CF, U+2605-2606;
+}
+@font-face {
+  font-family: 'Lievre Wide Marks';
+  font-style: normal;
   font-weight: 500;
-  size-adjust: 83.333%;
-  src: url('@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
-    U+0308, U+0329, U+2000-200F, U+2010-2011, U+2022, U+2030, U+2039-203A, U+20AC, U+2122, U+2191,
-    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'Lievre Mono';
-  font-style: normal;
   font-display: swap;
+  src: url('@lievre/fonts/files/LievreSans-Medium.base.woff2') format('woff2');
+  unicode-range: U+2015, U+2025-2026, U+203B, U+25A0-25A1, U+25B2-25B3, U+25BC-25BD, U+25C6-25C7,
+    U+25CB, U+25CE-25CF, U+2605-2606;
+}
+@font-face {
+  font-family: 'Lievre Wide Marks';
+  font-style: normal;
   font-weight: 600;
-  size-adjust: 83.333%;
-  src: url('@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-600-normal.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
-    U+0308, U+0329, U+2000-200F, U+2010-2011, U+2022, U+2030, U+2039-203A, U+20AC, U+2122, U+2191,
-    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  font-display: swap;
+  src: url('@lievre/fonts/files/LievreSans-SemiBold.base.woff2') format('woff2');
+  unicode-range: U+2015, U+2025-2026, U+203B, U+25A0-25A1, U+25B2-25B3, U+25BC-25BD, U+25C6-25C7,
+    U+25CB, U+25CE-25CF, U+2605-2606;
 }

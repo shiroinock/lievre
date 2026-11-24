@@ -269,7 +269,9 @@ export function DataTable<T>(props: DataTableProps<T>) {
     const head = headRef.current;
     if (!maxHeight || !wrap || !head) return;
     const apply = () => {
-      wrap.style.scrollPaddingTop = `${head.getBoundingClientRect().height}px`;
+      // Rounded up: the scroll position lands on whole pixels, and a fractional heading height
+      // would leave the focused control up to a pixel under it.
+      wrap.style.scrollPaddingTop = `${Math.ceil(head.getBoundingClientRect().height)}px`;
     };
     apply();
     const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(apply);

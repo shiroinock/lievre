@@ -15,7 +15,7 @@ import '@lievre/react/styles.css';
 
 - スタイルは `LievreProvider` が出す `.lievre` の内側でだけ効きます。包み忘れても誤りは出ず、見た目が崩れるだけです。
 - `useToast()` は `ToastProvider` の内側で呼びます。
-- 書体は同梱していません（README の「別のプロジェクトで使う」）。
+- 書体のファイルは同梱していません。lievre の書体 `@lievre/fonts` を `npm i https://github.com/shiroinock/lievre-fonts/releases/download/v0.1.1/lievre-fonts-0.1.1.tgz` で入れ、`import '@lievre/react/fonts.css'` で読み込みます（本文の `'Lievre Sans'` と、等幅の `'Lievre Term JP'`）。読み込まないと、字が行の中央より上に寄り、等幅の英数字と日本語が 1:2 になりません。
 
 ## 約束
 
@@ -26,6 +26,7 @@ import '@lievre/react/styles.css';
 - `Button` の `type` の既定は `'button'` です。フォームの送信には `type="submit"` を付けます。主要な操作（`variant="primary"`）は1つの作業領域に1つ。危険な操作は `variant="danger"`。画面の移動は `Link` / `ActionLink`。
 - 状態の名前：Badge・Alert の `tone` は `'neutral' | 'success' | 'warning' | 'danger' | 'info'`、Toast の `tone` は `'success' | 'error'`。
 - 状態は色だけでなく文字でも伝えます。Badge には必ず文字を入れます。Metric の `trend` は矢印と色だけなので、向きは `change` に言葉で書きます（「前週比 +0.02 ポイント上昇」）。
+- ログ・コマンドの出力・差分・コードのように日本語も含めて桁で読むものは、`<Text mono>`・`<Card mono>` で囲みごと等幅にします（中の部品、中から開くポップオーバー、入れ子の LievreProvider も等幅になる）。クラス `lv-family-mono` はその要素の中だけで、ポータルには届きません。端末のような画面全体は `<LievreProvider family="mono">`、その中で本文の書体に戻す範囲は `<LievreProvider family="sans">` で包みます。
 - 数値・時刻・ID・コードは `<span className="lv-mono">`、文中の数値は `.lv-tabular`。単位（%・円）は `.lv-mono` の外に置きます：`<span><span className="lv-mono">{n}</span>円</span>`。Metric は `value="99.95" unit="%"` と分けます。
 - Dialog には `title` と `description` が必須です。閉じるだけのボタンは `<DialogClose asChild><Button>キャンセル</Button></DialogClose>` で包みます。処理してから閉じるときは `open` / `onOpenChange` で開閉を持ちます。フォーカスの閉じ込めと復帰は部品が行います。
 - アイコンだけのボタンは `<IconButton label="行の操作" icon={<MoreHorizontal />} />`。`label` が読み上げの名前とツールチップの両方になるので、`aria-label` は書きません。`Button` に svg だけを入れません。

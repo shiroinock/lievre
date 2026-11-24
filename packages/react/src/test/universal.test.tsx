@@ -2,11 +2,20 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { expect, it } from 'vitest';
 import axe from 'axe-core';
-import { ActionLink, Button, Dialog, EmptyState, LievreProvider, RadioGroup, Text } from '../index';
+import {
+  ActionLink,
+  Button,
+  Card,
+  Dialog,
+  EmptyState,
+  LievreProvider,
+  RadioGroup,
+  Text,
+} from '../index';
 import { RegistrationExample, ResourceLibrary, ArticleExample } from '../patterns/Everyday';
-it('inherits theme, density and typography independently through nested providers and portals', async () => {
+it('inherits theme, density, typography and family independently through nested providers and portals', async () => {
   render(
-    <LievreProvider theme="ink" density="compact">
+    <LievreProvider theme="ink" density="compact" family="mono">
       <LievreProvider typography="interface">
         <Dialog trigger={<Button>開く</Button>} title="詳細" description="読み物の補足">
           <Text>説明</Text>
@@ -19,7 +28,59 @@ it('inherits theme, density and typography independently through nested provider
   expect(scope).toHaveAttribute('data-theme', 'ink');
   expect(scope).toHaveAttribute('data-density', 'compact');
   expect(scope).toHaveAttribute('data-typography', 'interface');
+  expect(scope).toHaveAttribute('data-family', 'mono');
   expect(screen.queryByText('WORKSPACE / EDIT')).not.toBeInTheDocument();
+});
+it('carries a mono range to portals and nested providers inside it', async () => {
+  render(
+    <LievreProvider>
+      <Card title="記録" mono>
+        <Dialog trigger={<Button>開く</Button>} title="詳細" description="記録の補足">
+          <Text>説明</Text>
+        </Dialog>
+        <LievreProvider theme="ink">
+          <Text>入れ子</Text>
+        </LievreProvider>
+      </Card>
+    </LievreProvider>,
+  );
+  expect(screen.getByText('入れ子').closest('.lievre')).toHaveAttribute('data-family', 'mono');
+  await userEvent.click(screen.getByRole('button', { name: '開く' }));
+  expect(screen.getByRole('dialog').closest('.lievre')).toHaveAttribute('data-family', 'mono');
+});
+it('keeps what is inside when mono or the screen family changes', async () => {
+  const view = (family: 'sans' | 'mono', mono: boolean) => (
+    <LievreProvider family={family}>
+      <Card title="記録" mono={mono}>
+        <input aria-label="メモ" />
+      </Card>
+      <Text mono={mono}>
+        <input aria-label="行" />
+      </Text>
+    </LievreProvider>
+  );
+  const { rerender } = render(view('sans', false));
+  const memo = screen.getByRole('textbox', { name: 'メモ' });
+  const line = screen.getByRole('textbox', { name: '行' });
+  await userEvent.type(memo, '途中');
+  rerender(view('sans', true));
+  rerender(view('mono', true));
+  rerender(view('mono', false));
+  expect(screen.getByRole('textbox', { name: 'メモ' })).toBe(memo);
+  expect(screen.getByRole('textbox', { name: '行' })).toBe(line);
+  expect(memo).toHaveValue('途中');
+});
+it('marks monospace ranges with lv-family-mono', () => {
+  const { container } = render(
+    <LievreProvider>
+      <Text mono>$ npm test</Text>
+      <Text>本文</Text>
+    </LievreProvider>,
+  );
+  const [mono, plain] = container.querySelectorAll('.lv-text');
+  expect(mono).toHaveClass('lv-family-mono');
+  expect(plain).not.toHaveClass('lv-family-mono');
+  expect(container.querySelector('.lievre')).toHaveAttribute('data-family', 'sans');
 });
 it('keeps navigation links semantic and supports native radio keyboard selection', async () => {
   render(
