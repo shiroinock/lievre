@@ -97,10 +97,10 @@ export function LievreProvider({
   wear?: Wear;
   /**
    * 試作：live の模様を決めるソルト。既定は wear.config.json のソルトで、baked と同じ模様になります。
-   * baked はビルド時の値（npm run wear）で決まります。
+   * baked はビルド時の値（pnpm run wear）で決まります。
    */
   wearSeed?: string;
-  /** 試作：live の強さ。既定は wear.config.json の値。調整の画面（npm run wear:tune）が使います。 */
+  /** 試作：live の強さ。既定は wear.config.json の値。調整の画面（pnpm run wear:tune）が使います。 */
   wearConfig?: WearConfig;
   /**
    * 試作：経年。none（既定）・light・heavy。褪色・インクのむら・罫線のかすれ・角の欠けを

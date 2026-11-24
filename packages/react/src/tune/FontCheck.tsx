@@ -170,7 +170,7 @@ export function FontCheck({ reach, stamp }: { reach: number; stamp: number }) {
         <Text size="small">
           {result.loaded
             ? `幅の差は最大 ${worst.toFixed(3)}px（${SIZE}px、${result.widths.length}通り）。かなと英字の幅の比 ${result.ratio.map((r) => r.toFixed(3)).join(' / ')}。字の左端は平均 ${result.ink.mean.toFixed(2)}px、最大 ${result.ink.max.toFixed(2)}px 動き、許容 ${result.ink.limit.toFixed(2)}px。`
-            : '焼き込んだフォントがないか、読み込めませんでした。npm run wear:font を実行するか、保存してください。'}
+            : '焼き込んだフォントがないか、読み込めませんでした。pnpm run wear:font を実行するか、保存してください。'}
         </Text>
       )}
     </section>

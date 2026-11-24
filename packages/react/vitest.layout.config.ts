@@ -1,5 +1,5 @@
 // Layout gate: renders every story in a real browser and measures where the parts sit.
-// jsdom has no layout, so this runs separately from `npm test`.
+// jsdom has no layout, so this runs separately from `pnpm test`.
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { playwright } from '@vitest/browser-playwright';

@@ -24,7 +24,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '採用前の試作です。質感の3段階 `wear="off | baked | live"` を、Paper / Ink で比べます（試作した Sepia と Rust のテーマは採用しませんでした）。baked はビルド時のソルト（`npm run wear`、文字の歪みは `npm run wear:font`）で模様が決まり、live は `wearSeed` から実行時に SVG フィルタで描きます。候補の一覧と根拠は references/weathered-candidates.md にあります。',
+          '採用前の試作です。質感の3段階 `wear="off | baked | live"` を、Paper / Ink で比べます（試作した Sepia と Rust のテーマは採用しませんでした）。baked はビルド時のソルト（`pnpm run wear`、文字の歪みは `pnpm run wear:font`）で模様が決まり、live は `wearSeed` から実行時に SVG フィルタで描きます。候補の一覧と根拠は references/weathered-candidates.md にあります。',
       },
     },
   },

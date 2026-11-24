@@ -400,8 +400,8 @@ const runs: Run[] = [
 ];
 
 const root = resolve(import.meta.dirname, '../..');
-// npm installs the workspaces' tools once, at the repository root.
-const bin = (name: string) => join(root, '../../node_modules/.bin', name);
+// pnpm links each workspace's own tools into its node_modules/.bin.
+const bin = (name: string) => join(root, 'node_modules/.bin', name);
 const grit = readdirSync(join(root, 'lint/biome')).filter((f) => f.endsWith('.grit'));
 const biomeRules = new Set(grit.map((f) => basename(f, '.grit')));
 const ruleNames = Object.keys(lievre.rules) as RuleName[];

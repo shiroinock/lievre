@@ -35,7 +35,7 @@ import { ColorFoundation, Foundations, ReferenceDirection, principles } from './
 import { OperationsExample, SettingsExample } from './patterns/Operations';
 import { ResourceLibrary, ArticleExample, RegistrationExample } from './patterns/Everyday';
 import './styles/demo.css';
-// Worn glyphs exist only after `npm run wear:font`. Their @font-face list is as long as Plex's own
+// Worn glyphs exist only after `pnpm run wear:font`. Their @font-face list is as long as Plex's own
 // (about 150 KB gzipped), so it is fetched only once baked wear is chosen.
 const wornFonts = Object.values(import.meta.glob('../wear-fonts/fonts.css'));
 

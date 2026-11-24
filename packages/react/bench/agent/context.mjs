@@ -1,6 +1,6 @@
 // How much an agent must read to solve each task, in estimated tokens.
 //   node bench/agent/context.mjs [--root <checkout>] [--external] [--json out.json]
-// --root measures another checkout (for example main, after `npm run build:lib` there).
+// --root measures another checkout (for example main, after `pnpm run build:lib` there).
 // --external also downloads the other systems' docs listed in external-docs.json.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -29,7 +29,7 @@ const tasks = {
   T4: ['primitives', 'foundation', 'system'],
   T5: ['data', 'primitives'],
 };
-// DESIGN.md sits at the repository root in the workspaces; npm pack copies it into the package.
+// DESIGN.md sits at the repository root in the workspaces; pnpm pack copies it into the package.
 const read = (file) => {
   const path = [join(root, file), join(root, '../..', file)].find((p) => existsSync(p));
   return path ? readFileSync(path, 'utf8') : null;
@@ -38,7 +38,7 @@ const size = (files) => files.reduce((sum, f) => sum + estimateTokens(read(f) ??
 
 if (!existsSync(join(root, 'lib/index.d.ts'))) {
   console.error(
-    `${root}/lib がありません。そのチェックアウトで npm run build:lib を実行してください。`,
+    `${root}/lib がありません。そのチェックアウトで pnpm run build:lib を実行してください。`,
   );
   process.exit(1);
 }

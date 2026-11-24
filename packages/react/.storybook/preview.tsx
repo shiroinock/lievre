@@ -3,7 +3,7 @@ import { LievreProvider } from '../src/components/system';
 import '../src/styles/fonts.css';
 import '../src/styles/lievre.css';
 import '../src/styles/lievre-wear.css';
-// Worn glyphs exist only after `npm run wear:font`; without them baked keeps the plain faces.
+// Worn glyphs exist only after `pnpm run wear:font`; without them baked keeps the plain faces.
 import.meta.glob('../wear-fonts/fonts.css', { eager: true });
 import '../src/styles/demo.css';
 const preview: Preview = {

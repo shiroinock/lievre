@@ -1,5 +1,5 @@
 // Everything wear draws, as a pure function of the config: the texture pixels, where each part's
-// tile starts, and the custom properties that place them. The build (npm run wear) writes these as
+// tile starts, and the custom properties that place them. The build (pnpm run wear) writes these as
 // PNG files and baked.css; the live provider builds the same pixels and properties in the browser,
 // so both modes show the same grain, stains and dry brush for the same values.
 import { hash32, mulberry32, noise2, seedFor } from './seed.mjs';
@@ -238,7 +238,7 @@ export function sheetThemeVars(config, theme, urls, tokens) {
 }
 
 /**
- * Which face each text kind is set in under baked wear: the worn faces from npm run wear:font for
+ * Which face each text kind is set in under baked wear: the worn faces from pnpm run wear:font for
  * the kinds whose edges wear, the plain ones otherwise. The tuning page swaps --lv-wear-sans and
  * --lv-wear-mono for faces baked on the spot from unsaved values.
  */

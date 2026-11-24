@@ -1,4 +1,4 @@
-// tokens.json is written from tokens.css; run `npm run tokens` after editing tokens.css.
+// tokens.json is written from tokens.css; run `pnpm run tokens` after editing tokens.css.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';

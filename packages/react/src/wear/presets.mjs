@@ -1,5 +1,5 @@
 // Wear presets, and the parts each text kind covers. wear.config.json holds the chosen values;
-// the tuning page (npm run wear:tune) starts from one of these and saves its own.
+// the tuning page (pnpm run wear:tune) starts from one of these and saves its own.
 
 /** Size of the yake frame image, and the slice each edge takes of it, in image pixels. */
 export const SHEET = 512;

@@ -184,7 +184,7 @@ describe('Age: generated and provided', () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it('keeps src/styles/wear/age.css identical to what wear.config.json generates', () => {
-    // Run `npm run wear` after changing wear.config.json or the generator.
+    // Run `pnpm run wear` after changing wear.config.json or the generator.
     const config = readConfig();
     expect(readFileSync('src/styles/wear/age.css', 'utf8')).toBe(buildWear(config, tokens).age);
   }, 20000);

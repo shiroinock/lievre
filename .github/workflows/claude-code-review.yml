@@ -24,7 +24,7 @@ jobs:
       review_focus: |
         - WCAG 2.x AA：文字のコントラスト 4.5:1、輪郭とフォーカスの表示 3:1、色だけに頼らない、`prefers-reduced-motion` で動きを減らす。
         - キーボード操作と ARIA：Tab の順、矢印・Enter・Escape、role と aria-* の正しさ、フォーカスの戻り先。
-        - 部品の props の `/** */` の説明と、`npm run llms` で書き出す `llms.txt` の更新。`tokens.css` を変えたら `tokens.json` の更新。
+        - 部品の props の `/** */` の説明と、`pnpm run llms` で書き出す `llms.txt` の更新。`tokens.css` を変えたら `tokens.json` の更新。
         - 変更履歴：利用する側に見える変更は `changes/` に PR ごとの断片が1つあるか（`changes/README.md`）。`CHANGELOG.md` の「未公開」には書かない。見えないなら PR の説明に「変更履歴：なし（理由）」。
         - 片側だけの色の帯（左や上だけに色の付いた border を引いて強調する飾り）を使っていないか。
         - 4px の格子：高さ・余白・間隔がトークン（`--lv-space-*`、`--lv-control-height`）か 4px の倍数か。等幅の英数字と日本語の幅が 1:2 にそろう決まり（`DESIGN.md`）を崩していないか。

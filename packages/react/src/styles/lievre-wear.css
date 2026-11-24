@@ -1,9 +1,9 @@
 /*
  * lievre wear — prototype. <LievreProvider wear="off | baked | live" wearSeed="…">
  *
- * Values come from wear.config.json (tune them with npm run wear:tune).
- * baked: textures and offsets written at build time (npm run wear → wear/baked.css), and worn
- *        faces from npm run wear:font. Plain background and mask images in the browser.
+ * Values come from wear.config.json (tune them with pnpm run wear:tune).
+ * baked: textures and offsets written at build time (pnpm run wear → wear/baked.css), and worn
+ *        faces from pnpm run wear:font. Plain background and mask images in the browser.
  * live:  the provider builds the same textures and offsets in the browser from wearSeed, and
  *        distorts text with feDisplacementMap instead of worn faces. Heavier.
  *
@@ -25,7 +25,7 @@
      rendering. The provider lowers the setting too; this covers pages without JavaScript. */
   @media (not (prefers-contrast: more)) and (not (forced-colors: active)) {
     /* Worn faces for the distorted kinds (wear/baked.css picks them). The faces come from
-       `npm run wear:font`; until then these names fall through to the plain ones. */
+       `pnpm run wear:font`; until then these names fall through to the plain ones. */
     .lievre[data-wear='baked'] {
       --lv-wear-sans: 'Lievre Worn Sans', 'Lievre Sans', 'IBM Plex Sans JP', system-ui,
         -apple-system, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;

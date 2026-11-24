@@ -3,9 +3,9 @@
 // 「## 触るファイル」 in the description and by what they actually change. It only tells; it never
 // fails.
 //
-//   npm run check:overlap              (this branch's PR, or this branch's diff when it has none)
-//   npm run check:overlap -- 12        (PR #12)
-//   npm run check:overlap -- --all     (every pair of open PRs)
+//   pnpm run check:overlap              (this branch's PR, or this branch's diff when it has none)
+//   pnpm run check:overlap 12        (PR #12)
+//   pnpm run check:overlap --all     (every pair of open PRs)
 //
 // Needs gh. Generated files and CHANGELOG.md are listed apart: write them out again and they mend.
 import { execFileSync } from 'node:child_process';
@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 export const HEADING = '触るファイル';
 
-/** Mended by `npm run llms`, `npm run tokens`, or by keeping both lines. */
+/** Mended by `pnpm run llms`, `pnpm run tokens`, or by keeping both lines. */
 export const REWRITABLE = [
   'packages/react/llms.txt',
   'packages/tokens/tokens.json',
@@ -153,7 +153,7 @@ export function report(target, found) {
     lines.push(
       '',
       `重なっても書き出し直せば済むもの：${mending.join('、')}`,
-      '  食い違ったら、llms.txt は npm run llms、tokens.json は npm run tokens、CHANGELOG.md は両方の行を残す。',
+      '  食い違ったら、llms.txt は pnpm run llms、tokens.json は pnpm run tokens、CHANGELOG.md は両方の行を残す。',
     );
   }
   return lines.join('\n');

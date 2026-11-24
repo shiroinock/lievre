@@ -13,7 +13,7 @@ import {
 } from './check-overlap.mjs';
 
 const body = (...paths) =>
-  `## 概要\n\n部品\n\n## ${HEADING}\n\n${paths.map((p) => `- \`${p}\``).join('\n')}\n\n## 確かめたこと\n\n- \`npm test\`\n`;
+  `## 概要\n\n部品\n\n## ${HEADING}\n\n${paths.map((p) => `- \`${p}\``).join('\n')}\n\n## 確かめたこと\n\n- \`pnpm test\`\n`;
 
 const pr = (number, over = {}) => ({
   number,
@@ -41,7 +41,7 @@ test('「触るファイル」の節の項目だけを読む', () => {
     '### 細かい分け（同じ節の続き）',
     '- `packages/react/src/stories/Menu*`',
     '## 確かめたこと',
-    '- `npm test`',
+    '- `pnpm test`',
   ].join('\n');
   assert.deepEqual(parseDeclared(text), [
     'packages/react/src/components/menu.tsx',
@@ -121,7 +121,7 @@ test('書き出したファイルと CHANGELOG.md は、別に「書き出し直
   const text = report(mine, found);
   assert.match(text, /重なるファイルはありません/);
   assert.match(text, /書き出し直せば済むもの：packages\/react\/llms\.txt、CHANGELOG\.md/);
-  assert.match(text, /npm run llms/);
+  assert.match(text, /pnpm run llms/);
 });
 
 test('積んだ PR どうしの重なりは、知らせない', () => {

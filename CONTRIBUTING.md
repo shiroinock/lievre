@@ -63,21 +63,21 @@ const meta = {
 コマンドはリポジトリの直下で実行します。
 
 ```sh
-npm run typecheck
-npm run lint
-npm test             # jsdom：部品のふるまい・axe・Story の play
-npm run test:layout  # ブラウザ：配置の基準（初回は npx playwright install chromium）
+pnpm run typecheck
+pnpm run lint
+pnpm test             # jsdom：部品のふるまい・axe・Story の play
+pnpm run test:layout  # ブラウザ：配置の基準（初回は pnpm exec playwright install chromium）
 ```
 
-部品の props や説明（`/** */`）を書いたら `npm run llms`、`tokens.css` のトークンを変えたら `npm run tokens` で書き出します。書き出し忘れは `npm test` が止めます。
+部品の props や説明（`/** */`）を書いたら `pnpm run llms`、`tokens.css` のトークンを変えたら `pnpm run tokens` で書き出します。書き出し忘れは `pnpm test` が止めます。
 
-`npm run test:layout` が失敗したら、メッセージの「基準」に合わせて CSS を直します。メッセージには Story、配色・密度・文字の組み合わせ、部品の名前、要素、ずれの大きさが出ます。
+`pnpm run test:layout` が失敗したら、メッセージの「基準」に合わせて CSS を直します。メッセージには Story、配色・密度・文字の組み合わせ、部品の名前、要素、ずれの大きさが出ます。
 
 すぐに直せない理由があるときだけ、`packages/react/src/test/layout/baseline.ts` に理由付きで例外を足します。画面の例外は `example`（Story の名前）か `element`（要素の一部）で、ずれる箇所だけに絞ります。直したら例外を消してください（消し忘れると検査が知らせます）。
 
 ## プルリクエスト
 
-作業を始める前に、下書きの PR を開き、本文の「触るファイル」に変えるつもりのファイルを1行に1つ書きます（`.github/pull_request_template.md` に節があります）。そのあと `npm run check:overlap` を流すと、ほかの開いた PR の宣言と実際の変更に重なるファイルが出ます。重なったら、相手と分け方を決めるか、相手の枝に積みます。`--all` を付けると、開いた PR どうしの重なりをすべて出します。知らせるだけで、検査は落ちません。`llms.txt`・`tokens.json`・`CHANGELOG.md` は、重なっても書き出し直せば済むので、別に出します。変更履歴の断片（`changes/`）は PR ごとのファイルなので、名前が重ならなければ食い違いません。
+作業を始める前に、下書きの PR を開き、本文の「触るファイル」に変えるつもりのファイルを1行に1つ書きます（`.github/pull_request_template.md` に節があります）。そのあと `pnpm run check:overlap` を流すと、ほかの開いた PR の宣言と実際の変更に重なるファイルが出ます。重なったら、相手と分け方を決めるか、相手の枝に積みます。`--all` を付けると、開いた PR どうしの重なりをすべて出します。知らせるだけで、検査は落ちません。`llms.txt`・`tokens.json`・`CHANGELOG.md` は、重なっても書き出し直せば済むので、別に出します。変更履歴の断片（`changes/`）は PR ごとのファイルなので、名前が重ならなければ食い違いません。
 
 CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査・build を走らせます。
 
@@ -105,7 +105,7 @@ CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査�
 
 書き方は [changes/README.md](changes/README.md) と CHANGELOG.md の冒頭にあります。CHANGELOG.md の「未公開」には書きません。どの PR も同じ区分の末尾に1行足すと、並行する PR がほぼ必ず食い違うからです。テストや内部の整理だけで利用する側に見えないときは、PR の説明に「変更履歴：なし（理由）」の1行を書きます。書き忘れと「未公開」に足した行は `.github/workflows/changelog.yml` が止め、落ちたときのメッセージに貼れる断片が出ます。
 
-公開するときは `npm run changelog:release -- 0.3.0` で、断片と「未公開」の行を CHANGELOG.md の版の見出しの下にまとめ、断片を消します。package.json の版、タグ、`npm publish` は手で行います。
+公開するときは `pnpm run changelog:release 0.3.0` で、断片と「未公開」の行を CHANGELOG.md の版の見出しの下にまとめ、断片を消します。package.json の版、タグ、`pnpm -r publish --access public` は手で行います（`npm publish` では `workspace:*` が置き換わらない）。
 
 ### マージの予約
 

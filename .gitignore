@@ -10,9 +10,9 @@ coverage/
 .env
 .env.*
 !.env.example
-# Worn fonts from `npm run wear:font` (modified IBM Plex, regenerated per salt)
+# Worn fonts from `pnpm run wear:font` (modified IBM Plex, regenerated per salt)
 wear-fonts/
-# Python for the worn fonts, from `npm run wear:setup`
+# Python for the worn fonts, from `pnpm run wear:setup`
 .venv-wear/
 # nix build and direnv
 result
@@ -23,5 +23,5 @@ result-*
 packages/react/DESIGN.md
 packages/react/MIGRATION.md
 
-# Design System の見本集の書き出し（npm run design-system）
+# Design System の見本集の書き出し（pnpm run design-system）
 .design-system/

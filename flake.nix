@@ -15,13 +15,13 @@
       forAllSystems = f: lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
       version = (lib.importJSON ./packages/react/package.json).version;
 
-      # Only what `npm ci` and the builds read, so editing docs or references does not rebuild.
+      # Only what `pnpm install` and the builds read, so editing docs or references does not rebuild.
       src = lib.fileset.toSource {
         root = ./.;
         fileset = lib.fileset.unions [
           ./package.json
-          ./package-lock.json
-          ./.npmrc
+          ./pnpm-lock.yaml
+          ./pnpm-workspace.yaml
           ./DESIGN.md
           ./MIGRATION.md
           ./logo
@@ -29,72 +29,37 @@
         ];
       };
 
-      lock = lib.importJSON ./package-lock.json;
-      workspaces = (lib.importJSON ./package.json).workspaces;
-
-      # A workspace may ask for a package by a tarball URL (@lievre/fonts comes from its GitHub
-      # release). importNpmLock fetches it like the rest, but npm still sees the URL in the
-      # workspace's package.json and goes to download it, which the sandbox refuses. So for the
-      # build those specs read as the version in the lock, and the URLs go back before `npm pack`.
-      isUrl = lib.hasPrefix "https://";
-      lockedVersion = name: lock.packages."node_modules/${name}".version;
-      urlDeps = lib.genAttrs workspaces (
-        path:
-        let
-          module = lock.packages.${path};
-        in
-        lib.filterAttrs (_: isUrl) ((module.dependencies or { }) // (module.devDependencies or { }))
-      );
-      byVersion = lib.mapAttrs (name: spec: if isUrl spec then lockedVersion name else spec);
-      buildLock = lock // {
-        packages = lib.mapAttrs (
-          path: module:
-          if lib.elem path workspaces then
-            module
-            // lib.optionalAttrs (module ? dependencies) { dependencies = byVersion module.dependencies; }
-            // lib.optionalAttrs (module ? devDependencies) {
-              devDependencies = byVersion module.devDependencies;
-            }
-          else
-            module
-        ) lock.packages;
-      };
-      urlsToVersions = lib.concatStrings (
-        lib.mapAttrsToList (
-          path: deps:
-          lib.optionalString (deps != { }) ''
-            cp ${path}/package.json ${path}/package.json.orig
-            ${lib.concatStrings (
-              lib.mapAttrsToList (name: spec: ''
-                substituteInPlace ${path}/package.json --replace-fail '"${spec}"' '"${lockedVersion name}"'
-              '') deps
-            )}''
-        ) urlDeps
-      );
-
-      # One set of node_modules (from package-lock.json) for every package below. Each package is
-      # fetched by its integrity in package-lock.json, so there is no hash here to keep in step.
+      # One set of node_modules (from pnpm-lock.yaml) for every package below.
       mkLievre =
         pkgs: args:
-        pkgs.buildNpmPackage (
+        let
+          pnpm = pkgs.pnpm_12;
+        in
+        pkgs.stdenv.mkDerivation (
+          finalAttrs:
           {
             inherit version src;
-            nodejs = pkgs.nodejs_24;
-            npmDeps = pkgs.importNpmLock {
-              npmRoot = src;
-              packageLock = buildLock;
+            # Fetched from pnpm-lock.yaml without network during the build. When the lockfile
+            # changes, `nix run github:shiroinock/workflows#nix-hashes -- --fix .#default.pnpmDeps`
+            # writes the new hash here (CI fails until then).
+            pnpmDeps = pkgs.fetchPnpmDeps {
+              inherit (finalAttrs) pname version src;
+              inherit pnpm;
+              fetcherVersion = 5;
+              hash = "sha256-H26hZquWiLaEtrorI809Jvc9cecKrSXqEFnBmAhkcEE=";
             };
-            inherit (pkgs.importNpmLock) npmConfigHook;
-            postPatch = urlsToVersions;
-            postConfigure = ''
-              for orig in packages/*/package.json.orig; do
-                if [ -e "$orig" ]; then mv "$orig" "''${orig%.orig}"; fi
-              done
-            '';
-            # The npm playwright package must not fetch browsers; nothing here runs one.
+            nativeBuildInputs = [
+              pkgs.nodejs_24
+              pnpm
+              pkgs.pnpmConfigHook
+            ]
+            ++ (args.nativeBuildInputs or [ ]);
+            # So that patchShebangs points bin/ scripts at this node.
+            buildInputs = [ pkgs.nodejs_24 ];
+            # The playwright package must not fetch browsers; nothing here runs one.
             env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
           }
-          // args
+          // removeAttrs args [ "nativeBuildInputs" ]
         );
     in
     {
@@ -102,14 +67,14 @@
         pkgs:
         let
           nodejs = pkgs.nodejs_24;
-          # Builds an npm script of packages/react and copies its output folder to $out.
+          # Builds a script of packages/react and copies its output folder to $out.
           site =
             name: script: dir:
             mkLievre pkgs {
               pname = "lievre-${name}";
               buildPhase = ''
                 runHook preBuild
-                npm run ${script} -w packages/react
+                pnpm --filter @lievre/react run ${script}
                 runHook postBuild
               '';
               installPhase = ''
@@ -120,21 +85,20 @@
             };
         in
         {
-          # The three libraries, laid out as `npm pack` would publish them, and lievre-migrate.
+          # The three libraries, laid out as `pnpm pack` would publish them, and lievre-migrate.
           default = mkLievre pkgs {
             pname = "lievre";
             nativeBuildInputs = [ pkgs.makeWrapper ];
             buildPhase = ''
               runHook preBuild
-              npm run build:lib -w packages/react
-              npm run build -w packages/tui
+              pnpm --filter @lievre/react run build:lib
+              pnpm --filter @lievre/tui run build
               runHook postBuild
             '';
             installPhase = ''
               runHook preInstall
               mkdir -p packs $out/lib/node_modules/@lievre
-              # The deps cache is read-only; packing only needs somewhere to write.
-              npm pack --offline --cache "$TMPDIR/npm-cache" --pack-destination packs -w packages/tokens -w packages/react -w packages/tui
+              pnpm --filter "./packages/*" pack --pack-destination "$PWD/packs"
               for name in tokens react tui; do
                 mkdir -p $out/lib/node_modules/@lievre/$name
                 tar -xzf packs/lievre-$name-*.tgz --strip-components=1 \
@@ -178,14 +142,15 @@
           default = pkgs.mkShell {
             packages = [
               pkgs.nodejs_24
+              pkgs.pnpm_12
               wearPython
               pkgs.nixfmt
             ];
             LIEVRE_WEAR_PYTHON = lib.getExe wearPython;
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
             PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = "1";
-            # nixpkgs' Playwright is not the npm one (package-lock.json), so its browser folders
-            # have other names. `npm run test:layout` launches this headless shell by path instead.
+            # nixpkgs' Playwright is not the one in pnpm-lock.yaml, so its browser folders
+            # have other names. `pnpm run test:layout` launches this headless shell by path instead.
             shellHook = ''
               for path in ${browsers}/chromium_headless_shell-*/chrome-headless-shell-*/chrome-headless-shell \
                 ${browsers}/chromium_headless_shell-*/chrome-linux/headless_shell; do

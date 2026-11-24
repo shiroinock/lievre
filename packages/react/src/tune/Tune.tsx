@@ -1,4 +1,4 @@
-// The wear tuning page (npm run wear:tune). Values change the live column at once; 保存 writes
+// The wear tuning page (pnpm run wear:tune). Values change the live column at once; 保存 writes
 // wear.config.json through the dev server, which regenerates the baked textures and fonts.
 import { useDeferredValue, useEffect, useMemo, useState, type CSSProperties } from 'react';
 import tokens from '@lievre/tokens/tokens.json';
@@ -440,12 +440,12 @@ export function Tune() {
 function SaveStatus({ status }: { status: Status }) {
   const text: Record<string, string> = {
     idle: '',
-    offline: '開発サーバーに接続できません。npm run wear:tune で開いてください。保存はできません。',
+    offline: '開発サーバーに接続できません。pnpm run wear:tune で開いてください。保存はできません。',
     saving: '保存しています…',
     running: '保存しました。フォントを焼き込んでいます（1分ほど）…',
     done: '保存し、画像とフォントを焼き込みました。',
     failed:
-      '保存しました。フォントの焼き込みは失敗しました。Python の環境がなければ、npm run wear:setup を実行してから、もう一度保存してください。',
+      '保存しました。フォントの焼き込みは失敗しました。Python の環境がなければ、pnpm run wear:setup を実行してから、もう一度保存してください。',
     rejected: '保存できませんでした。',
   };
   return (

@@ -1,4 +1,4 @@
-// `npm run wear:setup`: makes .venv-wear/ in the repo and installs the pinned modules from
+// `pnpm run wear:setup`: makes .venv-wear/ in the repo and installs the pinned modules from
 // scripts/wear/requirements.txt, with uv when it is on PATH and python3 -m venv + pip otherwise.
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';

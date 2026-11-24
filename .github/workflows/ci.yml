@@ -23,27 +23,31 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # The version comes from packageManager in package.json.
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
-          cache: npm
+          cache: pnpm
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       - name: 型の検査
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: lint（stylelint・ESLint）
-        run: npm run lint
+        run: pnpm run lint
 
       # Every workspace: tokens (node --test), react (jsdom), tui (renderToString and contrast).
       - name: テスト（tokens・react・tui）
-        run: npm test
+        run: pnpm test
 
       # The browser is keyed on the installed Playwright version, so it is only downloaded again
-      # when package-lock.json moves Playwright. npm installs it once, at the repository root.
+      # when pnpm-lock.yaml moves Playwright. It is a dependency of @lievre/react, so read it there.
       - name: Playwright の版を調べる
         id: playwright
+        working-directory: packages/react
         run: echo "version=$(node -p "require('playwright/package.json').version")" >> "$GITHUB_OUTPUT"
 
       - name: Playwright のブラウザをキャッシュから戻す
@@ -55,21 +59,21 @@ jobs:
 
       - name: Chromium を入れる
         if: steps.browsers.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: pnpm --filter @lievre/react exec playwright install --with-deps chromium
 
       - name: Chromium の依存ライブラリを入れる
         if: steps.browsers.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
+        run: pnpm --filter @lievre/react exec playwright install-deps chromium
 
       - name: 配置の検査（ブラウザ）
-        run: npm run test:layout
+        run: pnpm run test:layout
 
       - name: build（react の lib・デモ・Storybook、tui の lib）
         run: >-
-          npm run build:lib -w packages/react &&
-          npm run build:demo -w packages/react &&
-          npm run build:storybook -w packages/react &&
-          npm run build -w packages/tui
+          pnpm --filter @lievre/react run build:lib &&
+          pnpm --filter @lievre/react run build:demo &&
+          pnpm --filter @lievre/react run build:storybook &&
+          pnpm --filter @lievre/tui run build
 
-      - name: npm pack の中身
-        run: npm run check:pack -w packages/react
+      - name: pnpm pack の中身
+        run: pnpm --filter @lievre/react run check:pack

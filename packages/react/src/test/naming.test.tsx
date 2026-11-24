@@ -23,7 +23,8 @@ const ABOUT_OLD_NAMES: [RegExp, string][] = [
   ],
   [/^packages\/react\/src\/test\/naming\.test\.tsx$/, 'この検査そのもの'],
   [/^packages\/react\/bench\/agent\/results\//, 'ベンチマークの過去の結果。記録なので書き換えない'],
-  [/(^|\/)package-lock\.json$/, 'npm が書き出す。過去の版の解決が残る'],
+  [/(^|\/)pnpm-lock\.yaml$/, 'pnpm が書き出す。過去の版の解決が残る'],
+  [/(^|\/)package-lock\.json$/, 'npm が書き出す（spikes/ はまだ npm）。過去の版の解決が残る'],
 ];
 // Data gathered from outside (the Pinterest pins and their categories).
 const OUTSIDE_DATA = [/^references\/pinterest\//, /^references\/design-references\.json$/];

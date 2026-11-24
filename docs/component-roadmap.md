@@ -468,7 +468,7 @@ lievre の △：Field は TextField・Select・RadioGroup がそれぞれラベ
 
 ## 7. 実装の順番
 
-初版の第1段階（IconButton・Popover・DropdownMenu・ConfirmDialog・DescriptionList・VisuallyHidden・Spinner）は作り終えました。残りを、今ある部品のバリエーションと新しい部品を合わせて、次の段階で進めます。各段階は1つの PR にし、段階ごとに `npm run typecheck && npm run lint && npm test` と `npm run test:layout` を通してから次へ進みます。
+初版の第1段階（IconButton・Popover・DropdownMenu・ConfirmDialog・DescriptionList・VisuallyHidden・Spinner）は作り終えました。残りを、今ある部品のバリエーションと新しい部品を合わせて、次の段階で進めます。各段階は1つの PR にし、段階ごとに `pnpm run typecheck && pnpm run lint && pnpm test` と `pnpm run test:layout` を通してから次へ進みます。
 
 段階の番号は初版から付け直しました。[Combobox と DatePicker の土台](combobox-foundation.md) で「第2段階」と書いているのは、下の第5段階です。
 
@@ -505,7 +505,7 @@ lievre の △：Field は TextField・Select・RadioGroup がそれぞれラベ
 3. Textarea・TextField：文字数と上限（`maxCount`。上限を超えても入力は止めず、超えた数を言葉と記号で示す。読み上げは上限を一度と、入力が止まってから残りの数）、数え方（`countBy`。見た目の1文字か、全角を2と数えるか）
 4. Textarea の自動の高さ（`autoResize`。CSS の `field-sizing` で4行分から12行分まで。対応しないブラウザでは高さは決まったまま）
 
-Field で今の TextField・Select・RadioGroup を作り直すときは、配置の品質基準の CI（`npm run test:layout`）を通し、上の3点のほかは見た目が変わらないことを確かめます。
+Field で今の TextField・Select・RadioGroup を作り直すときは、配置の品質基準の CI（`pnpm run test:layout`）を通し、上の3点のほかは見た目が変わらないことを確かめます。
 
 ### 第3段階：操作と移動のバリエーション
 

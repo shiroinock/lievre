@@ -1,0 +1,15 @@
+# pnpm reads its own settings here; pnpm 11 and later read only auth and registry settings from
+# .npmrc.
+packages:
+  - packages/tokens
+  - packages/react
+  - packages/tui
+
+# Supply chain: install only versions published at least 3 days ago (in minutes).
+# Renovate waits 7 days for ordinary updates and 3 for security fixes.
+minimumReleaseAge: 4320
+
+# Lifecycle scripts of dependencies run only when listed true here. esbuild's postinstall only
+# checks the binary that its platform package already brings.
+allowBuilds:
+  esbuild: false

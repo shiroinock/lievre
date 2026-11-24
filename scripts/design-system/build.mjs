@@ -3,10 +3,10 @@
 // code, under <out>/project/. Nothing here talks to the artifact: an agent publishes the files
 // (AGENTS.md の「見本集（Design System）を更新する」).
 //
-//   npm run design-system                      (.design-system/ at the repository root)
-//   npm run design-system -- --out <dir>       (another folder)
-//   npm run design-system -- --skip-build      (reuse packages/react/lib from the last build:lib)
-//   npm run design-system -- --against <files.json>
+//   pnpm run design-system                      (.design-system/ at the repository root)
+//   pnpm run design-system --out <dir>       (another folder)
+//   pnpm run design-system --skip-build      (reuse packages/react/lib from the last build:lib)
+//   pnpm run design-system --against <files.json>
 //                                              (also list what changed since that files.json,
 //                                               the copy read back from the artifact)
 //
@@ -121,7 +121,7 @@ const dirty = git('status', '--porcelain', '--', 'packages', 'logo', 'scripts/de
 if (dirty) console.warn(`手元に未コミットの変更があります。内容は ${ref} と違うかもしれません。`);
 
 if (!opts['skip-build'] || !existsSync(`${REACT}/lib/lievre.js`)) {
-  execFileSync('npm', ['run', 'build:lib', '-w', 'packages/react'], {
+  execFileSync('pnpm', ['--filter', '@lievre/react', 'run', 'build:lib'], {
     cwd: ROOT,
     stdio: 'inherit',
   });

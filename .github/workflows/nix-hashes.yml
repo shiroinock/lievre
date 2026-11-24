@@ -1,9 +1,6 @@
-# Fails a PR when Nix cannot fetch what package-lock.json lists. flake.nix holds no npmDepsHash:
-# importNpmLock fetches each package by its integrity in the lockfile, so a lockfile Renovate
-# raised needs nothing else. This builds .#default.npmDeps on an empty store, which fetches every
-# package and checks its integrity, and catches a dependency Nix cannot fetch (a URL tarball the
-# flake does not handle yet). A hash that a later fixed-output derivation adds is caught too; fix
-# it with `nix run github:shiroinock/workflows#nix-hashes -- --fix .#default.npmDeps`.
+# Fails a PR when the hash of the pnpm deps in flake.nix no longer matches pnpm-lock.yaml (Renovate
+# raises the lockfile but not the hash). Fix it with
+# `nix run github:shiroinock/workflows#nix-hashes -- --fix .#default.pnpmDeps`.
 # The job lives in shiroinock/workflows; change it there, not here. Pinned to a commit that was
 # read, like the other workflows that call it; Renovate raises the SHA in all of them together.
 name: Nix のハッシュ
@@ -20,6 +17,6 @@ jobs:
     permissions:
       contents: read
     with:
-      # Only the npm deps: fetching them is enough, and quicker than the build.
-      installables: .#default.npmDeps
+      # Only the pnpm deps: fetching them is enough to compare the hash, and quicker than the build.
+      installables: .#default.pnpmDeps
       workflows_ref: 37d94d049d54bbd7c8453ad4929d8afbd9fed472

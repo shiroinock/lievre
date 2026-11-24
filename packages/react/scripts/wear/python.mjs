@@ -1,5 +1,5 @@
 // Which Python bakes the worn fonts: LIEVRE_WEAR_PYTHON, then the repo's .venv-wear (made by
-// `npm run wear:setup`), then python3 on PATH.
+// `pnpm run wear:setup`), then python3 on PATH.
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -12,7 +12,7 @@ export function wearPython() {
 }
 
 export const SETUP_HINT =
-  'npm run wear:setup を実行してください（.venv-wear/ に fontTools と brotli を入れます）。';
+  'pnpm run wear:setup を実行してください（.venv-wear/ に fontTools と brotli を入れます）。';
 
 // One line for the terminal and the tuning page when the modules (or Python itself) are missing.
 export function missingMessage(python) {
