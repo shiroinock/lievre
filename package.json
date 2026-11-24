@@ -7,7 +7,7 @@
     "storybook": "pnpm --filter @lievre/react run storybook",
     "typecheck": "pnpm -r --if-present run typecheck",
     "lint": "pnpm -r --if-present run lint",
-    "test": "node --test \"scripts/*.test.mjs\" && pnpm -r --if-present run test",
+    "test": "node --test \"scripts/*.test.mjs\" && pnpm -r --workspace-concurrency=1 --if-present run test",
     "test:layout": "pnpm --filter @lievre/react run test:layout",
     "build": "pnpm -r --if-present run build",
     "check:changelog": "node scripts/check-changelog.mjs",

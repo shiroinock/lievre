@@ -50,7 +50,6 @@
             };
             nativeBuildInputs = [
               pkgs.nodejs_24
-              pkgs.pnpm_12
               pnpm
               pkgs.pnpmConfigHook
             ]

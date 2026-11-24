@@ -105,7 +105,7 @@ CI（`.github/workflows/ci.yml`）が typecheck・lint・test・配置の検査�
 
 書き方は [changes/README.md](changes/README.md) と CHANGELOG.md の冒頭にあります。CHANGELOG.md の「未公開」には書きません。どの PR も同じ区分の末尾に1行足すと、並行する PR がほぼ必ず食い違うからです。テストや内部の整理だけで利用する側に見えないときは、PR の説明に「変更履歴：なし（理由）」の1行を書きます。書き忘れと「未公開」に足した行は `.github/workflows/changelog.yml` が止め、落ちたときのメッセージに貼れる断片が出ます。
 
-公開するときは `pnpm run changelog:release 0.3.0` で、断片と「未公開」の行を CHANGELOG.md の版の見出しの下にまとめ、断片を消します。package.json の版、タグ、`npm publish` は手で行います。
+公開するときは `pnpm run changelog:release 0.3.0` で、断片と「未公開」の行を CHANGELOG.md の版の見出しの下にまとめ、断片を消します。package.json の版、タグ、`pnpm -r publish --access public` は手で行います（`npm publish` では `workspace:*` が置き換わらない）。
 
 ### マージの予約
 
