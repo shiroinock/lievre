@@ -19,8 +19,8 @@ lievre のデザイン言語を端末に広げる部品です。描画には Ink
 `src/core` は Ink に依りません。描画の道具を替えるときは `src/ink` だけを書き直します。
 
 ```sh
-npm test -w packages/tui       # 描画（renderToString）とコントラスト
-npm run build -w packages/tui  # lib/ に書き出す
+pnpm --filter @lievre/tui test       # 描画（renderToString）とコントラスト
+pnpm --filter @lievre/tui run build  # lib/ に書き出す
 ```
 
 `test/tui.test.tsx` は、truecolor と 256色の色の組がそれぞれの基準（文字 4.5:1、部品と輪郭 3:1）に届くか、日本語を2セルに数えてカードの右端が揃うか、16色で面を塗らないか、色なしで色を出さないかを検査します。

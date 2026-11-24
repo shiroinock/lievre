@@ -1,5 +1,5 @@
 // Readability gauges for a wear config, shown on the tuning page and checked for the presets.
-// They estimate from the same values the build uses; the font check (npm run wear:font) and the
+// They estimate from the same values the build uses; the font check (pnpm run wear:font) and the
 // contrast tests are the hard limits.
 import {
   heldOutline,

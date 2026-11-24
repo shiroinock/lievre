@@ -11,7 +11,7 @@ lievre は、日本語の画面を読みやすく組み立てるための、作�
 
 ## トークン
 
-正は `packages/tokens/tokens.css` の `lievre.tokens` レイヤーです。`npm run tokens` で `packages/tokens/tokens.json` を書き出し、テストで両者が一致することを確認します。`@lievre/react` の `styles.css` は、この層を読み込んで1つのファイルにまとめて出します。
+正は `packages/tokens/tokens.css` の `lievre.tokens` レイヤーです。`pnpm run tokens` で `packages/tokens/tokens.json` を書き出し、テストで両者が一致することを確認します。`@lievre/react` の `styles.css` は、この層を読み込んで1つのファイルにまとめて出します。
 
 | 種類         | 主なトークン                                                  | 値                                                     |
 | ------------ | ------------------------------------------------------------- | ------------------------------------------------------ |
@@ -96,7 +96,7 @@ console.table(M.measureIcons()); // アイコンと1行目の中央のずれ
 console.table(M.audit()); // 背景か線のある箱のうち、上下か左右が2px以上ずれているもの
 ```
 
-CI では、すべての Story をこの基準で測ります（`npm run test:layout`）。基準の値と、宣言・既知の例外の扱いは [docs/quality-gate.md](docs/quality-gate.md) にあります。
+CI では、すべての Story をこの基準で測ります（`pnpm run test:layout`）。基準の値と、宣言・既知の例外の扱いは [docs/quality-gate.md](docs/quality-gate.md) にあります。
 
 ## 部品の構成
 

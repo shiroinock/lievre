@@ -2,8 +2,8 @@
 
 部品を追加・変更するときに満たす、配置の基準です。どれも数値で測れる形にしてあり、CI で検査します。
 
-- **実際の描画で測るもの**：`npm run test:layout`（`packages/react/src/test/layout`）。Vitest のブラウザモードと Playwright の Chromium で、すべての Story を描画して測ります。
-- **CSS から静的に分かるもの**：`npm run lint`（`packages/react/scripts/stylelint-lievre.mjs`）。
+- **実際の描画で測るもの**：`pnpm run test:layout`（`packages/react/src/test/layout`）。Vitest のブラウザモードと Playwright の Chromium で、すべての Story を描画して測ります。
+- **CSS から静的に分かるもの**：`pnpm run lint`（`packages/react/scripts/stylelint-lievre.mjs`）。
 
 基準の値は `packages/react/src/test/layout/declare.ts` の `CRITERIA` が正です。この文書と食い違ったら、どちらかを直してください。
 
@@ -94,7 +94,7 @@ padding: 0 12px 0 36px;
 
 ## 宣言のない部品は通さない
 
-`npm run test:layout` は、配置そのものに加えて次のことも検査します。
+`pnpm run test:layout` は、配置そのものに加えて次のことも検査します。
 
 1. `packages/react/src/stories` のすべての Story ファイルが、meta の `parameters.layoutGate` に「測る部品」か「測らない理由」を書いている。
 2. `packages/react/src/index.ts` から公開している部品（大文字で始まるもの）ごとに、`meta.component` にその部品を指定し、部品を測る Story がある。入れ物だけのもの（`LievreProvider` など）は `packages/react/src/test/layout/baseline.ts` の `NOT_A_PART` に理由付きで書く。

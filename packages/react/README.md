@@ -11,9 +11,9 @@ AI のコーディングエージェントで使うときは、まず [llms.txt]
 npm には公開していません。リポジトリの直下でパッケージを作って取り込みます。
 
 ```sh
-npm ci
-npm run build:lib -w packages/react
-npm pack -w packages/react
+pnpm install --frozen-lockfile
+pnpm --filter @lievre/react run build:lib
+pnpm --filter @lievre/react pack
 ```
 
 ```tsx

@@ -100,7 +100,7 @@ shadcn/ui、Radix Themes、MUI（v9）、Chakra UI（v3）、Mantine（v9）、G
 | 対照の T0 を引いた平均 |           14,294 |            8,406 | 10.2 → 4.2     | 45 → 24    | 3件 → 0件                   |
 
 - 対照の T0 は 51,679 トークン、道具の呼び出し2回でした。
-- 改善前の計測では、準備の誤りで利用側のアプリに `node_modules/.bin` がなく、`npm run typecheck` が環境の古い tsc を呼びました。各エージェントはローカルの tsc を直接呼んで確かめたため、道具の呼び出しが1〜2回多く出ています。それを引いても、呼び出しは半分程度に減っています。
+- 改善前の計測では、準備の誤りで利用側のアプリに `node_modules/.bin` がなく、`pnpm run typecheck` が環境の古い tsc を呼びました。各エージェントはローカルの tsc を直接呼んで確かめたため、道具の呼び出しが1〜2回多く出ています。それを引いても、呼び出しは半分程度に減っています。
 - 型の誤りは前後とも0回でした。どの解答も型検査を通り、課題の確認項目（ラベルとエラーの関連付け、全件を並べ替えてからのページ送り、単位の書体の分離、変化の向きを言葉で書くこと）を満たしていました。差が出たのは正しさではなく、確かめるために読む量です。
 - 改善前に「分からなかった」と報告されたこと：DataTable が渡した行だけを並べ替えること、Metric の `trend` が言葉を足さないこと、入力が `aria-describedby` を付けるか、RadioGroup が `fieldset` を使うか、`Space` の値、Dialog の `children` の役割。改善後はこれらを props の説明と `llms.txt` に書き、残った問いは「Toast の `tone` の既定値」「並べ替えの見出しを押したときの順序」「RadioGroup の名前の付き方」でした。この3つもこのブランチで説明を足しています。
 
@@ -154,22 +154,22 @@ shadcn/ui、Radix Themes、MUI（v9）、Chakra UI（v3）、Mantine（v9）、G
 
 効果は「誤りに気づけるようになる件数」と「読む量の減り方」、手間はこのリポジトリでの作業量の見積もりです。
 
-|  順 | 改善                                                                   | 効果                                                           | 手間   | 状態                    |
-| --: | ---------------------------------------------------------------------- | -------------------------------------------------------------- | ------ | ----------------------- |
-|   1 | 利用者向けの lint プラグインを配布する（`@lievre/react/lint`）         | 大：検出なしの6件のうち4件を編集時に止められる                 | 中     | 済（README の「lint」） |
-|   2 | 開発時の警告を足す                                                     | 中：LievreProvider の包み忘れなど、lint で見えない誤りを止める | 小〜中 | 提案                    |
-|   3 | 型の誤りのメッセージに、使える名前が出るようにする                     | 中：型で止まる誤りのうち4件が直せるようになる                  | 小     | 提案                    |
-|   4 | Claude Code の plugin（Skill）で配る                                   | 中：入口を探す手間がなくなり、レビューの観点も渡せる           | 小     | 提案                    |
-|   5 | Story から使い方の例を `llms.txt` に載せる                             | 中：T2 のように手順が要る課題で、例をそのまま使える            | 小     | 提案                    |
-|   6 | 部品が増えたら、索引と部品ごとの文書に分ける                           | 部品が増えたときの読む量                                       | 小     | 提案                    |
-|   7 | MCP サーバー（部品の一覧・props・約束を返す）                          | 小：今は `llms.txt` が 4.4k トークンで足りる                   | 中     | 提案                    |
-|   8 | `bench:agent` を CI で定期的に回し、点数の下落を止める                 | 退行の防止                                                     | 小     | 提案                    |
-|   — | 型から生成する `llms.txt`（パッケージに同梱、`npm test` で同期を検査） | 実測で読む量 41% 減、実装を読みに行く課題が 3件 → 0件          | 小     | このブランチ            |
-|   — | props の説明（ふるまい・既定値・取り違えやすい名前）                   | 上と同じ。エディタの補完にも出る                               | 小     | このブランチ            |
-|   — | `Text` の戻り値の型を明示し、`foundation.d.ts` を 21.8KB → 2.3KB に    | 型を読むときの量                                               | 小     | このブランチ            |
-|   — | Badge の文字を必須にする                                               | 色だけの状態表示を型で止める（1件）                            | 小     | このブランチ            |
-|   — | `useToast` の例外に包み方の例を書く                                    | 実行時のメッセージから直せる                                   | 小     | このブランチ            |
-|   — | `AGENTS.md`（このリポジトリで作業するエージェント向け）                | 確かめるコマンドと書き出しの手順が分かる                       | 小     | このブランチ            |
+|  順 | 改善                                                                    | 効果                                                           | 手間   | 状態                    |
+| --: | ----------------------------------------------------------------------- | -------------------------------------------------------------- | ------ | ----------------------- |
+|   1 | 利用者向けの lint プラグインを配布する（`@lievre/react/lint`）          | 大：検出なしの6件のうち4件を編集時に止められる                 | 中     | 済（README の「lint」） |
+|   2 | 開発時の警告を足す                                                      | 中：LievreProvider の包み忘れなど、lint で見えない誤りを止める | 小〜中 | 提案                    |
+|   3 | 型の誤りのメッセージに、使える名前が出るようにする                      | 中：型で止まる誤りのうち4件が直せるようになる                  | 小     | 提案                    |
+|   4 | Claude Code の plugin（Skill）で配る                                    | 中：入口を探す手間がなくなり、レビューの観点も渡せる           | 小     | 提案                    |
+|   5 | Story から使い方の例を `llms.txt` に載せる                              | 中：T2 のように手順が要る課題で、例をそのまま使える            | 小     | 提案                    |
+|   6 | 部品が増えたら、索引と部品ごとの文書に分ける                            | 部品が増えたときの読む量                                       | 小     | 提案                    |
+|   7 | MCP サーバー（部品の一覧・props・約束を返す）                           | 小：今は `llms.txt` が 4.4k トークンで足りる                   | 中     | 提案                    |
+|   8 | `bench:agent` を CI で定期的に回し、点数の下落を止める                  | 退行の防止                                                     | 小     | 提案                    |
+|   — | 型から生成する `llms.txt`（パッケージに同梱、`pnpm test` で同期を検査） | 実測で読む量 41% 減、実装を読みに行く課題が 3件 → 0件          | 小     | このブランチ            |
+|   — | props の説明（ふるまい・既定値・取り違えやすい名前）                    | 上と同じ。エディタの補完にも出る                               | 小     | このブランチ            |
+|   — | `Text` の戻り値の型を明示し、`foundation.d.ts` を 21.8KB → 2.3KB に     | 型を読むときの量                                               | 小     | このブランチ            |
+|   — | Badge の文字を必須にする                                                | 色だけの状態表示を型で止める（1件）                            | 小     | このブランチ            |
+|   — | `useToast` の例外に包み方の例を書く                                     | 実行時のメッセージから直せる                                   | 小     | このブランチ            |
+|   — | `AGENTS.md`（このリポジトリで作業するエージェント向け）                 | 確かめるコマンドと書き出しの手順が分かる                       | 小     | このブランチ            |
 
 ### 1. 利用者向けの ESLint プラグイン
 
@@ -201,13 +201,13 @@ shadcn/ui、Radix Themes、MUI（v9）、Chakra UI（v3）、Mantine（v9）、G
 - **使い方の例**：T2 の改善後の解答は、`llms.txt` にある並べ替えとページ送りの例をほぼそのまま使っていました。Story の play 関数のある例から、部品ごとに1つずつ抜き出して載せると効きます。
 - **索引への分割**：Mantine や Chakra は `llms.txt` を索引にして、本文を部品ごとに分けています。lievre の `llms.txt` が1万トークンを超えたら同じ形にします。
 - **MCP**：Primer の MCP は使い方とアクセシビリティの指針を返すツールを持っています。lievre では、部品が少ないうちは `llms.txt` を読むほうが安く、効果は小さいと見ています。
-- **CI**：`npm run bench:agent` は数秒で終わります。誤用の点数が下がったら止める検査にできます。
+- **CI**：`pnpm run bench:agent` は数秒で終わります。誤用の点数が下がったら止める検査にできます。
 
 ## 再実行の手順
 
 ```sh
-npm ci
-npm run bench:agent                                   # 誤用の検出と、lievre の読む量
+pnpm install --frozen-lockfile
+pnpm run bench:agent                                   # 誤用の検出と、lievre の読む量
 cd packages/react
 node bench/agent/context.mjs --external               # 他のシステムの文書も取得して数える
 node bench/agent/misuse.mjs --json out.json           # 結果を JSON で残す
@@ -217,15 +217,15 @@ node bench/agent/misuse.mjs --json out.json           # 結果を JSON で残す
 
 ```sh
 git worktree add ../../../lievre-main main
-cd ../../../lievre-main && npm ci && npm run build:lib -w packages/react && cd -
+cd ../../../lievre-main && pnpm install --frozen-lockfile && pnpm --filter @lievre/react run build:lib && cd -
 node bench/agent/misuse.mjs --root ../../../lievre-main/packages/react
 node bench/agent/context.mjs --root ../../../lievre-main/packages/react
 ```
 
 エージェントの実測は手作業です。
 
-1. リポジトリの直下で `npm run build:lib -w packages/react && npm pack -w packages/react` を実行し、パッケージを作る。
-2. 課題ごとに空の利用側アプリを作り、パッケージ・react・react-dom・typescript を入れる（`npm run typecheck` が `tsc --noEmit` を呼べること）。`src/App.tsx` は LievreProvider と ToastProvider で包むだけ。
+1. リポジトリの直下で `pnpm --filter @lievre/react run build:lib && pnpm --filter @lievre/react pack` を実行し、パッケージを作る。
+2. 課題ごとに空の利用側アプリを作り、パッケージ・react・react-dom・typescript を入れる（`pnpm run typecheck` が `tsc --noEmit` を呼べること）。`src/App.tsx` は LievreProvider と ToastProvider で包むだけ。
 3. [agent-prompt.md](../packages/react/bench/agent/agent-prompt.md) に課題の節を入れてサブエージェントに渡す。同じモデルで、対照の T0（何も調べずに1行書く）も1回解かせる。
 4. 合計トークン・道具の呼び出し・時間・読んだファイルを [results/agent-runs.json](../packages/react/bench/agent/results/agent-runs.json) の形で残し、解答が型検査を通り、課題の確認項目を満たすかを見る。
 

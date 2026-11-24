@@ -1,7 +1,7 @@
 /*
  * lievre tokens 0.2
  * The source of truth for every --lv-* token. @lievre/react reads this file into
- * styles.css; `npm run tokens` writes tokens.json from it.
+ * styles.css; `pnpm run tokens` writes tokens.json from it.
  */
 @layer lievre.tokens {
   .lievre {

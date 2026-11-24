@@ -23,7 +23,7 @@
     "react": ">=19.3.0"
   },
   "dependencies": {
-    "@lievre/tokens": "0.2.0",
+    "@lievre/tokens": "workspace:*",
     "cli-boxes": "^4.0.1",
     "ink": "8.0.0",
     "string-width": "^8.3.0"

@@ -1,6 +1,6 @@
 # 変更履歴の断片
 
-利用する側に見える変更をする PR は、ここに断片を1つ足します。公開するときに `npm run changelog:release -- <版>` が、断片を [CHANGELOG.md](../CHANGELOG.md) の版の見出しの下にまとめ、断片を消します。
+利用する側に見える変更をする PR は、ここに断片を1つ足します。公開するときに `pnpm run changelog:release <版>` が、断片を [CHANGELOG.md](../CHANGELOG.md) の版の見出しの下にまとめ、断片を消します。
 
 ## 名前
 
@@ -33,4 +33,4 @@ CHANGELOG.md と同じ見出しで書きます。
 - 項目：`- ` で始めて1つに1つ、利用する側の言葉で書き、末尾に PR の番号を付けます（例：`（#6）`）。長いときは、続きの行を2文字下げます。
 - `<!-- -->` のコメントは読みません。
 
-`npm run check:changelog` が、書き忘れと書き方を確かめます。まとめたときの並びは、`npm run changelog:release -- 0.3.0 --dry-run` で書き込まずに見られます。
+`pnpm run check:changelog` が、書き忘れと書き方を確かめます。まとめたときの並びは、`pnpm run changelog:release 0.3.0 --dry-run` で書き込まずに見られます。

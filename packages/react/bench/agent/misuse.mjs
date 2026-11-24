@@ -1,7 +1,7 @@
 // Which layer catches each likely mistake, and whether its message says how to fix it.
 // Cases are compiled as a consumer app would see lievre: through the built package (lib/).
-//   npm run build:lib && node bench/agent/misuse.mjs [--root <checkout>] [--json out.json]
-// --root measures another checkout (for example main, after `npm run build:lib` there).
+//   pnpm run build:lib && node bench/agent/misuse.mjs [--root <checkout>] [--json out.json]
+// --root measures another checkout (for example main, after `pnpm run build:lib` there).
 import { mkdirSync, rmSync, symlinkSync, writeFileSync, existsSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -16,7 +16,7 @@ const root = resolve(
   rootArg > 0 ? process.argv[rootArg + 1] : join(dirname(fileURLToPath(import.meta.url)), '../..'),
 );
 if (!existsSync(join(root, 'lib/index.d.ts'))) {
-  console.error('lib/ がありません。先に npm run build:lib を実行してください。');
+  console.error('lib/ がありません。先に pnpm run build:lib を実行してください。');
   process.exit(1);
 }
 

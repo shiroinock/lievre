@@ -1,5 +1,5 @@
-// Bakes worn glyphs from wear.config.json (salt and outline): `npm run wear:font`.
-// Needs Python 3 with fontTools and brotli (`npm run wear:setup`). Results are cached per salt and strength under
+// Bakes worn glyphs from wear.config.json (salt and outline): `pnpm run wear:font`.
+// Needs Python 3 with fontTools and brotli (`pnpm run wear:setup`). Results are cached per salt and strength under
 // wear-fonts/; wear-fonts/fonts.css always points at the current values, and wear-fonts/current.json
 // records them so src/test/wear.test.tsx can tell when the fonts are out of date.
 import { execFileSync } from 'node:child_process';

@@ -2,12 +2,12 @@
 // Gathers the fragments in changes/ and what is left under 「## 未公開」 into a release of
 // CHANGELOG.md, then deletes the fragments.
 //
-//   npm run changelog:release -- 0.3.0                    (dated today)
-//   npm run changelog:release -- 0.3.0 --date 2026-12-01
-//   npm run changelog:release -- 0.3.0 --dry-run          (prints the release, writes nothing)
+//   pnpm run changelog:release 0.3.0                    (dated today)
+//   pnpm run changelog:release 0.3.0 --date 2026-12-01
+//   pnpm run changelog:release 0.3.0 --dry-run          (prints the release, writes nothing)
 //
 // It only writes CHANGELOG.md and deletes the fragments; the versions in package.json, the tag and
-// npm publish stay by hand.
+// pnpm publish stay by hand.
 import { readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import {
@@ -103,7 +103,7 @@ function main(args) {
     result = release({ changelog: readFileSync(file, 'utf8'), fragments, version, date });
   } catch (error) {
     console.error(error.message);
-    console.error('\n使い方：npm run changelog:release -- 0.3.0 [--date 2026-12-01] [--dry-run]');
+    console.error('\n使い方：pnpm run changelog:release 0.3.0 [--date 2026-12-01] [--dry-run]');
     process.exit(1);
   }
   if (dryRun) {

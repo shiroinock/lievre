@@ -25,7 +25,7 @@ import { LievreProvider, Dialog, Button } from '../index';
 describe('Wear: seeded and reproducible', () => {
   const config = readConfig();
   it('keeps src/styles/wear identical to what wear.config.json generates', () => {
-    // Run `npm run wear` after changing wear.config.json, the generator or the text kinds.
+    // Run `pnpm run wear` after changing wear.config.json, the generator or the text kinds.
     const meta = JSON.parse(readFileSync('src/styles/wear/wear.json', 'utf8'));
     const built = buildWear(config, tokens);
     expect(meta.config).toEqual(config);
@@ -39,7 +39,7 @@ describe('Wear: seeded and reproducible', () => {
   it.runIf(existsSync('wear-fonts/current.json'))(
     'keeps the worn fonts in step with wear.config.json',
     () => {
-      // Run `npm run wear:font` after changing the salt or the outline.
+      // Run `pnpm run wear:font` after changing the salt or the outline.
       const fonts = JSON.parse(readFileSync('wear-fonts/current.json', 'utf8'));
       expect({ salt: fonts.salt, outline: fonts.outline }).toEqual({
         salt: config.salt,
@@ -165,7 +165,7 @@ describe('Wear: what it may touch', () => {
       'border-radius',
       'background',
       'clip-path',
-      // Worn faces keep every advance width (checked by npm run wear:font), so text does not move.
+      // Worn faces keep every advance width (checked by pnpm run wear:font), so text does not move.
       'font-family',
       '--lv-font-mono',
       // The sheet: the root's ::before and ::after are fixed (or absolute) behind the content, and

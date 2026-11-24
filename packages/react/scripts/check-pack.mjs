@@ -1,15 +1,22 @@
-// Checks what `npm pack` puts in the package: `npm run check:pack` after `npm run build:lib`.
+// Checks what `pnpm pack` puts in the package: `pnpm run check:pack` after `pnpm run build:lib`.
 // The package must stand alone for apps: everything the exports point at, and nothing from src/.
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'));
-const out = execFileSync('npm', ['pack', '--dry-run', '--json'], {
-  encoding: 'utf8',
-  stdio: ['ignore', 'pipe', 'inherit'],
-});
-// prepack and postpack print their own lines before and after the JSON.
-const [{ files }] = JSON.parse(out.slice(out.indexOf('\n[') + 1, out.lastIndexOf(']') + 1));
+// prepack copies these in; a dry run does not run postpack, so take away what it left.
+const copied = ['DESIGN.md', 'MIGRATION.md'].filter((path) => !existsSync(path));
+let out;
+try {
+  out = execFileSync('pnpm', ['pack', '--dry-run', '--json'], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'inherit'],
+  });
+} finally {
+  for (const path of copied) rmSync(path, { force: true });
+}
+// prepack prints its own lines before the JSON.
+const { files } = JSON.parse(out.slice(out.indexOf('\n{') + 1, out.lastIndexOf('}') + 1));
 const packed = new Set(files.map((f) => f.path));
 
 const targets = (value) =>
@@ -36,8 +43,8 @@ if (![...packed].some((path) => path.startsWith('lint/biome/')))
 
 if (problems.length) {
   console.error(
-    `npm pack の中身に問題があります（先に npm run build:lib を実行してください）。\n${problems.join('\n')}`,
+    `pnpm pack の中身に問題があります（先に pnpm run build:lib を実行してください）。\n${problems.join('\n')}`,
   );
   process.exit(1);
 }
-console.log(`npm pack: ${packed.size} files, ${required.length} required entries present`);
+console.log(`pnpm pack: ${packed.size} files, ${required.length} required entries present`);

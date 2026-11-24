@@ -1,5 +1,5 @@
 /*
- * The plain face the worn mono is made from (npm run wear:font): IBM Plex Mono's Latin at 5/6
+ * The plain face the worn mono is made from (pnpm run wear:font): IBM Plex Mono's Latin at 5/6
  * size, so a letter is half a Japanese one. lievre itself draws mono text in Lievre Term JP now;
  * this page keeps the old 'Lievre Mono' only to compare the worn copy with its source.
  */

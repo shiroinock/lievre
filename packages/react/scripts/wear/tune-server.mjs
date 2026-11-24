@@ -1,4 +1,4 @@
-// Dev-server endpoints for the wear tuning page (npm run wear:tune). Only `vite` serve loads this,
+// Dev-server endpoints for the wear tuning page (pnpm run wear:tune). Only `vite` serve loads this,
 // and it answers only requests from this machine, so nothing in a build can write the config.
 //   GET  /__lievre-wear/config  the saved wear.config.json
 //   POST /__lievre-wear/config  save values, regenerate src/styles/wear/ and start the font build

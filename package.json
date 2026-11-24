@@ -2,30 +2,25 @@
   "name": "lievre",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "packages/tokens",
-    "packages/react",
-    "packages/tui"
-  ],
   "scripts": {
-    "dev": "npm run dev -w packages/react",
-    "storybook": "npm run storybook -w packages/react",
-    "typecheck": "npm run typecheck --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "test": "node --test \"scripts/*.test.mjs\" && npm run test --workspaces --if-present",
-    "test:layout": "npm run test:layout -w packages/react",
-    "build": "npm run build --workspaces --if-present",
+    "dev": "pnpm --filter @lievre/react run dev",
+    "storybook": "pnpm --filter @lievre/react run storybook",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "lint": "pnpm -r --if-present run lint",
+    "test": "node --test \"scripts/*.test.mjs\" && pnpm -r --if-present run test",
+    "test:layout": "pnpm --filter @lievre/react run test:layout",
+    "build": "pnpm -r --if-present run build",
     "check:changelog": "node scripts/check-changelog.mjs",
     "changelog:release": "node scripts/changelog-release.mjs",
     "check:overlap": "node scripts/check-overlap.mjs",
     "format": "prettier --write .",
-    "tokens": "npm run tokens -w packages/tokens",
-    "llms": "npm run llms -w packages/react",
-    "wear": "npm run wear -w packages/react",
-    "wear:font": "npm run wear:font -w packages/react",
-    "wear:setup": "npm run wear:setup -w packages/react",
-    "wear:tune": "npm run wear:tune -w packages/react",
-    "bench:agent": "npm run bench:agent -w packages/react",
+    "tokens": "pnpm --filter @lievre/tokens run tokens",
+    "llms": "pnpm --filter @lievre/react run llms",
+    "wear": "pnpm --filter @lievre/react run wear",
+    "wear:font": "pnpm --filter @lievre/react run wear:font",
+    "wear:setup": "pnpm --filter @lievre/react run wear:setup",
+    "wear:tune": "pnpm --filter @lievre/react run wear:tune",
+    "bench:agent": "pnpm --filter @lievre/react run bench:agent",
     "design-system": "node scripts/design-system/build.mjs"
   },
   "devDependencies": {
@@ -33,5 +28,6 @@
   },
   "engines": {
     "node": ">=24.15"
-  }
+  },
+  "packageManager": "pnpm@12.21.0"
 }

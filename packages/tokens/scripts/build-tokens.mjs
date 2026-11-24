@@ -1,5 +1,5 @@
 // Generates tokens.json from the token layer in tokens.css.
-// tokens.css is the source of truth; run `npm run tokens` after editing it.
+// tokens.css is the source of truth; run `pnpm run tokens` after editing it.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 

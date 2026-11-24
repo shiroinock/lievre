@@ -1,6 +1,6 @@
 # lievre（@lievre/react）
 
-> 日本語の画面のための React 部品と CSS トークン（作者個人の実験的なデザインシステム。WCAG 2.x AA は守る）。この文書だけで部品を使えるように、使い方の約束と全部品の API をまとめています。後半の「部品」以降は `npm run llms` で型から生成しています。
+> 日本語の画面のための React 部品と CSS トークン（作者個人の実験的なデザインシステム。WCAG 2.x AA は守る）。この文書だけで部品を使えるように、使い方の約束と全部品の API をまとめています。後半の「部品」以降は `pnpm run llms` で型から生成しています。
 
 ## 始め方
 
@@ -101,8 +101,8 @@ import '@lievre/react/styles.css';
 `lv-family-mono` はその要素の中だけで、ポータルに出る部品と入れ子の LievreProvider には届きません。
 - `wear?: Wear` — 試作：質感の段階。既定は off。
 - `wearSeed?: string` — 試作：live の模様を決めるソルト。既定は wear.config.json のソルトで、baked と同じ模様になります。
-baked はビルド時の値（npm run wear）で決まります。
-- `wearConfig?: WearConfig` — 試作：live の強さ。既定は wear.config.json の値。調整の画面（npm run wear:tune）が使います。
+baked はビルド時の値（pnpm run wear）で決まります。
+- `wearConfig?: WearConfig` — 試作：live の強さ。既定は wear.config.json の値。調整の画面（pnpm run wear:tune）が使います。
 - `age?: Age` — 試作：経年。none（既定）・light・heavy。褪色・インクのむら・罫線のかすれ・角の欠けを
 部品に渡します。入れ子にでき、質感（wear）とは別に効きます。状態（フォーカス・選択・エラー・無効）には
 かけません。強いコントラストを求める設定と強制カラーモードでは none になります。

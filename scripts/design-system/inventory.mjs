@@ -1,5 +1,5 @@
 // The design system's inventory: which exports of @lievre/react get a card in the Design System
-// artifact, read from the TypeScript sources so it follows src/index.ts. `npm test`
+// artifact, read from the TypeScript sources so it follows src/index.ts. `pnpm test`
 // (scripts/design-system.test.mjs) fails when an export has neither a card nor a reason below.
 import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';

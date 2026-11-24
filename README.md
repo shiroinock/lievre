@@ -6,7 +6,7 @@
 
 日本語の画面を読みやすく組み立てるためのデザインシステムです。作者個人の実験的なデザインシステムで、特定の用途に絞らず、質感や経年のような表現も試しています。どの試みでも、WCAG 2.x AA などの Web 標準の基準は守ります。設計の考え方は [DESIGN.md](DESIGN.md) にまとめています。
 
-このリポジトリは npm のワークスペースで、同じデザイン言語のパッケージを3つ持っています。
+このリポジトリは pnpm のワークスペースで、同じデザイン言語のパッケージを3つ持っています。
 
 | パッケージ                          | 場所              | 内容                                                                     |
 | ----------------------------------- | ----------------- | ------------------------------------------------------------------------ |
@@ -20,26 +20,26 @@
 
 ## 起動
 
-Node.js 24.15 以降が必要です。コマンドはすべてリポジトリの直下で実行します。
+Node.js 24.15 以降と pnpm が必要です（版は `package.json` の `packageManager`。corepack か pnpm 自身が合わせます）。コマンドはすべてリポジトリの直下で実行します。
 
 ```sh
-npm ci
-npm run storybook   # http://127.0.0.1:6006
-npm run dev         # 概要のデモ http://127.0.0.1:5173
+pnpm install --frozen-lockfile
+pnpm run storybook   # http://127.0.0.1:6006
+pnpm run dev         # 概要のデモ http://127.0.0.1:5173
 ```
 
-`.npmrc` の `legacy-peer-deps=true` は、npm が optional peer を解決するときに出る `edgesOut` エラーを避けるための設定です。
+pnpm の設定は `pnpm-workspace.yaml` にあります。公開から 3 日たっていない版は入れません（`minimumReleaseAge`）。
 
 ### Nix で使う
 
 Nix（flakes を有効にしたもの）があれば、Node.js などを別に入れなくても始められます。nixpkgs は `nixpkgs-unstable` を `flake.lock` で固定しています。対応する system は `aarch64-darwin`・`x86_64-linux`・`aarch64-linux` です（x86_64-darwin は nixpkgs 26.11 でサポートが終わったので外しています）。
 
 ```sh
-nix develop         # Node.js 24、npm、Chromium（Playwright 用）、fontTools と brotli 入りの Python
-npm ci
+nix develop         # Node.js 24、pnpm、Chromium（Playwright 用）、fontTools と brotli 入りの Python
+pnpm install --frozen-lockfile
 ```
 
-`nix develop` の中では、`npm run test:layout` は nixpkgs の Chromium（headless shell）を使うので、`npx playwright install` は要りません。経年の書体を焼く Python も用意されるので、`npm run wear:setup` も要りません。`.envrc` に `use flake` を書いてあるので、direnv を入れれば、フォルダに入ったときに自動で同じ環境になります。
+`nix develop` の中では、`pnpm run test:layout` は nixpkgs の Chromium（headless shell）を使うので、`pnpm exec playwright install` は要りません。経年の書体を焼く Python も用意されるので、`pnpm run wear:setup` も要りません。`.envrc` に `use flake` を書いてあるので、direnv を入れれば、フォルダに入ったときに自動で同じ環境になります。
 
 ビルドと `lievre-migrate`（[MIGRATION.md](MIGRATION.md)）は、手元に clone しなくても動かせます。`lievre-migrate` は引数のフォルダ（省くと今のフォルダ）を書き換えるので、先に `--dry-run` で確かめてください。
 
@@ -51,7 +51,7 @@ nix build .#storybook                               # result/ に Storybook（.#
 nix fmt                                             # flake.nix を整える
 ```
 
-Nix は npm の依存を `package-lock.json` の `integrity` で取ってくるので（`importNpmLock`）、`package-lock.json` を変えても `flake.nix` を直す必要はありません。Nix で取ってこられない依存が入った PR は、CI の「Nix のハッシュ」が止めます。
+Nix は依存を `pnpm-lock.yaml` から `fetchPnpmDeps` で取り、その中身のハッシュを `flake.nix` に書いています。`pnpm-lock.yaml` を変えたら、`nix run github:shiroinock/workflows#nix-hashes -- --fix .#default.pnpmDeps` でハッシュを合わせます。ずれたままの PR は、CI の「Nix のハッシュ」が止めます。
 
 ## 構成
 
@@ -75,25 +75,25 @@ Nix は npm の依存を `package-lock.json` の `integrity` で取ってくる�
 ## 開発
 
 ```sh
-npm run typecheck   # 各パッケージの tsc
-npm run lint        # stylelint の lievre 独自ルール（packages/react/scripts/stylelint-lievre.mjs）と、使う側向けのルール（lint/）を Story と画面例に
-npm test            # tokens の同期、react の部品・画面フロー・axe・コントラスト、tui の描画とコントラスト
-npm run test:layout # 配置の基準をブラウザで測る（docs/quality-gate.md、初回は npx playwright install chromium）
-npm run tokens      # tokens.css を変更したら tokens.json を書き出す
-npm run llms        # 部品の props や説明を変えたら llms.txt を書き出す
-npm run bench:agent # エージェント向けのベンチマーク（docs/agent-benchmark.md）
-npm run format
-npm run build       # react の lib/・dist/・dist/storybook/ と tui の lib/
+pnpm run typecheck   # 各パッケージの tsc
+pnpm run lint        # stylelint の lievre 独自ルール（packages/react/scripts/stylelint-lievre.mjs）と、使う側向けのルール（lint/）を Story と画面例に
+pnpm test            # tokens の同期、react の部品・画面フロー・axe・コントラスト、tui の描画とコントラスト
+pnpm run test:layout # 配置の基準をブラウザで測る（docs/quality-gate.md、初回は pnpm exec playwright install chromium）
+pnpm run tokens      # tokens.css を変更したら tokens.json を書き出す
+pnpm run llms        # 部品の props や説明を変えたら llms.txt を書き出す
+pnpm run bench:agent # エージェント向けのベンチマーク（docs/agent-benchmark.md）
+pnpm run format
+pnpm run build       # react の lib/・dist/・dist/storybook/ と tui の lib/
 ```
 
-1つのパッケージだけで流すときは、`npm test -w packages/tui` のように `-w` を付けます。
+1つのパッケージだけで流すときは、`pnpm --filter @lievre/tui test` のように `--filter` を付けます。
 
-質感の試作（[references/wear-prototype.md](references/wear-prototype.md)）の強さを調整するときは、はじめに一度だけ `npm run wear:setup` を実行します（`nix develop` の中では要りません）。`packages/react/.venv-wear/` に、フォントを焼くための fontTools と brotli を入れます。
+質感の試作（[references/wear-prototype.md](references/wear-prototype.md)）の強さを調整するときは、はじめに一度だけ `pnpm run wear:setup` を実行します（`nix develop` の中では要りません）。`packages/react/.venv-wear/` に、フォントを焼くための fontTools と brotli を入れます。
 
 ```sh
-npm run wear:setup  # .venv-wear/ を作る（uv があれば uv、なければ python3 -m venv と pip）
-npm run wear:tune   # 調整の画面を開く
-npm run wear:font   # wear.config.json の値でフォントを焼く
+pnpm run wear:setup  # .venv-wear/ を作る（uv があれば uv、なければ python3 -m venv と pip）
+pnpm run wear:tune   # 調整の画面を開く
+pnpm run wear:font   # wear.config.json の値でフォントを焼く
 ```
 
 部品を追加するときの手順は [CONTRIBUTING.md](CONTRIBUTING.md) にあります。
@@ -105,9 +105,9 @@ jsdom では色のコントラストを測れないため、トークンの組�
 まだ npm には公開していません（どのパッケージも `private: true`）。公開するときは次の順にします。依存を増やさないため、changesets などの道具は入れません。
 
 1. 公開するパッケージの `private: true` を外す。`@lievre/react` は `styles.css` と `tokens.json` にトークンを焼き込んでいるので、`@lievre/tokens` を入れなくても使える。`@lievre/tui` は `@lievre/tokens` に依存するので、tokens も一緒に公開する。
-2. 3つの版を揃えて上げる：`npm version <版> -w packages/tokens -w packages/react -w packages/tui`。`packages/react/lint/index.js` の `meta.version` も同じ値にする（テストが止める）。
-3. 中身を確かめる：`npm run build`、`npm run check:pack -w packages/react`。`npm pack -w packages/react` で作った物を、別のプロジェクトに入れて試す。
-4. 公開する：`npm publish -w packages/tokens -w packages/react -w packages/tui --access public`。
+2. 3つの版を揃えて上げる：`pnpm -r exec npm version <版> --no-git-tag-version`。`packages/react/lint/index.js` の `meta.version` も同じ値にする（テストが止める）。
+3. 中身を確かめる：`pnpm run build`、`pnpm --filter @lievre/react run check:pack`。`pnpm --filter @lievre/react pack` で作った物を、別のプロジェクトに入れて試す。
+4. 公開する：`pnpm -r publish --access public`（`workspace:*` の依存は、そのときの版に置き換わる）。
 
 `DESIGN.md` はリポジトリの直下にあり、`@lievre/react` の `prepack` がパッケージへ写し、`postpack` が消します。
 

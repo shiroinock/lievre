@@ -1,4 +1,4 @@
-// The wear settings in force: wear.config.json (written by the tuning page, npm run wear:tune),
+// The wear settings in force: wear.config.json (written by the tuning page, pnpm run wear:tune),
 // filled out from the standard preset. Shared by the baked textures, the live provider and the
 // contrast tests, so raising a value that breaks 4.5:1 fails src/test/contrast.test.tsx.
 import saved from '../../wear.config.json' with { type: 'json' };
