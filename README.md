@@ -51,7 +51,7 @@ nix build .#storybook                               # result/ に Storybook（.#
 nix fmt                                             # flake.nix を整える
 ```
 
-`package-lock.json` を変えたら、`flake.nix` の `npmDepsHash` も合わせます。`nix run github:shiroinock/workflows#nix-hashes -- --fix .#default.npmDeps` で書き換わります。ずれたままの PR は、CI の「Nix のハッシュ」が止めます。
+Nix は npm の依存を `package-lock.json` の `integrity` で取ってくるので（`importNpmLock`）、`package-lock.json` を変えても `flake.nix` を直す必要はありません。Nix で取ってこられない依存が入った PR は、CI の「Nix のハッシュ」が止めます。
 
 ## 構成
 
