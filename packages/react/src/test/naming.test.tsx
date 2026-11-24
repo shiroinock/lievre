@@ -37,6 +37,7 @@ const OLD_NAMES: [RegExp, string][] = [
   [/(?<![\w$@/-])k-[a-z$]/, 'クラスの頭 k- は lv- に'],
   [/\.k-/, 'クラスの頭 .k- は .lv- に'],
   [/--k-[a-z]/, 'CSS 変数の頭 --k- は --lv- に'],
+  [/@lievre-design(?![\w-])/, 'パッケージの置き場所 @lievre-design は @lievre に'],
 ];
 
 const text = (file: string) => {
