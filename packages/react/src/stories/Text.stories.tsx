@@ -40,3 +40,13 @@ export const Weights: Story = {
     </div>
   ),
 };
+/** 日本語も含めて等幅。英数字 1 対日本語 2 の幅で桁がそろいます（コマンドの出力・ログ）。 */
+export const Mono: Story = {
+  render: () => (
+    <div style={{ display: 'grid', gap: 4 }}>
+      <Text mono>$ npm run build</Text>
+      <Text mono>書き出し 12 件　失敗 0 件</Text>
+      <Text mono>経過 00:01:42　完了しました</Text>
+    </div>
+  ),
+};

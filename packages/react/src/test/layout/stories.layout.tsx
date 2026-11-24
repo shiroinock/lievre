@@ -1,4 +1,5 @@
-// The layout gate: every story, in every theme × density × typography, measured in a real browser.
+// The layout gate: every story, in every theme × density × typography (and two monospace screens),
+// measured in a real browser.
 // A part that misses a criterion fails here unless it is listed in baseline.ts with a reason.
 import { describe, it, beforeAll } from 'vitest';
 import { composeStories, setProjectAnnotations } from '@storybook/react';
@@ -21,13 +22,24 @@ const files = Object.entries(
   import.meta.glob<StoryModule>('../../stories/*.stories.tsx', { eager: true }),
 ).map(([path, module]) => ({ file: `src/stories/${path.split('/').pop()}`, module }));
 
-const COMBOS: Combo[] = (['paper', 'ink'] as const).flatMap((theme) =>
-  (['comfortable', 'compact'] as const).flatMap((density) =>
-    (['standard', 'interface'] as const).map((typography) => ({ theme, density, typography })),
+// Monospace screens (family="mono") are measured at the two ends: Paper, comfortable, 16px and
+// Ink, compact, 14px (the 14px body floors at 14.4px there).
+const COMBOS: Combo[] = [
+  ...(['paper', 'ink'] as const).flatMap((theme) =>
+    (['comfortable', 'compact'] as const).flatMap((density) =>
+      (['standard', 'interface'] as const).map((typography) => ({
+        theme,
+        density,
+        typography,
+        family: 'sans' as const,
+      })),
+    ),
   ),
-);
+  { theme: 'paper', density: 'comfortable', typography: 'standard', family: 'mono' },
+  { theme: 'ink', density: 'compact', typography: 'interface', family: 'mono' },
+];
 const comboLabel = (c: Combo) =>
-  `${c.theme === 'paper' ? 'Paper' : 'Ink'}・${c.density === 'comfortable' ? '標準の密度' : '高密度'}・${c.typography === 'standard' ? '本文16px' : '本文14px'}`;
+  `${c.theme === 'paper' ? 'Paper' : 'Ink'}・${c.density === 'comfortable' ? '標準の密度' : '高密度'}・${c.typography === 'standard' ? '本文16px' : '本文14px'}${c.family === 'mono' ? '・等幅' : ''}`;
 
 const usedBaseline = new Set<number>();
 const foundParts = new Map<string, number>();

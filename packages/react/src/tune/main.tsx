@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import '../styles/fonts.css';
+import './plain-mono.css';
 import '../styles/lievre.css';
 import '../styles/lievre-wear.css';
 import './tune.css';

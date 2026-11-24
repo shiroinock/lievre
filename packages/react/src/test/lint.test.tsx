@@ -15,30 +15,12 @@ async function tsxMessages(code: string) {
   return result.messages.map((m) => m.ruleId);
 }
 
-const face = (weight: number, range = 'U+0000-00FF') => `@font-face {
-  font-family: 'Lievre Mono';
-  font-weight: ${weight};
-  unicode-range: ${range};
-}`;
-const allFaces = [400, 500, 600].map((w) => face(w)).join('\n');
-
 describe('stylelint: lievre rules', () => {
   it('rejects sizes in the utilities layer', async () => {
     expect(await cssRules('@layer lievre.utilities { .lv-mono { font-size: 1em; } }')).toContain(
       'lievre/utilities-no-size',
     );
     expect(await cssRules('@layer lievre.base { .lv-mono { font-size: 1em; } }')).toEqual([]);
-  });
-
-  it('rejects full-width punctuation in the Lievre Mono range', async () => {
-    const css = allFaces + face(400, 'U+2000-206F');
-    expect(await cssRules(css)).toContain('lievre/mono-unicode-range');
-    expect(await cssRules(allFaces + face(400, 'U+2010-2011'))).toEqual([]);
-  });
-
-  it('requires a Lievre Mono face for every weight token', async () => {
-    expect(await cssRules(face(400) + face(500))).toContain('lievre/mono-weights');
-    expect(await cssRules(allFaces)).toEqual([]);
   });
 
   it('requires forced-colors styles for states shown by a background', async () => {

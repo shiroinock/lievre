@@ -33,7 +33,7 @@ export const App = () => (
 .kei .k-card, .kei-portal { padding: var(--k-panel-padding); font-family: 'KEI Mono'; }`;
     expect(migrate(before, names))
       .toBe(`@layer reset, lievre.tokens, lievre.base, lievre.components, lievre.utilities;
-.lievre .lv-card, .lievre-portal { padding: var(--lv-panel-padding); font-family: 'Lievre Mono'; }`);
+.lievre .lv-card, .lievre-portal { padding: var(--lv-panel-padding); font-family: 'Lievre Term JP'; }`);
   });
 
   it('rewrites the lint settings for ESLint, Oxlint and Biome', () => {
@@ -76,7 +76,7 @@ export const other = [{ plugins: { lievre: plugin } }];`);
       `<div className="lievre tag" /><div class='a lievre' />`,
     );
     expect(migrate(`font-family: KEI Mono, monospace;`, names)).toBe(
-      `font-family: Lievre Mono, monospace;`,
+      `font-family: Lievre Term JP, monospace;`,
     );
   });
 

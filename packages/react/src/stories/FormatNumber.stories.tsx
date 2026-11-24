@@ -19,7 +19,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '数を桁区切りの書式で出します。数字は等幅（Lievre Mono）で、単位は本文の書体で後ろに添えます。fractionDigits で小数の桁を決めると、表の右揃えの列で小数点の位置がそろいます。percent は 1 を 100% として割合を、sign は前との差の符号を出します。文の中や aria-label には、同じ書式の formatNumber を使います。',
+          '数を桁区切りの書式で出します。数字は等幅（Lievre Term JP）で、単位は本文の書体で後ろに添えます。fractionDigits で小数の桁を決めると、表の右揃えの列で小数点の位置がそろいます。percent は 1 を 100% として割合を、sign は前との差の符号を出します。文の中や aria-label には、同じ書式の formatNumber を使います。',
       },
     },
   },

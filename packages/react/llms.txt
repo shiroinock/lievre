@@ -15,7 +15,7 @@ import '@lievre/react/styles.css';
 
 - スタイルは `LievreProvider` が出す `.lievre` の内側でだけ効きます。包み忘れても誤りは出ず、見た目が崩れるだけです。
 - `useToast()` は `ToastProvider` の内側で呼びます。
-- 書体のファイルは同梱していません。`npm i @fontsource/ibm-plex-sans-jp @fontsource/ibm-plex-mono` で入れ、`import '@lievre/react/fonts.css'` で lievre の `@font-face`（行の中央に置き直した `'Lievre Sans'` と、1:2 の `'Lievre Mono'`）を読み込みます。fontsource の CSS を直接読み込むと、字が行の中央より上に寄ります。
+- 書体のファイルは同梱していません。lievre の書体 `@lievre/fonts` を `npm i https://github.com/shiroinock/lievre-fonts/releases/download/v0.1.1/lievre-fonts-0.1.1.tgz` で入れ、`import '@lievre/react/fonts.css'` で読み込みます（本文の `'Lievre Sans'` と、等幅の `'Lievre Term JP'`）。読み込まないと、字が行の中央より上に寄り、等幅の英数字と日本語が 1:2 になりません。
 
 ## 約束
 
@@ -26,6 +26,7 @@ import '@lievre/react/styles.css';
 - `Button` の `type` の既定は `'button'` です。フォームの送信には `type="submit"` を付けます。主要な操作（`variant="primary"`）は1つの作業領域に1つ。危険な操作は `variant="danger"`。画面の移動は `Link` / `ActionLink`。
 - 状態の名前：Badge・Alert の `tone` は `'neutral' | 'success' | 'warning' | 'danger' | 'info'`、Toast の `tone` は `'success' | 'error'`。
 - 状態は色だけでなく文字でも伝えます。Badge には必ず文字を入れます。Metric の `trend` は矢印と色だけなので、向きは `change` に言葉で書きます（「前週比 +0.02 ポイント上昇」）。
+- ログ・コマンドの出力・差分・コードのように日本語も含めて桁で読むものは、`<Text mono>`・`<Card mono>` で囲みごと等幅にします（中の部品、中から開くポップオーバー、入れ子の LievreProvider も等幅になる）。クラス `lv-family-mono` はその要素の中だけで、ポータルには届きません。端末のような画面全体は `<LievreProvider family="mono">`、その中で本文の書体に戻す範囲は `<LievreProvider family="sans">` で包みます。
 - 数値・時刻・ID・コードは `<span className="lv-mono">`、文中の数値は `.lv-tabular`。単位（%・円）は `.lv-mono` の外に置きます：`<span><span className="lv-mono">{n}</span>円</span>`。Metric は `value="99.95" unit="%"` と分けます。
 - Dialog には `title` と `description` が必須です。閉じるだけのボタンは `<DialogClose asChild><Button>キャンセル</Button></DialogClose>` で包みます。処理してから閉じるときは `open` / `onOpenChange` で開閉を持ちます。フォーカスの閉じ込めと復帰は部品が行います。
 - アイコンだけのボタンは `<IconButton label="行の操作" icon={<MoreHorizontal />} />`。`label` が読み上げの名前とツールチップの両方になるので、`aria-label` は書きません。`Button` に svg だけを入れません。
@@ -91,6 +92,13 @@ import '@lievre/react/styles.css';
 - `theme?: Theme`
 - `density?: Density`
 - `typography?: Typography`
+- `family?: Family` — 画面の書体。'sans'（既定）は本文の書体、'mono' は端末のように画面全体を等幅にします。日本語も含めて
+英数字 1 対日本語 2 の幅でそろい、中の部品もすべて等幅になります。文字の大きさ（typography）とは別に
+選べ、等幅では小さい文字も 14.4px（英数字が 12px に見える大きさ）より小さくしません。
+入れ子にすると、指定しない値は外側から引き継ぎます。等幅の画面の一部だけ本文の書体に戻すときは、
+その範囲を `<LievreProvider family="sans">` で包みます。範囲だけを等幅にするなら、Text・Card の
+`mono` を使います（中から開いたポップオーバーや入れ子の LievreProvider にも届きます）。クラス
+`lv-family-mono` はその要素の中だけで、ポータルに出る部品と入れ子の LievreProvider には届きません。
 - `wear?: Wear` — 試作：質感の段階。既定は off。
 - `wearSeed?: string` — 試作：live の模様を決めるソルト。既定は wear.config.json のソルトで、baked と同じ模様になります。
 baked はビルド時の値（npm run wear）で決まります。
@@ -187,6 +195,7 @@ baked はビルド時の値（npm run wear）で決まります。
 - `variant?: 'outline' | 'plain'` — 既定 'outline'。'outline'（既定）は線と面で囲み、'plain' は線のない凹んだ面だけにします。並べた中で控えめにしたいカードに使います。
 - `href?: string` — 移る先。見出しをリンクにし、そのリンクの当たり判定をカード全体に広げます（中にボタンを入れ子にしません）。中にほかの操作を置かないでください。
 - `selection?: { checked: boolean; onCheckedChange: (checked: boolean) => void; disabled?: boolean | undefined; }` — 選べるカード。見出しの横にチェックボックスを出し、その当たり判定をカード全体に広げます。選んだカードは線と面とチェックの3つで示します。中にほかの操作を置かないでください。
+- `mono?: boolean` — 既定 false。カードの中を、見出しも中の部品も含めて日本語ごと等幅にします。差分・ログ・桁をそろえる表など、カード1枚分を端末のように見せるときに使います。中から開く Tooltip・Dialog・Select の一覧などのポータルと、入れ子の LievreProvider にも届きます。画面全体なら LievreProvider の family="mono"。
 - ほかに HTMLAttributes<HTMLElement> の属性を受け取ります。
 
 ### Alert
@@ -471,6 +480,7 @@ baked はビルド時の値（npm run wear）で決まります。
 - `tone?: 'default' | 'muted'` — 既定 'default'。'muted' は補助の色。どちらも面に対して 4.5:1 を超えます。
 - `weight?: 'regular' | 'medium' | 'bold'` — 文字の太さ。既定は本文の太さ（regular）。'medium' は少し強く、'bold' は強調。強調は太さだけにし、色は変えません。
 - `maxLines?: number` — この行数で切り、末尾に「…」を出します。表の長い件名やカードの説明に使います。切った分は読み上げでは読まれますが、目では見えないので、全文は詳細の画面などで読めるようにします。
+- `mono?: boolean` — 既定 false。日本語も含めて等幅にします。ログ・コマンドの出力・コードのように、字の桁をそろえて読む文に使います。英数字 1 対日本語 2 の幅でそろい、14.4px より小さくしません。中に置いた部品も、中から開くツールチップなどのポータルも等幅になります。
 - ほかに HTMLAttributes<HTMLElement> の属性を受け取ります。
 
 ### Link
@@ -745,7 +755,7 @@ selected・onSelectedChange で押して入り切りする絞り込みの札に�
 ### FormatNumber
 
 数を、桁をそろえた書式で出します（桁区切り・小数の桁・割合・符号）。
-数字は等幅（Lievre Mono）で、単位（円・件）は数字の後ろに本文の書体で添えます。表の列では右揃えの列に置くと、桁と小数点の位置がそろいます。
+数字は等幅（Lievre Term JP）で、単位（円・件）は数字の後ろに本文の書体で添えます。表の列では右揃えの列に置くと、桁と小数点の位置がそろいます。
 
 - `fractionDigits?: number` — 小数の桁。決めると、その桁で丸めて0も埋めます（1.5 → 1.50）。表の列で小数点の位置をそろえるときに。
 - `percent?: boolean` — 割合として出す（0.123 → 12.3%）。value は 1 を 100% として渡します。
@@ -955,7 +965,7 @@ type="number" は使いません（ホイールで値が変わる・全角を受
 
 ### useLievreTheme
 
-`useLievreTheme() => { theme: Theme; density: Density; typography: Typography; wear: Wear; wearSeed: string; wearConfig: WearConfig; wearStyle?: CSSProperties | undefined; age: Age; }`
+`useLievreTheme() => { theme: Theme; density: Density; typography: Typography; family: Family; wear: Wear; wearSeed: string; wearConfig: WearConfig; wearStyle?: CSSProperties | undefined; age: Age; }`
 
 ### useEffectiveWear
 
@@ -1004,6 +1014,7 @@ accept() で取り込みます。消えた項目は、取り込みを待たず�
 live は wearSeed から SVG のフィルタを作り、文字も歪ませる。重い。
 - `type Density = 'comfortable' | 'compact';`
 - `type Typography = 'standard' | 'interface';`
+- `type Family = 'sans' | 'mono';` — 書体の系統。sans は本文の書体（Lievre Sans）、mono は日本語も含めて等幅（Lievre Term JP）。
 - `type ToastMessage`
   - `title: string` — 何が起きたかを短く（「設定を保存しました」）。
   - `description?: string`
