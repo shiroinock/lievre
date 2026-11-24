@@ -36,7 +36,7 @@ export function App() {
 - 書体のファイルは同梱していません。lievre の書体 [`@lievre/fonts`](https://github.com/shiroinock/lievre-fonts) を入れ、`fonts.css` を読み込みます。npm にはまだ出していないので、リリースの tgz を指定します。
 
   ```sh
-  npm i https://github.com/shiroinock/lievre-fonts/releases/download/v0.1.0/lievre-fonts-0.1.0.tgz
+  npm i https://github.com/shiroinock/lievre-fonts/releases/download/v0.1.1/lievre-fonts-0.1.1.tgz
   ```
 
   ```tsx

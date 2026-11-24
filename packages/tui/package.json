@@ -29,7 +29,7 @@
     "string-width": "^8.3.0"
   },
   "devDependencies": {
-    "@lievre/fonts": "https://github.com/shiroinock/lievre-fonts/releases/download/v0.1.0/lievre-fonts-0.1.0.tgz",
+    "@lievre/fonts": "https://github.com/shiroinock/lievre-fonts/releases/download/v0.1.1/lievre-fonts-0.1.1.tgz",
     "@types/node": "^22.0.0",
     "@types/react": "^19.3.0",
     "react": "^19.3.0",
