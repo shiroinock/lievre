@@ -1,0 +1,525 @@
+{
+  "lockfile": "./pnpm-lock.yaml",
+  "format": "pnpm-lock.yaml",
+  "weights": {
+    "major": 30,
+    "minor": 3,
+    "patch": 1
+  },
+  "total": 613,
+  "lag": {
+    "major": 10,
+    "minor": 57,
+    "patch": 142
+  },
+  "packages": 36,
+  "outdated": 21,
+  "errors": 0,
+  "libyear": 3.6695915088599893,
+  "rows": [
+    {
+      "name": "@types/node",
+      "package": "@types/node",
+      "kind": "dev",
+      "current": "22.20.5",
+      "latest": "26.6.7",
+      "lag": {
+        "major": 3,
+        "minor": 29,
+        "patch": 101
+      },
+      "score": 278,
+      "libyear": 0.14749540522726695
+    },
+    {
+      "name": "typescript",
+      "package": "typescript",
+      "kind": "dev",
+      "current": "5.9.3",
+      "latest": "7.0.2",
+      "lag": {
+        "major": 2,
+        "minor": 0,
+        "patch": 1
+      },
+      "score": 61,
+      "libyear": 0.7687193893071717
+    },
+    {
+      "name": "@vitest/browser-playwright",
+      "package": "@vitest/browser-playwright",
+      "kind": "dev",
+      "current": "4.1.12",
+      "latest": "5.1.1",
+      "lag": {
+        "major": 1,
+        "minor": 1,
+        "patch": 6
+      },
+      "score": 39,
+      "libyear": 0.0922770426141405
+    },
+    {
+      "name": "vitest",
+      "package": "vitest",
+      "kind": "dev",
+      "current": "4.1.12",
+      "latest": "5.1.1",
+      "lag": {
+        "major": 1,
+        "minor": 1,
+        "patch": 6
+      },
+      "score": 39,
+      "libyear": 0.09225796638527645
+    },
+    {
+      "name": "playwright",
+      "package": "playwright",
+      "kind": "dev",
+      "current": "1.56.1",
+      "latest": "1.65.1",
+      "lag": {
+        "major": 0,
+        "minor": 9,
+        "patch": 7
+      },
+      "score": 34,
+      "libyear": 1.075563984586914
+    },
+    {
+      "name": "stylelint",
+      "package": "stylelint",
+      "kind": "dev",
+      "current": "17.16.0",
+      "latest": "18.1.0",
+      "lag": {
+        "major": 1,
+        "minor": 1,
+        "patch": 0
+      },
+      "score": 33,
+      "libyear": 0.1368088194286004
+    },
+    {
+      "name": "@testing-library/jest-dom",
+      "package": "@testing-library/jest-dom",
+      "kind": "dev",
+      "current": "7.0.1",
+      "latest": "8.0.0",
+      "lag": {
+        "major": 1,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 30,
+      "libyear": 0.2769126929804548
+    },
+    {
+      "name": "string-width",
+      "package": "string-width",
+      "kind": "prod",
+      "current": "8.3.0",
+      "latest": "9.0.0",
+      "lag": {
+        "major": 1,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 30,
+      "libyear": 0.13163501026694044
+    },
+    {
+      "name": "lucide-react",
+      "package": "lucide-react",
+      "kind": "prod",
+      "current": "1.73.0",
+      "latest": "1.79.0",
+      "lag": {
+        "major": 0,
+        "minor": 6,
+        "patch": 0
+      },
+      "score": 18,
+      "libyear": 0.02737251882272416
+    },
+    {
+      "name": "oxlint",
+      "package": "oxlint",
+      "kind": "dev",
+      "current": "1.89.0",
+      "latest": "1.95.0",
+      "lag": {
+        "major": 0,
+        "minor": 6,
+        "patch": 0
+      },
+      "score": 18,
+      "libyear": 0.09568176920931883
+    },
+    {
+      "name": "typescript-eslint",
+      "package": "typescript-eslint",
+      "kind": "dev",
+      "current": "8.72.0",
+      "latest": "8.74.0",
+      "lag": {
+        "major": 0,
+        "minor": 2,
+        "patch": 2
+      },
+      "score": 8,
+      "libyear": 0.09582252769538875
+    },
+    {
+      "name": "@biomejs/biome",
+      "package": "@biomejs/biome",
+      "kind": "dev",
+      "current": "2.6.2",
+      "latest": "2.6.9",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 7
+      },
+      "score": 7,
+      "libyear": 0.09355274165335765
+    },
+    {
+      "name": "eslint",
+      "package": "eslint",
+      "kind": "dev",
+      "current": "10.13.0",
+      "latest": "10.15.0",
+      "lag": {
+        "major": 0,
+        "minor": 2,
+        "patch": 0
+      },
+      "score": 6,
+      "libyear": 0.07747620224605167
+    },
+    {
+      "name": "@testing-library/user-event",
+      "package": "@testing-library/user-event",
+      "kind": "dev",
+      "current": "14.6.8",
+      "latest": "14.6.13",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 5
+      },
+      "score": 5,
+      "libyear": 0.10053717646462342
+    },
+    {
+      "name": "@storybook/addon-a11y",
+      "package": "@storybook/addon-a11y",
+      "kind": "dev",
+      "current": "10.6.7",
+      "latest": "10.6.8",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 1
+      },
+      "score": 1,
+      "libyear": 0.02699859938651862
+    },
+    {
+      "name": "@storybook/addon-docs",
+      "package": "@storybook/addon-docs",
+      "kind": "dev",
+      "current": "10.6.7",
+      "latest": "10.6.8",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 1
+      },
+      "score": 1,
+      "libyear": 0.026969794914695668
+    },
+    {
+      "name": "@storybook/react",
+      "package": "@storybook/react",
+      "kind": "dev",
+      "current": "10.6.7",
+      "latest": "10.6.8",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 1
+      },
+      "score": 1,
+      "libyear": 0.027010419043273254
+    },
+    {
+      "name": "@storybook/react-vite",
+      "package": "@storybook/react-vite",
+      "kind": "dev",
+      "current": "10.6.7",
+      "latest": "10.6.8",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 1
+      },
+      "score": 1,
+      "libyear": 0.026977495120034476
+    },
+    {
+      "name": "@types/react",
+      "package": "@types/react",
+      "kind": "dev",
+      "current": "19.3.0",
+      "latest": "19.3.1",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 1
+      },
+      "score": 1,
+      "libyear": 0.20818382893502674
+    },
+    {
+      "name": "axe-core",
+      "package": "axe-core",
+      "kind": "dev",
+      "current": "4.14.0",
+      "latest": "4.14.1",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 1
+      },
+      "score": 1,
+      "libyear": 0.11432973356655766
+    },
+    {
+      "name": "storybook",
+      "package": "storybook",
+      "kind": "dev",
+      "current": "10.6.7",
+      "latest": "10.6.8",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 1
+      },
+      "score": 1,
+      "libyear": 0.027008391005653158
+    },
+    {
+      "name": "@fontsource/ibm-plex-mono",
+      "package": "@fontsource/ibm-plex-mono",
+      "kind": "dev",
+      "current": "5.3.0",
+      "latest": "5.3.0",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "@fontsource/ibm-plex-sans-jp",
+      "package": "@fontsource/ibm-plex-sans-jp",
+      "kind": "dev",
+      "current": "5.3.1",
+      "latest": "5.3.1",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "@internationalized/date",
+      "package": "@internationalized/date",
+      "kind": "prod",
+      "current": "3.12.4",
+      "latest": "3.12.4",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "@testing-library/react",
+      "package": "@testing-library/react",
+      "kind": "dev",
+      "current": "16.3.3",
+      "latest": "16.3.3",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "@types/react-dom",
+      "package": "@types/react-dom",
+      "kind": "dev",
+      "current": "19.3.0",
+      "latest": "19.3.0",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "@vitejs/plugin-react",
+      "package": "@vitejs/plugin-react",
+      "kind": "dev",
+      "current": "6.3.0",
+      "latest": "6.3.0",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "cli-boxes",
+      "package": "cli-boxes",
+      "kind": "prod",
+      "current": "4.0.1",
+      "latest": "4.0.1",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "downshift",
+      "package": "downshift",
+      "kind": "prod",
+      "current": "9.5.0",
+      "latest": "9.5.0",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "ink",
+      "package": "ink",
+      "kind": "prod",
+      "current": "8.0.0",
+      "latest": "8.0.0",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "jsdom",
+      "package": "jsdom",
+      "kind": "dev",
+      "current": "31.0.1",
+      "latest": "31.0.1",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "prettier",
+      "package": "prettier",
+      "kind": "dev",
+      "current": "3.10.1",
+      "latest": "3.10.1",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "radix-ui",
+      "package": "radix-ui",
+      "kind": "prod",
+      "current": "1.8.1",
+      "latest": "1.8.1",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "react",
+      "package": "react",
+      "kind": "dev",
+      "current": "19.3.1",
+      "latest": "19.3.1",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "react-dom",
+      "package": "react-dom",
+      "kind": "dev",
+      "current": "19.3.1",
+      "latest": "19.3.1",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    },
+    {
+      "name": "vite",
+      "package": "vite",
+      "kind": "dev",
+      "current": "8.3.8",
+      "latest": "8.3.8",
+      "lag": {
+        "major": 0,
+        "minor": 0,
+        "patch": 0
+      },
+      "score": 0,
+      "libyear": 0.0
+    }
+  ]
+}
