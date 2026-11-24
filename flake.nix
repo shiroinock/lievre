@@ -29,14 +29,68 @@
         ];
       };
 
-      # One set of node_modules (from package-lock.json) for every package below.
+      lock = lib.importJSON ./package-lock.json;
+      workspaces = (lib.importJSON ./package.json).workspaces;
+
+      # A workspace may ask for a package by a tarball URL (@lievre/fonts comes from its GitHub
+      # release). importNpmLock fetches it like the rest, but npm still sees the URL in the
+      # workspace's package.json and goes to download it, which the sandbox refuses. So for the
+      # build those specs read as the version in the lock, and the URLs go back before `npm pack`.
+      isUrl = lib.hasPrefix "https://";
+      lockedVersion = name: lock.packages."node_modules/${name}".version;
+      urlDeps = lib.genAttrs workspaces (
+        path:
+        let
+          module = lock.packages.${path};
+        in
+        lib.filterAttrs (_: isUrl) ((module.dependencies or { }) // (module.devDependencies or { }))
+      );
+      byVersion = lib.mapAttrs (name: spec: if isUrl spec then lockedVersion name else spec);
+      buildLock = lock // {
+        packages = lib.mapAttrs (
+          path: module:
+          if lib.elem path workspaces then
+            module
+            // lib.optionalAttrs (module ? dependencies) { dependencies = byVersion module.dependencies; }
+            // lib.optionalAttrs (module ? devDependencies) {
+              devDependencies = byVersion module.devDependencies;
+            }
+          else
+            module
+        ) lock.packages;
+      };
+      urlsToVersions = lib.concatStrings (
+        lib.mapAttrsToList (
+          path: deps:
+          lib.optionalString (deps != { }) ''
+            cp ${path}/package.json ${path}/package.json.orig
+            ${lib.concatStrings (
+              lib.mapAttrsToList (name: spec: ''
+                substituteInPlace ${path}/package.json --replace-fail '"${spec}"' '"${lockedVersion name}"'
+              '') deps
+            )}''
+        ) urlDeps
+      );
+
+      # One set of node_modules (from package-lock.json) for every package below. Each package is
+      # fetched by its integrity in package-lock.json, so there is no hash here to keep in step.
       mkLievre =
         pkgs: args:
         pkgs.buildNpmPackage (
           {
             inherit version src;
             nodejs = pkgs.nodejs_24;
-            npmDepsHash = "sha256-HNjPJPLGzxYfHXLT4C9CK6hE4qQIssI25sstwqoHCUM=";
+            npmDeps = pkgs.importNpmLock {
+              npmRoot = src;
+              packageLock = buildLock;
+            };
+            inherit (pkgs.importNpmLock) npmConfigHook;
+            postPatch = urlsToVersions;
+            postConfigure = ''
+              for orig in packages/*/package.json.orig; do
+                if [ -e "$orig" ]; then mv "$orig" "''${orig%.orig}"; fi
+              done
+            '';
             # The npm playwright package must not fetch browsers; nothing here runs one.
             env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
           }
