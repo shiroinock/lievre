@@ -18,6 +18,10 @@ if (!HTMLElement.prototype.setPointerCapture)
   HTMLElement.prototype.setPointerCapture = function () {};
 if (!HTMLElement.prototype.releasePointerCapture)
   HTMLElement.prototype.releasePointerCapture = function () {};
+// jsdom has no object URLs, and Node's URL.createObjectURL only takes Node's own Blob, not jsdom's.
+let objectUrls = 0;
+URL.createObjectURL = () => `blob:jsdom/${++objectUrls}`;
+URL.revokeObjectURL = () => {};
 // No canvas measurement is available in jsdom. Return its unsupported value without a console error.
 HTMLCanvasElement.prototype.getContext = (() =>
   null) as typeof HTMLCanvasElement.prototype.getContext;
