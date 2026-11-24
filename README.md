@@ -20,7 +20,7 @@
 
 ## 起動
 
-Node.js 24 以降が必要です。コマンドはすべてリポジトリの直下で実行します。
+Node.js 24.15 以降が必要です。コマンドはすべてリポジトリの直下で実行します。
 
 ```sh
 npm ci
@@ -50,6 +50,8 @@ nix build github:shiroinock/lievre                  # result/lib/node_modules/@l
 nix build .#storybook                               # result/ に Storybook（.#demo は概要のデモ）
 nix fmt                                             # flake.nix を整える
 ```
+
+`package-lock.json` を変えたら、`flake.nix` の `npmDepsHash` も合わせます。`nix run github:shiroinock/workflows#nix-hashes -- --fix .#default.npmDeps` で書き換わります。ずれたままの PR は、CI の「Nix のハッシュ」が止めます。
 
 ## 構成
 

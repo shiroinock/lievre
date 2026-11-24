@@ -91,7 +91,7 @@
     "@vitest/browser-playwright": "^4.1.12",
     "axe-core": "^4.11.0",
     "eslint": "^10.13.0",
-    "jsdom": "^26.1.0",
+    "jsdom": "^31.0.0",
     "oxlint": "^1.89.0",
     "playwright": "^1.56.1",
     "react": "^19.2.0",

@@ -220,8 +220,9 @@ export const Keyboard: Story = {
     const end = await canvas.findByRole('heading', { name: 'すべて確認しました' });
     await waitFor(() => expect(end.parentElement).toHaveFocus());
     expect(canvas.getByText('件を確認', { exact: false })).toHaveTextContent('5 / 5 件を確認');
-    // Pressing a decided item puts it back in the queue.
-    await userEvent.click(canvas.getByRole('button', { name: /公開しない hooks/ }));
+    // Pressing a decided item puts it back in the queue. The mark and the label are side by side
+    // with no space between them, so the accessible name may join them without one.
+    await userEvent.click(canvas.getByRole('button', { name: /公開しない\s*hooks/ }));
     await waitFor(() => expect(canvas.getByRole('article', { name: /hooks/ })).toHaveFocus());
   },
 };
