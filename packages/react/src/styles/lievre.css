@@ -15,7 +15,14 @@
   .lv-mono {
     font-size: max(1em, var(--lv-text-mono-min));
   }
+  /* Tracking and 'palt' go through these, so a monospace scope can turn them off for everything
+     inside it and a nested LievreProvider (family="sans") turns them back on. */
   .lievre {
+    --lv-tracking: 1;
+    /* The body size a mono range inside uses: worked out on each provider (its own typography,
+       not any outer one's) and inherited, so 16px stays 16px and 14px rises to the mono floor. */
+    --lv-body-mono: max(var(--lv-body), var(--lv-text-mono-min));
+    --lv-kerning: 'palt';
     color: var(--lv-text);
     background: var(--lv-bg);
     font: var(--lv-weight-regular) var(--lv-body) / var(--lv-leading-body) var(--lv-font-sans);
@@ -25,6 +32,32 @@
   }
   .lievre[data-theme='ink'] {
     color-scheme: dark;
+  }
+  /* Monospace screens (LievreProvider family="mono") and ranges (.lv-family-mono, the mono prop
+     of Text and Card): Japanese included, every part inside follows (the parts draw with
+     --lv-font-sans), and no text drops below the mono floor, where the narrowed Latin reads as
+     12px. Japanese stays 1em wide and Latin 0.5em, so the columns line up 1:2. */
+  .lievre[data-family='mono'],
+  .lievre .lv-family-mono {
+    --lv-font-sans: var(--lv-font-mono);
+    --lv-text-xs: var(--lv-text-mono-min);
+    --lv-text-sm: var(--lv-text-mono-min);
+    --lv-text-md: var(--lv-text-mono-min);
+    /* Tracking adds the same to a 0.5em letter and a 1em one, and 'palt' narrows kana: both
+       would break the 1:2 columns. */
+    --lv-tracking: 0;
+    --lv-kerning: normal;
+    font-family: var(--lv-font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  /* 14px body at the mono floor: 14.4px × 24 / 14.4 keeps inherited body lines at 24px. */
+  .lievre[data-family='mono'][data-typography='interface'] {
+    --lv-leading-body: calc(24 / 14.4);
+  }
+  .lievre .lv-family-mono {
+    --lv-body: var(--lv-body-mono);
+    font-size: max(1em, var(--lv-text-mono-min));
+    line-height: var(--lv-line-body);
   }
   .lievre-portal {
     background: transparent;
@@ -104,8 +137,8 @@
     margin: 0;
     font-weight: var(--lv-weight-bold);
     line-height: var(--lv-line-tight);
-    letter-spacing: var(--lv-tracking-heading);
-    font-feature-settings: 'palt';
+    letter-spacing: calc(var(--lv-tracking-heading) * var(--lv-tracking));
+    font-feature-settings: var(--lv-kerning);
     text-wrap: balance;
     overflow-wrap: anywhere;
   }
@@ -131,7 +164,7 @@
     font-size: var(--lv-text-xs);
     font-weight: var(--lv-weight-bold);
     line-height: var(--lv-line-body);
-    letter-spacing: 0.04em;
+    letter-spacing: calc(0.04em * var(--lv-tracking));
     color: var(--lv-muted);
   }
 
@@ -1452,7 +1485,7 @@
     font-size: var(--lv-text-base);
     font-weight: var(--lv-weight-bold);
     line-height: var(--lv-line-tight);
-    letter-spacing: 0.02em;
+    letter-spacing: calc(0.02em * var(--lv-tracking));
   }
   .lv-card-body {
     padding: var(--lv-panel-padding);
@@ -2299,6 +2332,8 @@
     padding: 0;
     list-style: none;
     font-size: var(--lv-text-sm);
+    /* On the grid at any size: 13px and the 14.4px mono floor both give 24px lines. */
+    line-height: var(--lv-line-body);
     color: var(--lv-muted);
   }
   .lv-breadcrumb li {
@@ -2461,8 +2496,8 @@
     font-size: var(--lv-text-xl);
     font-weight: var(--lv-weight-bold);
     line-height: var(--lv-line-tight);
-    letter-spacing: var(--lv-tracking-heading);
-    font-feature-settings: 'palt';
+    letter-spacing: calc(var(--lv-tracking-heading) * var(--lv-tracking));
+    font-feature-settings: var(--lv-kerning);
   }
   .lv-dialog-description {
     margin: 0;
@@ -2623,7 +2658,7 @@
     font-weight: var(--lv-weight-regular);
     font-variant-numeric: tabular-nums;
     line-height: round(1.2em, 4px);
-    letter-spacing: -0.01em;
+    letter-spacing: calc(-0.01em * var(--lv-tracking));
   }
   /* Units are words, not data: the sans face keeps % the same size as 件 or 秒.
      line-height: 1 keeps the smaller sans box inside the figure's line. */

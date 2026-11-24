@@ -13,7 +13,7 @@ import { Toast as ToastPrimitive } from 'radix-ui';
 import { X, CheckCircle2, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 import { LiveWearFilters, liveAgeStyle, liveWearStyle } from '../wear/live';
 import type { Age } from '../wear/age.mjs';
-import { WEAR_CONFIG } from '../wear/params.mjs';
+import { ThemeContext } from './theme-context';
 import type { WearConfig } from '../wear/presets.mjs';
 
 export type { WearConfig, Age };
@@ -26,26 +26,10 @@ export type Theme = 'paper' | 'ink';
 export type Wear = 'off' | 'baked' | 'live';
 export type Density = 'comfortable' | 'compact';
 export type Typography = 'standard' | 'interface';
+/** 書体の系統。sans は本文の書体（Lievre Sans）、mono は日本語も含めて等幅（Lievre Mono）。 */
+export type Family = 'sans' | 'mono';
 export const cx = (...values: (string | false | undefined | null)[]) =>
   values.filter(Boolean).join(' ');
-const ThemeContext = createContext<{
-  theme: Theme;
-  density: Density;
-  typography: Typography;
-  wear: Wear;
-  wearSeed: string;
-  wearConfig: WearConfig;
-  wearStyle?: CSSProperties;
-  age: Age;
-}>({
-  theme: 'paper',
-  density: 'comfortable',
-  typography: 'standard',
-  wear: 'off',
-  wearSeed: WEAR_CONFIG.salt,
-  wearConfig: WEAR_CONFIG,
-  age: 'none',
-});
 export function useLievreTheme() {
   return useContext(ThemeContext);
 }
@@ -86,6 +70,7 @@ export function LievreProvider({
   theme: givenTheme,
   density: givenDensity,
   typography: givenTypography,
+  family: givenFamily,
   wear: givenWear,
   wearSeed: givenWearSeed,
   wearConfig: givenWearConfig,
@@ -98,6 +83,16 @@ export function LievreProvider({
   theme?: Theme;
   density?: Density;
   typography?: Typography;
+  /**
+   * 画面の書体。'sans'（既定）は本文の書体、'mono' は端末のように画面全体を等幅にします。日本語も含めて
+   * 英数字 1 対日本語 2 の幅でそろい、中の部品もすべて等幅になります。文字の大きさ（typography）とは別に
+   * 選べ、等幅では小さい文字も 14.4px（英数字が 12px に見える大きさ）より小さくしません。
+   * 入れ子にすると、指定しない値は外側から引き継ぎます。等幅の画面の一部だけ本文の書体に戻すときは、
+   * その範囲を `<LievreProvider family="sans">` で包みます。範囲だけを等幅にするなら、Text・Card の
+   * `mono` を使います（中から開いたポップオーバーや入れ子の LievreProvider にも届きます）。クラス
+   * `lv-family-mono` はその要素の中だけで、ポータルに出る部品と入れ子の LievreProvider には届きません。
+   */
+  family?: Family;
   /** 試作：質感の段階。既定は off。 */
   wear?: Wear;
   /**
@@ -118,6 +113,7 @@ export function LievreProvider({
   const theme = givenTheme ?? inherited.theme;
   const density = givenDensity ?? inherited.density;
   const typography = givenTypography ?? inherited.typography;
+  const family = givenFamily ?? inherited.family;
   const wearSeed = givenWearSeed ?? givenWearConfig?.salt ?? inherited.wearSeed;
   const baseConfig = givenWearConfig ?? inherited.wearConfig;
   const wearConfig = useMemo(() => ({ ...baseConfig, salt: wearSeed }), [baseConfig, wearSeed]);
@@ -133,7 +129,7 @@ export function LievreProvider({
   }, [wear, prefix, wearConfig, theme, age, givenWearConfig]);
   return (
     <ThemeContext.Provider
-      value={{ theme, density, typography, wear, wearSeed, wearConfig, wearStyle, age }}
+      value={{ theme, density, typography, family, wear, wearSeed, wearConfig, wearStyle, age }}
     >
       <div
         {...props}
@@ -142,6 +138,7 @@ export function LievreProvider({
         data-theme={theme}
         data-density={density}
         data-typography={typography}
+        data-family={family}
         data-wear={wear}
         data-wear-seed={wear === 'live' ? wearSeed : undefined}
         data-age={age}
@@ -153,7 +150,7 @@ export function LievreProvider({
   );
 }
 export function PortalSurface({ children }: { children: ReactNode }) {
-  const { theme, density, typography, wear, wearStyle, age } = useLievreTheme();
+  const { theme, density, typography, family, wear, wearStyle, age } = useLievreTheme();
   return (
     <div
       className="lievre lievre-portal"
@@ -161,6 +158,7 @@ export function PortalSurface({ children }: { children: ReactNode }) {
       data-theme={theme}
       data-density={density}
       data-typography={typography}
+      data-family={family}
       data-wear={wear}
       data-age={age}
     >
