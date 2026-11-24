@@ -13,10 +13,10 @@ permissions: {}
 
 jobs:
   hashes:
-    uses: shiroinock/workflows/.github/workflows/nix-hashes.yml@37d94d049d54bbd7c8453ad4929d8afbd9fed472
+    uses: shiroinock/workflows/.github/workflows/nix-hashes.yml@f77b08ac922abfc245d5ddf65db437ee99592ee9
     permissions:
       contents: read
     with:
       # Only the pnpm deps: fetching them is enough to compare the hash, and quicker than the build.
       installables: .#default.pnpmDeps
-      workflows_ref: 37d94d049d54bbd7c8453ad4929d8afbd9fed472
+      workflows_ref: f77b08ac922abfc245d5ddf65db437ee99592ee9
