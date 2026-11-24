@@ -34,7 +34,7 @@ npm run typecheck && npm run lint && npm test
 手順（作業用のフォルダ `<dir>` は Claude の scratchpad の中に置く。Artifact へは作業ディレクトリか scratchpad の中のファイルしか送れない）：
 
 1. 最新の `main` で `npm ci`。
-2. Artifact を `read` し直す：`path: "project/sync/files.json"`（前に載せたファイルの sha256）と `path: "project/design-system.json"`（索引）。保存先を控える。
+2. Artifact を `read` し直す：まず `path` を付けずに読み（`path` 付きで読むだけでは「最新版を見ていない」と publish を断られる）、続けて `path: "project/sync/files.json"`（前に載せたファイルの sha256）と `path: "project/design-system.json"`（索引）を読む。保存先を控える。
 3. `npm run design-system -- --out <dir> --against <控えた files.json>` を流す。`<dir>/changed.json` に、載せ直すファイル（`changed`。`project/sync/files.json` も含む）、消すファイル（`removed`）、上げ直すロゴ（`logos`）が出る。同じコミットからは同じバイトが出るので、ここに出ないファイルは送らない。
 4. `logos` が空でなければ、`<dir>/project/assets/Logos/` のそのファイルを `asset: true` で Artifact に上げ、返ってきた id・大きさと `logo/` のファイルの sha256 を `scripts/design-system/assets.json` に書いて、手順 3 を流し直す。`assets.json` の変更は PR にする。
 5. 索引をまとめる：手順 2 で読んだ索引をもとに、`title`・`namespace`・`libraries`・`editing`・`groups`・`assetGroups`・`lastChange` だけを `<dir>/project/design-system.json` の値に置き換え、ほかのキー（`createdOnFiles`・`sections`・`blobs`・`docs` など）は読んだままにして、`<dir>/project/design-system.json` に書き戻す。
